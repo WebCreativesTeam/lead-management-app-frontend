@@ -279,6 +279,9 @@
     .btn-outline-dark {
         @apply border-dark text-dark shadow-none hover:bg-dark hover:text-white;
     }
+    .btn-gradient {
+        @apply bg-gradient-to-r from-[#EF1262] to-[#4361EE] text-white hover:from-[#4361EE] hover:to-[#EF1262];
+    }
 
     /* Badge */
     .badge {
