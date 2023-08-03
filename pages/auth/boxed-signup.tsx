@@ -8,6 +8,7 @@ import { useFormik } from 'formik';
 import { signUpSchema } from '../../utils/schemas';
 import Swal from 'sweetalert2';
 import axios from 'axios';
+import { useRouter } from 'next/router';
 
 const initialValues = {
     firstname: '',
@@ -24,12 +25,15 @@ const RegisterBoxed = () => {
         dispatch(setPageTitle('Register Boxed'));
     });
     const [serverErrors, setServerErrors] = useState('');
-    const [forceRender, setForceRender] = useState(false);
+    const [forceRender, setForceRender] = useState<boolean>(false);
+    const [disableBtn, setDisableBtn] = useState<boolean>(false);
+    const router = useRouter();
     const { values, handleChange, handleSubmit, errors, handleBlur } = useFormik({
         initialValues,
         validationSchema: signUpSchema,
         validateOnChange: false,
         onSubmit: async (value, action) => {
+            setDisableBtn(true);
             try {
                 const createUserObj = {
                     firstName: value.firstname,
@@ -40,20 +44,16 @@ const RegisterBoxed = () => {
                 };
                 await axios.post('http://13.233.50.11:3030/auth/sign-up', createUserObj);
                 action.resetForm();
-                Swal.fire({
-                    icon: 'success',
-                    title: 'signUp sussessfully',
-                    text: 'Email varification mail has been already sent to your given email address, Please verify to signin.',
-                    padding: '2em',
-                    customClass: 'sweet-alerts',
-                });
-                alert('form submited');
+                setDisableBtn(false);
+                router.push('/auth/boxed-signup-successfull');
             } catch (error: any) {
+                setDisableBtn(true);
                 if (typeof error?.response?.data?.message === 'object') {
                     setServerErrors(error?.response?.data?.message.join(' , '));
                 } else {
                     setServerErrors(error?.response?.data?.message);
                 }
+                setDisableBtn(false);
             }
         },
     });
@@ -333,14 +333,14 @@ const RegisterBoxed = () => {
                                 </div>
                                 <div>
                                     <label className="flex cursor-pointer items-center">
-                                        <input type="checkbox" className="form-checkbox bg-white dark:bg-black" onChange={handleChange} value={values.checkCondition} name="checkCondition"/>
+                                        <input type="checkbox" className="form-checkbox bg-white dark:bg-black" onChange={handleChange} value={values.checkCondition} name="checkCondition" />
                                         <span className="text-white-dark">I agree to the terms and conditions.</span>
                                     </label>
                                 </div>
                                 <button
                                     type="submit"
                                     className="btn btn-gradient !mt-6 w-full border-0 uppercase shadow-[0_10px_20px_-10px_rgba(67,97,238,0.44)]"
-                                    disabled={values.checkCondition && values.firstname && values.lastname && values.email && values.password && values.confirmPassword ? false : true}
+                                    disabled={values.checkCondition && values.firstname && values.lastname && values.email && values.password && values.confirmPassword && !disableBtn ? false : true}
                                     onClick={handleClickSubmit}
                                 >
                                     Sign Up

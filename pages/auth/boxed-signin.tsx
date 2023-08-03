@@ -8,6 +8,7 @@ import { useFormik } from 'formik';
 import Swal from 'sweetalert2';
 import { signInSchema } from '@/utils/schemas';
 import axios from 'axios';
+import { useRouter } from 'next/router';
 
 const initialValues = {
     email: '',
@@ -19,13 +20,16 @@ const LoginBoxed = () => {
         dispatch(setPageTitle('Login Boxed'));
     });
     const [serverErrors, setServerErrors] = useState('');
-    const [forceRender, setForceRender] = useState(false);
+    const [forceRender, setForceRender] = useState<boolean>(false);
+    const [disableBtn, setDisableBtn] = useState<boolean>(false);
+    const router = useRouter();
 
     const { values, handleChange, handleSubmit, errors, handleBlur } = useFormik({
         initialValues,
         validationSchema: signInSchema,
         validateOnChange: false,
         onSubmit: async (value, action) => {
+            setDisableBtn(true);
             try {
                 const createUserObj = {
                     email: value.email,
@@ -34,14 +38,17 @@ const LoginBoxed = () => {
                 await axios.post('http://13.233.50.11:3030/auth/sign-in', createUserObj);
                 action.resetForm();
                 setServerErrors('');
-                alert('login successfully');
+                router.push('/');
+                setDisableBtn(false);
             } catch (error: any) {
+                setDisableBtn(true);
                 if (typeof error?.response?.data?.message === 'object') {
                     setServerErrors(error?.response?.data?.message.join(' , '));
                 } else {
                     setServerErrors(error?.response?.data?.message);
                 }
                 setServerErrors(error?.response?.data?.message);
+                setDisableBtn(false);
             }
         },
     });
@@ -212,7 +219,7 @@ const LoginBoxed = () => {
                                     type="submit"
                                     className="btn btn-gradient !mt-6 w-full border-0 uppercase shadow-[0_10px_20px_-10px_rgba(67,97,238,0.44)]"
                                     onClick={handleClickSubmit}
-                                    disabled={values.email && values.password ? false : true}
+                                    disabled={values.email && values.password && !disableBtn ? false : true}
                                 >
                                     Sign in
                                 </button>
