@@ -647,7 +647,7 @@ const SourcePage = () => {
                                 >
                                     <Dialog.Panel as="div" className="panel my-8 w-full max-w-lg overflow-hidden rounded-lg border-0 p-0 text-black dark:text-white-dark">
                                         <div className="flex items-center justify-between bg-[#fbfbfb] px-5 py-3 dark:bg-[#121c2c]">
-                                            <h5 className="text-lg font-bold">Delete source</h5>
+                                            <h5 className="text-lg font-bold">Delete Source</h5>
                                             <button type="button" className="text-white-dark hover:text-dark" onClick={() => setDeleteModal(false)}>
                                                 <svg
                                                     xmlns="http://www.w3.org/2000/svg"

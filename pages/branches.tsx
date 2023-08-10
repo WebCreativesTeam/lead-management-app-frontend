@@ -607,7 +607,7 @@ const BranchPage = () => {
                                 >
                                     <Dialog.Panel as="div" className="panel my-8 w-full max-w-lg  overflow-visible rounded-lg border-0 p-0 text-black dark:text-white-dark sm:min-w-[40rem]">
                                         <div className="flex items-center justify-between rounded-t-lg bg-[#fbfbfb] px-5 py-3 dark:bg-[#121c2c]">
-                                            <h5 className="text-lg font-bold">Create Branch</h5>
+                                            <h5 className="text-lg font-bold">Edit Branch</h5>
                                             <button type="button" className="text-white-dark hover:text-dark" onClick={handleDiscard}>
                                                 <svg
                                                     xmlns="http://www.w3.org/2000/svg"
@@ -628,7 +628,7 @@ const BranchPage = () => {
                                         <div className="p-5">
                                             <form className="space-y-5" onSubmit={handleSubmit}>
                                                 <div>
-                                                    <label htmlFor="createBranch">branch Name</label>
+                                                    <label htmlFor="createBranch">Branch Name</label>
                                                     <input
                                                         onChange={handleChange}
                                                         onBlur={handleBlur}
@@ -717,7 +717,7 @@ const BranchPage = () => {
                                 >
                                     <Dialog.Panel as="div" className="panel my-8 w-full max-w-lg overflow-hidden rounded-lg border-0 p-0 text-black dark:text-white-dark md:min-w-[37rem]">
                                         <div className="flex items-center justify-between bg-[#fbfbfb] px-5 py-3 dark:bg-[#121c2c]">
-                                            <h5 className="text-lg font-bold">View branch</h5>
+                                            <h5 className="text-lg font-bold">View Branch</h5>
                                             <button type="button" className="text-white-dark hover:text-dark" onClick={() => setViewModal(false)}>
                                                 <svg
                                                     xmlns="http://www.w3.org/2000/svg"
@@ -890,7 +890,7 @@ const BranchPage = () => {
                                         <div className="p-5">
                                             <form className="space-y-5" onSubmit={handleSubmit}>
                                                 <div>
-                                                    <label htmlFor="createBranch">branch Name</label>
+                                                    <label htmlFor="createBranch">Branch Name</label>
                                                     <input
                                                         onChange={handleChange}
                                                         onBlur={handleBlur}
