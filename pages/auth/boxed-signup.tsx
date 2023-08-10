@@ -42,7 +42,7 @@ const RegisterBoxed = () => {
                     password: value.password,
                     passwordConfirm: value.confirmPassword,
                 };
-                await axios.post('http://13.233.50.11:3030/auth/sign-up', createUserObj);
+                await axios.post('http://15.206.70.64:3030/auth/sign-up', createUserObj);
                 action.resetForm();
                 setDisableBtn(false);
                 router.push('/auth/boxed-signup-successfull');

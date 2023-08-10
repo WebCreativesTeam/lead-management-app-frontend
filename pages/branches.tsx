@@ -5,44 +5,68 @@ import 'tippy.js/dist/tippy.css';
 import axios from 'axios';
 import { Dialog, Transition } from '@headlessui/react';
 import { useFormik } from 'formik';
-import { policyEditSchema } from '@/utils/schemas';
+import { branchSchema } from '@/utils/schemas';
 import Swal from 'sweetalert2';
-import usePermission from '@/utils/Hooks/usePermissions';
+import Select, { ActionMeta } from 'react-select';
 
-type PolicyDataType = {
+type BranchDataType = {
     name: string;
     id: string;
-    description: string;
-    permissions: string[];
+    address: string;
+    city: string;
+    state: string;
+    country: string;
 };
 
-type Permission = {
-    key: string;
+type SelectAddress = {
+    country: OptionType;
+    state: OptionType;
+    city: OptionType;
+};
+
+type OptionType = {
     value: string;
+    label: string;
 };
 
-const BoxedPolicy = () => {
+const countryData: OptionType[] = [
+    { value: 'india', label: 'India' },
+    { value: 'nepal', label: 'Nepal' },
+    { value: 'bangladesh', label: 'Bangladesh' },
+];
+const BranchPage = () => {
     //hooks
-    const [data, setData] = useState<PolicyDataType[]>([]);
+    const [data, setData] = useState<BranchDataType[]>([]);
     const [createModal, setCreateModal] = useState<boolean>(false);
     const [editModal, setEditModal] = useState<boolean>(false);
     const [viewModal, setViewModal] = useState<boolean>(false);
     const [deleteModal, setDeleteModal] = useState<boolean>(false);
-    const [singlePolicy, setSinglePolicy] = useState<any>({});
-    const [singleViewPolicy, setSingleViewPolicy] = useState<any>({});
-    const [singleDeletePolicy, setSingleDeletePolicy] = useState<any>('');
+    const [singleBranch, setSingleBranch] = useState<any>({});
+    const [singleViewBranch, setSingleViewBranch] = useState<any>({});
+    const [singleDeleteBranch, setSingleDeleteBranch] = useState<any>('');
     const [disableBtn, setDisableBtn] = useState<boolean>(false);
     const [serverErrors, setServerErrors] = useState('');
     const [forceRender, setForceRender] = useState<boolean>(false);
-    const [permissionArr, setPermissionArr] = useState<string[]>([]);
-    const [viewPermissionArr, setViewPermissionArr] = useState<Permission[]>([]);
-    const [searchPolicyText, setSearchPolicyText] = useState<string>('');
+    const [searchInputText, setSearchInputText] = useState<string>('');
+    const [selectAddress, setSelectAddress] = useState<SelectAddress>({
+        country: {
+            value: '',
+            label: '',
+        },
+        state: {
+            value: '',
+            label: '',
+        },
+        city: {
+            value: '',
+            label: '',
+        },
+    });
 
-    const [searchedData, setSearchedData] = useState<PolicyDataType[]>(data);
-    const permission: Permission[] = usePermission();
-    //get all policy after page render
+    const [searchedData, setSearchedData] = useState<BranchDataType[]>(data);
+    //get all branch after page render
     useEffect(() => {
-        getPolicyList();
+        getBranchList();
     }, [editModal, createModal, deleteModal]);
 
     useEffect(() => {
@@ -51,48 +75,60 @@ const BoxedPolicy = () => {
 
     // set initialValues when open modal
     const initialValues = {
-        policyName: '',
-        policyDescription: '',
+        name: '',
+        address: '',
     };
 
     //useDefferedValue hook for search query
-
-    const searchQuery = useDeferredValue(searchPolicyText);
+    const searchQuery = useDeferredValue(searchInputText);
 
     //form handling
     const { values, handleChange, handleSubmit, setFieldValue, errors, handleBlur, resetForm } = useFormik({
         initialValues,
-        validationSchema: policyEditSchema,
+        validationSchema: branchSchema,
         validateOnChange: false,
         enableReinitialize: true,
         onSubmit: async (value, action) => {
             try {
                 if (editModal) {
                     setDisableBtn(true);
-                    const editPolicyObj = {
-                        name: value.policyName,
-                        description: value.policyDescription,
-                        permissions: singlePolicy.permissions,
+                    const editBranchObj = {
+                        name: value.name,
+                        address: value.address,
+                        city: selectAddress.city.value,
+                        state: selectAddress.state.value,
+                        country: selectAddress.country.value,
                     };
-                    await axios.patch('http://15.206.70.64:3030/policies/' + singlePolicy.id, editPolicyObj);
+                    await axios.patch('http://15.206.70.64:3030/branches/' + singleBranch.id, editBranchObj);
                     setDisableBtn(false);
                     action.resetForm();
                     setEditModal(false);
-                    setPermissionArr([]);
                 } else if (createModal) {
-                    const createPolicyObj = {
-                        name: value.policyName,
-                        description: value.policyDescription,
-                        permissions: permissionArr,
+                    const createBranchObj = {
+                        name: value.name,
+                        address: value.address,
+                        city: selectAddress.city.value,
+                        state: selectAddress.state.value,
+                        country: selectAddress.country.value,
                     };
-
-                    await axios.post('http://15.206.70.64:3030/policies/', createPolicyObj);
-
-                    setDisableBtn(true);
+                    await axios.post('http://15.206.70.64:3030/branches', createBranchObj);
                     setDisableBtn(false);
                     setCreateModal(false);
+                    setSelectAddress({
+                        country: {
+                            value: '',
+                            label: '',
+                        },
+                        state: {
+                            value: '',
+                            label: '',
+                        },
+                        city: {
+                            value: '',
+                            label: '',
+                        },
+                    });
                     action.resetForm();
-                    setPermissionArr([]);
                 }
             } catch (error: any) {
                 setDisableBtn(true);
@@ -109,6 +145,7 @@ const BoxedPolicy = () => {
     useEffect(() => {
         showServerAlert();
     }, [errors, serverErrors, forceRender]);
+    useEffect(() => {}, [forceRender]);
 
     //server alerts
     const showServerAlert = () => {
@@ -128,33 +165,45 @@ const BoxedPolicy = () => {
         setServerErrors('');
     };
 
-    //get single policy by id
-
-    const handleEditPolicy = (id: string): void => {
+    //get single branch by id
+    const handleEditBranch = (id: string): void => {
         setEditModal(true);
-        const findPolicy: any = data?.find((item: PolicyDataType) => {
+        const findBranch: any = data?.find((item: BranchDataType) => {
             return item.id === id;
         });
-        setPermissionArr(findPolicy.permissions);
-        setFieldValue('policyName', findPolicy?.name);
-        setFieldValue('policyDescription', findPolicy?.description);
-        setSinglePolicy(findPolicy);
+        setFieldValue('name', findBranch?.name);
+        setFieldValue('address', findBranch?.address);
+        setSingleBranch(findBranch);
+        const existingCountry: any = countryData.find((item) => {
+            return item.value === findBranch.country;
+        });
+        const existingState: any = countryData.find((item) => {
+            return item.value === findBranch.state;
+        });
+        const existingCity: any = countryData.find((item) => {
+            return item.value === findBranch.city;
+        });
+        setSelectAddress({
+            country: existingCountry,
+            state: existingState,
+            city: existingCity,
+        });
     };
 
-    //get all policy list
-
-    const getPolicyList = async () => {
+    //get all Branch list
+    const getBranchList = async () => {
         try {
-            const res = await axios.get('http://15.206.70.64:3030/policies');
-            const policy = res?.data?.data;
-            setData(policy);
+            const res = await axios.get('http://15.206.70.64:3030/branches');
+            const branches = res?.data?.data;
+            setData(branches);
         } catch (error) {
             console.log(error);
         }
     };
 
+    //showing validation error
     const showAlert = async () => {
-        if (errors.policyName) {
+        if (errors.address) {
             const toast = Swal.mixin({
                 toast: true,
                 position: 'top-end',
@@ -163,10 +212,10 @@ const BoxedPolicy = () => {
             });
             toast.fire({
                 icon: 'error',
-                title: errors.policyName,
+                title: errors.address,
                 padding: '10px 20px',
             });
-        } else if (errors.policyDescription) {
+        } else if (errors.name) {
             const toast = Swal.mixin({
                 toast: true,
                 position: 'top-end',
@@ -175,14 +224,13 @@ const BoxedPolicy = () => {
             });
             toast.fire({
                 icon: 'error',
-                title: errors.policyDescription,
+                title: errors.name,
                 padding: '10px 20px',
             });
         }
     };
 
     //alert and server alert execution
-
     const handleClickSubmit = () => {
         errors && showAlert();
         if (serverErrors) {
@@ -198,76 +246,47 @@ const BoxedPolicy = () => {
         setEditModal(false);
         setDeleteModal(false);
         setCreateModal(false);
+        setSelectAddress({
+            country: {
+                value: '',
+                label: '',
+            },
+            state: {
+                value: '',
+                label: '',
+            },
+            city: {
+                value: '',
+                label: '',
+            },
+        });
         resetForm();
     };
 
-    // get single policy for view modal
-
-    const handleViewPolicy = (id: string) => {
+    // get single branch for view modal
+    const handleViewBranch = (id: string) => {
         setViewModal(true);
-        const findPolicy = data?.find((item: PolicyDataType) => {
+        const findBranch = data?.find((item: BranchDataType) => {
             return item.id === id;
         });
-        const tempArray: Permission[] = permission?.filter((item) => {
-            return findPolicy?.permissions.includes(item.key);
-        });
-        setViewPermissionArr(tempArray);
-        setSingleViewPolicy(findPolicy);
+        setSingleViewBranch(findBranch);
     };
 
-    // delete policy by id
+    // delete branch by id
 
-    const handleDeletePolicy = (id: string) => {
+    const handleDeleteBranch = (id: string) => {
         setDeleteModal(true);
-        const findPolicy = data?.find((item: PolicyDataType) => {
+        const findBranch = data?.find((item: BranchDataType) => {
             return item.id === id;
         });
-        setSingleDeletePolicy(findPolicy?.id);
+        setSingleDeleteBranch(findBranch?.id);
     };
 
-    useEffect(() => {}, [forceRender]);
-
-    //creating permission array
-    const handleCreatePermission = (e: any, key: string) => {
-        if (e.target.checked) {
-            permissionArr.push(key);
-        } else {
-            const index = permissionArr.indexOf(key);
-            if (index > -1) {
-                permissionArr.splice(index, 1);
-            }
-        }
-        //force render component because not updating state
-        if (forceRender === true) {
-            setForceRender(false);
-        } else {
-            setForceRender(true);
-        }
-    };
-
-    //editing permission array
-    const handleEditPermission = (e: any, key: string) => {
-        if (e.target.checked) {
-            permissionArr.push(key);
-        } else {
-            const index = permissionArr.indexOf(key);
-            if (index > -1) {
-                permissionArr.splice(index, 1);
-            }
-        }
-        //force render component because not updating state
-        if (forceRender === true) {
-            setForceRender(false);
-        } else {
-            setForceRender(true);
-        }
-    };
-
-    //deleting policy
-    const onDeletePolicy = async () => {
+    //deleting branch
+    const onDeleteBranch = async () => {
         try {
             setDisableBtn(true);
-            await axios.delete('http://15.206.70.64:3030/policies/' + singleDeletePolicy);
+            await axios.delete('http://15.206.70.64:3030/branches/' + singleDeleteBranch);
             setDisableBtn(false);
             setDeleteModal(false);
         } catch (error: any) {
@@ -282,17 +301,39 @@ const BoxedPolicy = () => {
         }
     };
 
-    //search policy
-    const handleSearchPolicy = () => {
-        const searchPolicyData = data?.filter((policy: PolicyDataType) => {
+    //search branch
+    const handleSearchBranch = () => {
+        const searchBranchData = data?.filter((branch: BranchDataType) => {
             return (
-                policy.name.toLowerCase().startsWith(searchQuery.toLowerCase().trim(), 0) ||
-                policy.name.toLowerCase().endsWith(searchQuery.toLowerCase().trim()) ||
-                policy.name.toLowerCase().includes(searchQuery.toLowerCase().trim())
+                branch.name.toLowerCase().startsWith(searchQuery.toLowerCase().trim(), 0) ||
+                branch.name.toLowerCase().endsWith(searchQuery.toLowerCase().trim()) ||
+                branch.name.toLowerCase().includes(searchQuery.toLowerCase().trim())
             );
         });
-        setSearchedData(searchPolicyData);
+        setSearchedData(searchBranchData);
     };
+
+    //select country
+    const handleSelectCountry = (country: any | OptionType, actionMeta: ActionMeta<any>) => {
+        setSelectAddress((preVal) => {
+            return { ...preVal, country };
+        });
+    };
+
+    //select state
+    const handleSelectState = (state: any | OptionType, actionMeta: ActionMeta<any>) => {
+        setSelectAddress((preVal) => {
+            return { ...preVal, state };
+        });
+    };
+
+    //select  city
+    const handleSelectCity = (city: any | OptionType, actionMeta: ActionMeta<any>) => {
+        setSelectAddress((preVal) => {
+            return { ...preVal, city };
+        });
+    };
+
     return (
         <div>
             <div className="relative rounded-t-md bg-primary-light bg-[url('/assets/images/knowledge/pattern.png')] bg-contain bg-left-top bg-no-repeat px-5 py-10 dark:bg-black md:px-10">
@@ -414,9 +455,9 @@ const BoxedPolicy = () => {
                                 />
                             </svg>
                         </div>
-                        <div className="mb-2 text-center text-2xl font-bold dark:text-white md:text-5xl">Policies</div>
+                        <div className="mb-2 text-center text-2xl font-bold dark:text-white md:text-5xl">Branches</div>
                     </div>
-                    <p className="mb-9 text-center text-base font-semibold">Create, read, write or delete policy</p>
+                    <p className="mb-9 text-center text-base font-semibold">Create, read, write or delete branch</p>
                 </div>
             </div>
             <div className="my-6 flex flex-col gap-5 sm:flex-row ">
@@ -426,48 +467,46 @@ const BoxedPolicy = () => {
                             <line x1="12" y1="5" x2="12" y2="19"></line>
                             <line x1="5" y1="12" x2="19" y2="12"></line>
                         </svg>
-                        Add New Policy
+                        Add New Branch
                     </button>
                 </div>
                 <div className="relative  flex-1">
-                    <input
-                        type="text"
-                        placeholder="Find A Policy"
-                        className="form-input py-3 ltr:pr-[100px] rtl:pl-[100px]"
-                        onChange={(e) => setSearchPolicyText(e.target.value)}
-                        value={searchQuery}
-                    />
-                    <button type="button" className="btn btn-primary absolute top-1 shadow-none ltr:right-1 rtl:left-1" onClick={handleSearchPolicy}>
+                    <input type="text" placeholder="Find A Branch" className="form-input py-3 ltr:pr-[100px] rtl:pl-[100px]" onChange={(e) => setSearchInputText(e.target.value)} value={searchQuery} />
+                    <button type="button" className="btn btn-primary absolute top-1 shadow-none ltr:right-1 rtl:left-1" onClick={handleSearchBranch}>
                         Search
                     </button>
                 </div>
             </div>
 
-            {/* Policy List table*/}
+            {/* Branch List table*/}
 
             <div className="table-responsive my-5 ">
-                <h2 className="my-4 text-center text-2xl font-bold dark:text-white md:text-5xl">Policies List</h2>
+                <h2 className="my-4 text-center text-2xl font-bold dark:text-white md:text-5xl">Branch List</h2>
                 <table>
                     <thead>
                         <tr>
                             <th>#</th>
                             <th>Name</th>
-                            <th>Description</th>
+                            <th>country</th>
+                            <th>state</th>
+                            <th>city</th>
                             <th className="text-center">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {searchedData?.map((item: PolicyDataType, i) => {
+                        {searchedData?.map((item: BranchDataType, i) => {
                             return (
                                 <tr key={item.id}>
                                     <td>{i + 1}</td>
                                     <td>
                                         <div className="whitespace-nowrap">{item?.name}</div>
                                     </td>
-                                    <td>{item?.description}</td>
+                                    <td>{item?.country}</td>
+                                    <td>{item?.state}</td>
+                                    <td>{item?.city}</td>
                                     <td className="flex gap-2 border-b border-[#ebedf2] p-3 text-center dark:border-[#191e3a]">
                                         <Tippy content="View">
-                                            <button type="button" onClick={() => handleViewPolicy(item.id)}>
+                                            <button type="button" onClick={() => handleViewBranch(item.id)}>
                                                 <svg width="24" className="mr-2 w-5" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                     <path
                                                         d="M20.082 3.01787L20.1081 3.76741L20.082 3.01787ZM16.5 3.48757L16.2849 2.76907V2.76907L16.5 3.48757ZM13.6738 4.80287L13.2982 4.15375L13.2982 4.15375L13.6738 4.80287ZM3.9824 3.07501L3.93639 3.8236L3.9824 3.07501ZM7 3.48757L7.19136 2.76239V2.76239L7 3.48757ZM10.2823 4.87558L9.93167 5.5386L10.2823 4.87558ZM13.6276 20.0694L13.9804 20.7312L13.6276 20.0694ZM17 18.6335L16.8086 17.9083H16.8086L17 18.6335ZM19.9851 18.2229L20.032 18.9715L19.9851 18.2229ZM10.3724 20.0694L10.0196 20.7312H10.0196L10.3724 20.0694ZM7 18.6335L7.19136 17.9083H7.19136L7 18.6335ZM4.01486 18.2229L3.96804 18.9715H3.96804L4.01486 18.2229ZM2.75 16.1437V4.99792H1.25V16.1437H2.75ZM22.75 16.1437V4.93332H21.25V16.1437H22.75ZM20.0559 2.26832C18.9175 2.30798 17.4296 2.42639 16.2849 2.76907L16.7151 4.20606C17.6643 3.92191 18.9892 3.80639 20.1081 3.76741L20.0559 2.26832ZM16.2849 2.76907C15.2899 3.06696 14.1706 3.6488 13.2982 4.15375L14.0495 5.452C14.9 4.95981 15.8949 4.45161 16.7151 4.20606L16.2849 2.76907ZM3.93639 3.8236C4.90238 3.88297 5.99643 3.99842 6.80864 4.21274L7.19136 2.76239C6.23055 2.50885 5.01517 2.38707 4.02841 2.32642L3.93639 3.8236ZM6.80864 4.21274C7.77076 4.46663 8.95486 5.02208 9.93167 5.5386L10.6328 4.21257C9.63736 3.68618 8.32766 3.06224 7.19136 2.76239L6.80864 4.21274ZM13.9804 20.7312C14.9714 20.2029 16.1988 19.6206 17.1914 19.3587L16.8086 17.9083C15.6383 18.2171 14.2827 18.8702 13.2748 19.4075L13.9804 20.7312ZM17.1914 19.3587C17.9943 19.1468 19.0732 19.0314 20.032 18.9715L19.9383 17.4744C18.9582 17.5357 17.7591 17.6575 16.8086 17.9083L17.1914 19.3587ZM10.7252 19.4075C9.71727 18.8702 8.3617 18.2171 7.19136 17.9083L6.80864 19.3587C7.8012 19.6206 9.0286 20.2029 10.0196 20.7312L10.7252 19.4075ZM7.19136 17.9083C6.24092 17.6575 5.04176 17.5357 4.06168 17.4744L3.96804 18.9715C4.9268 19.0314 6.00566 19.1468 6.80864 19.3587L7.19136 17.9083ZM21.25 16.1437C21.25 16.8295 20.6817 17.4279 19.9383 17.4744L20.032 18.9715C21.5062 18.8793 22.75 17.6799 22.75 16.1437H21.25ZM22.75 4.93332C22.75 3.47001 21.5847 2.21507 20.0559 2.26832L20.1081 3.76741C20.7229 3.746 21.25 4.25173 21.25 4.93332H22.75ZM1.25 16.1437C1.25 17.6799 2.49378 18.8793 3.96804 18.9715L4.06168 17.4744C3.31831 17.4279 2.75 16.8295 2.75 16.1437H1.25ZM13.2748 19.4075C12.4825 19.8299 11.5175 19.8299 10.7252 19.4075L10.0196 20.7312C11.2529 21.3886 12.7471 21.3886 13.9804 20.7312L13.2748 19.4075ZM13.2982 4.15375C12.4801 4.62721 11.4617 4.65083 10.6328 4.21257L9.93167 5.5386C11.2239 6.22189 12.791 6.18037 14.0495 5.452L13.2982 4.15375ZM2.75 4.99792C2.75 4.30074 3.30243 3.78463 3.93639 3.8236L4.02841 2.32642C2.47017 2.23065 1.25 3.49877 1.25 4.99792H2.75Z"
@@ -487,7 +526,7 @@ const BoxedPolicy = () => {
                                             </button>
                                         </Tippy>
                                         <Tippy content="Edit">
-                                            <button type="button" onClick={() => handleEditPolicy(item.id)}>
+                                            <button type="button" onClick={() => handleEditBranch(item.id)}>
                                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-4.5 w-4.5 ltr:mr-2 rtl:ml-2">
                                                     <path
                                                         d="M15.2869 3.15178L14.3601 4.07866L5.83882 12.5999L5.83881 12.5999C5.26166 13.1771 4.97308 13.4656 4.7249 13.7838C4.43213 14.1592 4.18114 14.5653 3.97634 14.995C3.80273 15.3593 3.67368 15.7465 3.41556 16.5208L2.32181 19.8021L2.05445 20.6042C1.92743 20.9852 2.0266 21.4053 2.31063 21.6894C2.59466 21.9734 3.01478 22.0726 3.39584 21.9456L4.19792 21.6782L7.47918 20.5844L7.47919 20.5844C8.25353 20.3263 8.6407 20.1973 9.00498 20.0237C9.43469 19.8189 9.84082 19.5679 10.2162 19.2751C10.5344 19.0269 10.8229 18.7383 11.4001 18.1612L11.4001 18.1612L19.9213 9.63993L20.8482 8.71306C22.3839 7.17735 22.3839 4.68748 20.8482 3.15178C19.3125 1.61607 16.8226 1.61607 15.2869 3.15178Z"
@@ -504,7 +543,7 @@ const BoxedPolicy = () => {
                                             </button>
                                         </Tippy>
                                         <Tippy content="Delete">
-                                            <button type="button" onClick={() => handleDeletePolicy(item.id)}>
+                                            <button type="button" onClick={() => handleDeleteBranch(item.id)}>
                                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-5 w-5">
                                                     <path d="M20.5001 6H3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
                                                     <path
@@ -556,7 +595,7 @@ const BoxedPolicy = () => {
                             <div className="fixed inset-0" />
                         </Transition.Child>
                         <div className="fixed inset-0 z-[999] overflow-y-auto bg-[black]/60">
-                            <div className="flex min-h-screen items-center justify-center px-4">
+                            <div className="flex min-h-screen items-center justify-center px-4 ">
                                 <Transition.Child
                                     as={Fragment}
                                     enter="ease-out duration-300"
@@ -566,9 +605,9 @@ const BoxedPolicy = () => {
                                     leaveFrom="opacity-100 scale-100"
                                     leaveTo="opacity-0 scale-95"
                                 >
-                                    <Dialog.Panel as="div" className="panel my-8 w-full max-w-lg overflow-hidden rounded-lg border-0 p-0 text-black dark:text-white-dark sm:min-w-[35rem]">
-                                        <div className="flex items-center justify-between bg-[#fbfbfb] px-5 py-3 dark:bg-[#121c2c]">
-                                            <h5 className="text-lg font-bold">Edit Policy</h5>
+                                    <Dialog.Panel as="div" className="panel my-8 w-full max-w-lg  overflow-visible rounded-lg border-0 p-0 text-black dark:text-white-dark sm:min-w-[40rem]">
+                                        <div className="flex items-center justify-between rounded-t-lg bg-[#fbfbfb] px-5 py-3 dark:bg-[#121c2c]">
+                                            <h5 className="text-lg font-bold">Create Branch</h5>
                                             <button type="button" className="text-white-dark hover:text-dark" onClick={handleDiscard}>
                                                 <svg
                                                     xmlns="http://www.w3.org/2000/svg"
@@ -589,53 +628,45 @@ const BoxedPolicy = () => {
                                         <div className="p-5">
                                             <form className="space-y-5" onSubmit={handleSubmit}>
                                                 <div>
-                                                    <label htmlFor="policyNameEdit">Policy Name</label>
+                                                    <label htmlFor="createBranch">branch Name</label>
                                                     <input
                                                         onChange={handleChange}
                                                         onBlur={handleBlur}
-                                                        value={values.policyName}
-                                                        id="policyNameEdit"
-                                                        name="policyName"
+                                                        value={values.name}
+                                                        id="createBranch"
+                                                        name="name"
                                                         type="text"
-                                                        placeholder="Policy Name"
+                                                        placeholder="Branch Name"
                                                         className="form-input"
                                                     />
                                                 </div>
                                                 <div>
-                                                    <label htmlFor="policyDescriptionEdit">Policy Description</label>
+                                                    <label htmlFor="createAddress">Address</label>
                                                     <input
                                                         onChange={handleChange}
                                                         onBlur={handleBlur}
-                                                        value={values.policyDescription}
-                                                        id="policyDescriptionEdit"
-                                                        name="policyDescription"
+                                                        value={values.address}
+                                                        id="createAddress"
+                                                        name="address"
                                                         type="text"
-                                                        placeholder="Policy Description"
+                                                        placeholder="Branch Address"
                                                         className="form-input"
                                                     />
                                                 </div>
-                                                <p className="text-lg font-bold">Permissions</p>
-                                                <div className="grid gap-y-1 sm:grid-cols-2 sm:gap-y-4">
-                                                    {permission.map((item: Permission, i: number) => {
-                                                        return (
-                                                            <div key={i} className="flex gap-3">
-                                                                <label className="relative h-6 w-12">
-                                                                    <input
-                                                                        type="checkbox"
-                                                                        className="custom_switch peer absolute z-10 h-full w-full cursor-pointer opacity-0"
-                                                                        id="custom_switch_checkbox1"
-                                                                        name="permission"
-                                                                        defaultChecked={permissionArr.includes(item.key) ? true : false}
-                                                                        onChange={(e) => handleEditPermission(e, item.key)}
-                                                                    />
-                                                                    <span className="block h-full rounded-full bg-[#ebedf2] before:absolute before:bottom-1 before:left-1 before:h-4 before:w-4 before:rounded-full before:bg-white before:transition-all before:duration-300 peer-checked:bg-primary peer-checked:before:left-7 dark:bg-dark dark:before:bg-white-dark dark:peer-checked:before:bg-white"></span>
-                                                                </label>
-                                                                <span>{item.value}</span>
-                                                            </div>
-                                                        );
-                                                    })}
-                                                </div>
-
+                                                <section className="flex flex-col  gap-4 sm:flex-row">
+                                                    <div className="flex-1">
+                                                        <label htmlFor="country">Select Country</label>
+                                                        <Select placeholder="Select Country" options={countryData} id="country" onChange={handleSelectCountry} defaultValue={selectAddress.country} />
+                                                    </div>
+                                                    <div className="flex-1">
+                                                        <label htmlFor="state">Select State</label>
+                                                        <Select placeholder="Select State" options={countryData} onChange={handleSelectState} defaultValue={selectAddress.state} />
+                                                    </div>
+                                                    <div className="flex-1">
+                                                        <label htmlFor="state">Select City</label>
+                                                        <Select placeholder="Select City" options={countryData} onChange={handleSelectCity} defaultValue={selectAddress.city} />
+                                                    </div>
+                                                </section>
                                                 <div className="mt-8 flex items-center justify-end">
                                                     <button type="button" className="btn btn-outline-danger" onClick={handleDiscard}>
                                                         Discard
@@ -643,9 +674,8 @@ const BoxedPolicy = () => {
                                                     <input
                                                         type="submit"
                                                         className="btn btn-primary cursor-pointer ltr:ml-4 rtl:mr-4"
-                                                        value={'Save Changes'}
-                                                        onClick={handleClickSubmit}
-                                                        disabled={values.policyName && values.policyDescription && !disableBtn && permissionArr.length !== 0 ? false : true}
+                                                        value="Edit Branch"
+                                                        disabled={values.name && selectAddress.state && selectAddress.country && selectAddress.city && values.address && !disableBtn ? false : true}
                                                     />
                                                 </div>
                                             </form>
@@ -687,7 +717,7 @@ const BoxedPolicy = () => {
                                 >
                                     <Dialog.Panel as="div" className="panel my-8 w-full max-w-lg overflow-hidden rounded-lg border-0 p-0 text-black dark:text-white-dark md:min-w-[37rem]">
                                         <div className="flex items-center justify-between bg-[#fbfbfb] px-5 py-3 dark:bg-[#121c2c]">
-                                            <h5 className="text-lg font-bold">View policy</h5>
+                                            <h5 className="text-lg font-bold">View branch</h5>
                                             <button type="button" className="text-white-dark hover:text-dark" onClick={() => setViewModal(false)}>
                                                 <svg
                                                     xmlns="http://www.w3.org/2000/svg"
@@ -707,25 +737,25 @@ const BoxedPolicy = () => {
                                         </div>
                                         <div className="p-5">
                                             <ul className="flex flex-col gap-4">
-                                                <li className="flex gap-16">
-                                                    <span className="text-lg font-bold">Name</span>
-                                                    <p>{singleViewPolicy.name}</p>
+                                                <li className="flex flex-wrap">
+                                                    <span className="flex-1 text-lg font-bold">Branch Name</span>
+                                                    <p className="flex-[2]">{singleViewBranch.name}</p>
                                                 </li>
-                                                <li className="flex gap-4">
-                                                    <span className="text-lg font-bold"> Description</span>
-                                                    <p>{singleViewPolicy.description}</p>
+                                                <li className="flex">
+                                                    <span className="flex-1 text-lg font-bold"> Country</span>
+                                                    <p className="flex-[2]">{singleViewBranch.country}</p>
                                                 </li>
-                                                <li className="flex gap-3">
-                                                    <span className="text-lg font-bold">Permissions</span>
-                                                    <div className="flex flex-wrap gap-x-2">
-                                                        {viewPermissionArr?.map((item: Permission, i: number) => {
-                                                            return (
-                                                                <span key={i} className="badge rounded-full bg-primary text-sm">
-                                                                    {item.value}
-                                                                </span>
-                                                            );
-                                                        })}
-                                                    </div>
+                                                <li className="flex">
+                                                    <span className="flex-1 text-lg font-bold"> State</span>
+                                                    <p className="flex-[2]">{singleViewBranch.state}</p>
+                                                </li>
+                                                <li className="flex">
+                                                    <span className="flex-1 text-lg font-bold"> City</span>
+                                                    <p className="flex-[2]">{singleViewBranch.city}</p>
+                                                </li>
+                                                <li className="flex">
+                                                    <span className="flex-1 text-lg font-bold"> Address</span>
+                                                    <p className="flex-[2]">{singleViewBranch.address}</p>
                                                 </li>
                                             </ul>
                                             <div className="mt-8 flex items-center justify-center">
@@ -771,7 +801,7 @@ const BoxedPolicy = () => {
                                 >
                                     <Dialog.Panel as="div" className="panel my-8 w-full max-w-lg overflow-hidden rounded-lg border-0 p-0 text-black dark:text-white-dark">
                                         <div className="flex items-center justify-between bg-[#fbfbfb] px-5 py-3 dark:bg-[#121c2c]">
-                                            <h5 className="text-lg font-bold">Delete policy</h5>
+                                            <h5 className="text-lg font-bold">Delete branch</h5>
                                             <button type="button" className="text-white-dark hover:text-dark" onClick={() => setDeleteModal(false)}>
                                                 <svg
                                                     xmlns="http://www.w3.org/2000/svg"
@@ -791,14 +821,14 @@ const BoxedPolicy = () => {
                                         </div>
                                         <div className="p-5">
                                             <div className="text-center text-xl">
-                                                Are you sure you want to delete this policy? <br /> It will not revert!
+                                                Are you sure you want to delete this branch? <br /> It will not revert!
                                             </div>
                                             <div className="mt-8 flex items-center justify-center">
                                                 <button type="button" className="btn btn-outline-success" onClick={handleDiscard} disabled={disableBtn}>
                                                     Cancel
                                                 </button>
-                                                <button type="button" className="btn btn-danger ltr:ml-4 rtl:mr-4" onClick={onDeletePolicy} disabled={disableBtn}>
-                                                    Delete Policy
+                                                <button type="button" className="btn btn-danger ltr:ml-4 rtl:mr-4" onClick={onDeleteBranch} disabled={disableBtn}>
+                                                    Delete Branch
                                                 </button>
                                             </div>
                                         </div>
@@ -827,7 +857,7 @@ const BoxedPolicy = () => {
                             <div className="fixed inset-0" />
                         </Transition.Child>
                         <div className="fixed inset-0 z-[999] overflow-y-auto bg-[black]/60">
-                            <div className="flex min-h-screen items-center justify-center px-4">
+                            <div className="flex min-h-screen items-center justify-center px-4 ">
                                 <Transition.Child
                                     as={Fragment}
                                     enter="ease-out duration-300"
@@ -837,9 +867,9 @@ const BoxedPolicy = () => {
                                     leaveFrom="opacity-100 scale-100"
                                     leaveTo="opacity-0 scale-95"
                                 >
-                                    <Dialog.Panel as="div" className="panel my-8 w-full max-w-lg overflow-hidden rounded-lg border-0 p-0 text-black dark:text-white-dark sm:min-w-[35rem]">
-                                        <div className="flex items-center justify-between bg-[#fbfbfb] px-5 py-3 dark:bg-[#121c2c]">
-                                            <h5 className="text-lg font-bold">Create Policy</h5>
+                                    <Dialog.Panel as="div" className="panel my-8 w-full max-w-lg  overflow-visible rounded-lg border-0 p-0 text-black dark:text-white-dark sm:min-w-[40rem]">
+                                        <div className="flex items-center justify-between rounded-t-lg bg-[#fbfbfb] px-5 py-3 dark:bg-[#121c2c]">
+                                            <h5 className="text-lg font-bold">Create Branch</h5>
                                             <button type="button" className="text-white-dark hover:text-dark" onClick={handleDiscard}>
                                                 <svg
                                                     xmlns="http://www.w3.org/2000/svg"
@@ -860,62 +890,57 @@ const BoxedPolicy = () => {
                                         <div className="p-5">
                                             <form className="space-y-5" onSubmit={handleSubmit}>
                                                 <div>
-                                                    <label htmlFor="policyNameEdit">Policy Name</label>
+                                                    <label htmlFor="createBranch">branch Name</label>
                                                     <input
                                                         onChange={handleChange}
                                                         onBlur={handleBlur}
-                                                        value={values.policyName}
-                                                        id="policyNameEdit"
-                                                        name="policyName"
+                                                        value={values.name}
+                                                        id="createBranch"
+                                                        name="name"
                                                         type="text"
-                                                        placeholder="Policy Name"
+                                                        placeholder="Branch Name"
                                                         className="form-input"
                                                     />
                                                 </div>
                                                 <div>
-                                                    <label htmlFor="policyDescriptionEdit">Policy Description</label>
+                                                    <label htmlFor="createAddress">Address</label>
                                                     <input
                                                         onChange={handleChange}
                                                         onBlur={handleBlur}
-                                                        value={values.policyDescription}
-                                                        id="policyDescriptionEdit"
-                                                        name="policyDescription"
+                                                        value={values.address}
+                                                        id="createAddress"
+                                                        name="address"
                                                         type="text"
-                                                        placeholder="Policy Description"
+                                                        placeholder="Branch Address"
                                                         className="form-input"
                                                     />
                                                 </div>
-
-                                                <p className="text-lg font-bold">Permissions</p>
-                                                <div className="grid gap-y-1 sm:grid-cols-2 sm:gap-y-4">
-                                                    {permission.map((item: Permission, i: number) => {
-                                                        return (
-                                                            <div key={i} className="flex gap-3">
-                                                                <label className="relative h-6 w-12">
-                                                                    <input
-                                                                        type="checkbox"
-                                                                        className="custom_switch peer absolute z-10 h-full w-full cursor-pointer opacity-0"
-                                                                        id="custom_switch_checkbox1"
-                                                                        name="permission"
-                                                                        onChange={(e) => handleCreatePermission(e, item.key)}
-                                                                    />
-                                                                    <span className="block h-full rounded-full bg-[#ebedf2] before:absolute before:bottom-1 before:left-1 before:h-4 before:w-4 before:rounded-full before:bg-white before:transition-all before:duration-300 peer-checked:bg-primary peer-checked:before:left-7 dark:bg-dark dark:before:bg-white-dark dark:peer-checked:before:bg-white"></span>
-                                                                </label>
-                                                                <span>{item.value}</span>
-                                                            </div>
-                                                        );
-                                                    })}
-                                                </div>
+                                                <section className="flex flex-col  gap-4 sm:flex-row">
+                                                    <div className="flex-1">
+                                                        <label htmlFor="country">Select Country</label>
+                                                        <Select placeholder="Select Country" options={countryData} id="country" onChange={handleSelectCountry} />
+                                                    </div>
+                                                    <div className="flex-1">
+                                                        <label htmlFor="state">Select State</label>
+                                                        <Select placeholder="Select State" options={countryData} onChange={handleSelectState} />
+                                                    </div>
+                                                    <div className="flex-1">
+                                                        <label htmlFor="state">Select City</label>
+                                                        <Select placeholder="Select City" options={countryData} onChange={handleSelectCity} />
+                                                    </div>
+                                                </section>
                                                 <div className="mt-8 flex items-center justify-end">
                                                     <button type="button" className="btn btn-outline-danger" onClick={handleDiscard}>
                                                         Discard
                                                     </button>
-                                                    <input
+                                                    <button
                                                         type="submit"
                                                         className="btn btn-primary cursor-pointer ltr:ml-4 rtl:mr-4"
-                                                        value="Create Policy"
-                                                        disabled={values.policyName && values.policyDescription && !disableBtn && permissionArr.length !== 0 ? false : true}
-                                                    />
+                                                        onClick={handleClickSubmit}
+                                                        disabled={values.name && selectAddress.state && selectAddress.country && selectAddress.city && values.address && !disableBtn ? false : true}
+                                                    >
+                                                        Create Branch
+                                                    </button>
                                                 </div>
                                             </form>
                                         </div>
@@ -930,4 +955,4 @@ const BoxedPolicy = () => {
     );
 };
 
-export default BoxedPolicy;
+export default BranchPage;
