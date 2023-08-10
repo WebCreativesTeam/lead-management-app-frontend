@@ -46,3 +46,7 @@ export const branchSchema = Yup.object().shape({
     name: Yup.string().required('Please enter Branch Name'),
     address: Yup.string().required('Please enter Branch Address'),
 });
+
+export const sourceSchema = Yup.object().shape({
+    name: Yup.string().required('Please enter Source Name'),
+});

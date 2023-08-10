@@ -174,6 +174,9 @@ const Sidebar = () => {
                                         <li>
                                             <Link href="/branches">{t('Branches')}</Link>
                                         </li>
+                                        <li>
+                                            <Link href="/sources">{t('Sources')}</Link>
+                                        </li>
                                     </ul>
                                 </AnimateHeight>
                             </li>
