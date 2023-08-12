@@ -114,7 +114,7 @@ const DefaultLayout = ({ children }: PropsWithChildren) => {
                         {/* END CONTENT AREA */}
 
                         {/* BEGIN FOOTER */}
-                        <Footer />
+                        {/* <Footer /> */}
                         {/* END FOOTER */}
                         <Portals />
                     </div>
