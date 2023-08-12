@@ -482,9 +482,9 @@ const BranchPage = () => {
                                 />
                             </svg>
                         </div>
-                        <div className="mb-2 text-center text-2xl font-bold dark:text-white md:text-5xl">Branches</div>
+                        <div className="mb-2 text-center text-2xl font-bold dark:text-white md:text-5xl">Organize Offices</div>
                     </div>
-                    <p className="mb-9 text-center text-base font-semibold">Create, read, write or delete branch</p>
+                    <p className="mb-9 text-center text-base font-semibold">List company branches. Add new locations. Update details. Remove obsolete branches.</p>
                 </div>
             </div>
             <div className="my-6 flex flex-col gap-5 sm:flex-row ">

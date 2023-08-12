@@ -17,7 +17,7 @@ type SourceDataType = {
     id: string;
 };
 
-const SourcePage = () => {
+const Source = () => {
     //hooks
     const [data, setData] = useState<SourceDataType[]>([]);
     const [createModal, setCreateModal] = useState<boolean>(false);
@@ -86,7 +86,7 @@ const SourcePage = () => {
                     const editSourceObj = {
                         name: value.name,
                     };
-                    await axios.patch('http://13.232.14.111:3030/sources/' + singleSource.id, editSourceObj);
+                    await axios.patch('http://15.206.153.110:3030/sources/' + singleSource.id, editSourceObj);
                     setDisableBtn(false);
                     action.resetForm();
                     setEditModal(false);
@@ -95,7 +95,7 @@ const SourcePage = () => {
                     const createSourceObj = {
                         name: value.name,
                     };
-                    await axios.post('http://13.232.14.111:3030/sources', createSourceObj);
+                    await axios.post('http://15.206.153.110:3030/sources', createSourceObj);
                     setDisableBtn(false);
                     setCreateModal(false);
                     action.resetForm();
@@ -148,7 +148,7 @@ const SourcePage = () => {
     //get all Source list
     const getSourceList = async () => {
         try {
-            const res = await axios.get('http://13.232.14.111:3030/sources');
+            const res = await axios.get('http://15.206.153.110:3030/sources');
             const sources = res?.data?.data;
             setData(sources);
         } catch (error) {
@@ -214,7 +214,7 @@ const SourcePage = () => {
     const onDeleteSource = async () => {
         try {
             setDisableBtn(true);
-            await axios.delete('http://13.232.14.111:3030/sources/' + singleDeleteSource);
+            await axios.delete('http://15.206.153.110:3030/sources/' + singleDeleteSource);
             setDisableBtn(false);
             setDeleteModal(false);
         } catch (error: any) {
@@ -363,9 +363,9 @@ const SourcePage = () => {
                                 />
                             </svg>
                         </div>
-                        <div className="mb-2 text-center text-2xl font-bold dark:text-white md:text-5xl">Sources</div>
+                        <div className="mb-2 text-center text-2xl font-bold dark:text-white md:text-5xl">Track Leads</div>
                     </div>
-                    <p className="mb-9 text-center text-base font-semibold">Create, read, write or delete Source</p>
+                    <p className="mb-9 text-center text-base font-semibold">Identify and categorize lead sources. Update descriptions. Add or remove source channels.</p>
                 </div>
             </div>
             <div className="my-6 flex flex-col gap-5 sm:flex-row ">
@@ -386,7 +386,7 @@ const SourcePage = () => {
                 </div>
             </div>
 
-            {/* Source List table*/}
+            {/* source List table*/}
             <div className="datatables panel mt-6">
                 <DataTable
                     className="table-hover whitespace-nowrap"
@@ -490,6 +490,7 @@ const SourcePage = () => {
                     paginationText={({ from, to, totalRecords }) => `Showing  ${from} to ${to} of ${totalRecords} entries`}
                 />
             </div>
+
             {/* edit modal */}
 
             <div className="mb-5">
@@ -803,4 +804,4 @@ const SourcePage = () => {
     );
 };
 
-export default SourcePage;
+export default Source;

@@ -548,9 +548,9 @@ const Users = () => {
                                 />
                             </svg>
                         </div>
-                        <div className="mb-2 text-center text-2xl font-bold dark:text-white md:text-5xl">Users</div>
+                        <div className="mb-2 text-center text-2xl font-bold dark:text-white md:text-5xl">Manage Users</div>
                     </div>
-                    <p className="mb-9 text-center text-base font-semibold">Create, read, write or delete users</p>
+                    <p className="mb-9 text-center text-base font-semibold">Add, edit, or remove users. Assign roles. Track activity. Personalize user experience.</p>
                 </div>
             </div>
             <div className="my-6 flex flex-col gap-5 sm:flex-row ">
