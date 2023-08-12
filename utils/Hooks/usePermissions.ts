@@ -5,7 +5,7 @@ const usePermission = () => {
     const [data, setData] = useState([]);
     useEffect(() => {
         const fetchPermissions = async () => {
-            const res = await axios.get('http://15.206.70.64:3030/policies/rules');
+            const res = await axios.get('http://15.206.153.110:3030/policies/rules');
             const policyRule = res?.data?.data;
             setData(policyRule);
         };

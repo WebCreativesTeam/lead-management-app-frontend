@@ -114,20 +114,20 @@ const Sidebar = () => {
                                 <AnimateHeight duration={300} height={currentMenu === 'auth' ? 'auto' : 0}>
                                     <ul className="sub-menu text-gray-500">
                                         <li>
-                                            <Link href="/auth/boxed-signin" target="_blank">
-                                                {t('login_boxed')}
+                                            <Link href="/auth/login" target="_blank">
+                                                {t('Login')}
                                             </Link>
                                         </li>
                                         <li>
-                                            <Link href="/auth/boxed-signup" target="_blank">
-                                                {t('register_boxed')}
+                                            <Link href="/auth/signup" target="_blank">
+                                                {t('SignUp')}
                                             </Link>
                                         </li>
                                         <li>
-                                            <Link href="/auth/boxed-signup-successfull">{t('signup email verification')}</Link>
+                                            <Link href="/auth/email-verification">{t('Email verification')}</Link>
                                         </li>
                                         <li>
-                                            <Link href="/auth/boxed-policy">{t('Policy Boxed')}</Link>
+                                            <Link href="/auth/policies">{t('Policies')}</Link>
                                         </li>
                                         <li>
                                             <Link href="/auth/users">{t('Users')}</Link>

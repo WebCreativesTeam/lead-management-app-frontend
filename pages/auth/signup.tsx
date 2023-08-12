@@ -19,7 +19,7 @@ const initialValues = {
     checkCondition: '',
 };
 
-const RegisterBoxed = () => {
+const SignUpPage = () => {
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('Register Boxed'));
@@ -42,7 +42,7 @@ const RegisterBoxed = () => {
                     password: value.password,
                     passwordConfirm: value.confirmPassword,
                 };
-                await axios.post('http://15.206.70.64:3030/auth/sign-up', createUserObj);
+                await axios.post('http://15.206.153.110:3030/auth/sign-up', createUserObj);
                 action.resetForm();
                 setDisableBtn(false);
                 router.push('/auth/boxed-signup-successfull');
@@ -360,7 +360,7 @@ const RegisterBoxed = () => {
         </div>
     );
 };
-RegisterBoxed.getLayout = (page: any) => {
+SignUpPage.getLayout = (page: any) => {
     return <BlankLayout>{page}</BlankLayout>;
 };
-export default RegisterBoxed;
+export default SignUpPage;

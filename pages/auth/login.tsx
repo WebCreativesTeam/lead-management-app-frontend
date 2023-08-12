@@ -14,7 +14,7 @@ const initialValues = {
     email: '',
     password: '',
 };
-const LoginBoxed = () => {
+const LoginPage = () => {
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('Login Boxed'));
@@ -35,7 +35,7 @@ const LoginBoxed = () => {
                     email: value.email,
                     password: value.password,
                 };
-                await axios.post('http://15.206.70.64:3030/auth/sign-in', createUserObj);
+                await axios.post('http://15.206.153.110:3030/auth/sign-in', createUserObj);
                 action.resetForm();
                 setServerErrors('');
                 router.push('/');
@@ -238,7 +238,7 @@ const LoginBoxed = () => {
         </div>
     );
 };
-LoginBoxed.getLayout = (page: any) => {
+LoginPage.getLayout = (page: any) => {
     return <BlankLayout>{page}</BlankLayout>;
 };
-export default LoginBoxed;
+export default LoginPage;
