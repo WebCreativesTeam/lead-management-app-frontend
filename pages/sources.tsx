@@ -32,6 +32,8 @@ const Source = () => {
     const [forceRender, setForceRender] = useState<boolean>(false);
     const [searchInputText, setSearchInputText] = useState<string>('');
     const [searchedData, setSearchedData] = useState<SourceDataType[]>(data);
+    const [loading, setLoading] = useState<boolean>(false);
+    const [fetching, setFetching] = useState<boolean>(false);
 
     //datatable
     const [page, setPage] = useState(1);
@@ -58,7 +60,7 @@ const Source = () => {
     //get all source after page render
     useEffect(() => {
         getSourceList();
-    }, [editModal, createModal, deleteModal]);
+    }, [fetching]);
 
     useEffect(() => {
         setSearchedData(data);
@@ -80,6 +82,7 @@ const Source = () => {
         validateOnChange: false,
         enableReinitialize: true,
         onSubmit: async (value, action) => {
+            setFetching(true);
             try {
                 if (editModal) {
                     setDisableBtn(true);
@@ -118,6 +121,7 @@ const Source = () => {
                 setServerErrors(error?.response?.data?.message);
                 setDisableBtn(false);
             }
+            setFetching(false);
         },
     });
     useEffect(() => {
@@ -156,6 +160,7 @@ const Source = () => {
     //get all Source list
     const getSourceList = async () => {
         try {
+            setLoading(true);
             const res = await axios.get(process.env.NEXT_PUBLIC_API_LINK + 'sources/', {
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem('loginToken')}`,
@@ -163,6 +168,7 @@ const Source = () => {
             });
             const sources = res?.data?.data;
             setData(sources);
+            setLoading(false);
         } catch (error) {
             console.log(error);
         }
@@ -224,6 +230,7 @@ const Source = () => {
 
     //deleting source
     const onDeleteSource = async () => {
+        setFetching(true);
         try {
             setDisableBtn(true);
             await axios.delete(process.env.NEXT_PUBLIC_API_LINK + 'sources/' + singleDeleteSource, {
@@ -243,6 +250,7 @@ const Source = () => {
             setServerErrors(error?.response?.data?.message);
             setDisableBtn(false);
         }
+        setFetching(false);
     };
 
     //search source
@@ -504,6 +512,7 @@ const Source = () => {
                     onSortStatusChange={setSortStatus}
                     minHeight={200}
                     paginationText={({ from, to, totalRecords }) => `Showing  ${from} to ${to} of ${totalRecords} entries`}
+                    fetching={loading}
                 />
             </div>
 

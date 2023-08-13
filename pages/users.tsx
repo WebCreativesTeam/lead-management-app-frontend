@@ -66,6 +66,8 @@ const Users = () => {
     const [policiesData, setPoliciesData] = useState([]);
     const [userPolicyId, setUserPolicyId] = useState<string>();
     const [defaultSelectedPolicy, setDefaultSelectedPolicy] = useState<OptionType[]>([]);
+    const [loading, setLoading] = useState<boolean>(false);
+    const [fetching, setFetching] = useState<boolean>(false);
 
     //datatable
     const [page, setPage] = useState(1);
@@ -92,7 +94,7 @@ const Users = () => {
     //get all user after page render
     useEffect(() => {
         getUsersList();
-    }, [editModal, createModal, deleteModal, deactivateModal, policyModal]);
+    }, [fetching, policyModal]);
 
     useEffect(() => {
         setSearchedData(data);
@@ -118,6 +120,7 @@ const Users = () => {
         validateOnChange: false,
         enableReinitialize: true,
         onSubmit: async (value, action) => {
+            setFetching(true);
             try {
                 if (editModal) {
                     setDisableBtn(true);
@@ -163,6 +166,7 @@ const Users = () => {
                 setServerErrors(error?.response?.data?.message);
                 setDisableBtn(false);
             }
+            setFetching(false);
         },
     });
     const handleClickSubmit = () => {
@@ -215,6 +219,7 @@ const Users = () => {
     //get all users list
     const getUsersList = async () => {
         try {
+            setLoading(true);
             const res = await axios.get(process.env.NEXT_PUBLIC_API_LINK + 'users', {
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem('loginToken')}`,
@@ -222,13 +227,16 @@ const Users = () => {
             });
             const users = res?.data?.data;
             setData(users);
+            setLoading(false);
         } catch (error: any) {
+            setLoading(true);
             if (typeof error?.response?.data?.message === 'object') {
                 setServerErrors(error?.response?.data?.message.join(' , '));
             } else {
                 setServerErrors(error?.response?.data?.message);
             }
             setServerErrors(error?.response?.data?.message);
+            setLoading(false);
         }
     };
 
@@ -329,6 +337,7 @@ const Users = () => {
     };
 
     const onSubmitPolicy = async () => {
+        setFetching(true)
         try {
             const selectedPolicyArr = defaultSelectedPolicy.map((policy: OptionType) => {
                 return policy.value;
@@ -345,6 +354,7 @@ const Users = () => {
             );
             setDisableBtn(false);
             setPolicyModal(false);
+            setFetching(false)
         } catch (error: any) {
             setDisableBtn(true);
             if (typeof error?.response?.data?.message === 'object') {
@@ -394,6 +404,7 @@ const Users = () => {
 
     //deleting User
     const onDeleteUser = async () => {
+        setFetching(true);
         try {
             setDisableBtn(true);
             await axios.delete(process.env.NEXT_PUBLIC_API_LINK + 'users/' + singleDeleteUser, {
@@ -413,6 +424,7 @@ const Users = () => {
             setServerErrors(error?.response?.data?.message);
             setDisableBtn(false);
         }
+        setFetching(false);
     };
 
     //search user
@@ -439,6 +451,7 @@ const Users = () => {
         setDeactivateVal(e.target.checked);
     };
     const onDeactivateUser = async () => {
+        setFetching(true);
         try {
             setDisableBtn(true);
             await axios.patch(
@@ -462,6 +475,7 @@ const Users = () => {
             setServerErrors(error?.response?.data?.message);
             setDisableBtn(false);
         }
+        setFetching(false);
     };
     return (
         <div>
@@ -760,6 +774,7 @@ const Users = () => {
                     onSortStatusChange={setSortStatus}
                     minHeight={200}
                     paginationText={({ from, to, totalRecords }) => `Showing  ${from} to ${to} of ${totalRecords} entries`}
+                    fetching={loading}
                 />
             </div>
 

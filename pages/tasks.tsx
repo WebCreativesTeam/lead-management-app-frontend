@@ -39,6 +39,9 @@ const TaskPage = () => {
     const [forceRender, setForceRender] = useState<boolean>(false);
     const [searchInputText, setSearchInputText] = useState<string>('');
     const [searchedData, setSearchedData] = useState<TaskDataType[]>(data);
+    const [loading, setLoading] = useState<boolean>(false);
+    const [fetching, setFetching] = useState<boolean>(false);
+
     //useDefferedValue hook for search query
     const searchQuery = useDeferredValue(searchInputText);
 
@@ -67,7 +70,7 @@ const TaskPage = () => {
     //get all task after page render
     useEffect(() => {
         getTasksList();
-    }, [editModal, createModal, deleteModal]);
+    }, [fetching]);
 
     useEffect(() => {
         setSearchedData(data);
@@ -87,6 +90,7 @@ const TaskPage = () => {
         validateOnChange: false,
         enableReinitialize: true,
         onSubmit: async (value, action) => {
+            setFetching(true);
             try {
                 if (editModal) {
                     setDisableBtn(true);
@@ -125,6 +129,7 @@ const TaskPage = () => {
                 setServerErrors(error?.response?.data?.message);
                 setDisableBtn(false);
             }
+            setFetching(false);
         },
     });
     useEffect(() => {
@@ -163,6 +168,7 @@ const TaskPage = () => {
     //get all tasks list
     const getTasksList = async () => {
         try {
+            setLoading(true);
             const res = await axios.get(process.env.NEXT_PUBLIC_API_LINK + 'tasks/', {
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem('loginToken')}`,
@@ -170,6 +176,7 @@ const TaskPage = () => {
             });
             const tasks = res?.data?.data;
             setData(tasks);
+            setLoading(false);
         } catch (error) {
             console.log(error);
         }
@@ -231,6 +238,7 @@ const TaskPage = () => {
 
     //deleting task
     const onDeleteTask = async () => {
+        setFetching(true);
         try {
             setDisableBtn(true);
             await axios.delete(process.env.NEXT_PUBLIC_API_LINK + 'tasks/' + singleDeleteTask, {
@@ -250,6 +258,7 @@ const TaskPage = () => {
             setServerErrors(error?.response?.data?.message);
             setDisableBtn(false);
         }
+        setFetching(false);
     };
 
     //search task
@@ -529,6 +538,7 @@ const TaskPage = () => {
                     onSortStatusChange={setSortStatus}
                     minHeight={200}
                     paginationText={({ from, to, totalRecords }) => `Showing  ${from} to ${to} of ${totalRecords} entries`}
+                    fetching={loading}
                 />
             </div>
 

@@ -66,6 +66,8 @@ const BranchPage = () => {
         },
     });
     const [searchedData, setSearchedData] = useState<BranchDataType[]>(data);
+    const [loading, setLoading] = useState<boolean>(false);
+    const [fetching, setFetching] = useState<boolean>(false);
 
     //datatable
     const [page, setPage] = useState(1);
@@ -92,7 +94,7 @@ const BranchPage = () => {
     //get all branch after page render
     useEffect(() => {
         getBranchList();
-    }, [editModal, createModal, deleteModal]);
+    }, [fetching]);
 
     useEffect(() => {
         setSearchedData(data);
@@ -116,6 +118,7 @@ const BranchPage = () => {
         enableReinitialize: true,
         onSubmit: async (value, action) => {
             try {
+                setFetching(true);
                 if (editModal) {
                     setDisableBtn(true);
                     const editBranchObj = {
@@ -134,6 +137,7 @@ const BranchPage = () => {
                     action.resetForm();
                     setEditModal(false);
                 } else if (createModal) {
+                    setDisableBtn(true)
                     const createBranchObj = {
                         name: value.name,
                         address: value.address,
@@ -174,6 +178,7 @@ const BranchPage = () => {
                 setServerErrors(error?.response?.data?.message);
                 setDisableBtn(false);
             }
+            setFetching(false);
         },
     });
     useEffect(() => {
@@ -227,6 +232,7 @@ const BranchPage = () => {
     //get all Branch list
     const getBranchList = async () => {
         try {
+            setLoading(true);
             const res = await axios.get(process.env.NEXT_PUBLIC_API_LINK + 'branches/', {
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem('loginToken')}`,
@@ -234,6 +240,7 @@ const BranchPage = () => {
             });
             const branches = res?.data?.data;
             setData(branches);
+            setLoading(false);
         } catch (error) {
             console.log(error);
         }
@@ -322,6 +329,7 @@ const BranchPage = () => {
 
     //deleting branch
     const onDeleteBranch = async () => {
+        setFetching(true);
         try {
             setDisableBtn(true);
             await axios.delete(process.env.NEXT_PUBLIC_API_LINK + 'branches/' + singleDeleteBranch, {
@@ -341,6 +349,7 @@ const BranchPage = () => {
             setServerErrors(error?.response?.data?.message);
             setDisableBtn(false);
         }
+        setFetching(false);
     };
 
     //search branch
@@ -376,7 +385,6 @@ const BranchPage = () => {
             return { ...preVal, city };
         });
     };
-
     return (
         <div>
             <div className="relative rounded-t-md bg-primary-light bg-[url('/assets/images/knowledge/pattern.png')] bg-contain bg-left-top bg-no-repeat px-5 py-10 dark:bg-black md:px-10">
@@ -526,6 +534,7 @@ const BranchPage = () => {
                 <DataTable
                     className="table-hover whitespace-nowrap"
                     records={recordsData}
+                    fetching={loading}
                     columns={[
                         {
                             accessor: 'name',
@@ -721,7 +730,7 @@ const BranchPage = () => {
                                                     </div>
                                                 </section>
                                                 <div className="mt-8 flex items-center justify-end">
-                                                    <button type="button" className="btn btn-outline-danger" onClick={handleDiscard}>
+                                                    <button type="button" className="btn btn-outline-danger" disabled={disableBtn} onClick={handleDiscard}>
                                                         Discard
                                                     </button>
                                                     <input
@@ -983,14 +992,14 @@ const BranchPage = () => {
                                                     </div>
                                                 </section>
                                                 <div className="mt-8 flex items-center justify-end">
-                                                    <button type="button" className="btn btn-outline-danger" onClick={handleDiscard}>
+                                                    <button type="button" className="btn btn-outline-danger" disabled={disableBtn} onClick={handleDiscard}>
                                                         Discard
                                                     </button>
                                                     <button
                                                         type="submit"
                                                         className="btn btn-primary cursor-pointer ltr:ml-4 rtl:mr-4"
                                                         onClick={handleClickSubmit}
-                                                        disabled={values.name && selectAddress.state && selectAddress.country && selectAddress.city && values.address && !disableBtn ? false : true}
+                                                        disabled={values.name && selectAddress.state.value && selectAddress.country.value && selectAddress.city.value && values.address && !disableBtn ? false : true}
                                                     >
                                                         Create Branch
                                                     </button>
