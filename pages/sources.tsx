@@ -86,7 +86,11 @@ const Source = () => {
                     const editSourceObj = {
                         name: value.name,
                     };
-                    await axios.patch('http://13.233.123.25:3030/sources/' + singleSource.id, editSourceObj);
+                    await axios.patch(process.env.NEXT_PUBLIC_API_LINK + 'sources/' + singleSource.id, editSourceObj, {
+                        headers: {
+                            Authorization: `Bearer ${localStorage.getItem('loginToken')}`,
+                        },
+                    });
                     setDisableBtn(false);
                     action.resetForm();
                     setEditModal(false);
@@ -95,7 +99,11 @@ const Source = () => {
                     const createSourceObj = {
                         name: value.name,
                     };
-                    await axios.post('http://13.233.123.25:3030/sources', createSourceObj);
+                    await axios.post(process.env.NEXT_PUBLIC_API_LINK + 'sources/', createSourceObj, {
+                        headers: {
+                            Authorization: `Bearer ${localStorage.getItem('loginToken')}`,
+                        },
+                    });
                     setDisableBtn(false);
                     setCreateModal(false);
                     action.resetForm();
@@ -148,7 +156,11 @@ const Source = () => {
     //get all Source list
     const getSourceList = async () => {
         try {
-            const res = await axios.get('http://13.233.123.25:3030/sources');
+            const res = await axios.get(process.env.NEXT_PUBLIC_API_LINK + 'sources/', {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('loginToken')}`,
+                },
+            });
             const sources = res?.data?.data;
             setData(sources);
         } catch (error) {
@@ -214,7 +226,11 @@ const Source = () => {
     const onDeleteSource = async () => {
         try {
             setDisableBtn(true);
-            await axios.delete('http://13.233.123.25:3030/sources/' + singleDeleteSource);
+            await axios.delete(process.env.NEXT_PUBLIC_API_LINK + 'sources/' + singleDeleteSource, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('loginToken')}`,
+                },
+            });
             setDisableBtn(false);
             setDeleteModal(false);
         } catch (error: any) {
@@ -365,7 +381,7 @@ const Source = () => {
                         </div>
                         <div className="mb-2 text-center text-2xl font-bold dark:text-white md:text-5xl">Track Leads</div>
                     </div>
-                    <p className="mb-9 text-center text-base font-semibold">Identify and categorize lead sources. Update descriptions. Add or remove source channels.</p>
+                    <p className="my-9 text-center text-base font-semibold">Identify and categorize lead sources. Update descriptions. Add or remove source channels.</p>
                 </div>
             </div>
             <div className="my-6 flex flex-col gap-5 sm:flex-row ">

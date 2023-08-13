@@ -93,7 +93,11 @@ const TaskPage = () => {
                     const editTaskObj = {
                         name: value.title,
                     };
-                    await axios.patch('http://13.233.123.25:3030/tasks/' + singleTask.id, editTaskObj);
+                    await axios.patch(process.env.NEXT_PUBLIC_API_LINK + 'tasks/' + singleTask.id, editTaskObj, {
+                        headers: {
+                            Authorization: `Bearer ${localStorage.getItem('loginToken')}`,
+                        },
+                    });
                     setDisableBtn(false);
                     action.resetForm();
                     setEditModal(false);
@@ -102,7 +106,11 @@ const TaskPage = () => {
                     const createTaskObj = {
                         name: value.title,
                     };
-                    await axios.post('http://13.233.123.25:3030/tasks', createTaskObj);
+                    await axios.post(process.env.NEXT_PUBLIC_API_LINK + 'tasks/', createTaskObj, {
+                        headers: {
+                            Authorization: `Bearer ${localStorage.getItem('loginToken')}`,
+                        },
+                    });
                     setDisableBtn(false);
                     setCreateModal(false);
                     action.resetForm();
@@ -155,7 +163,11 @@ const TaskPage = () => {
     //get all tasks list
     const getTasksList = async () => {
         try {
-            const res = await axios.get('http://13.233.123.25:3030/tasks');
+            const res = await axios.get(process.env.NEXT_PUBLIC_API_LINK + 'tasks/', {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('loginToken')}`,
+                },
+            });
             const tasks = res?.data?.data;
             setData(tasks);
         } catch (error) {
@@ -221,7 +233,11 @@ const TaskPage = () => {
     const onDeleteTask = async () => {
         try {
             setDisableBtn(true);
-            await axios.delete('http://13.233.123.25:3030/tasks/' + singleDeleteTask);
+            await axios.delete(process.env.NEXT_PUBLIC_API_LINK + 'tasks/' + singleDeleteTask, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('loginToken')}`,
+                },
+            });
             setDisableBtn(false);
             setDeleteModal(false);
         } catch (error: any) {
@@ -372,7 +388,7 @@ const TaskPage = () => {
                         </div>
                         <div className="mb-2 text-center text-2xl font-bold dark:text-white md:text-5xl">Tasks</div>
                     </div>
-                    <p className="mb-9 text-center text-base font-semibold">Create, read, write, delete, assign, or change status of the task</p>
+                    <p className="my-9 text-center text-base font-semibold">Create, read, write, delete, assign, or change status of the task</p>
                 </div>
             </div>
             <div className="my-6 flex flex-col gap-5 sm:flex-row ">

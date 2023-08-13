@@ -125,7 +125,11 @@ const BranchPage = () => {
                         state: selectAddress.state.value,
                         country: selectAddress.country.value,
                     };
-                    await axios.patch('http://13.233.123.25:3030/branches/' + singleBranch.id, editBranchObj);
+                    await axios.patch(process.env.NEXT_PUBLIC_API_LINK + 'branches/' + singleBranch.id, editBranchObj, {
+                        headers: {
+                            Authorization: `Bearer ${localStorage.getItem('loginToken')}`,
+                        },
+                    });
                     setDisableBtn(false);
                     action.resetForm();
                     setEditModal(false);
@@ -137,7 +141,11 @@ const BranchPage = () => {
                         state: selectAddress.state.value,
                         country: selectAddress.country.value,
                     };
-                    await axios.post('http://13.233.123.25:3030/branches', createBranchObj);
+                    await axios.post(process.env.NEXT_PUBLIC_API_LINK + 'branches/', createBranchObj, {
+                        headers: {
+                            Authorization: `Bearer ${localStorage.getItem('loginToken')}`,
+                        },
+                    });
                     setDisableBtn(false);
                     setCreateModal(false);
                     setSelectAddress({
@@ -219,7 +227,11 @@ const BranchPage = () => {
     //get all Branch list
     const getBranchList = async () => {
         try {
-            const res = await axios.get('http://13.233.123.25:3030/branches');
+            const res = await axios.get(process.env.NEXT_PUBLIC_API_LINK + 'branches/', {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('loginToken')}`,
+                },
+            });
             const branches = res?.data?.data;
             setData(branches);
         } catch (error) {
@@ -312,7 +324,11 @@ const BranchPage = () => {
     const onDeleteBranch = async () => {
         try {
             setDisableBtn(true);
-            await axios.delete('http://13.233.123.25:3030/branches/' + singleDeleteBranch);
+            await axios.delete(process.env.NEXT_PUBLIC_API_LINK + 'branches/' + singleDeleteBranch, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('loginToken')}`,
+                },
+            });
             setDisableBtn(false);
             setDeleteModal(false);
         } catch (error: any) {
@@ -484,7 +500,7 @@ const BranchPage = () => {
                         </div>
                         <div className="mb-2 text-center text-2xl font-bold dark:text-white md:text-5xl">Organize Offices</div>
                     </div>
-                    <p className="mb-9 text-center text-base font-semibold">List company branches. Add new locations. Update details. Remove obsolete branches.</p>
+                    <p className="my-9 text-center text-base font-semibold">List company branches. Add new locations. Update details. Remove obsolete branches.</p>
                 </div>
             </div>
             <div className="my-6 flex flex-col gap-5 sm:flex-row ">

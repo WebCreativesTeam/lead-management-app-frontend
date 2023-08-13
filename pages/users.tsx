@@ -125,7 +125,11 @@ const Users = () => {
                         firstName: value.firstname,
                         lastName: value.lastname,
                     };
-                    await axios.patch('http://13.233.123.25:3030/users/' + singleUserEdit.id, editUserObj);
+                    await axios.patch(process.env.NEXT_PUBLIC_API_LINK + 'users/' + +singleUserEdit.id, editUserObj, {
+                        headers: {
+                            Authorization: `Bearer ${localStorage.getItem('loginToken')}`,
+                        },
+                    });
                     setDisableBtn(false);
                     action.resetForm();
                     setEditModal(false);
@@ -139,7 +143,11 @@ const Users = () => {
                         password: value.password,
                         passwordConfirm: value.confirmPassword,
                     };
-                    await axios.post('http://13.233.123.25:3030/users', createUserObj);
+                    await axios.post(process.env.NEXT_PUBLIC_API_LINK + 'users/', createUserObj, {
+                        headers: {
+                            Authorization: `Bearer ${localStorage.getItem('loginToken')}`,
+                        },
+                    });
                     setDisableBtn(false);
                     setCreateModal(false);
                     action.resetForm();
@@ -207,9 +215,9 @@ const Users = () => {
     //get all users list
     const getUsersList = async () => {
         try {
-            const res = await axios.get('http://13.233.123.25:3030/users', {
+            const res = await axios.get(process.env.NEXT_PUBLIC_API_LINK + 'users', {
                 headers: {
-                    Authorization: `Bearer ${localStorage.getItem("loginToken")}`,
+                    Authorization: `Bearer ${localStorage.getItem('loginToken')}`,
                 },
             });
             const users = res?.data?.data;
@@ -326,7 +334,15 @@ const Users = () => {
                 return policy.value;
             });
             setDisableBtn(true);
-            await axios.post('http://13.233.123.25:3030/users/' + userPolicyId + '/policies', { policies: selectedPolicyArr });
+            await axios.post(
+                process.env.NEXT_PUBLIC_API_LINK + 'users/' + userPolicyId + '/policies',
+                { policies: selectedPolicyArr },
+                {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem('loginToken')}`,
+                    },
+                }
+            );
             setDisableBtn(false);
             setPolicyModal(false);
         } catch (error: any) {
@@ -345,7 +361,11 @@ const Users = () => {
         setPolicyModal(true);
         setUserPolicyId(id);
         try {
-            const res = await axios.get('http://13.233.123.25:3030/policies');
+            const res = await axios.get(process.env.NEXT_PUBLIC_API_LINK + 'policies/', {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('loginToken')}`,
+                },
+            });
             const policy = res?.data?.data;
             const createPolicyObj = policy.map((policy: PolicyDataType) => {
                 return { value: policy.id, label: policy.name };
@@ -376,7 +396,11 @@ const Users = () => {
     const onDeleteUser = async () => {
         try {
             setDisableBtn(true);
-            await axios.delete('http://13.233.123.25:3030/users/' + singleDeleteUser);
+            await axios.delete(process.env.NEXT_PUBLIC_API_LINK + 'users/' + singleDeleteUser, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('loginToken')}`,
+                },
+            });
             setDisableBtn(false);
             setDeleteModal(false);
         } catch (error: any) {
@@ -417,7 +441,15 @@ const Users = () => {
     const onDeactivateUser = async () => {
         try {
             setDisableBtn(true);
-            await axios.patch('http://13.233.123.25:3030/users/' + singleDeactivateUserId + '/internal', { isActive: deactivateVal });
+            await axios.patch(
+                process.env.NEXT_PUBLIC_API_LINK + 'users/' + singleDeactivateUserId + '/internal',
+                { isActive: deactivateVal },
+                {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem('loginToken')}`,
+                    },
+                }
+            );
             setDisableBtn(false);
             setDeactivateModal(false);
         } catch (error: any) {
@@ -554,7 +586,7 @@ const Users = () => {
                         </div>
                         <div className="mb-2 text-center text-2xl font-bold dark:text-white md:text-5xl">Manage Users</div>
                     </div>
-                    <p className="mb-9 text-center text-base font-semibold">Add, edit, or remove users. Assign roles. Track activity. Personalize user experience.</p>
+                    <p className="my-9 text-center text-base font-semibold">Add, edit, or remove users. Assign roles. Track activity. Personalize user experience.</p>
                 </div>
             </div>
             <div className="my-6 flex flex-col gap-5 sm:flex-row ">

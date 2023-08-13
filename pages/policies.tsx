@@ -99,7 +99,11 @@ const PolicyPage = () => {
                         description: value.policyDescription,
                         permissions: singlePolicy.permissions,
                     };
-                    await axios.patch('http://13.233.123.25:3030/policies/' + singlePolicy.id, editPolicyObj);
+                    await axios.patch(process.env.NEXT_PUBLIC_API_LINK + 'policies/' + singlePolicy.id, editPolicyObj, {
+                        headers: {
+                            Authorization: `Bearer ${localStorage.getItem('loginToken')}`,
+                        },
+                    });
                     setDisableBtn(false);
                     action.resetForm();
                     setEditModal(false);
@@ -111,7 +115,11 @@ const PolicyPage = () => {
                         permissions: permissionArr,
                     };
 
-                    await axios.post('http://13.233.123.25:3030/policies/', createPolicyObj);
+                    await axios.post(process.env.NEXT_PUBLIC_API_LINK + 'policies/', createPolicyObj, {
+                        headers: {
+                            Authorization: `Bearer ${localStorage.getItem('loginToken')}`,
+                        },
+                    });
 
                     setDisableBtn(true);
                     setDisableBtn(false);
@@ -170,9 +178,12 @@ const PolicyPage = () => {
 
     const getPolicyList = async () => {
         try {
-            const res = await axios.get('http://13.233.123.25:3030/policies');
+            const res = await axios.get(process.env.NEXT_PUBLIC_API_LINK + 'policies/', {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('loginToken')}`,
+                },
+            });
             const policy = res?.data?.data;
-            console.log(policy);
             setData(policy);
         } catch (error) {
             console.log(error);
@@ -293,7 +304,11 @@ const PolicyPage = () => {
     const onDeletePolicy = async () => {
         try {
             setDisableBtn(true);
-            await axios.delete('http://13.233.123.25:3030/policies/' + singleDeletePolicy);
+            await axios.delete(process.env.NEXT_PUBLIC_API_LINK + 'policies/' + singleDeletePolicy, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('loginToken')}`,
+                },
+            });
             setDisableBtn(false);
             setDeleteModal(false);
         } catch (error: any) {
@@ -443,7 +458,7 @@ const PolicyPage = () => {
                         </div>
                         <div className="mb-2 text-center text-2xl font-bold dark:text-white md:text-5xl">Define Access</div>
                     </div>
-                    <p className="mb-9 text-center text-base font-semibold">Craft policies for in-app permissions. Link to users. Ensure secure and relevant access.</p>
+                    <p className="my-9 text-center text-base font-semibold">Craft policies for in-app permissions. Link to users. Ensure secure and relevant access.</p>
                 </div>
             </div>
             <div className="my-6 flex flex-col gap-5 sm:flex-row ">

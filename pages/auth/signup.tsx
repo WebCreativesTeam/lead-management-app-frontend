@@ -42,7 +42,11 @@ const SignUpPage = () => {
                     password: value.password,
                     passwordConfirm: value.confirmPassword,
                 };
-                await axios.post('http://13.233.123.25:3030/auth/sign-up', createUserObj);
+                await axios.post(process.env.NEXT_PUBLIC_API_LINK + 'auth/sign-up', createUserObj, {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem('loginToken')}`,
+                    },
+                });
                 action.resetForm();
                 setDisableBtn(false);
                 router.push('/auth/email-verification');

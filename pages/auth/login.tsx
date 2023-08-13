@@ -35,7 +35,11 @@ const LoginPage = () => {
                     email: value.email,
                     password: value.password,
                 };
-                const res = await axios.post('http://13.233.123.25:3030/auth/sign-in', createUserObj);
+                const res = await axios.post(process.env.NEXT_PUBLIC_API_LINK + 'auth/sign-in', createUserObj, {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem('loginToken')}`,
+                    },
+                });
                 localStorage.setItem("loginToken",res?.data?.token)
                 action.resetForm();
                 setServerErrors('');
