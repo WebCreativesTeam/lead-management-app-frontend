@@ -99,7 +99,7 @@ const PolicyPage = () => {
                         description: value.policyDescription,
                         permissions: singlePolicy.permissions,
                     };
-                    await axios.patch('http://15.206.153.110:3030/policies/' + singlePolicy.id, editPolicyObj);
+                    await axios.patch('http://13.233.123.25:3030/policies/' + singlePolicy.id, editPolicyObj);
                     setDisableBtn(false);
                     action.resetForm();
                     setEditModal(false);
@@ -111,7 +111,7 @@ const PolicyPage = () => {
                         permissions: permissionArr,
                     };
 
-                    await axios.post('http://15.206.153.110:3030/policies/', createPolicyObj);
+                    await axios.post('http://13.233.123.25:3030/policies/', createPolicyObj);
 
                     setDisableBtn(true);
                     setDisableBtn(false);
@@ -170,7 +170,7 @@ const PolicyPage = () => {
 
     const getPolicyList = async () => {
         try {
-            const res = await axios.get('http://15.206.153.110:3030/policies');
+            const res = await axios.get('http://13.233.123.25:3030/policies');
             const policy = res?.data?.data;
             console.log(policy);
             setData(policy);
@@ -293,7 +293,7 @@ const PolicyPage = () => {
     const onDeletePolicy = async () => {
         try {
             setDisableBtn(true);
-            await axios.delete('http://15.206.153.110:3030/policies/' + singleDeletePolicy);
+            await axios.delete('http://13.233.123.25:3030/policies/' + singleDeletePolicy);
             setDisableBtn(false);
             setDeleteModal(false);
         } catch (error: any) {

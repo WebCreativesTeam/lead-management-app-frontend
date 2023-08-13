@@ -42,10 +42,10 @@ const SignUpPage = () => {
                     password: value.password,
                     passwordConfirm: value.confirmPassword,
                 };
-                await axios.post('http://15.206.153.110:3030/auth/sign-up', createUserObj);
+                await axios.post('http://13.233.123.25:3030/auth/sign-up', createUserObj);
                 action.resetForm();
                 setDisableBtn(false);
-                router.push('/auth/boxed-signup-successfull');
+                router.push('/auth/email-verification');
             } catch (error: any) {
                 setDisableBtn(true);
                 if (typeof error?.response?.data?.message === 'object') {
@@ -349,7 +349,7 @@ const SignUpPage = () => {
                             <div className="mb-3"></div>
                             <div className="text-center dark:text-white">
                                 Already have an account ?&nbsp;
-                                <Link href="/auth/boxed-signin" className="uppercase text-primary underline transition hover:text-black dark:hover:text-white">
+                                <Link href="/auth/login" className="uppercase text-primary underline transition hover:text-black dark:hover:text-white">
                                     SIGN IN
                                 </Link>
                             </div>

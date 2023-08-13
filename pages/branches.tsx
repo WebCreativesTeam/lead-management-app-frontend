@@ -125,7 +125,7 @@ const BranchPage = () => {
                         state: selectAddress.state.value,
                         country: selectAddress.country.value,
                     };
-                    await axios.patch('http://15.206.153.110:3030/branches/' + singleBranch.id, editBranchObj);
+                    await axios.patch('http://13.233.123.25:3030/branches/' + singleBranch.id, editBranchObj);
                     setDisableBtn(false);
                     action.resetForm();
                     setEditModal(false);
@@ -137,7 +137,7 @@ const BranchPage = () => {
                         state: selectAddress.state.value,
                         country: selectAddress.country.value,
                     };
-                    await axios.post('http://15.206.153.110:3030/branches', createBranchObj);
+                    await axios.post('http://13.233.123.25:3030/branches', createBranchObj);
                     setDisableBtn(false);
                     setCreateModal(false);
                     setSelectAddress({
@@ -219,7 +219,7 @@ const BranchPage = () => {
     //get all Branch list
     const getBranchList = async () => {
         try {
-            const res = await axios.get('http://15.206.153.110:3030/branches');
+            const res = await axios.get('http://13.233.123.25:3030/branches');
             const branches = res?.data?.data;
             setData(branches);
         } catch (error) {
@@ -312,7 +312,7 @@ const BranchPage = () => {
     const onDeleteBranch = async () => {
         try {
             setDisableBtn(true);
-            await axios.delete('http://15.206.153.110:3030/branches/' + singleDeleteBranch);
+            await axios.delete('http://13.233.123.25:3030/branches/' + singleDeleteBranch);
             setDisableBtn(false);
             setDeleteModal(false);
         } catch (error: any) {

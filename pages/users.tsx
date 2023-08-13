@@ -125,7 +125,7 @@ const Users = () => {
                         firstName: value.firstname,
                         lastName: value.lastname,
                     };
-                    await axios.patch('http://15.206.153.110:3030/users/' + singleUserEdit.id, editUserObj);
+                    await axios.patch('http://13.233.123.25:3030/users/' + singleUserEdit.id, editUserObj);
                     setDisableBtn(false);
                     action.resetForm();
                     setEditModal(false);
@@ -139,7 +139,7 @@ const Users = () => {
                         password: value.password,
                         passwordConfirm: value.confirmPassword,
                     };
-                    await axios.post('http://15.206.153.110:3030/users', createUserObj);
+                    await axios.post('http://13.233.123.25:3030/users', createUserObj);
                     setDisableBtn(false);
                     setCreateModal(false);
                     action.resetForm();
@@ -207,7 +207,11 @@ const Users = () => {
     //get all users list
     const getUsersList = async () => {
         try {
-            const res = await axios.get('http://15.206.153.110:3030/users');
+            const res = await axios.get('http://13.233.123.25:3030/users', {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("loginToken")}`,
+                },
+            });
             const users = res?.data?.data;
             setData(users);
         } catch (error: any) {
@@ -322,7 +326,7 @@ const Users = () => {
                 return policy.value;
             });
             setDisableBtn(true);
-            await axios.post('http://15.206.153.110:3030/users/' + userPolicyId + '/policies', { policies: selectedPolicyArr });
+            await axios.post('http://13.233.123.25:3030/users/' + userPolicyId + '/policies', { policies: selectedPolicyArr });
             setDisableBtn(false);
             setPolicyModal(false);
         } catch (error: any) {
@@ -341,7 +345,7 @@ const Users = () => {
         setPolicyModal(true);
         setUserPolicyId(id);
         try {
-            const res = await axios.get('http://15.206.153.110:3030/policies');
+            const res = await axios.get('http://13.233.123.25:3030/policies');
             const policy = res?.data?.data;
             const createPolicyObj = policy.map((policy: PolicyDataType) => {
                 return { value: policy.id, label: policy.name };
@@ -372,7 +376,7 @@ const Users = () => {
     const onDeleteUser = async () => {
         try {
             setDisableBtn(true);
-            await axios.delete('http://15.206.153.110:3030/users/' + singleDeleteUser);
+            await axios.delete('http://13.233.123.25:3030/users/' + singleDeleteUser);
             setDisableBtn(false);
             setDeleteModal(false);
         } catch (error: any) {
@@ -413,7 +417,7 @@ const Users = () => {
     const onDeactivateUser = async () => {
         try {
             setDisableBtn(true);
-            await axios.patch('http://15.206.153.110:3030/users/' + singleDeactivateUserId + '/internal', { isActive: deactivateVal });
+            await axios.patch('http://13.233.123.25:3030/users/' + singleDeactivateUserId + '/internal', { isActive: deactivateVal });
             setDisableBtn(false);
             setDeactivateModal(false);
         } catch (error: any) {

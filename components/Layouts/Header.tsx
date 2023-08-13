@@ -602,7 +602,7 @@ const Header = () => {
                                         </Link>
                                     </li>
                                     <li className="border-t border-white-light dark:border-white-light/10">
-                                        <Link href="/auth/boxed-signin" className="!py-3 text-danger">
+                                        <Link href="/auth/login" className="!py-3 text-danger">
                                             <svg className="rotate-90 ltr:mr-2 rtl:ml-2 shrink-0" width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                 <path
                                                     opacity="0.5"
@@ -1188,7 +1188,7 @@ const Header = () => {
                                         </Link>
                                     </li>
                                     <li>
-                                        <Link href="/auth/boxed-signin" target="_blank">
+                                        <Link href="/auth/login" target="_blank">
                                             {t('login_boxed')}
                                         </Link>
                                     </li>

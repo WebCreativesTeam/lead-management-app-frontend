@@ -86,7 +86,7 @@ const Source = () => {
                     const editSourceObj = {
                         name: value.name,
                     };
-                    await axios.patch('http://15.206.153.110:3030/sources/' + singleSource.id, editSourceObj);
+                    await axios.patch('http://13.233.123.25:3030/sources/' + singleSource.id, editSourceObj);
                     setDisableBtn(false);
                     action.resetForm();
                     setEditModal(false);
@@ -95,7 +95,7 @@ const Source = () => {
                     const createSourceObj = {
                         name: value.name,
                     };
-                    await axios.post('http://15.206.153.110:3030/sources', createSourceObj);
+                    await axios.post('http://13.233.123.25:3030/sources', createSourceObj);
                     setDisableBtn(false);
                     setCreateModal(false);
                     action.resetForm();
@@ -148,7 +148,7 @@ const Source = () => {
     //get all Source list
     const getSourceList = async () => {
         try {
-            const res = await axios.get('http://15.206.153.110:3030/sources');
+            const res = await axios.get('http://13.233.123.25:3030/sources');
             const sources = res?.data?.data;
             setData(sources);
         } catch (error) {
@@ -214,7 +214,7 @@ const Source = () => {
     const onDeleteSource = async () => {
         try {
             setDisableBtn(true);
-            await axios.delete('http://15.206.153.110:3030/sources/' + singleDeleteSource);
+            await axios.delete('http://13.233.123.25:3030/sources/' + singleDeleteSource);
             setDisableBtn(false);
             setDeleteModal(false);
         } catch (error: any) {

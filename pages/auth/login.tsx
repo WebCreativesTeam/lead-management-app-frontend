@@ -35,7 +35,8 @@ const LoginPage = () => {
                     email: value.email,
                     password: value.password,
                 };
-                await axios.post('http://15.206.153.110:3030/auth/sign-in', createUserObj);
+                const res = await axios.post('http://13.233.123.25:3030/auth/sign-in', createUserObj);
+                localStorage.setItem("loginToken",res?.data?.token)
                 action.resetForm();
                 setServerErrors('');
                 router.push('/');

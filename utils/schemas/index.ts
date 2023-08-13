@@ -50,3 +50,10 @@ export const branchSchema = Yup.object().shape({
 export const sourceSchema = Yup.object().shape({
     name: Yup.string().required('Please enter Source Name'),
 });
+
+
+//task Schema
+
+export const taskSchema = Yup.object().shape({
+    
+})

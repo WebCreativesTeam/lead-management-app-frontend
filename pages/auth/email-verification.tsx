@@ -30,7 +30,7 @@ const LoginBoxed = () => {
                                 <p className="py-6 text-justify text-base font-bold leading-normal text-white-dark">
                                     Thank you for signing up. We&apos;ve just sent a verification email to your mail inbox. Please verify your email to access all features.
                                 </p>
-                                <Link href="/auth/boxed-signin">
+                                <Link href="/auth/login">
                                     <button type="submit" className="btn btn-gradient !mt-6 w-full border-0 uppercase shadow-[0_10px_20px_-10px_rgba(67,97,238,0.44)]">
                                         Sign in
                                     </button>
