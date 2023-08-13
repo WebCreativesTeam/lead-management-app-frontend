@@ -489,7 +489,7 @@
 
     table.dataTable-table tbody tr th,
     table.dataTable-table tbody tr td {
-        @apply border-b border-[#e5e7eb] py-3 px-4 ltr:text-left rtl:text-right dark:border-[#191e3a];
+        @apply border-b border-[#e5e7eb] py-3 px-4 ltr:text-left rtl:text-right ;
     }
     table.dataTable-table tbody tr:last-child td {
         @apply border-b-0;
