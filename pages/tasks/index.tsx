@@ -19,9 +19,9 @@ import { TaskDataType } from '@/utils/Types';
 import { useDispatch } from 'react-redux';
 import { setPageTitle } from '@/store/themeConfigSlice';
 import ConfirmationModal from '@/components/__Shared/ConfirmationModal';
+import Dropdown from '@/components/Dropdown';
 
 const TaskPage = () => {
-
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('Manage Tasks'));
@@ -44,6 +44,7 @@ const TaskPage = () => {
     const [loading, setLoading] = useState<boolean>(false);
     const [fetching, setFetching] = useState<boolean>(false);
     const [priorityOptions, setPriorityOptions] = useState<SelectOptionsType[]>([]);
+    const [filter, setFilter] = useState<string>('assigned-by-me');
 
     //useDefferedValue hook for search query
     const searchQuery = useDeferredValue(searchInputText);
@@ -73,7 +74,7 @@ const TaskPage = () => {
     //get all task after page render
     useEffect(() => {
         getTasksList();
-    }, [fetching]);
+    }, [fetching,filter]);
 
     useEffect(() => {
         getTasksPriority();
@@ -206,12 +207,13 @@ const TaskPage = () => {
     const getTasksList = async () => {
         try {
             setLoading(true);
-            const res = await axios.get(process.env.NEXT_PUBLIC_API_LINK + 'tasks/', {
+            const res = await axios.get(process.env.NEXT_PUBLIC_API_LINK + 'tasks/' + filter, {
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem('loginToken')}`,
                 },
             });
             const tasks = res?.data?.data;
+            console.log(tasks)
             setData(tasks);
             setLoading(false);
         } catch (error: any) {
@@ -348,12 +350,36 @@ const TaskPage = () => {
     return (
         <div>
             <PageHeadingSection description="View, create, update, and close tasks. Organize by status, priority, and due date. Stay on top of work." heading="Task Management" />
-            <div className="my-6 flex flex-col gap-5 sm:flex-row ">
-                <div className="flex-1">
+            <div className="my-6 flex gap-5 ">
+                <div className="flex flex-1 gap-5 ">
                     <button className="btn btn-primary h-full w-full max-w-[200px] max-sm:mx-auto" type="button" onClick={() => setCreateModal(true)}>
                         <Plus />
                         Add New Task
                     </button>
+                    <div className="dropdown">
+                        <Dropdown
+                            placement="bottom-start"
+                            btnClassName="btn btn-outline-primary h-full dropdown-toggle"
+                            button={
+                                <>
+                                    <span>Filter</span>
+                                </>
+                            }
+                        >
+                            <ul className="!min-w-[170px]">
+                                <li>
+                                    <button type="button" onClick={() => setFilter('assigned-by-me')}>
+                                        Assigned by Me
+                                    </button>
+                                </li>
+                                <li>
+                                    <button type="button" onClick={() => setFilter('assigned-to-me')}>
+                                        Assigned to Me
+                                    </button>
+                                </li>
+                            </ul>
+                        </Dropdown>
+                    </div>
                 </div>
                 <div className="relative  flex-1">
                     <input type="text" placeholder="Find A Policy" className="form-input py-3 ltr:pr-[100px] rtl:pl-[100px]" onChange={(e) => setSearchInputText(e.target.value)} value={searchQuery} />
