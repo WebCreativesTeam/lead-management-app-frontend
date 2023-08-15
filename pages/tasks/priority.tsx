@@ -13,8 +13,15 @@ import { Close, Delete, Edit, Plus, View } from '@/components/icons';
 import PageHeadingSection from '@/components/__Shared/PageHeadingSection/index.';
 import { TaskPriorityType } from '@/utils/Types';
 import ConfirmationModal from '@/components/__Shared/ConfirmationModal';
+import { useDispatch } from 'react-redux';
+import { setPageTitle } from '@/store/themeConfigSlice';
 
 const TaskPriorityPage = () => {
+    const dispatch = useDispatch();
+    useEffect(() => {
+        dispatch(setPageTitle('Tasks Priority Page' ));
+    });
+
     //hooks
     const [data, setData] = useState<TaskPriorityType[]>([]);
     const [createModal, setCreateModal] = useState<boolean>(false);
@@ -267,7 +274,7 @@ const TaskPriorityPage = () => {
         setFetching(false);
     };
 
-    //search taskPriority
+    //search Task Priority
     const handleSearchTaskPriority = () => {
         const searchTaskPriorityData = data?.filter((taskPriority: TaskPriorityType) => {
             return (
@@ -315,18 +322,18 @@ const TaskPriorityPage = () => {
     };
     return (
         <div>
-            <PageHeadingSection description="Create, update,delete and view task priority" heading="Task Priority" />
+            <PageHeadingSection description="Define task priorities. Arrange by urgency. Optimize task distribution. Enhance productivity." heading="Task Importance" />
             <div className="my-6 flex flex-col gap-5 sm:flex-row ">
                 <div className="flex-1">
                     <button className="btn btn-primary h-full w-full max-w-[250px] max-sm:mx-auto" type="button" onClick={() => setCreateModal(true)}>
                         <Plus />
-                        Add New TaskPriority
+                        Add New Task Priority
                     </button>
                 </div>
                 <div className="relative  flex-1">
                     <input
                         type="text"
-                        placeholder="Find A TaskPriority"
+                        placeholder="Find Task Priority"
                         className="form-input py-3 ltr:pr-[100px] rtl:pl-[100px]"
                         onChange={(e) => setSearchInputText(e.target.value)}
                         value={searchQuery}
@@ -337,7 +344,7 @@ const TaskPriorityPage = () => {
                 </div>
             </div>
 
-            {/* taskPriority List table*/}
+            {/* Task Priority List table*/}
             <div className="datatables panel mt-6">
                 <DataTable
                     className="table-hover whitespace-nowrap"
@@ -345,9 +352,13 @@ const TaskPriorityPage = () => {
                     columns={[
                         {
                             accessor: 'name',
-                            title: 'TaskPriority Name',
+                            title: 'Task Priority Name',
                             sortable: true,
-                            render: ({ name }) => <div>{name}</div>,
+                            render: ({ name, color }) => (
+                                <span className={`mr-2 rounded px-2.5 py-0.5 text-sm font-medium dark:bg-blue-900 dark:text-blue-300`} style={{ color: color, backgroundColor: color + '20' }}>
+                                    {name}
+                                </span>
+                            ),
                         },
                         {
                             accessor: 'createdAt',
@@ -449,7 +460,7 @@ const TaskPriorityPage = () => {
                                 >
                                     <Dialog.Panel as="div" className="panel my-8 w-full max-w-lg  overflow-visible rounded-lg border-0 p-0 text-black dark:text-white-dark ">
                                         <div className="flex items-center justify-between rounded-t-lg bg-[#fbfbfb] px-5 py-3 dark:bg-[#121c2c]">
-                                            <h5 className="text-lg font-bold">Edit TaskPriority</h5>
+                                            <h5 className="text-lg font-bold">Edit Task Priority</h5>
                                             <button type="button" className="text-white-dark hover:text-dark" onClick={handleDiscard}>
                                                 <Close />
                                             </button>
@@ -457,7 +468,7 @@ const TaskPriorityPage = () => {
                                         <div className="p-5">
                                             <form className="space-y-5" onSubmit={handleSubmit}>
                                                 <div>
-                                                    <label htmlFor="createTaskPriority">TaskPriority Name</label>
+                                                    <label htmlFor="createTaskPriority">Task Priority Name</label>
                                                     <input
                                                         onChange={handleChange}
                                                         onBlur={handleBlur}
@@ -465,12 +476,12 @@ const TaskPriorityPage = () => {
                                                         id="createTaskPriority"
                                                         name="name"
                                                         type="text"
-                                                        placeholder="TaskPriority Name"
+                                                        placeholder="Task Priority Name"
                                                         className="form-input"
                                                     />
                                                 </div>
                                                 <div>
-                                                    <label htmlFor="priorityColor">TaskPriority Color</label>
+                                                    <label htmlFor="priorityColor">Task Priority Color</label>
                                                     <input
                                                         onBlur={(e: React.ChangeEvent<HTMLInputElement>) => setInputColor(e.target.value)}
                                                         id="createTaskPriority"
@@ -490,7 +501,7 @@ const TaskPriorityPage = () => {
                                                         onClick={handleClickSubmit}
                                                         disabled={values.name && !disableBtn ? false : true}
                                                     >
-                                                        Edit TaskPriority
+                                                        Edit Task Priority
                                                     </button>
                                                 </div>
                                             </form>
@@ -532,7 +543,7 @@ const TaskPriorityPage = () => {
                                 >
                                     <Dialog.Panel as="div" className="panel my-8 w-full max-w-lg overflow-hidden rounded-lg border-0 p-0 text-black dark:text-white-dark">
                                         <div className="flex items-center justify-between bg-[#fbfbfb] px-5 py-3 dark:bg-[#121c2c]">
-                                            <h5 className="text-lg font-bold">View TaskPriority</h5>
+                                            <h5 className="text-lg font-bold">View Task Priority</h5>
                                             <button type="button" className="text-white-dark hover:text-dark" onClick={() => setViewModal(false)}>
                                                 <Close />
                                             </button>
@@ -540,25 +551,11 @@ const TaskPriorityPage = () => {
                                         <div className="p-5">
                                             <ul className="flex flex-col gap-4">
                                                 <li className="flex flex-wrap">
-                                                    <span className="flex-1 text-lg font-bold">TaskPriority Name</span>
+                                                    <span className="flex-1 text-lg font-bold">Task Priority Name</span>
                                                     <p className="flex-[2]">{singleViewTaskPriority.name}</p>
                                                 </li>
                                                 <li className="flex flex-wrap">
-                                                    <span className="flex-1 text-lg font-bold">TaskPriority Color</span>
-                                                    <p className="flex-[2]">
-                                                        <span
-                                                            style={{
-                                                                border: '3px solid' + singleViewTaskPriority.color,
-                                                                borderRadius: '4px',
-                                                            }}
-                                                            className="px-3 font-bold"
-                                                        >
-                                                            {singleViewTaskPriority.color}
-                                                        </span>
-                                                    </p>
-                                                </li>
-                                                <li className="flex flex-wrap">
-                                                    <span className="flex-1 text-lg font-bold">TaskPriority Created</span>
+                                                    <span className="flex-1 text-lg font-bold">Task Priority Created</span>
                                                     <p className="flex-[2]">{new Date(singleViewTaskPriority.createdAt).toLocaleString()}</p>
                                                 </li>
                                                 <li className="flex flex-wrap">
@@ -587,7 +584,7 @@ const TaskPriorityPage = () => {
                 onDiscard={() => setDeleteModal(false)}
                 description={
                     <>
-                        Are you sure you want to delete this taskPriority? <br /> It will not revert!
+                        Are you sure you want to delete this Task Priority? <br /> It will not revert!
                     </>
                 }
                 title="Delete task priority"
@@ -624,7 +621,7 @@ const TaskPriorityPage = () => {
                                 >
                                     <Dialog.Panel as="div" className="panel my-8 w-full max-w-lg  overflow-visible rounded-lg border-0 p-0 text-black dark:text-white-dark ">
                                         <div className="flex items-center justify-between rounded-t-lg bg-[#fbfbfb] px-5 py-3 dark:bg-[#121c2c]">
-                                            <h5 className="text-lg font-bold">Create TaskPriority</h5>
+                                            <h5 className="text-lg font-bold">Create Task Priority</h5>
                                             <button type="button" className="text-white-dark hover:text-dark" onClick={handleDiscard}>
                                                 <Close />
                                             </button>
@@ -632,7 +629,7 @@ const TaskPriorityPage = () => {
                                         <div className="p-5">
                                             <form className="space-y-5" onSubmit={handleSubmit}>
                                                 <div>
-                                                    <label htmlFor="createTaskPriority">TaskPriority Name</label>
+                                                    <label htmlFor="createTaskPriority">Task Priority Name</label>
                                                     <input
                                                         onChange={handleChange}
                                                         onBlur={handleBlur}
@@ -640,12 +637,12 @@ const TaskPriorityPage = () => {
                                                         id="createTaskPriority"
                                                         name="name"
                                                         type="text"
-                                                        placeholder="TaskPriority Name"
+                                                        placeholder="Task Priority Name"
                                                         className="form-input"
                                                     />
                                                 </div>
                                                 <div>
-                                                    <label htmlFor="priorityColor">TaskPriority Color</label>
+                                                    <label htmlFor="priorityColor">Task Priority Color</label>
                                                     <input onBlur={(e: React.ChangeEvent<HTMLInputElement>) => setInputColor(e.target.value)} id="createTaskPriority" name="color" type="color" />
                                                 </div>
 
@@ -659,7 +656,7 @@ const TaskPriorityPage = () => {
                                                         onClick={handleClickSubmit}
                                                         disabled={values.name && !disableBtn ? false : true}
                                                     >
-                                                        Create TaskPriority
+                                                        Create Task Priority
                                                     </button>
                                                 </div>
                                             </form>

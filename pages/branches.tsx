@@ -14,6 +14,8 @@ import { sortBy } from 'lodash';
 import { Close, Delete, Edit, Plus, SnackLine, View, WalkingMan } from '@/components/icons';
 import PageHeadingSection from '@/components/__Shared/PageHeadingSection/index.';
 import ConfirmationModal from '@/components/__Shared/ConfirmationModal';
+import { setPageTitle } from '@/store/themeConfigSlice';
+import { useDispatch } from 'react-redux';
 
 type BranchDataType = {
     name: string;
@@ -41,6 +43,12 @@ const countryData: OptionType[] = [
     { value: 'bangladesh', label: 'Bangladesh' },
 ];
 const BranchPage = () => {
+
+     const dispatch = useDispatch();
+     useEffect(() => {
+         dispatch(setPageTitle('Organize Offices | Branches'));
+     });
+
     //hooks
     const [data, setData] = useState<BranchDataType[]>([]);
     const [createModal, setCreateModal] = useState<boolean>(false);

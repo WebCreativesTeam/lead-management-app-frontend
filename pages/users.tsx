@@ -14,8 +14,15 @@ import { Close, Delete, Edit, Plus, Shield, SnackLine, View, WalkingMan } from '
 import { UserDataType, SelectOptionsType, Permission, PolicyDataType } from '@/utils/Types';
 import PageHeadingSection from '@/components/__Shared/PageHeadingSection/index.';
 import ConfirmationModal from '@/components/__Shared/ConfirmationModal';
+import { setPageTitle } from '@/store/themeConfigSlice';
+import { useDispatch } from 'react-redux';
 
 const Users = () => {
+
+    const dispatch = useDispatch();
+    useEffect(() => {
+        dispatch(setPageTitle('Manage Users'));
+    });
     //hooks
     const [data, setData] = useState<UserDataType[]>([]);
     const [createModal, setCreateModal] = useState<boolean>(false);

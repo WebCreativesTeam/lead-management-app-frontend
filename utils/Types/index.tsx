@@ -1,7 +1,7 @@
 export type SelectOptionsType = {
     value: string;
     label: string;
-}
+};
 
 export type Permission = {
     key: string;
@@ -14,8 +14,6 @@ export type PolicyDataType = {
     description: string;
     permissions: string[];
 };
-
-
 
 //users Page
 
@@ -48,6 +46,11 @@ export type TaskDataType = {
     comment: string;
     isActive: boolean;
     lead: string;
+    status: {
+        color: string;
+        id: string;
+        name: string;
+    };
 };
 
 export type TaskSelectOptions = {
@@ -57,7 +60,6 @@ export type TaskSelectOptions = {
     createdAt?: string;
     updatedAt?: string;
 };
-
 
 export type TaskPriorityType = {
     name: string;

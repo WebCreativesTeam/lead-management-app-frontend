@@ -17,7 +17,7 @@ const initialValues = {
 const LoginPage = () => {
     const dispatch = useDispatch();
     useEffect(() => {
-        dispatch(setPageTitle('Login Boxed'));
+        dispatch(setPageTitle('Signin | Authentication'));
     });
     const [serverErrors, setServerErrors] = useState('');
     const [forceRender, setForceRender] = useState<boolean>(false);
@@ -43,7 +43,7 @@ const LoginPage = () => {
                 localStorage.setItem("loginToken",res?.data?.token)
                 action.resetForm();
                 setServerErrors('');
-                router.push('/');
+                router.push('/tasks');
                 setDisableBtn(false);
             } catch (error: any) {
                 setDisableBtn(true);

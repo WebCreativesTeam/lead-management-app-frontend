@@ -12,12 +12,16 @@ import { DataTable, DataTableSortStatus } from 'mantine-datatable';
 import { sortBy } from 'lodash';
 import { Close, Delete, Edit, Plus, SnackLine, View, WalkingMan } from '@/components/icons';
 import PageHeadingSection from '@/components/__Shared/PageHeadingSection/index.';
+import ConfirmationModal from '@/components/__Shared/ConfirmationModal';
+import { useDispatch } from 'react-redux';
+import { setPageTitle } from '@/store/themeConfigSlice';
 
 type PolicyDataType = {
     name: string;
     id: string;
     description: string;
     permissions: string[];
+    isDefault: boolean;
 };
 
 type Permission = {
@@ -26,12 +30,19 @@ type Permission = {
 };
 
 const PolicyPage = () => {
+
+    const dispatch = useDispatch();
+    useEffect(() => {
+        dispatch(setPageTitle('Define Access | Policies'));
+    });
+
     //hooks
     const [data, setData] = useState<PolicyDataType[]>([]);
     const [createModal, setCreateModal] = useState<boolean>(false);
     const [editModal, setEditModal] = useState<boolean>(false);
     const [viewModal, setViewModal] = useState<boolean>(false);
     const [deleteModal, setDeleteModal] = useState<boolean>(false);
+    const [defaultPolicyModal, setDefaultPolicyModal] = useState<boolean>(false);
     const [singlePolicy, setSinglePolicy] = useState<any>({});
     const [singleViewPolicy, setSingleViewPolicy] = useState<any>({});
     const [singleDeletePolicy, setSingleDeletePolicy] = useState<any>('');
@@ -45,6 +56,7 @@ const PolicyPage = () => {
     const permission: Permission[] = usePermission();
     const [loading, setLoading] = useState<boolean>(false);
     const [fetching, setFetching] = useState<boolean>(false);
+    const [defaultPolicyId, setDefaultPolicyId] = useState<string>('');
 
     //datatable
     const [page, setPage] = useState(1);
@@ -266,12 +278,15 @@ const PolicyPage = () => {
     };
 
     // delete policy by id
-
     const handleDeletePolicy = (id: string) => {
-        setDeleteModal(true);
         const findPolicy = data?.find((item: PolicyDataType) => {
             return item.id === id;
         });
+        if (findPolicy?.isDefault) {
+            setServerErrors('Please make other policy default to Delete this policy');
+            return;
+        }
+        setDeleteModal(true);
         setSingleDeletePolicy(findPolicy?.id);
     };
 
@@ -338,6 +353,16 @@ const PolicyPage = () => {
         setFetching(false);
     };
 
+    //changing defalt policy
+    const handleChangeDefaultPolicy = async (e: React.ChangeEvent<HTMLInputElement>, id: string) => {
+        if (!e.target.checked) {
+            setServerErrors('default policy already selected');
+            return;
+        }
+        setDefaultPolicyModal(true);
+        setDefaultPolicyId(id);
+    };
+
     //search policy
     const handleSearchPolicy = () => {
         const searchPolicyData = data?.filter((policy: PolicyDataType) => {
@@ -349,6 +374,30 @@ const PolicyPage = () => {
         });
         setSearchedData(searchPolicyData);
         setRecordsData(searchPolicyData);
+    };
+
+    const handleSubmitDefaultPolicy = async () => {
+        setFetching(true);
+        try {
+            setDisableBtn(true);
+            await axios.get(process.env.NEXT_PUBLIC_API_LINK + 'policies/' + defaultPolicyId + '/set-default', {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('loginToken')}`,
+                },
+            });
+            setDisableBtn(false);
+            setDefaultPolicyModal(false);
+        } catch (error: any) {
+            setDisableBtn(true);
+            if (typeof error?.response?.data?.message === 'object') {
+                setServerErrors(error?.response?.data?.message.join(' , '));
+            } else {
+                setServerErrors(error?.response?.data?.message);
+            }
+            setServerErrors(error?.response?.data?.message);
+            setDisableBtn(false);
+        }
+        setFetching(false);
     };
     return (
         <div>
@@ -394,6 +443,26 @@ const PolicyPage = () => {
                             render: ({ description }) => <div>{description}</div>,
                         },
                         {
+                            accessor: 'isDefault',
+                            title: 'Default Policy',
+                            sortable: true,
+                            render: ({ isDefault, id }) => (
+                                <div>
+                                    <label className="relative h-6 w-12">
+                                        <input
+                                            type="checkbox"
+                                            className="custom_switch peer absolute z-10 h-full w-full cursor-pointer opacity-0"
+                                            id="custom_switch_checkbox1"
+                                            name="permission"
+                                            checked={isDefault}
+                                            onChange={(e) => handleChangeDefaultPolicy(e, id)}
+                                        />
+                                        <span className="block h-full rounded-full bg-[#ebedf2] before:absolute before:bottom-1 before:left-1 before:h-4 before:w-4 before:rounded-full before:bg-white before:transition-all before:duration-300 peer-checked:bg-primary peer-checked:before:left-7 dark:bg-dark dark:before:bg-white-dark dark:peer-checked:before:bg-white"></span>
+                                    </label>
+                                </div>
+                            ),
+                        },
+                        {
                             accessor: 'action',
                             title: 'Actions',
                             titleClassName: '!text-center',
@@ -430,6 +499,17 @@ const PolicyPage = () => {
                     paginationText={({ from, to, totalRecords }) => `Showing  ${from} to ${to} of ${totalRecords} entries`}
                 />
             </div>
+
+            {/* default policy confirmation Modal */}
+            <ConfirmationModal
+                open={defaultPolicyModal}
+                onClose={() => setDefaultPolicyModal(false)}
+                onDiscard={() => setDefaultPolicyModal(false)}
+                description={'Are you sure you want to change default policy? after submit all new create policy have this selected default policy options.'}
+                title="Change Default Task Priority"
+                isBtnDisabled={disableBtn}
+                onSubmit={handleSubmitDefaultPolicy}
+            />
 
             {/* edit modal */}
 

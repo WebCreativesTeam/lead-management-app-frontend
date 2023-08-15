@@ -13,8 +13,16 @@ import { Close, Delete, Edit, Plus, View } from '@/components/icons';
 import PageHeadingSection from '@/components/__Shared/PageHeadingSection/index.';
 import { TaskStatusType } from '@/utils/Types';
 import ConfirmationModal from '@/components/__Shared/ConfirmationModal';
+import { useDispatch } from 'react-redux';
+import { setPageTitle } from '@/store/themeConfigSlice';
 
 const TaskStatusPage = () => {
+
+     const dispatch = useDispatch();
+     useEffect(() => {
+         dispatch(setPageTitle('Tasks Status Page'));
+     });
+
     //hooks
     const [data, setData] = useState<TaskStatusType[]>([]);
     const [createModal, setCreateModal] = useState<boolean>(false);
@@ -315,18 +323,18 @@ const TaskStatusPage = () => {
     };
     return (
         <div>
-            <PageHeadingSection description="Create, update, delte, and view task status" heading="Task Status" />
+            <PageHeadingSection description="Customize task statuses. Monitor workflow. Update stages. Reflect real-time progress." heading="Manage Progress" />
             <div className="my-6 flex flex-col gap-5 sm:flex-row ">
                 <div className="flex-1">
                     <button className="btn btn-primary h-full w-full max-w-[250px] max-sm:mx-auto" type="button" onClick={() => setCreateModal(true)}>
                         <Plus />
-                        Add New TaskStatus
+                        Add New Task Status
                     </button>
                 </div>
                 <div className="relative  flex-1">
                     <input
                         type="text"
-                        placeholder="Find A TaskStatus"
+                        placeholder="Find Task Status"
                         className="form-input py-3 ltr:pr-[100px] rtl:pl-[100px]"
                         onChange={(e) => setSearchInputText(e.target.value)}
                         value={searchQuery}
@@ -337,7 +345,7 @@ const TaskStatusPage = () => {
                 </div>
             </div>
 
-            {/* taskStatus List table*/}
+            {/* Task Status List table*/}
             <div className="datatables panel mt-6">
                 <DataTable
                     className="table-hover whitespace-nowrap"
@@ -345,9 +353,13 @@ const TaskStatusPage = () => {
                     columns={[
                         {
                             accessor: 'name',
-                            title: 'TaskStatus Name',
+                            title: 'Task Status Name',
                             sortable: true,
-                            render: ({ name }) => <div>{name}</div>,
+                            render: ({ name, color }) => (
+                                <span className={`mr-2 rounded px-2.5 py-0.5 text-sm font-medium dark:bg-blue-900 dark:text-blue-300`} style={{ color: color, backgroundColor: color + '20' }}>
+                                    {name}
+                                </span>
+                            ),
                         },
                         {
                             accessor: 'createdAt',
@@ -449,7 +461,7 @@ const TaskStatusPage = () => {
                                 >
                                     <Dialog.Panel as="div" className="panel my-8 w-full max-w-lg  overflow-visible rounded-lg border-0 p-0 text-black dark:text-white-dark ">
                                         <div className="flex items-center justify-between rounded-t-lg bg-[#fbfbfb] px-5 py-3 dark:bg-[#121c2c]">
-                                            <h5 className="text-lg font-bold">Edit TaskStatus</h5>
+                                            <h5 className="text-lg font-bold">Edit Task Status</h5>
                                             <button type="button" className="text-white-dark hover:text-dark" onClick={handleDiscard}>
                                                 <Close />
                                             </button>
@@ -457,7 +469,7 @@ const TaskStatusPage = () => {
                                         <div className="p-5">
                                             <form className="space-y-5" onSubmit={handleSubmit}>
                                                 <div>
-                                                    <label htmlFor="createTaskStatus">TaskStatus Name</label>
+                                                    <label htmlFor="createTaskStatus">Task Status Name</label>
                                                     <input
                                                         onChange={handleChange}
                                                         onBlur={handleBlur}
@@ -465,12 +477,12 @@ const TaskStatusPage = () => {
                                                         id="createTaskStatus"
                                                         name="name"
                                                         type="text"
-                                                        placeholder="TaskStatus Name"
+                                                        placeholder="Task Status Name"
                                                         className="form-input"
                                                     />
                                                 </div>
                                                 <div>
-                                                    <label htmlFor="statusColor">TaskStatus Color</label>
+                                                    <label htmlFor="statusColor">Task Status Color</label>
                                                     <input
                                                         onBlur={(e: React.ChangeEvent<HTMLInputElement>) => setInputColor(e.target.value)}
                                                         id="statusColor"
@@ -490,7 +502,7 @@ const TaskStatusPage = () => {
                                                         onClick={handleClickSubmit}
                                                         disabled={values.name && !disableBtn ? false : true}
                                                     >
-                                                        Edit TaskStatus
+                                                        Edit Task Status
                                                     </button>
                                                 </div>
                                             </form>
@@ -532,7 +544,7 @@ const TaskStatusPage = () => {
                                 >
                                     <Dialog.Panel as="div" className="panel my-8 w-full max-w-lg overflow-hidden rounded-lg border-0 p-0 text-black dark:text-white-dark">
                                         <div className="flex items-center justify-between bg-[#fbfbfb] px-5 py-3 dark:bg-[#121c2c]">
-                                            <h5 className="text-lg font-bold">View TaskStatus</h5>
+                                            <h5 className="text-lg font-bold">View Task Status</h5>
                                             <button type="button" className="text-white-dark hover:text-dark" onClick={() => setViewModal(false)}>
                                                 <Close />
                                             </button>
@@ -540,25 +552,11 @@ const TaskStatusPage = () => {
                                         <div className="p-5">
                                             <ul className="flex flex-col gap-4">
                                                 <li className="flex flex-wrap">
-                                                    <span className="flex-1 text-lg font-bold">TaskStatus Name</span>
+                                                    <span className="flex-1 text-lg font-bold">Task Status Name</span>
                                                     <p className="flex-[2]">{singleViewTaskStatus.name}</p>
                                                 </li>
                                                 <li className="flex flex-wrap">
-                                                    <span className="flex-1 text-lg font-bold">TaskStatus Color</span>
-                                                    <p className="flex-[2]">
-                                                        <span
-                                                            style={{
-                                                                border: '3px solid' + singleViewTaskStatus.color,
-                                                                borderRadius: '4px',
-                                                            }}
-                                                            className="px-3 font-bold"
-                                                        >
-                                                            {singleViewTaskStatus.color}
-                                                        </span>
-                                                    </p>
-                                                </li>
-                                                <li className="flex flex-wrap">
-                                                    <span className="flex-1 text-lg font-bold">TaskStatus Created</span>
+                                                    <span className="flex-1 text-lg font-bold">Task Status Created</span>
                                                     <p className="flex-[2]">{new Date(singleViewTaskStatus.createdAt).toLocaleString()}</p>
                                                 </li>
                                                 <li className="flex flex-wrap">
@@ -587,7 +585,7 @@ const TaskStatusPage = () => {
                 onDiscard={() => setDeleteModal(false)}
                 description={
                     <>
-                        Are you sure you want to delete this taskStatus? <br /> It will not revert!
+                        Are you sure you want to delete this Task Status? <br /> It will not revert!
                     </>
                 }
                 title="Delete task status"
@@ -624,7 +622,7 @@ const TaskStatusPage = () => {
                                 >
                                     <Dialog.Panel as="div" className="panel my-8 w-full max-w-lg  overflow-visible rounded-lg border-0 p-0 text-black dark:text-white-dark ">
                                         <div className="flex items-center justify-between rounded-t-lg bg-[#fbfbfb] px-5 py-3 dark:bg-[#121c2c]">
-                                            <h5 className="text-lg font-bold">Create TaskStatus</h5>
+                                            <h5 className="text-lg font-bold">Create Task Status</h5>
                                             <button type="button" className="text-white-dark hover:text-dark" onClick={handleDiscard}>
                                                 <Close />
                                             </button>
@@ -632,7 +630,7 @@ const TaskStatusPage = () => {
                                         <div className="p-5">
                                             <form className="space-y-5" onSubmit={handleSubmit}>
                                                 <div>
-                                                    <label htmlFor="createTaskStatus">TaskStatus Name</label>
+                                                    <label htmlFor="createTaskStatus">Task Status Name</label>
                                                     <input
                                                         onChange={handleChange}
                                                         onBlur={handleBlur}
@@ -640,12 +638,12 @@ const TaskStatusPage = () => {
                                                         id="createTaskStatus"
                                                         name="name"
                                                         type="text"
-                                                        placeholder="TaskStatus Name"
+                                                        placeholder="Task Status Name"
                                                         className="form-input"
                                                     />
                                                 </div>
                                                 <div>
-                                                    <label htmlFor="editStatusColor">TaskStatus Color</label>
+                                                    <label htmlFor="editStatusColor">Task Status Color</label>
                                                     <input onBlur={(e: React.ChangeEvent<HTMLInputElement>) => setInputColor(e.target.value)} id="editStatusColor" name="color" type="color" />
                                                 </div>
 
@@ -659,7 +657,7 @@ const TaskStatusPage = () => {
                                                         onClick={handleClickSubmit}
                                                         disabled={values.name && !disableBtn ? false : true}
                                                     >
-                                                        Create TaskStatus
+                                                        Create Task Status
                                                     </button>
                                                 </div>
                                             </form>

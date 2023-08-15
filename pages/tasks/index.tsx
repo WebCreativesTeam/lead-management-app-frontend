@@ -16,8 +16,17 @@ import { Close, Delete, Edit, Plus, View } from '@/components/icons';
 import PageHeadingSection from '@/components/__Shared/PageHeadingSection/index.';
 import { SelectOptionsType, TaskSelectOptions } from '@/utils/Types';
 import { TaskDataType } from '@/utils/Types';
+import { useDispatch } from 'react-redux';
+import { setPageTitle } from '@/store/themeConfigSlice';
+import ConfirmationModal from '@/components/__Shared/ConfirmationModal';
 
 const TaskPage = () => {
+
+    const dispatch = useDispatch();
+    useEffect(() => {
+        dispatch(setPageTitle('Manage Tasks'));
+    });
+
     //hooks
     const [data, setData] = useState<TaskDataType[]>([]);
     const [createModal, setCreateModal] = useState<boolean>(false);
@@ -134,7 +143,6 @@ const TaskPage = () => {
                         priority: value.priority.value,
                         assignedTo: values.assignedTo,
                     };
-                    console.log(createTaskObj);
                     await axios.post(process.env.NEXT_PUBLIC_API_LINK + 'tasks/', createTaskObj, {
                         headers: {
                             Authorization: `Bearer ${localStorage.getItem('loginToken')}`,
@@ -186,7 +194,6 @@ const TaskPage = () => {
         const findTask: TaskDataType | any = data?.find((item: TaskDataType) => {
             return item.id === id;
         });
-        console.log(findTask);
         setFieldValue('title', findTask?.title);
         setFieldValue('startDate', findTask?.startDate);
         setFieldValue('endDate', findTask?.endDate);
@@ -326,23 +333,21 @@ const TaskPage = () => {
     };
 
     //search task
-const handleSearchTask = () => {
-    const searchTaskData = data?.filter((task: TaskDataType) => {
-        return (
-            task.title.toLowerCase().startsWith(searchQuery.toLowerCase().trim(), 0) ||
-            task.title.toLowerCase().endsWith(searchQuery.toLowerCase().trim()) ||
-            task.title.toLowerCase().includes(searchQuery.toLowerCase().trim())
-        );
-    });
-    console.log(searchTaskData)
-    setSearchedData(searchTaskData);
-    setRecordsData(searchTaskData);
-};
-
-    console.log(recordsData)
+    const handleSearchTask = () => {
+        const searchTaskData = data?.filter((task: TaskDataType) => {
+            return (
+                task.title.toLowerCase().startsWith(searchQuery.toLowerCase().trim(), 0) ||
+                task.title.toLowerCase().endsWith(searchQuery.toLowerCase().trim()) ||
+                task.title.toLowerCase().includes(searchQuery.toLowerCase().trim())
+            );
+        });
+        setSearchedData(searchTaskData);
+        setRecordsData(searchTaskData);
+    };
+    console.log(recordsData);
     return (
         <div>
-            <PageHeadingSection description="Create, read, write, delete, assign, or change status of the task" heading="Manage Tasks" />
+            <PageHeadingSection description="View, create, update, and close tasks. Organize by status, priority, and due date. Stay on top of work." heading="Task Management" />
             <div className="my-6 flex flex-col gap-5 sm:flex-row ">
                 <div className="flex-1">
                     <button className="btn btn-primary h-full w-full max-w-[200px] max-sm:mx-auto" type="button" onClick={() => setCreateModal(true)}>
@@ -392,7 +397,14 @@ const handleSearchTask = () => {
                             accessor: 'isActive',
                             title: 'Task Status',
                             sortable: true,
-                            render: ({ createdAt }) => <div>Active</div>,
+                            render: ({ status }) => (
+                                <span
+                                    className={`mr-2 rounded px-2.5 py-0.5 text-sm font-medium dark:bg-blue-900 dark:text-blue-300`}
+                                    style={{ color: status.color, backgroundColor: status.color + '20' }}
+                                >
+                                    {status.name}
+                                </span>
+                            ),
                         },
                         {
                             accessor: 'endDate',
@@ -586,7 +598,7 @@ const handleSearchTask = () => {
                                                         onClick={handleClickSubmit}
                                                         disabled={values.title && !disableBtn ? false : true}
                                                     >
-                                                        Create Task
+                                                        Edit Task
                                                     </button>
                                                 </div>
                                             </form>
@@ -687,59 +699,20 @@ const handleSearchTask = () => {
             </div>
 
             {/* delete modal */}
-
-            <div className="mb-5">
-                <Transition appear show={deleteModal} as={Fragment}>
-                    <Dialog as="div" open={deleteModal} onClose={() => setDeleteModal(false)}>
-                        <Transition.Child
-                            as={Fragment}
-                            enter="ease-out duration-300"
-                            enterFrom="opacity-0"
-                            enterTo="opacity-100"
-                            leave="ease-in duration-200"
-                            leaveFrom="opacity-100"
-                            leaveTo="opacity-0"
-                        >
-                            <div className="fixed inset-0" />
-                        </Transition.Child>
-                        <div className="fixed inset-0 z-[999] overflow-y-auto bg-[black]/60">
-                            <div className="flex min-h-screen items-center justify-center px-4">
-                                <Transition.Child
-                                    as={Fragment}
-                                    enter="ease-out duration-300"
-                                    enterFrom="opacity-0 scale-95"
-                                    enterTo="opacity-100 scale-100"
-                                    leave="ease-in duration-200"
-                                    leaveFrom="opacity-100 scale-100"
-                                    leaveTo="opacity-0 scale-95"
-                                >
-                                    <Dialog.Panel as="div" className="panel my-8 w-full max-w-lg overflow-hidden rounded-lg border-0 p-0 text-black dark:text-white-dark">
-                                        <div className="flex items-center justify-between bg-[#fbfbfb] px-5 py-3 dark:bg-[#121c2c]">
-                                            <h5 className="text-lg font-bold">Delete Task</h5>
-                                            <button type="button" className="text-white-dark hover:text-dark" onClick={() => setDeleteModal(false)}>
-                                                <Close />
-                                            </button>
-                                        </div>
-                                        <div className="p-5">
-                                            <div className="text-center text-xl">
-                                                Are you sure you want to delete this task? <br /> It will not revert!
-                                            </div>
-                                            <div className="mt-8 flex items-center justify-center">
-                                                <button type="button" className="btn btn-outline-success" onClick={handleDiscard} disabled={disableBtn}>
-                                                    Cancel
-                                                </button>
-                                                <button type="button" className="btn btn-danger ltr:ml-4 rtl:mr-4" onClick={onDeleteTask} disabled={disableBtn}>
-                                                    Delete Task
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </Dialog.Panel>
-                                </Transition.Child>
-                            </div>
-                        </div>
-                    </Dialog>
-                </Transition>
-            </div>
+            <ConfirmationModal
+                open={deleteModal}
+                onClose={() => setDeleteModal(false)}
+                onDiscard={() => setDeleteModal(false)}
+                description={
+                    <>
+                        Are you sure you want to delete this Task? <br /> It will not revert!
+                    </>
+                }
+                title="Delete task priority"
+                isBtnDisabled={disableBtn}
+                onSubmit={onDeleteTask}
+                btnSubmitText="Delete"
+            />
 
             {/* create modal */}
 

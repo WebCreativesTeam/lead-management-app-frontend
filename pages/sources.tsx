@@ -12,6 +12,8 @@ import { sortBy } from 'lodash';
 import { Close, Delete, Edit, Plus, SnackLine, View, WalkingMan } from '@/components/icons';
 import PageHeadingSection from '@/components/__Shared/PageHeadingSection/index.';
 import ConfirmationModal from '@/components/__Shared/ConfirmationModal';
+import { useDispatch } from 'react-redux';
+import { setPageTitle } from '@/store/themeConfigSlice';
 
 type SourceDataType = {
     name: string;
@@ -21,6 +23,12 @@ type SourceDataType = {
 };
 
 const Source = () => {
+
+     const dispatch = useDispatch();
+     useEffect(() => {
+         dispatch(setPageTitle('Track Leads | Sources'));
+     });
+
     //hooks
     const [data, setData] = useState<SourceDataType[]>([]);
     const [createModal, setCreateModal] = useState<boolean>(false);

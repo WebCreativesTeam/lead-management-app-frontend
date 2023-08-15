@@ -22,7 +22,7 @@ const initialValues = {
 const SignUpPage = () => {
     const dispatch = useDispatch();
     useEffect(() => {
-        dispatch(setPageTitle('Register Boxed'));
+        dispatch(setPageTitle('Signup | Authentication'));
     });
     const [serverErrors, setServerErrors] = useState('');
     const [forceRender, setForceRender] = useState<boolean>(false);
@@ -353,7 +353,7 @@ const SignUpPage = () => {
                             <div className="mb-3"></div>
                             <div className="text-center dark:text-white">
                                 Already have an account ?&nbsp;
-                                <Link href="/auth/login" className="uppercase text-primary underline transition hover:text-black dark:hover:text-white">
+                                <Link href="/auth/signin" className="uppercase text-primary underline transition hover:text-black dark:hover:text-white">
                                     SIGN IN
                                 </Link>
                             </div>
