@@ -53,7 +53,7 @@ const PolicyPage = () => {
     const [initialRecords, setInitialRecords] = useState(sortBy(searchedData, 'name'));
     const [recordsData, setRecordsData] = useState(initialRecords);
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
-        columnAccessor: 'firstName',
+        columnAccessor: 'name',
         direction: 'asc',
     });
     useEffect(() => {

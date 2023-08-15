@@ -15,19 +15,7 @@ import 'flatpickr/dist/flatpickr.css';
 import { Close, Delete, Edit, Plus, View } from '@/components/icons';
 import PageHeadingSection from '@/components/__Shared/PageHeadingSection/index.';
 import { SelectOptionsType, TaskSelectOptions } from '@/utils/Types';
-
-type TaskDataType = {
-    title: string;
-    createdAt: string;
-    updatedAt: string;
-    id: string;
-    startDate: string;
-    endDate: string;
-    description: string;
-    comment: string;
-    isActive: boolean;
-    lead: string;
-};
+import { TaskDataType } from '@/utils/Types';
 
 const TaskPage = () => {
     //hooks
@@ -47,7 +35,6 @@ const TaskPage = () => {
     const [loading, setLoading] = useState<boolean>(false);
     const [fetching, setFetching] = useState<boolean>(false);
     const [priorityOptions, setPriorityOptions] = useState<SelectOptionsType[]>([]);
-    const [statusOptions, setStatusOptions] = useState<SelectOptionsType[]>([]);
 
     //useDefferedValue hook for search query
     const searchQuery = useDeferredValue(searchInputText);
@@ -56,10 +43,10 @@ const TaskPage = () => {
     const [page, setPage] = useState(1);
     const PAGE_SIZES = [10, 20, 30, 50, 100];
     const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
-    const [initialRecords, setInitialRecords] = useState(sortBy(searchedData, 'name'));
+    const [initialRecords, setInitialRecords] = useState(sortBy(searchedData, 'title'));
     const [recordsData, setRecordsData] = useState(initialRecords);
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
-        columnAccessor: 'firstName',
+        columnAccessor: 'title',
         direction: 'asc',
     });
     useEffect(() => {
@@ -77,7 +64,6 @@ const TaskPage = () => {
     //get all task after page render
     useEffect(() => {
         getTasksList();
-        getTaskStatus();
     }, [fetching]);
 
     useEffect(() => {
@@ -92,15 +78,15 @@ const TaskPage = () => {
     // set initialValues when open modal
     const initialValues = {
         title: '',
-        lead: '',
+        lead: '64c90bd5c7cd824f606addcd',
         priority: {
             value: '',
             label: '',
         },
         startDate: '',
         endDate: '',
-        assignedTo: '',
-        observer: '',
+        assignedTo: '64c90bd5c7cd824f606addce',
+        observer: '64c90bd5c7cd824f606addd0',
         description: '',
         isActive: false,
         comment: '',
@@ -118,7 +104,13 @@ const TaskPage = () => {
                 if (editModal) {
                     setDisableBtn(true);
                     const editTaskObj = {
-                        name: value.title,
+                        title: value.title,
+                        comment: value.comment,
+                        isActive: value.isActive,
+                        startDate: new Date(value.startDate).toISOString(),
+                        endDate: new Date(value.endDate).toISOString(),
+                        description: value.description,
+                        lead: values.lead,
                     };
                     await axios.patch(process.env.NEXT_PUBLIC_API_LINK + 'tasks/' + singleTask.id, editTaskObj, {
                         headers: {
@@ -137,10 +129,8 @@ const TaskPage = () => {
                         startDate: new Date(value.startDate).toISOString(),
                         endDate: new Date(value.endDate).toISOString(),
                         description: value.description,
-                        lead: '64c90bd5c7cd824f606addcd',
-                        status: '64d7bc2be1463bfb4ed578fd',
-                        assignedBy: '64c90bd5c7cd824f606addcf',
-                        observer: '64c90bd5c7cd824f606addd0',
+                        lead: values.lead,
+                        observer: values.observer,
                         priority: value.priority.value,
                         assignedTo: values.assignedTo,
                     };
@@ -190,14 +180,18 @@ const TaskPage = () => {
         }
         setServerErrors('');
     };
-
     //get single task by id
     const handleEditTask = (id: string): void => {
         setEditModal(true);
-        const findTask: any = data?.find((item: TaskDataType) => {
+        const findTask: TaskDataType | any = data?.find((item: TaskDataType) => {
             return item.id === id;
         });
-        setFieldValue('name', findTask?.name);
+        console.log(findTask);
+        setFieldValue('title', findTask?.title);
+        setFieldValue('startDate', findTask?.startDate);
+        setFieldValue('endDate', findTask?.endDate);
+        setFieldValue('description', findTask?.description);
+        setFieldValue('comment', findTask?.comment);
         setSingleTask(findTask);
     };
 
@@ -240,34 +234,6 @@ const TaskPage = () => {
                 };
             });
             setPriorityOptions(createTaskPriorityOptions);
-            // setData(tasks);
-            setLoading(false);
-        } catch (error: any) {
-            if (typeof error?.response?.data?.message === 'object') {
-                setServerErrors(error?.response?.data?.message.join(' , '));
-            } else {
-                setServerErrors(error?.response?.data?.message);
-            }
-            setServerErrors(error?.response?.data?.message);
-        }
-    };
-    //get all task status list obj
-    const getTaskStatus = async () => {
-        try {
-            setLoading(true);
-            const res = await axios.get(process.env.NEXT_PUBLIC_API_LINK + 'task-status/', {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem('loginToken')}`,
-                },
-            });
-            const taskStatusAllData: TaskSelectOptions[] = res?.data?.data;
-            const createTaskStatusOptionsObj: SelectOptionsType[] | any = taskStatusAllData?.map((item: TaskSelectOptions) => {
-                return {
-                    value: item.id,
-                    label: item.name,
-                };
-            });
-            setStatusOptions(createTaskStatusOptionsObj);
             // setData(tasks);
             setLoading(false);
         } catch (error: any) {
@@ -360,18 +326,20 @@ const TaskPage = () => {
     };
 
     //search task
-    const handleSearchTask = () => {
-        const searchTaskData = data?.filter((task: TaskDataType) => {
-            return (
-                task.title.toLowerCase().startsWith(searchQuery.toLowerCase().trim(), 0) ||
-                task.title.toLowerCase().endsWith(searchQuery.toLowerCase().trim()) ||
-                task.title.toLowerCase().includes(searchQuery.toLowerCase().trim())
-            );
-        });
-        setSearchedData(searchTaskData);
-        setRecordsData(searchedData);
-    };
+const handleSearchTask = () => {
+    const searchTaskData = data?.filter((task: TaskDataType) => {
+        return (
+            task.title.toLowerCase().startsWith(searchQuery.toLowerCase().trim(), 0) ||
+            task.title.toLowerCase().endsWith(searchQuery.toLowerCase().trim()) ||
+            task.title.toLowerCase().includes(searchQuery.toLowerCase().trim())
+        );
+    });
+    console.log(searchTaskData)
+    setSearchedData(searchTaskData);
+    setRecordsData(searchTaskData);
+};
 
+    console.log(recordsData)
     return (
         <div>
             <PageHeadingSection description="Create, read, write, delete, assign, or change status of the task" heading="Manage Tasks" />
@@ -383,8 +351,8 @@ const TaskPage = () => {
                     </button>
                 </div>
                 <div className="relative  flex-1">
-                    <input type="text" placeholder="Find A Task" className="form-input py-3 ltr:pr-[100px] rtl:pl-[100px]" onChange={(e) => setSearchInputText(e.target.value)} value={searchQuery} />
-                    <button type="button" className="btn btn-primary absolute top-1 shadow-none ltr:right-1 rtl:left-1" onClick={handleSearchTask}>
+                    <input type="text" placeholder="Find A Policy" className="form-input py-3 ltr:pr-[100px] rtl:pl-[100px]" onChange={(e) => setSearchInputText(e.target.value)} value={searchQuery} />
+                    <button type="button" className="btn btn-primary absolute top-1 shadow-none ltr:right-1 rtl:left-1" onClick={() => handleSearchTask()}>
                         Search
                     </button>
                 </div>
@@ -487,7 +455,7 @@ const TaskPage = () => {
                         >
                             <div className="fixed inset-0" />
                         </Transition.Child>
-                        <div className="fixed inset-0 z-[999] overflow-y-auto bg-[black]/60">
+                        <div className="fixed inset-0 z-[999] overflow-y-auto bg-[black]/60 ">
                             <div className="flex min-h-screen items-center justify-center px-4 ">
                                 <Transition.Child
                                     as={Fragment}
@@ -498,7 +466,7 @@ const TaskPage = () => {
                                     leaveFrom="opacity-100 scale-100"
                                     leaveTo="opacity-0 scale-95"
                                 >
-                                    <Dialog.Panel as="div" className="panel my-8 w-full max-w-lg  overflow-visible rounded-lg border-0 p-0 text-black dark:text-white-dark">
+                                    <Dialog.Panel as="div" className="panel my-8 w-full  overflow-visible rounded-lg border-0 p-0 text-black dark:text-white-dark sm:w-[43rem]">
                                         <div className="flex items-center justify-between rounded-t-lg bg-[#fbfbfb] px-5 py-3 dark:bg-[#121c2c]">
                                             <h5 className="text-lg font-bold">Edit Task</h5>
                                             <button type="button" className="text-white-dark hover:text-dark" onClick={handleDiscard}>
@@ -507,25 +475,118 @@ const TaskPage = () => {
                                         </div>
                                         <div className="p-5">
                                             <form className="space-y-5" onSubmit={handleSubmit}>
+                                                <div className="flex flex-col gap-4 sm:flex-row">
+                                                    <div className="flex-1">
+                                                        <label htmlFor="createTask">Task Title</label>
+                                                        <input
+                                                            onChange={handleChange}
+                                                            onBlur={handleBlur}
+                                                            value={values.title}
+                                                            id="createTask"
+                                                            name="title"
+                                                            type="text"
+                                                            placeholder="Task Title"
+                                                            className="form-input"
+                                                        />
+                                                    </div>
+                                                    <div className="flex-1">
+                                                        <label htmlFor="chooseLead">Choose Lead</label>
+                                                        <input
+                                                            onChange={handleChange}
+                                                            onBlur={handleBlur}
+                                                            value={values.lead}
+                                                            id="chooseLead"
+                                                            name="lead"
+                                                            type="text"
+                                                            placeholder="Choose Lead"
+                                                            className="form-input"
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="flex flex-col gap-4 sm:flex-row">
+                                                    <div className="flex-1">
+                                                        <label>Task Start Date</label>
+                                                        <Flatpickr
+                                                            data-enable-time
+                                                            options={{
+                                                                enableTime: true,
+                                                                dateFormat: 'Y-m-d H:i',
+                                                                position: 'auto',
+                                                            }}
+                                                            id="taskStartDate"
+                                                            name="startDate"
+                                                            className="form-input"
+                                                            onChange={(e) => setFieldValue('startDate', e)}
+                                                            value={values.startDate}
+                                                        />
+                                                    </div>
+                                                    <div className="flex-1">
+                                                        <label>Task End Date</label>
+                                                        <Flatpickr
+                                                            data-enable-time
+                                                            options={{
+                                                                enableTime: true,
+                                                                dateFormat: 'Y-m-d H:i',
+                                                                position: 'auto',
+                                                            }}
+                                                            id="taskEndDate"
+                                                            name="endDate"
+                                                            className="form-input"
+                                                            onChange={(e) => setFieldValue('endDate', e)}
+                                                            value={values.endDate}
+                                                        />
+                                                    </div>
+                                                </div>
                                                 <div>
-                                                    <label htmlFor="createTask">Task Name</label>
-                                                    <input
+                                                    <label htmlFor="taskDescription">Task Description</label>
+                                                    <textarea
+                                                        id="taskDescription"
+                                                        rows={5}
+                                                        name="description"
+                                                        className="form-textarea"
+                                                        placeholder="Enter Task Description"
                                                         onChange={handleChange}
                                                         onBlur={handleBlur}
-                                                        value={values.title}
-                                                        id="createTask"
-                                                        name="name"
-                                                        type="text"
-                                                        placeholder="Task Name"
-                                                        className="form-input"
-                                                    />
+                                                        value={values.description}
+                                                    ></textarea>
+                                                </div>
+                                                <div>
+                                                    <label htmlFor="taskComment"> Comment</label>
+                                                    <textarea
+                                                        id="taskComment"
+                                                        rows={5}
+                                                        className="form-textarea"
+                                                        placeholder="Enter Task Comment"
+                                                        name="comment"
+                                                        onChange={handleChange}
+                                                        onBlur={handleBlur}
+                                                        value={values.comment}
+                                                    ></textarea>
+                                                </div>
+                                                <div>
+                                                    <label className="inline-flex" htmlFor="taskActiveStatus">
+                                                        <input
+                                                            type="checkbox"
+                                                            className="peer form-checkbox outline-success"
+                                                            id="taskActiveStatus"
+                                                            name="isActive"
+                                                            defaultChecked={singleTask?.isActive}
+                                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFieldValue('isActive', e.target.checked)}
+                                                        />
+                                                        <span className="peer-checked:text-success">Is Task Active</span>
+                                                    </label>
                                                 </div>
                                                 <div className="mt-8 flex items-center justify-end">
                                                     <button type="button" className="btn btn-outline-danger" onClick={handleDiscard} disabled={disableBtn}>
                                                         Discard
                                                     </button>
-                                                    <button type="submit" className="btn btn-primary cursor-pointer ltr:ml-4 rtl:mr-4" disabled={values.title && !disableBtn ? false : true}>
-                                                        Edit Task
+                                                    <button
+                                                        type="submit"
+                                                        className="btn btn-primary cursor-pointer ltr:ml-4 rtl:mr-4"
+                                                        onClick={handleClickSubmit}
+                                                        disabled={values.title && !disableBtn ? false : true}
+                                                    >
+                                                        Create Task
                                                     </button>
                                                 </div>
                                             </form>
@@ -576,7 +637,15 @@ const TaskPage = () => {
                                             <ul className="flex flex-col gap-4">
                                                 <li className="flex flex-wrap">
                                                     <span className="flex-1 text-lg font-bold">Task Name</span>
-                                                    <p className="flex-[2]">{singleViewTask.name}</p>
+                                                    <p className="flex-[2]">{singleViewTask.title}</p>
+                                                </li>
+                                                <li className="flex flex-wrap">
+                                                    <span className="flex-1 text-lg font-bold">Task Description</span>
+                                                    <p className="flex-[2]">{singleViewTask.description}</p>
+                                                </li>
+                                                <li className="flex flex-wrap">
+                                                    <span className="flex-1 text-lg font-bold">Task Comment</span>
+                                                    <p className="flex-[2]">{singleViewTask.comment}</p>
                                                 </li>
                                                 <li className="flex flex-wrap">
                                                     <span className="flex-1 text-lg font-bold">Task Created</span>
@@ -585,6 +654,22 @@ const TaskPage = () => {
                                                 <li className="flex flex-wrap">
                                                     <span className="flex-1 text-lg font-bold">Last Updated</span>
                                                     <p className="flex-[2]">{new Date(singleViewTask.updatedAt).toLocaleString()}</p>
+                                                </li>
+                                                <li className="flex flex-wrap">
+                                                    <span className="flex-1 text-lg font-bold">Task StartDate</span>
+                                                    <p className="flex-[2]">{new Date(singleViewTask.startDate).toLocaleString()}</p>
+                                                </li>
+                                                <li className="flex flex-wrap">
+                                                    <span className="flex-1 text-lg font-bold">Task EndDate</span>
+                                                    <p className="flex-[2]">{new Date(singleViewTask.endDate).toLocaleString()}</p>
+                                                </li>
+                                                <li className="flex flex-wrap">
+                                                    <span className="flex-1 text-lg font-bold">Task Status</span>
+                                                    <p className="flex-[2]">{singleViewTask?.status?.name}</p>
+                                                </li>
+                                                <li className="flex flex-wrap">
+                                                    <span className="flex-1 text-lg font-bold">Task AssignBy</span>
+                                                    <p className="flex-[2]">{singleViewTask?.assignedBy?.firstName + ' ' + singleViewTask?.assignedBy?.lastName}</p>
                                                 </li>
                                             </ul>
                                             <div className="mt-8 flex items-center justify-center">
@@ -787,15 +872,6 @@ const TaskPage = () => {
                                                         <label htmlFor="taskPriority">Task Priority</label>
                                                         <Select placeholder="Select task priority" options={priorityOptions} id="taskPriority" onChange={(e) => setFieldValue('priority', e)} />
                                                     </div>
-                                                    {/* <div className="flex-1">
-                                                        <label htmlFor="taskStatus">Task Status</label>
-                                                        <Select
-                                                            placeholder="Select task Status"
-                                                            options={statusOptions}
-                                                            id="taskStatus"
-                                                            onChange={(e) => setFieldValue('status', e)}
-                                                        />
-                                                    </div> */}
                                                 </div>
                                                 <div>
                                                     <label htmlFor="taskDescription">Task Description</label>

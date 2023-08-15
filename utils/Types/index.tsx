@@ -37,6 +37,19 @@ export type UserDataType = {
 
 //taskPage
 
+export type TaskDataType = {
+    title: string;
+    createdAt: string;
+    updatedAt: string;
+    id: string;
+    startDate: string;
+    endDate: string;
+    description: string;
+    comment: string;
+    isActive: boolean;
+    lead: string;
+};
+
 export type TaskSelectOptions = {
     name?: string;
     color?: string;
