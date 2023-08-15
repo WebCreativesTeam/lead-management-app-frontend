@@ -5,49 +5,35 @@ import 'tippy.js/dist/tippy.css';
 import axios from 'axios';
 import { Dialog, Transition } from '@headlessui/react';
 import { useFormik } from 'formik';
-import { taskSchema } from '@/utils/schemas';
+import { taskStatusSchema } from '@/utils/schemas';
 import Swal from 'sweetalert2';
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
 import { sortBy } from 'lodash';
-import Flatpickr from 'react-flatpickr';
-import Select, { ActionMeta } from 'react-select';
-import 'flatpickr/dist/flatpickr.css';
-import { taskPriorityOptions } from '@/utils/Raw Data';
-import { Close, Delete, Edit, Plus, SnackLine, View, WalkingMan } from '@/components/icons';
+import { Close, Delete, Edit, Plus, View } from '@/components/icons';
 import PageHeadingSection from '@/components/__Shared/PageHeadingSection/index.';
+import { TaskStatusType } from '@/utils/Types';
+import ConfirmationModal from '@/components/__Shared/ConfirmationModal';
 
-type TaskDataType = {
-    title: string;
-    createdAt: string;
-    updatedAt: string;
-    id: string;
-    startDate: string;
-    endDate: string;
-    description: string;
-    comment: string;
-    isActive: boolean;
-};
-
-const TaskPage = () => {
+const TaskStatusPage = () => {
     //hooks
-    const [data, setData] = useState<TaskDataType[]>([]);
+    const [data, setData] = useState<TaskStatusType[]>([]);
     const [createModal, setCreateModal] = useState<boolean>(false);
     const [editModal, setEditModal] = useState<boolean>(false);
     const [viewModal, setViewModal] = useState<boolean>(false);
     const [deleteModal, setDeleteModal] = useState<boolean>(false);
-    const [singleTask, setSingleTask] = useState<any>({});
-    const [singleViewTask, setSingleViewTask] = useState<any>({});
-    const [singleDeleteTask, setSingleDeleteTask] = useState<any>('');
+    const [defaultStatusModal, setDefaultStatusModal] = useState<boolean>(false);
+    const [singleTaskStatus, setSingleTaskStatus] = useState<any>({});
+    const [singleViewTaskStatus, setSingleViewTaskStatus] = useState<any>({});
+    const [singleDeleteTaskStatus, setSingleDeleteTaskStatus] = useState<any>('');
     const [disableBtn, setDisableBtn] = useState<boolean>(false);
     const [serverErrors, setServerErrors] = useState('');
     const [forceRender, setForceRender] = useState<boolean>(false);
     const [searchInputText, setSearchInputText] = useState<string>('');
-    const [searchedData, setSearchedData] = useState<TaskDataType[]>(data);
+    const [searchedData, setSearchedData] = useState<TaskStatusType[]>(data);
     const [loading, setLoading] = useState<boolean>(false);
     const [fetching, setFetching] = useState<boolean>(false);
-
-    //useDefferedValue hook for search query
-    const searchQuery = useDeferredValue(searchInputText);
+    const [defaultStatusId, setDefaultStatusId] = useState<string>('');
+    const [inputColor, setInputColor] = useState<string>('#90EE90');
 
     //datatable
     const [page, setPage] = useState(1);
@@ -56,7 +42,7 @@ const TaskPage = () => {
     const [initialRecords, setInitialRecords] = useState(sortBy(searchedData, 'name'));
     const [recordsData, setRecordsData] = useState(initialRecords);
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
-        columnAccessor: 'firstName',
+        columnAccessor: 'name',
         direction: 'asc',
     });
     useEffect(() => {
@@ -71,9 +57,9 @@ const TaskPage = () => {
         setPage(1);
     }, [sortStatus]);
 
-    //get all task after page render
+    //get all taskStatus after page render
     useEffect(() => {
-        getTasksList();
+        getTaskStatusList();
     }, [fetching]);
 
     useEffect(() => {
@@ -83,14 +69,16 @@ const TaskPage = () => {
 
     // set initialValues when open modal
     const initialValues = {
-        title: '',
-        lead: '',
+        name: '',
     };
+
+    //useDefferedValue hook for search query
+    const searchQuery = useDeferredValue(searchInputText);
 
     //form handling
     const { values, handleChange, handleSubmit, setFieldValue, errors, handleBlur, resetForm } = useFormik({
         initialValues,
-        validationSchema: taskSchema,
+        validationSchema: taskStatusSchema,
         validateOnChange: false,
         enableReinitialize: true,
         onSubmit: async (value, action) => {
@@ -98,10 +86,11 @@ const TaskPage = () => {
             try {
                 if (editModal) {
                     setDisableBtn(true);
-                    const editTaskObj = {
-                        name: value.title,
+                    const editTaskStatusObj = {
+                        name: value.name,
+                        color: inputColor,
                     };
-                    await axios.patch(process.env.NEXT_PUBLIC_API_LINK + 'tasks/' + singleTask.id, editTaskObj, {
+                    await axios.patch(process.env.NEXT_PUBLIC_API_LINK + 'task-status/' + singleTaskStatus.id, editTaskStatusObj, {
                         headers: {
                             Authorization: `Bearer ${localStorage.getItem('loginToken')}`,
                         },
@@ -111,16 +100,18 @@ const TaskPage = () => {
                     setEditModal(false);
                 } else if (createModal) {
                     setDisableBtn(true);
-                    const createTaskObj = {
-                        name: value.title,
+                    const createTaskStatusObj = {
+                        name: value.name,
+                        color: inputColor,
                     };
-                    await axios.post(process.env.NEXT_PUBLIC_API_LINK + 'tasks/', createTaskObj, {
+                    await axios.post(process.env.NEXT_PUBLIC_API_LINK + 'task-status/', createTaskStatusObj, {
                         headers: {
                             Authorization: `Bearer ${localStorage.getItem('loginToken')}`,
                         },
                     });
                     setDisableBtn(false);
                     setCreateModal(false);
+                    setInputColor('#000000');
                     action.resetForm();
                 }
             } catch (error: any) {
@@ -159,27 +150,29 @@ const TaskPage = () => {
         setServerErrors('');
     };
 
-    //get single task by id
-    const handleEditTask = (id: string): void => {
+    //get single taskStatus by id
+    const handleEditTaskStatus = (id: string): void => {
         setEditModal(true);
-        const findTask: any = data?.find((item: TaskDataType) => {
+        const findTaskStatus: any = data?.find((item: TaskStatusType) => {
             return item.id === id;
         });
-        setFieldValue('name', findTask?.name);
-        setSingleTask(findTask);
+        setInputColor(findTaskStatus.color);
+        setFieldValue('name', findTaskStatus?.name);
+        setSingleTaskStatus(findTaskStatus);
     };
 
-    //get all tasks list
-    const getTasksList = async () => {
+    //get all TaskStatus list
+    const getTaskStatusList = async () => {
         try {
             setLoading(true);
-            const res = await axios.get(process.env.NEXT_PUBLIC_API_LINK + 'tasks/', {
+            const res = await axios.get(process.env.NEXT_PUBLIC_API_LINK + 'task-status?sort=-isDefault', {
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem('loginToken')}`,
                 },
             });
-            const tasks = res?.data?.data;
-            setData(tasks);
+            const taskStatus = res?.data?.data;
+            setData(taskStatus);
+            console.log(taskStatus);
             setLoading(false);
         } catch (error: any) {
             if (typeof error?.response?.data?.message === 'object') {
@@ -193,7 +186,7 @@ const TaskPage = () => {
 
     //showing validation error
     const showAlert = async () => {
-        if (errors.title) {
+        if (errors.name) {
             const toast = Swal.mixin({
                 toast: true,
                 position: 'top-end',
@@ -202,7 +195,7 @@ const TaskPage = () => {
             });
             toast.fire({
                 icon: 'error',
-                title: errors.title,
+                title: errors.name,
                 padding: '10px 20px',
             });
         }
@@ -226,31 +219,35 @@ const TaskPage = () => {
         resetForm();
     };
 
-    // get single task for view modal
-    const handleViewTask = (id: string) => {
+    // get single taskStatus for view modal
+    const handleViewTaskStatus = (id: string) => {
         setViewModal(true);
-        const findTask = data?.find((item: TaskDataType) => {
+        const findTaskStatus = data?.find((item: TaskStatusType) => {
             return item.id === id;
         });
-        setSingleViewTask(findTask);
+        setSingleViewTaskStatus(findTaskStatus);
     };
 
-    // delete task by id
+    // delete taskStatus by id
 
-    const handleDeleteTask = (id: string) => {
+    const handleDeleteTaskStatus = (id: string) => {
+        const findTaskStatus = data?.find((item: TaskStatusType) => {
+            return item.id === id;
+        });
+        if (findTaskStatus?.isDefault) {
+            setServerErrors('Please make other option default to Delete this Status');
+            return;
+        }
         setDeleteModal(true);
-        const findTask = data?.find((item: TaskDataType) => {
-            return item.id === id;
-        });
-        setSingleDeleteTask(findTask?.id);
+        setSingleDeleteTaskStatus(findTaskStatus?.id);
     };
 
-    //deleting task
-    const onDeleteTask = async () => {
+    //deleting taskStatus
+    const onDeleteTaskStatus = async () => {
         setFetching(true);
         try {
             setDisableBtn(true);
-            await axios.delete(process.env.NEXT_PUBLIC_API_LINK + 'tasks/' + singleDeleteTask, {
+            await axios.delete(process.env.NEXT_PUBLIC_API_LINK + 'task-status/' + singleDeleteTaskStatus, {
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem('loginToken')}`,
                 },
@@ -270,48 +267,87 @@ const TaskPage = () => {
         setFetching(false);
     };
 
-    //search task
-    const handleSearchTask = () => {
-        const searchTaskData = data?.filter((task: TaskDataType) => {
+    //search taskStatus
+    const handleSearchTaskStatus = () => {
+        const searchTaskStatusData = data?.filter((taskStatus: TaskStatusType) => {
             return (
-                task.title.toLowerCase().startsWith(searchQuery.toLowerCase().trim(), 0) ||
-                task.title.toLowerCase().endsWith(searchQuery.toLowerCase().trim()) ||
-                task.title.toLowerCase().includes(searchQuery.toLowerCase().trim())
+                taskStatus.name.toLowerCase().startsWith(searchQuery.toLowerCase().trim(), 0) ||
+                taskStatus.name.toLowerCase().endsWith(searchQuery.toLowerCase().trim()) ||
+                taskStatus.name.toLowerCase().includes(searchQuery.toLowerCase().trim())
             );
         });
-        setSearchedData(searchTaskData);
+        setSearchedData(searchTaskStatusData);
         setRecordsData(searchedData);
     };
 
+    //changing defalt status
+    const handleChangeDefaultStatus = async (e: React.ChangeEvent<HTMLInputElement>, id: string) => {
+        if (!e.target.checked) {
+            setServerErrors('default task status already selected');
+            return;
+        }
+        setDefaultStatusModal(true);
+        setDefaultStatusId(id);
+    };
+
+    const handleSubmitDefaultStatus = async () => {
+        setFetching(true);
+        try {
+            setDisableBtn(true);
+            await axios.get(process.env.NEXT_PUBLIC_API_LINK + 'task-status/' + defaultStatusId + '/set-default', {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('loginToken')}`,
+                },
+            });
+            setDisableBtn(false);
+            setDefaultStatusModal(false);
+        } catch (error: any) {
+            setDisableBtn(true);
+            if (typeof error?.response?.data?.message === 'object') {
+                setServerErrors(error?.response?.data?.message.join(' , '));
+            } else {
+                setServerErrors(error?.response?.data?.message);
+            }
+            setServerErrors(error?.response?.data?.message);
+            setDisableBtn(false);
+        }
+        setFetching(false);
+    };
     return (
         <div>
-            <PageHeadingSection description="Create, read, write, delete, assign, or change status of the task" heading="Manage Tasks" />
+            <PageHeadingSection description="Create, update, delte, and view task status" heading="Task Status" />
             <div className="my-6 flex flex-col gap-5 sm:flex-row ">
                 <div className="flex-1">
-                    <button className="btn btn-primary h-full w-full max-w-[200px] max-sm:mx-auto" type="button" onClick={() => setCreateModal(true)}>
+                    <button className="btn btn-primary h-full w-full max-w-[250px] max-sm:mx-auto" type="button" onClick={() => setCreateModal(true)}>
                         <Plus />
-                        Add New Task
+                        Add New TaskStatus
                     </button>
                 </div>
                 <div className="relative  flex-1">
-                    <input type="text" placeholder="Find A Task" className="form-input py-3 ltr:pr-[100px] rtl:pl-[100px]" onChange={(e) => setSearchInputText(e.target.value)} value={searchQuery} />
-                    <button type="button" className="btn btn-primary absolute top-1 shadow-none ltr:right-1 rtl:left-1" onClick={handleSearchTask}>
+                    <input
+                        type="text"
+                        placeholder="Find A TaskStatus"
+                        className="form-input py-3 ltr:pr-[100px] rtl:pl-[100px]"
+                        onChange={(e) => setSearchInputText(e.target.value)}
+                        value={searchQuery}
+                    />
+                    <button type="button" className="btn btn-primary absolute top-1 shadow-none ltr:right-1 rtl:left-1" onClick={handleSearchTaskStatus}>
                         Search
                     </button>
                 </div>
             </div>
 
-            {/* Tasks List table*/}
+            {/* taskStatus List table*/}
             <div className="datatables panel mt-6">
                 <DataTable
                     className="table-hover whitespace-nowrap"
                     records={recordsData}
                     columns={[
                         {
-                            accessor: 'title',
-                            title: 'Task Name',
+                            accessor: 'name',
+                            title: 'TaskStatus Name',
                             sortable: true,
-                            render: ({ title }) => <div>{title}</div>,
+                            render: ({ name }) => <div>{name}</div>,
                         },
                         {
                             accessor: 'createdAt',
@@ -326,22 +362,24 @@ const TaskPage = () => {
                             render: ({ updatedAt }) => <div>{new Date(updatedAt).toLocaleString()}</div>,
                         },
                         {
-                            accessor: 'startDate',
-                            title: 'Start Date',
+                            accessor: 'isDefault',
+                            title: 'Default Status',
                             sortable: true,
-                            render: ({ createdAt }) => <div>{new Date(createdAt).toLocaleString()}</div>,
-                        },
-                        {
-                            accessor: 'isActive',
-                            title: 'Task Status',
-                            sortable: true,
-                            render: ({ createdAt }) => <div>Active</div>,
-                        },
-                        {
-                            accessor: 'endDate',
-                            title: 'End Date',
-                            sortable: true,
-                            render: ({ updatedAt }) => <div>{new Date(updatedAt).toLocaleString()}</div>,
+                            render: ({ isDefault, id }) => (
+                                <div>
+                                    <label className="relative h-6 w-12">
+                                        <input
+                                            type="checkbox"
+                                            className="custom_switch peer absolute z-10 h-full w-full cursor-pointer opacity-0"
+                                            id="custom_switch_checkbox1"
+                                            name="permission"
+                                            checked={isDefault}
+                                            onChange={(e) => handleChangeDefaultStatus(e, id)}
+                                        />
+                                        <span className="block h-full rounded-full bg-[#ebedf2] before:absolute before:bottom-1 before:left-1 before:h-4 before:w-4 before:rounded-full before:bg-white before:transition-all before:duration-300 peer-checked:bg-primary peer-checked:before:left-7 dark:bg-dark dark:before:bg-white-dark dark:peer-checked:before:bg-white"></span>
+                                    </label>
+                                </div>
+                            ),
                         },
                         {
                             accessor: 'action',
@@ -350,17 +388,17 @@ const TaskPage = () => {
                             render: ({ id }) => (
                                 <div className="flex justify-center gap-2  p-3 text-center ">
                                     <Tippy content="View">
-                                        <button type="button" onClick={() => handleViewTask(id)}>
+                                        <button type="button" onClick={() => handleViewTaskStatus(id)}>
                                             <View />
                                         </button>
                                     </Tippy>
                                     <Tippy content="Edit">
-                                        <button type="button" onClick={() => handleEditTask(id)}>
+                                        <button type="button" onClick={() => handleEditTaskStatus(id)}>
                                             <Edit />
                                         </button>
                                     </Tippy>
                                     <Tippy content="Delete">
-                                        <button type="button" onClick={() => handleDeleteTask(id)}>
+                                        <button type="button" onClick={() => handleDeleteTaskStatus(id)}>
                                             <Delete />
                                         </button>
                                     </Tippy>
@@ -409,9 +447,9 @@ const TaskPage = () => {
                                     leaveFrom="opacity-100 scale-100"
                                     leaveTo="opacity-0 scale-95"
                                 >
-                                    <Dialog.Panel as="div" className="panel my-8 w-full max-w-lg  overflow-visible rounded-lg border-0 p-0 text-black dark:text-white-dark">
+                                    <Dialog.Panel as="div" className="panel my-8 w-full max-w-lg  overflow-visible rounded-lg border-0 p-0 text-black dark:text-white-dark ">
                                         <div className="flex items-center justify-between rounded-t-lg bg-[#fbfbfb] px-5 py-3 dark:bg-[#121c2c]">
-                                            <h5 className="text-lg font-bold">Edit Task</h5>
+                                            <h5 className="text-lg font-bold">Edit TaskStatus</h5>
                                             <button type="button" className="text-white-dark hover:text-dark" onClick={handleDiscard}>
                                                 <Close />
                                             </button>
@@ -419,24 +457,40 @@ const TaskPage = () => {
                                         <div className="p-5">
                                             <form className="space-y-5" onSubmit={handleSubmit}>
                                                 <div>
-                                                    <label htmlFor="createTask">Task Name</label>
+                                                    <label htmlFor="createTaskStatus">TaskStatus Name</label>
                                                     <input
                                                         onChange={handleChange}
                                                         onBlur={handleBlur}
-                                                        value={values.title}
-                                                        id="createTask"
+                                                        value={values.name}
+                                                        id="createTaskStatus"
                                                         name="name"
                                                         type="text"
-                                                        placeholder="Task Name"
+                                                        placeholder="TaskStatus Name"
                                                         className="form-input"
                                                     />
                                                 </div>
+                                                <div>
+                                                    <label htmlFor="statusColor">TaskStatus Color</label>
+                                                    <input
+                                                        onBlur={(e: React.ChangeEvent<HTMLInputElement>) => setInputColor(e.target.value)}
+                                                        id="statusColor"
+                                                        name="color"
+                                                        type="color"
+                                                        defaultValue={inputColor}
+                                                    />
+                                                </div>
+
                                                 <div className="mt-8 flex items-center justify-end">
                                                     <button type="button" className="btn btn-outline-danger" onClick={handleDiscard} disabled={disableBtn}>
                                                         Discard
                                                     </button>
-                                                    <button type="submit" className="btn btn-primary cursor-pointer ltr:ml-4 rtl:mr-4" disabled={values.title && !disableBtn ? false : true}>
-                                                        Edit Task
+                                                    <button
+                                                        type="submit"
+                                                        className="btn btn-primary cursor-pointer ltr:ml-4 rtl:mr-4"
+                                                        onClick={handleClickSubmit}
+                                                        disabled={values.name && !disableBtn ? false : true}
+                                                    >
+                                                        Edit TaskStatus
                                                     </button>
                                                 </div>
                                             </form>
@@ -478,7 +532,7 @@ const TaskPage = () => {
                                 >
                                     <Dialog.Panel as="div" className="panel my-8 w-full max-w-lg overflow-hidden rounded-lg border-0 p-0 text-black dark:text-white-dark">
                                         <div className="flex items-center justify-between bg-[#fbfbfb] px-5 py-3 dark:bg-[#121c2c]">
-                                            <h5 className="text-lg font-bold">View Task</h5>
+                                            <h5 className="text-lg font-bold">View TaskStatus</h5>
                                             <button type="button" className="text-white-dark hover:text-dark" onClick={() => setViewModal(false)}>
                                                 <Close />
                                             </button>
@@ -486,16 +540,30 @@ const TaskPage = () => {
                                         <div className="p-5">
                                             <ul className="flex flex-col gap-4">
                                                 <li className="flex flex-wrap">
-                                                    <span className="flex-1 text-lg font-bold">Task Name</span>
-                                                    <p className="flex-[2]">{singleViewTask.name}</p>
+                                                    <span className="flex-1 text-lg font-bold">TaskStatus Name</span>
+                                                    <p className="flex-[2]">{singleViewTaskStatus.name}</p>
                                                 </li>
                                                 <li className="flex flex-wrap">
-                                                    <span className="flex-1 text-lg font-bold">Task Created</span>
-                                                    <p className="flex-[2]">{new Date(singleViewTask.createdAt).toLocaleString()}</p>
+                                                    <span className="flex-1 text-lg font-bold">TaskStatus Color</span>
+                                                    <p className="flex-[2]">
+                                                        <span
+                                                            style={{
+                                                                border: '3px solid' + singleViewTaskStatus.color,
+                                                                borderRadius: '4px',
+                                                            }}
+                                                            className="px-3 font-bold"
+                                                        >
+                                                            {singleViewTaskStatus.color}
+                                                        </span>
+                                                    </p>
+                                                </li>
+                                                <li className="flex flex-wrap">
+                                                    <span className="flex-1 text-lg font-bold">TaskStatus Created</span>
+                                                    <p className="flex-[2]">{new Date(singleViewTaskStatus.createdAt).toLocaleString()}</p>
                                                 </li>
                                                 <li className="flex flex-wrap">
                                                     <span className="flex-1 text-lg font-bold">Last Updated</span>
-                                                    <p className="flex-[2]">{new Date(singleViewTask.updatedAt).toLocaleString()}</p>
+                                                    <p className="flex-[2]">{new Date(singleViewTaskStatus.updatedAt).toLocaleString()}</p>
                                                 </li>
                                             </ul>
                                             <div className="mt-8 flex items-center justify-center">
@@ -513,62 +581,22 @@ const TaskPage = () => {
             </div>
 
             {/* delete modal */}
-
-            <div className="mb-5">
-                <Transition appear show={deleteModal} as={Fragment}>
-                    <Dialog as="div" open={deleteModal} onClose={() => setDeleteModal(false)}>
-                        <Transition.Child
-                            as={Fragment}
-                            enter="ease-out duration-300"
-                            enterFrom="opacity-0"
-                            enterTo="opacity-100"
-                            leave="ease-in duration-200"
-                            leaveFrom="opacity-100"
-                            leaveTo="opacity-0"
-                        >
-                            <div className="fixed inset-0" />
-                        </Transition.Child>
-                        <div className="fixed inset-0 z-[999] overflow-y-auto bg-[black]/60">
-                            <div className="flex min-h-screen items-center justify-center px-4">
-                                <Transition.Child
-                                    as={Fragment}
-                                    enter="ease-out duration-300"
-                                    enterFrom="opacity-0 scale-95"
-                                    enterTo="opacity-100 scale-100"
-                                    leave="ease-in duration-200"
-                                    leaveFrom="opacity-100 scale-100"
-                                    leaveTo="opacity-0 scale-95"
-                                >
-                                    <Dialog.Panel as="div" className="panel my-8 w-full max-w-lg overflow-hidden rounded-lg border-0 p-0 text-black dark:text-white-dark">
-                                        <div className="flex items-center justify-between bg-[#fbfbfb] px-5 py-3 dark:bg-[#121c2c]">
-                                            <h5 className="text-lg font-bold">Delete Task</h5>
-                                            <button type="button" className="text-white-dark hover:text-dark" onClick={() => setDeleteModal(false)}>
-                                                <Close />
-                                            </button>
-                                        </div>
-                                        <div className="p-5">
-                                            <div className="text-center text-xl">
-                                                Are you sure you want to delete this task? <br /> It will not revert!
-                                            </div>
-                                            <div className="mt-8 flex items-center justify-center">
-                                                <button type="button" className="btn btn-outline-success" onClick={handleDiscard} disabled={disableBtn}>
-                                                    Cancel
-                                                </button>
-                                                <button type="button" className="btn btn-danger ltr:ml-4 rtl:mr-4" onClick={onDeleteTask} disabled={disableBtn}>
-                                                    Delete Task
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </Dialog.Panel>
-                                </Transition.Child>
-                            </div>
-                        </div>
-                    </Dialog>
-                </Transition>
-            </div>
+            <ConfirmationModal
+                open={deleteModal}
+                onClose={() => setDeleteModal(false)}
+                onDiscard={() => setDeleteModal(false)}
+                description={
+                    <>
+                        Are you sure you want to delete this taskStatus? <br /> It will not revert!
+                    </>
+                }
+                title="Delete task status"
+                isBtnDisabled={disableBtn}
+                onSubmit={onDeleteTaskStatus}
+                btnSubmitText="Delete"
+            />
 
             {/* create modal */}
-
             <div className="mb-5">
                 <Transition appear show={createModal} as={Fragment}>
                     <Dialog as="div" open={createModal} onClose={handleDiscard}>
@@ -583,7 +611,7 @@ const TaskPage = () => {
                         >
                             <div className="fixed inset-0" />
                         </Transition.Child>
-                        <div className="fixed inset-0 z-[999] overflow-y-auto bg-[black]/60 ">
+                        <div className="fixed inset-0 z-[999] overflow-y-auto bg-[black]/60">
                             <div className="flex min-h-screen items-center justify-center px-4 ">
                                 <Transition.Child
                                     as={Fragment}
@@ -594,123 +622,33 @@ const TaskPage = () => {
                                     leaveFrom="opacity-100 scale-100"
                                     leaveTo="opacity-0 scale-95"
                                 >
-                                    <Dialog.Panel as="div" className="panel my-8 w-full  overflow-visible rounded-lg border-0 p-0 text-black dark:text-white-dark sm:w-[43rem]">
+                                    <Dialog.Panel as="div" className="panel my-8 w-full max-w-lg  overflow-visible rounded-lg border-0 p-0 text-black dark:text-white-dark ">
                                         <div className="flex items-center justify-between rounded-t-lg bg-[#fbfbfb] px-5 py-3 dark:bg-[#121c2c]">
-                                            <h5 className="text-lg font-bold">Create Task</h5>
+                                            <h5 className="text-lg font-bold">Create TaskStatus</h5>
                                             <button type="button" className="text-white-dark hover:text-dark" onClick={handleDiscard}>
                                                 <Close />
                                             </button>
                                         </div>
                                         <div className="p-5">
                                             <form className="space-y-5" onSubmit={handleSubmit}>
-                                                <div className="flex flex-col gap-4 sm:flex-row">
-                                                    <div className="flex-1">
-                                                        <label htmlFor="createTask">Task Title</label>
-                                                        <input
-                                                            onChange={handleChange}
-                                                            onBlur={handleBlur}
-                                                            value={values.title}
-                                                            id="createTask"
-                                                            name="name"
-                                                            type="text"
-                                                            placeholder="Task Title"
-                                                            className="form-input"
-                                                        />
-                                                    </div>
-                                                    <div className="flex-1">
-                                                        <label htmlFor="chooseLead">Choose Lead</label>
-                                                        <input
-                                                            onChange={handleChange}
-                                                            onBlur={handleBlur}
-                                                            value={values.lead}
-                                                            id="chooseLead"
-                                                            name="lead"
-                                                            type="text"
-                                                            placeholder="Choose Lead"
-                                                            className="form-input"
-                                                        />
-                                                    </div>
-                                                </div>
-                                                <div className="flex flex-col gap-4 sm:flex-row">
-                                                    <div className="flex-1">
-                                                        <label>Task Start Date</label>
-                                                        <Flatpickr
-                                                            data-enable-time
-                                                            options={{
-                                                                enableTime: true,
-                                                                dateFormat: 'Y-m-d H:i',
-                                                                //position :left,right,auto
-                                                                position: 'auto',
-                                                            }}
-                                                            // value={date2}
-                                                            className="form-input"
-                                                            // onChange={(date2) => setDate2(date2)}
-                                                        />
-                                                    </div>
-                                                    <div className="flex-1">
-                                                        <label>Task End Date</label>
-                                                        <Flatpickr
-                                                            data-enable-time
-                                                            options={{
-                                                                enableTime: true,
-                                                                dateFormat: 'Y-m-d H:i',
-                                                                //position :left,right,auto
-                                                                position: 'auto',
-                                                            }}
-                                                            // value={date2}
-                                                            className="form-input"
-                                                            // onChange={(date2) => setDate2(date2)}
-                                                        />
-                                                    </div>
-                                                </div>
-                                                <div className="flex flex-col gap-4 sm:flex-row">
-                                                    <div className="flex-1">
-                                                        <label htmlFor="taskAssignTo">Task Assign To</label>
-                                                        <input
-                                                            onChange={handleChange}
-                                                            onBlur={handleBlur}
-                                                            value={values.title}
-                                                            id="taskAssignTo"
-                                                            name="assignedTo"
-                                                            type="text"
-                                                            placeholder="Task Assign to"
-                                                            className="form-input"
-                                                        />
-                                                    </div>
-                                                    <div className="flex-1">
-                                                        <label htmlFor="taskObserver">Task Observer</label>
-                                                        <input
-                                                            onChange={handleChange}
-                                                            onBlur={handleBlur}
-                                                            value={values.lead}
-                                                            id="taskObserver"
-                                                            name="observer"
-                                                            type="text"
-                                                            placeholder="Task Observer"
-                                                            className="form-input"
-                                                        />
-                                                    </div>
-                                                </div>
-                                                <div className="flex-1">
-                                                    <label htmlFor="taskPriority">Task Priority</label>
-                                                    <Select
-                                                        placeholder="Select task priority"
-                                                        options={taskPriorityOptions}
-                                                        id="taskPriority"
-                                                        defaultValue={{ value: 'lower', label: 'Lower' }}
-                                                        // onChange={handleSelectCountry}
+                                                <div>
+                                                    <label htmlFor="createTaskStatus">TaskStatus Name</label>
+                                                    <input
+                                                        onChange={handleChange}
+                                                        onBlur={handleBlur}
+                                                        value={values.name}
+                                                        id="createTaskStatus"
+                                                        name="name"
+                                                        type="text"
+                                                        placeholder="TaskStatus Name"
+                                                        className="form-input"
                                                     />
                                                 </div>
                                                 <div>
-                                                    <label htmlFor="taskDescription">Task Description</label>
-                                                    <textarea id="taskDescription" rows={6} className="form-textarea" placeholder="Enter Task Description"></textarea>
+                                                    <label htmlFor="editStatusColor">TaskStatus Color</label>
+                                                    <input onBlur={(e: React.ChangeEvent<HTMLInputElement>) => setInputColor(e.target.value)} id="editStatusColor" name="color" type="color" />
                                                 </div>
-                                                <div>
-                                                    <label className="inline-flex" htmlFor="taskActiveStatus">
-                                                        <input type="checkbox" className="peer form-checkbox outline-success" id="taskActiveStatus" />
-                                                        <span className="peer-checked:text-success">Is Task Active</span>
-                                                    </label>
-                                                </div>
+
                                                 <div className="mt-8 flex items-center justify-end">
                                                     <button type="button" className="btn btn-outline-danger" onClick={handleDiscard} disabled={disableBtn}>
                                                         Discard
@@ -719,9 +657,9 @@ const TaskPage = () => {
                                                         type="submit"
                                                         className="btn btn-primary cursor-pointer ltr:ml-4 rtl:mr-4"
                                                         onClick={handleClickSubmit}
-                                                        disabled={values.title && !disableBtn ? false : true}
+                                                        disabled={values.name && !disableBtn ? false : true}
                                                     >
-                                                        Create Task
+                                                        Create TaskStatus
                                                     </button>
                                                 </div>
                                             </form>
@@ -733,8 +671,19 @@ const TaskPage = () => {
                     </Dialog>
                 </Transition>
             </div>
+
+            {/* default status confirmationModal */}
+            <ConfirmationModal
+                open={defaultStatusModal}
+                onClose={() => setDefaultStatusModal(false)}
+                onDiscard={() => setDefaultStatusModal(false)}
+                description={'Are you sure you want to change default status? after submit all new create task have this selected default status options.'}
+                title="Change Default Task Status"
+                isBtnDisabled={disableBtn}
+                onSubmit={handleSubmitDefaultStatus}
+            />
         </div>
     );
 };
 
-export default TaskPage;
+export default TaskStatusPage;

@@ -185,7 +185,7 @@ const PolicyPage = () => {
     const getPolicyList = async () => {
         try {
             setLoading(true);
-            const res = await axios.get(process.env.NEXT_PUBLIC_API_LINK + 'policies/', {
+            const res = await axios.get(process.env.NEXT_PUBLIC_API_LINK + 'policies?sort=-isDefault', {
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem('loginToken')}`,
                 },

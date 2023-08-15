@@ -34,3 +34,32 @@ export type UserDataType = {
         description: string;
     }[];
 };
+
+//taskPage
+
+export type TaskSelectOptions = {
+    name?: string;
+    color?: string;
+    id?: string;
+    createdAt?: string;
+    updatedAt?: string;
+};
+
+
+export type TaskPriorityType = {
+    name: string;
+    id: string;
+    createdAt: string;
+    updatedAt: string;
+    isDefault: boolean;
+    color: string;
+};
+
+export type TaskStatusType = {
+    name: string;
+    id: string;
+    createdAt: string;
+    updatedAt: string;
+    isDefault: boolean;
+    color: string;
+};

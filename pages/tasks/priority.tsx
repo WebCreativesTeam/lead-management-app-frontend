@@ -5,38 +5,35 @@ import 'tippy.js/dist/tippy.css';
 import axios from 'axios';
 import { Dialog, Transition } from '@headlessui/react';
 import { useFormik } from 'formik';
-import { sourceSchema } from '@/utils/schemas';
+import { taskPrioritySchema } from '@/utils/schemas';
 import Swal from 'sweetalert2';
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
 import { sortBy } from 'lodash';
-import { Close, Delete, Edit, Plus, SnackLine, View, WalkingMan } from '@/components/icons';
+import { Close, Delete, Edit, Plus, View } from '@/components/icons';
 import PageHeadingSection from '@/components/__Shared/PageHeadingSection/index.';
+import { TaskPriorityType } from '@/utils/Types';
 import ConfirmationModal from '@/components/__Shared/ConfirmationModal';
 
-type SourceDataType = {
-    name: string;
-    createdAt: string;
-    updatedAt: string;
-    id: string;
-};
-
-const Source = () => {
+const TaskPriorityPage = () => {
     //hooks
-    const [data, setData] = useState<SourceDataType[]>([]);
+    const [data, setData] = useState<TaskPriorityType[]>([]);
     const [createModal, setCreateModal] = useState<boolean>(false);
     const [editModal, setEditModal] = useState<boolean>(false);
     const [viewModal, setViewModal] = useState<boolean>(false);
     const [deleteModal, setDeleteModal] = useState<boolean>(false);
-    const [singleSource, setSingleSource] = useState<any>({});
-    const [singleViewSource, setSingleViewSource] = useState<any>({});
-    const [singleDeleteSource, setSingleDeleteSource] = useState<any>('');
+    const [defaultPriorityModal, setDefaultPriorityModal] = useState<boolean>(false);
+    const [singleTaskPriority, setSingleTaskPriority] = useState<any>({});
+    const [singleViewTaskPriority, setSingleViewTaskPriority] = useState<any>({});
+    const [singleDeleteTaskPriority, setSingleDeleteTaskPriority] = useState<any>('');
     const [disableBtn, setDisableBtn] = useState<boolean>(false);
     const [serverErrors, setServerErrors] = useState('');
     const [forceRender, setForceRender] = useState<boolean>(false);
     const [searchInputText, setSearchInputText] = useState<string>('');
-    const [searchedData, setSearchedData] = useState<SourceDataType[]>(data);
+    const [searchedData, setSearchedData] = useState<TaskPriorityType[]>(data);
     const [loading, setLoading] = useState<boolean>(false);
     const [fetching, setFetching] = useState<boolean>(false);
+    const [defaultPriorityId, setDefaultPriorityId] = useState<string>('');
+    const [inputColor, setInputColor] = useState<string>('#90EE90');
 
     //datatable
     const [page, setPage] = useState(1);
@@ -45,7 +42,7 @@ const Source = () => {
     const [initialRecords, setInitialRecords] = useState(sortBy(searchedData, 'name'));
     const [recordsData, setRecordsData] = useState(initialRecords);
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
-        columnAccessor: 'firstName',
+        columnAccessor: 'name',
         direction: 'asc',
     });
     useEffect(() => {
@@ -60,9 +57,9 @@ const Source = () => {
         setPage(1);
     }, [sortStatus]);
 
-    //get all source after page render
+    //get all taskPriority after page render
     useEffect(() => {
-        getSourceList();
+        getTaskPriorityList();
     }, [fetching]);
 
     useEffect(() => {
@@ -81,7 +78,7 @@ const Source = () => {
     //form handling
     const { values, handleChange, handleSubmit, setFieldValue, errors, handleBlur, resetForm } = useFormik({
         initialValues,
-        validationSchema: sourceSchema,
+        validationSchema: taskPrioritySchema,
         validateOnChange: false,
         enableReinitialize: true,
         onSubmit: async (value, action) => {
@@ -89,10 +86,11 @@ const Source = () => {
             try {
                 if (editModal) {
                     setDisableBtn(true);
-                    const editSourceObj = {
+                    const editTaskPriorityObj = {
                         name: value.name,
+                        color: inputColor,
                     };
-                    await axios.patch(process.env.NEXT_PUBLIC_API_LINK + 'sources/' + singleSource.id, editSourceObj, {
+                    await axios.patch(process.env.NEXT_PUBLIC_API_LINK + 'task-priorities/' + singleTaskPriority.id, editTaskPriorityObj, {
                         headers: {
                             Authorization: `Bearer ${localStorage.getItem('loginToken')}`,
                         },
@@ -102,16 +100,18 @@ const Source = () => {
                     setEditModal(false);
                 } else if (createModal) {
                     setDisableBtn(true);
-                    const createSourceObj = {
+                    const createTaskPriorityObj = {
                         name: value.name,
+                        color: inputColor,
                     };
-                    await axios.post(process.env.NEXT_PUBLIC_API_LINK + 'sources/', createSourceObj, {
+                    await axios.post(process.env.NEXT_PUBLIC_API_LINK + 'task-priorities/', createTaskPriorityObj, {
                         headers: {
                             Authorization: `Bearer ${localStorage.getItem('loginToken')}`,
                         },
                     });
                     setDisableBtn(false);
                     setCreateModal(false);
+                    setInputColor('#000000');
                     action.resetForm();
                 }
             } catch (error: any) {
@@ -150,27 +150,29 @@ const Source = () => {
         setServerErrors('');
     };
 
-    //get single source by id
-    const handleEditSource = (id: string): void => {
+    //get single taskPriority by id
+    const handleEditTaskPriority = (id: string): void => {
         setEditModal(true);
-        const findSource: any = data?.find((item: SourceDataType) => {
+        const findTaskPriority: any = data?.find((item: TaskPriorityType) => {
             return item.id === id;
         });
-        setFieldValue('name', findSource?.name);
-        setSingleSource(findSource);
+        setInputColor(findTaskPriority.color);
+        setFieldValue('name', findTaskPriority?.name);
+        setSingleTaskPriority(findTaskPriority);
     };
 
-    //get all Source list
-    const getSourceList = async () => {
+    //get all TaskPriority list
+    const getTaskPriorityList = async () => {
         try {
             setLoading(true);
-            const res = await axios.get(process.env.NEXT_PUBLIC_API_LINK + 'sources/', {
+            const res = await axios.get(process.env.NEXT_PUBLIC_API_LINK + 'task-priorities?sort=-isDefault', {
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem('loginToken')}`,
                 },
             });
-            const sources = res?.data?.data;
-            setData(sources);
+            const taskPriority = res?.data?.data;
+            setData(taskPriority);
+            console.log(taskPriority);
             setLoading(false);
         } catch (error: any) {
             if (typeof error?.response?.data?.message === 'object') {
@@ -217,31 +219,35 @@ const Source = () => {
         resetForm();
     };
 
-    // get single source for view modal
-    const handleViewSource = (id: string) => {
+    // get single taskPriority for view modal
+    const handleViewTaskPriority = (id: string) => {
         setViewModal(true);
-        const findSource = data?.find((item: SourceDataType) => {
+        const findTaskPriority = data?.find((item: TaskPriorityType) => {
             return item.id === id;
         });
-        setSingleViewSource(findSource);
+        setSingleViewTaskPriority(findTaskPriority);
     };
 
-    // delete source by id
+    // delete taskPriority by id
 
-    const handleDeleteSource = (id: string) => {
+    const handleDeleteTaskPriority = (id: string) => {
+        const findTaskPriority = data?.find((item: TaskPriorityType) => {
+            return item.id === id;
+        });
+        if (findTaskPriority?.isDefault) {
+            setServerErrors('Please make other option default to Delete this Priority');
+            return;
+        }
         setDeleteModal(true);
-        const findSource = data?.find((item: SourceDataType) => {
-            return item.id === id;
-        });
-        setSingleDeleteSource(findSource?.id);
+        setSingleDeleteTaskPriority(findTaskPriority?.id);
     };
 
-    //deleting source
-    const onDeleteSource = async () => {
+    //deleting taskPriority
+    const onDeleteTaskPriority = async () => {
         setFetching(true);
         try {
             setDisableBtn(true);
-            await axios.delete(process.env.NEXT_PUBLIC_API_LINK + 'sources/' + singleDeleteSource, {
+            await axios.delete(process.env.NEXT_PUBLIC_API_LINK + 'task-priorities/' + singleDeleteTaskPriority, {
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem('loginToken')}`,
                 },
@@ -261,38 +267,77 @@ const Source = () => {
         setFetching(false);
     };
 
-    //search source
-    const handleSearchSource = () => {
-        const searchSourceData = data?.filter((source: SourceDataType) => {
+    //search taskPriority
+    const handleSearchTaskPriority = () => {
+        const searchTaskPriorityData = data?.filter((taskPriority: TaskPriorityType) => {
             return (
-                source.name.toLowerCase().startsWith(searchQuery.toLowerCase().trim(), 0) ||
-                source.name.toLowerCase().endsWith(searchQuery.toLowerCase().trim()) ||
-                source.name.toLowerCase().includes(searchQuery.toLowerCase().trim())
+                taskPriority.name.toLowerCase().startsWith(searchQuery.toLowerCase().trim(), 0) ||
+                taskPriority.name.toLowerCase().endsWith(searchQuery.toLowerCase().trim()) ||
+                taskPriority.name.toLowerCase().includes(searchQuery.toLowerCase().trim())
             );
         });
-        setSearchedData(searchSourceData);
+        setSearchedData(searchTaskPriorityData);
         setRecordsData(searchedData);
     };
 
+    //changing defalt status
+    const handleChangeDefaultStatus = async (e: React.ChangeEvent<HTMLInputElement>, id: string) => {
+        if (!e.target.checked) {
+            setServerErrors('default task priority already selected');
+            return;
+        }
+        setDefaultPriorityModal(true);
+        setDefaultPriorityId(id);
+    };
+
+    const handleSubmitDefaultPriority = async () => {
+        setFetching(true);
+        try {
+            setDisableBtn(true);
+            await axios.get(process.env.NEXT_PUBLIC_API_LINK + 'task-priorities/' + defaultPriorityId + '/set-default', {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('loginToken')}`,
+                },
+            });
+            setDisableBtn(false);
+            setDefaultPriorityModal(false);
+        } catch (error: any) {
+            setDisableBtn(true);
+            if (typeof error?.response?.data?.message === 'object') {
+                setServerErrors(error?.response?.data?.message.join(' , '));
+            } else {
+                setServerErrors(error?.response?.data?.message);
+            }
+            setServerErrors(error?.response?.data?.message);
+            setDisableBtn(false);
+        }
+        setFetching(false);
+    };
     return (
         <div>
-            <PageHeadingSection description="Identify and categorize lead sources. Update descriptions. Add or remove source channels." heading="Track Leads" />
+            <PageHeadingSection description="Create, update,delete and view task priority" heading="Task Priority" />
             <div className="my-6 flex flex-col gap-5 sm:flex-row ">
                 <div className="flex-1">
-                    <button className="btn btn-primary h-full w-full max-w-[200px] max-sm:mx-auto" type="button" onClick={() => setCreateModal(true)}>
+                    <button className="btn btn-primary h-full w-full max-w-[250px] max-sm:mx-auto" type="button" onClick={() => setCreateModal(true)}>
                         <Plus />
-                        Add New Source
+                        Add New TaskPriority
                     </button>
                 </div>
                 <div className="relative  flex-1">
-                    <input type="text" placeholder="Find A Source" className="form-input py-3 ltr:pr-[100px] rtl:pl-[100px]" onChange={(e) => setSearchInputText(e.target.value)} value={searchQuery} />
-                    <button type="button" className="btn btn-primary absolute top-1 shadow-none ltr:right-1 rtl:left-1" onClick={handleSearchSource}>
+                    <input
+                        type="text"
+                        placeholder="Find A TaskPriority"
+                        className="form-input py-3 ltr:pr-[100px] rtl:pl-[100px]"
+                        onChange={(e) => setSearchInputText(e.target.value)}
+                        value={searchQuery}
+                    />
+                    <button type="button" className="btn btn-primary absolute top-1 shadow-none ltr:right-1 rtl:left-1" onClick={handleSearchTaskPriority}>
                         Search
                     </button>
                 </div>
             </div>
 
-            {/* source List table*/}
+            {/* taskPriority List table*/}
             <div className="datatables panel mt-6">
                 <DataTable
                     className="table-hover whitespace-nowrap"
@@ -300,7 +345,7 @@ const Source = () => {
                     columns={[
                         {
                             accessor: 'name',
-                            title: 'Source Name',
+                            title: 'TaskPriority Name',
                             sortable: true,
                             render: ({ name }) => <div>{name}</div>,
                         },
@@ -317,23 +362,43 @@ const Source = () => {
                             render: ({ updatedAt }) => <div>{new Date(updatedAt).toLocaleString()}</div>,
                         },
                         {
+                            accessor: 'isDefault',
+                            title: 'Default Status',
+                            sortable: true,
+                            render: ({ isDefault, id }) => (
+                                <div>
+                                    <label className="relative h-6 w-12">
+                                        <input
+                                            type="checkbox"
+                                            className="custom_switch peer absolute z-10 h-full w-full cursor-pointer opacity-0"
+                                            id="custom_switch_checkbox1"
+                                            name="permission"
+                                            checked={isDefault}
+                                            onChange={(e) => handleChangeDefaultStatus(e, id)}
+                                        />
+                                        <span className="block h-full rounded-full bg-[#ebedf2] before:absolute before:bottom-1 before:left-1 before:h-4 before:w-4 before:rounded-full before:bg-white before:transition-all before:duration-300 peer-checked:bg-primary peer-checked:before:left-7 dark:bg-dark dark:before:bg-white-dark dark:peer-checked:before:bg-white"></span>
+                                    </label>
+                                </div>
+                            ),
+                        },
+                        {
                             accessor: 'action',
                             title: 'Actions',
                             titleClassName: '!text-center',
                             render: ({ id }) => (
                                 <div className="flex justify-center gap-2  p-3 text-center ">
                                     <Tippy content="View">
-                                        <button type="button" onClick={() => handleViewSource(id)}>
+                                        <button type="button" onClick={() => handleViewTaskPriority(id)}>
                                             <View />
                                         </button>
                                     </Tippy>
                                     <Tippy content="Edit">
-                                        <button type="button" onClick={() => handleEditSource(id)}>
+                                        <button type="button" onClick={() => handleEditTaskPriority(id)}>
                                             <Edit />
                                         </button>
                                     </Tippy>
                                     <Tippy content="Delete">
-                                        <button type="button" onClick={() => handleDeleteSource(id)}>
+                                        <button type="button" onClick={() => handleDeleteTaskPriority(id)}>
                                             <Delete />
                                         </button>
                                     </Tippy>
@@ -356,6 +421,7 @@ const Source = () => {
             </div>
 
             {/* edit modal */}
+
             <div className="mb-5">
                 <Transition appear show={editModal} as={Fragment}>
                     <Dialog as="div" open={editModal} onClose={handleDiscard}>
@@ -381,9 +447,9 @@ const Source = () => {
                                     leaveFrom="opacity-100 scale-100"
                                     leaveTo="opacity-0 scale-95"
                                 >
-                                    <Dialog.Panel as="div" className="panel my-8 w-full max-w-lg  overflow-visible rounded-lg border-0 p-0 text-black dark:text-white-dark">
+                                    <Dialog.Panel as="div" className="panel my-8 w-full max-w-lg  overflow-visible rounded-lg border-0 p-0 text-black dark:text-white-dark ">
                                         <div className="flex items-center justify-between rounded-t-lg bg-[#fbfbfb] px-5 py-3 dark:bg-[#121c2c]">
-                                            <h5 className="text-lg font-bold">Edit Source</h5>
+                                            <h5 className="text-lg font-bold">Edit TaskPriority</h5>
                                             <button type="button" className="text-white-dark hover:text-dark" onClick={handleDiscard}>
                                                 <Close />
                                             </button>
@@ -391,24 +457,40 @@ const Source = () => {
                                         <div className="p-5">
                                             <form className="space-y-5" onSubmit={handleSubmit}>
                                                 <div>
-                                                    <label htmlFor="createSource">Source Name</label>
+                                                    <label htmlFor="createTaskPriority">TaskPriority Name</label>
                                                     <input
                                                         onChange={handleChange}
                                                         onBlur={handleBlur}
                                                         value={values.name}
-                                                        id="createSource"
+                                                        id="createTaskPriority"
                                                         name="name"
                                                         type="text"
-                                                        placeholder="Source Name"
+                                                        placeholder="TaskPriority Name"
                                                         className="form-input"
                                                     />
                                                 </div>
+                                                <div>
+                                                    <label htmlFor="priorityColor">TaskPriority Color</label>
+                                                    <input
+                                                        onBlur={(e: React.ChangeEvent<HTMLInputElement>) => setInputColor(e.target.value)}
+                                                        id="createTaskPriority"
+                                                        name="color"
+                                                        type="color"
+                                                        defaultValue={inputColor}
+                                                    />
+                                                </div>
+
                                                 <div className="mt-8 flex items-center justify-end">
                                                     <button type="button" className="btn btn-outline-danger" onClick={handleDiscard} disabled={disableBtn}>
                                                         Discard
                                                     </button>
-                                                    <button type="submit" className="btn btn-primary cursor-pointer ltr:ml-4 rtl:mr-4" disabled={values.name && !disableBtn ? false : true}>
-                                                        Edit Source
+                                                    <button
+                                                        type="submit"
+                                                        className="btn btn-primary cursor-pointer ltr:ml-4 rtl:mr-4"
+                                                        onClick={handleClickSubmit}
+                                                        disabled={values.name && !disableBtn ? false : true}
+                                                    >
+                                                        Edit TaskPriority
                                                     </button>
                                                 </div>
                                             </form>
@@ -422,6 +504,7 @@ const Source = () => {
             </div>
 
             {/* view modal */}
+
             <div className="mb-5">
                 <Transition appear show={viewModal} as={Fragment}>
                     <Dialog as="div" open={viewModal} onClose={() => setViewModal(false)}>
@@ -449,7 +532,7 @@ const Source = () => {
                                 >
                                     <Dialog.Panel as="div" className="panel my-8 w-full max-w-lg overflow-hidden rounded-lg border-0 p-0 text-black dark:text-white-dark">
                                         <div className="flex items-center justify-between bg-[#fbfbfb] px-5 py-3 dark:bg-[#121c2c]">
-                                            <h5 className="text-lg font-bold">View Source</h5>
+                                            <h5 className="text-lg font-bold">View TaskPriority</h5>
                                             <button type="button" className="text-white-dark hover:text-dark" onClick={() => setViewModal(false)}>
                                                 <Close />
                                             </button>
@@ -457,16 +540,30 @@ const Source = () => {
                                         <div className="p-5">
                                             <ul className="flex flex-col gap-4">
                                                 <li className="flex flex-wrap">
-                                                    <span className="flex-1 text-lg font-bold">Source Name</span>
-                                                    <p className="flex-[2]">{singleViewSource.name}</p>
+                                                    <span className="flex-1 text-lg font-bold">TaskPriority Name</span>
+                                                    <p className="flex-[2]">{singleViewTaskPriority.name}</p>
                                                 </li>
                                                 <li className="flex flex-wrap">
-                                                    <span className="flex-1 text-lg font-bold">Source Created</span>
-                                                    <p className="flex-[2]">{new Date(singleViewSource.createdAt).toLocaleString()}</p>
+                                                    <span className="flex-1 text-lg font-bold">TaskPriority Color</span>
+                                                    <p className="flex-[2]">
+                                                        <span
+                                                            style={{
+                                                                border: '3px solid' + singleViewTaskPriority.color,
+                                                                borderRadius: '4px',
+                                                            }}
+                                                            className="px-3 font-bold"
+                                                        >
+                                                            {singleViewTaskPriority.color}
+                                                        </span>
+                                                    </p>
+                                                </li>
+                                                <li className="flex flex-wrap">
+                                                    <span className="flex-1 text-lg font-bold">TaskPriority Created</span>
+                                                    <p className="flex-[2]">{new Date(singleViewTaskPriority.createdAt).toLocaleString()}</p>
                                                 </li>
                                                 <li className="flex flex-wrap">
                                                     <span className="flex-1 text-lg font-bold">Last Updated</span>
-                                                    <p className="flex-[2]">{new Date(singleViewSource.updatedAt).toLocaleString()}</p>
+                                                    <p className="flex-[2]">{new Date(singleViewTaskPriority.updatedAt).toLocaleString()}</p>
                                                 </li>
                                             </ul>
                                             <div className="mt-8 flex items-center justify-center">
@@ -488,10 +585,14 @@ const Source = () => {
                 open={deleteModal}
                 onClose={() => setDeleteModal(false)}
                 onDiscard={() => setDeleteModal(false)}
-                description={<>Are you sure you want to delete this Source? It will also remove form database.</>}
+                description={
+                    <>
+                        Are you sure you want to delete this taskPriority? <br /> It will not revert!
+                    </>
+                }
                 title="Delete task priority"
                 isBtnDisabled={disableBtn}
-                onSubmit={onDeleteSource}
+                onSubmit={onDeleteTaskPriority}
                 btnSubmitText="Delete"
             />
 
@@ -523,7 +624,7 @@ const Source = () => {
                                 >
                                     <Dialog.Panel as="div" className="panel my-8 w-full max-w-lg  overflow-visible rounded-lg border-0 p-0 text-black dark:text-white-dark ">
                                         <div className="flex items-center justify-between rounded-t-lg bg-[#fbfbfb] px-5 py-3 dark:bg-[#121c2c]">
-                                            <h5 className="text-lg font-bold">Create Source</h5>
+                                            <h5 className="text-lg font-bold">Create TaskPriority</h5>
                                             <button type="button" className="text-white-dark hover:text-dark" onClick={handleDiscard}>
                                                 <Close />
                                             </button>
@@ -531,17 +632,21 @@ const Source = () => {
                                         <div className="p-5">
                                             <form className="space-y-5" onSubmit={handleSubmit}>
                                                 <div>
-                                                    <label htmlFor="createSource">Source Name</label>
+                                                    <label htmlFor="createTaskPriority">TaskPriority Name</label>
                                                     <input
                                                         onChange={handleChange}
                                                         onBlur={handleBlur}
                                                         value={values.name}
-                                                        id="createSource"
+                                                        id="createTaskPriority"
                                                         name="name"
                                                         type="text"
-                                                        placeholder="Source Name"
+                                                        placeholder="TaskPriority Name"
                                                         className="form-input"
                                                     />
+                                                </div>
+                                                <div>
+                                                    <label htmlFor="priorityColor">TaskPriority Color</label>
+                                                    <input onBlur={(e: React.ChangeEvent<HTMLInputElement>) => setInputColor(e.target.value)} id="createTaskPriority" name="color" type="color" />
                                                 </div>
 
                                                 <div className="mt-8 flex items-center justify-end">
@@ -554,7 +659,7 @@ const Source = () => {
                                                         onClick={handleClickSubmit}
                                                         disabled={values.name && !disableBtn ? false : true}
                                                     >
-                                                        Create Source
+                                                        Create TaskPriority
                                                     </button>
                                                 </div>
                                             </form>
@@ -566,8 +671,19 @@ const Source = () => {
                     </Dialog>
                 </Transition>
             </div>
+
+            {/* default priority confirmationModal */}
+            <ConfirmationModal
+                open={defaultPriorityModal}
+                onClose={() => setDefaultPriorityModal(false)}
+                onDiscard={() => setDefaultPriorityModal(false)}
+                description={'Are you sure you want to change default priority? after submit all new create task have this selected default priority options.'}
+                title="Change Default Task Priority"
+                isBtnDisabled={disableBtn}
+                onSubmit={handleSubmitDefaultPriority}
+            />
         </div>
     );
 };
 
-export default Source;
+export default TaskPriorityPage;

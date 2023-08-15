@@ -47,13 +47,24 @@ export const branchSchema = Yup.object().shape({
     address: Yup.string().required('Please enter Branch Address'),
 });
 
+//source schema
 export const sourceSchema = Yup.object().shape({
     name: Yup.string().required('Please enter Source Name'),
 });
 
-
 //task Schema
 
 export const taskSchema = Yup.object().shape({
-    
-})
+    title: Yup.string().required('Please enter title'),
+});
+
+//task priority schema
+export const taskPrioritySchema = Yup.object().shape({
+    name: Yup.string().required('Please enter task priority name'),
+});
+
+//task status schema
+export const taskStatusSchema = Yup.object().shape({
+    name: Yup.string().required('Please enter task Status name'),
+});
+
