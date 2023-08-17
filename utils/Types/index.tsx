@@ -83,3 +83,27 @@ export type TaskStatusType = {
     isDefault: boolean;
     color: string;
 };
+
+export interface ContactDataType {
+    id: string;
+    title: string;
+    name: string;
+    phoneNumber: string;
+    email: string;
+    assignedTo: string;
+    source: string;
+    website: string;
+    position: string;
+    industry: string;
+    facebookProfile: string;
+    twitterProfile: string;
+    comment: string;
+    createdAt: string;
+    updatedAt: string;
+    location: {
+        address: string;
+        city: string;
+        state: string;
+        country: string;
+    };
+}
