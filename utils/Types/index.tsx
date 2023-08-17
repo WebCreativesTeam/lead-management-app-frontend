@@ -51,14 +51,19 @@ export type TaskDataType = {
         id: string;
         name: string;
     };
+    priority: {
+        color: string;
+        id: string;
+        name: string;
+    };
 };
 
 export type TaskSelectOptions = {
-    name?: string;
-    color?: string;
-    id?: string;
-    createdAt?: string;
-    updatedAt?: string;
+    name: string;
+    color: string;
+    id: string;
+    createdAt: string;
+    updatedAt: string;
 };
 
 export type TaskPriorityType = {

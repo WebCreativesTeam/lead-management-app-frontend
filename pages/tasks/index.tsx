@@ -33,7 +33,11 @@ const TaskPage = () => {
     const [editModal, setEditModal] = useState<boolean>(false);
     const [viewModal, setViewModal] = useState<boolean>(false);
     const [deleteModal, setDeleteModal] = useState<boolean>(false);
+    const [statusModal, setStatusModal] = useState<boolean>(false);
+    const [priorityModal, setPriorityModal] = useState<boolean>(false);
     const [singleTask, setSingleTask] = useState<any>({});
+    const [singleStatusId, setSingleStatusId] = useState<any>({});
+    const [singlePriorityId, setSinglePriorityId] = useState<any>({});
     const [singleViewTask, setSingleViewTask] = useState<any>({});
     const [singleDeleteTask, setSingleDeleteTask] = useState<any>('');
     const [disableBtn, setDisableBtn] = useState<boolean>(false);
@@ -45,6 +49,8 @@ const TaskPage = () => {
     const [fetching, setFetching] = useState<boolean>(false);
     const [priorityOptions, setPriorityOptions] = useState<SelectOptionsType[]>([]);
     const [filter, setFilter] = useState<string>('assigned-by-me');
+    const [allPriority, setAllPriority] = useState<TaskSelectOptions[]>([]);
+    const [allStatus, setAllStatus] = useState<TaskSelectOptions[]>([]);
 
     //useDefferedValue hook for search query
     const searchQuery = useDeferredValue(searchInputText);
@@ -74,10 +80,11 @@ const TaskPage = () => {
     //get all task after page render
     useEffect(() => {
         getTasksList();
-    }, [fetching,filter]);
+    }, [fetching, filter]);
 
     useEffect(() => {
         getTasksPriority();
+        getTasksStatus();
     }, []);
 
     useEffect(() => {
@@ -213,7 +220,6 @@ const TaskPage = () => {
                 },
             });
             const tasks = res?.data?.data;
-            console.log(tasks)
             setData(tasks);
             setLoading(false);
         } catch (error: any) {
@@ -236,7 +242,36 @@ const TaskPage = () => {
                 },
             });
             const taskPriorityAllData: TaskSelectOptions[] = res?.data?.data;
+            setAllPriority(taskPriorityAllData);
             const createTaskPriorityOptions: SelectOptionsType[] | any = taskPriorityAllData?.map((item: TaskSelectOptions) => {
+                return {
+                    value: item.id,
+                    label: item.name,
+                };
+            });
+            setPriorityOptions(createTaskPriorityOptions);
+            // setData(tasks);
+            setLoading(false);
+        } catch (error: any) {
+            if (typeof error?.response?.data?.message === 'object') {
+                setServerErrors(error?.response?.data?.message.join(' , '));
+            } else {
+                setServerErrors(error?.response?.data?.message);
+            }
+            setServerErrors(error?.response?.data?.message);
+        }
+    };
+    const getTasksStatus = async () => {
+        try {
+            setLoading(true);
+            const res = await axios.get(process.env.NEXT_PUBLIC_API_LINK + 'task-status/', {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('loginToken')}`,
+                },
+            });
+            const taskStatusAllData: TaskSelectOptions[] = res?.data?.data;
+            setAllStatus(taskStatusAllData);
+            const createTaskPriorityOptions: SelectOptionsType[] | any = taskStatusAllData?.map((item: TaskSelectOptions) => {
                 return {
                     value: item.id,
                     label: item.name,
@@ -287,6 +322,7 @@ const TaskPage = () => {
         setEditModal(false);
         setDeleteModal(false);
         setCreateModal(false);
+        setSingleTask({});
         resetForm();
     };
 
@@ -346,7 +382,82 @@ const TaskPage = () => {
         setSearchedData(searchTaskData);
         setRecordsData(searchTaskData);
     };
-    console.log(recordsData);
+
+    const handleOpenStatusModal = (statusId: string, taskId: string) => {
+        setStatusModal(true);
+        const findTaskStatus: any = allStatus?.find((item: TaskSelectOptions) => {
+            return item.id === statusId;
+        });
+        const findTask: any = data?.find((item: TaskDataType) => {
+            return item.id === taskId;
+        });
+        setSingleTask(findTask);
+        setSingleStatusId(findTaskStatus.id);
+    };
+    const handleOpenPriorityModal = (priorityId: string, taskId: string) => {
+        setPriorityModal(true);
+        const findTaskPriority: any = allPriority?.find((item: TaskSelectOptions) => {
+            return item.id === priorityId;
+        });
+        const findTask: any = data?.find((item: TaskDataType) => {
+            return item.id === taskId;
+        });
+        setSingleTask(findTask);
+        setSinglePriorityId(findTaskPriority.id);
+    };
+
+    //change task status
+    const onChangeStatus = async () => {
+        setDisableBtn(true);
+        setFetching(true);
+        try {
+            await axios.patch(
+                process.env.NEXT_PUBLIC_API_LINK + 'tasks/' + singleTask.id + '/status',
+                { status: singleStatusId },
+                {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem('loginToken')}`,
+                    },
+                }
+            );
+            setStatusModal(false);
+        } catch (error: any) {
+            if (typeof error?.response?.data?.message === 'object') {
+                setServerErrors(error?.response?.data?.message.join(' , '));
+            } else {
+                setServerErrors(error?.response?.data?.message);
+            }
+            setServerErrors(error?.response?.data?.message);
+        }
+        setFetching(false);
+        setDisableBtn(false);
+    };
+    //change task priority
+    const onChangePriority = async() => {
+        setDisableBtn(true);
+        setFetching(true);
+        try {
+            await axios.patch(
+                process.env.NEXT_PUBLIC_API_LINK + 'tasks/' + singleTask.id + '/priority',
+                { priority: singlePriorityId },
+                {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem('loginToken')}`,
+                    },
+                }
+            );
+            setPriorityModal(false);
+        } catch (error: any) {
+            if (typeof error?.response?.data?.message === 'object') {
+                setServerErrors(error?.response?.data?.message.join(' , '));
+            } else {
+                setServerErrors(error?.response?.data?.message);
+            }
+            setServerErrors(error?.response?.data?.message);
+        }
+        setFetching(false);
+        setDisableBtn(false);
+    };
     return (
         <div>
             <PageHeadingSection description="View, create, update, and close tasks. Organize by status, priority, and due date. Stay on top of work." heading="Task Management" />
@@ -420,16 +531,79 @@ const TaskPage = () => {
                             render: ({ createdAt }) => <div>{new Date(createdAt).toLocaleString()}</div>,
                         },
                         {
-                            accessor: 'isActive',
+                            accessor: 'status',
                             title: 'Task Status',
                             sortable: true,
-                            render: ({ status }) => (
-                                <span
-                                    className={`mr-2 rounded px-2.5 py-0.5 text-sm font-medium dark:bg-blue-900 dark:text-blue-300`}
-                                    style={{ color: status.color, backgroundColor: status.color + '20' }}
-                                >
-                                    {status.name}
-                                </span>
+                            render: ({ status, id }) => (
+                                <div className="dropdown">
+                                    <Dropdown
+                                        placement="bottom-start"
+                                        button={
+                                            <>
+                                                <span
+                                                    className={`mr-2 rounded px-2.5 py-0.5 text-sm font-medium dark:bg-blue-900 dark:text-blue-300`}
+                                                    style={{ color: status.color, backgroundColor: status.color + '20' }}
+                                                >
+                                                    {status.name}
+                                                </span>
+                                            </>
+                                        }
+                                    >
+                                        <ul className="!min-w-[170px]">
+                                            {allStatus.map((status: TaskSelectOptions, i: number) => {
+                                                return (
+                                                    <li key={i}>
+                                                        <button
+                                                            className={`mr-2 rounded px-2.5 py-0.5 text-sm font-medium dark:bg-blue-900 dark:text-blue-300`}
+                                                            style={{ color: status.color, backgroundColor: status.color + '20' }}
+                                                            onClick={() => handleOpenStatusModal(status?.id, id)}
+                                                        >
+                                                            {status.name}
+                                                        </button>
+                                                    </li>
+                                                );
+                                            })}
+                                        </ul>
+                                    </Dropdown>
+                                </div>
+                            ),
+                        },
+                        {
+                            accessor: 'priority',
+                            title: 'Task Priority',
+                            sortable: true,
+                            render: ({ priority, id }) => (
+                                <div className="dropdown">
+                                    <Dropdown
+                                        placement="bottom-start"
+                                        button={
+                                            <>
+                                                <span
+                                                    className={`mr-2 rounded px-2.5 py-0.5 text-sm font-medium dark:bg-blue-900 dark:text-blue-300`}
+                                                    style={{ color: priority.color, backgroundColor: priority.color + '20' }}
+                                                >
+                                                    {priority.name}
+                                                </span>
+                                            </>
+                                        }
+                                    >
+                                        <ul className="!min-w-[170px]">
+                                            {allPriority.map((priority: TaskSelectOptions, i: number) => {
+                                                return (
+                                                    <li key={i}>
+                                                        <button
+                                                            className={`mr-2 rounded px-2.5 py-0.5 text-sm font-medium dark:bg-blue-900 dark:text-blue-300`}
+                                                            style={{ color: priority.color, backgroundColor: priority.color + '20' }}
+                                                            onClick={() => handleOpenPriorityModal(priority.id, id)}
+                                                        >
+                                                            {priority.name}
+                                                        </button>
+                                                    </li>
+                                                );
+                                            })}
+                                        </ul>
+                                    </Dropdown>
+                                </div>
                             ),
                         },
                         {
@@ -738,6 +912,36 @@ const TaskPage = () => {
                 isBtnDisabled={disableBtn}
                 onSubmit={onDeleteTask}
                 btnSubmitText="Delete"
+            />
+            {/* change Status modal */}
+            <ConfirmationModal
+                open={statusModal}
+                onClose={() => setStatusModal(false)}
+                onDiscard={() => setStatusModal(false)}
+                description={
+                    <>
+                        Are you sure you want to change this Task status? <br /> It will not revert!
+                    </>
+                }
+                title="Change task status"
+                isBtnDisabled={disableBtn}
+                onSubmit={onChangeStatus}
+                btnSubmitText="Change Status"
+            />
+            {/* change task priority modal */}
+            <ConfirmationModal
+                open={priorityModal}
+                onClose={() => setPriorityModal(false)}
+                onDiscard={() => setPriorityModal(false)}
+                description={
+                    <>
+                        Are you sure you want to change this Task priority? <br /> It will not revert!
+                    </>
+                }
+                title="Change task priority"
+                isBtnDisabled={disableBtn}
+                onSubmit={onChangePriority}
+                btnSubmitText="Change Priority"
             />
 
             {/* create modal */}
