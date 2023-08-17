@@ -5,6 +5,8 @@ import { Provider } from 'react-redux';
 import store from '../store/index';
 import Head from 'next/head';
 
+
+
 import { appWithI18Next } from 'ni18n';
 import { ni18nConfig } from 'ni18n.config.ts';
 

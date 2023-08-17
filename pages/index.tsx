@@ -1,5 +1,5 @@
 const Index = () => {
-
+    //home page
     return (
         <>
             <div>
