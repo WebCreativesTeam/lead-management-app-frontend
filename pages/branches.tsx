@@ -16,32 +16,14 @@ import PageHeadingSection from '@/components/__Shared/PageHeadingSection/index.'
 import ConfirmationModal from '@/components/__Shared/ConfirmationModal';
 import { setPageTitle } from '@/store/themeConfigSlice';
 import { useDispatch } from 'react-redux';
-
-type BranchDataType = {
-    name: string;
-    id: string;
-    address: string;
-    city: string;
-    state: string;
-    country: string;
-};
+import { BranchDataType, SelectOptionsType } from '@/utils/Types';
+import { countryData } from '@/utils/Raw Data';
 
 type SelectAddress = {
-    country: OptionType;
-    state: OptionType;
-    city: OptionType;
+    country: SelectOptionsType;
+    state: SelectOptionsType;
+    city: SelectOptionsType;
 };
-
-type OptionType = {
-    value: string;
-    label: string;
-};
-
-const countryData: OptionType[] = [
-    { value: 'india', label: 'India' },
-    { value: 'nepal', label: 'Nepal' },
-    { value: 'bangladesh', label: 'Bangladesh' },
-];
 const BranchPage = () => {
 
      const dispatch = useDispatch();
@@ -382,21 +364,21 @@ const BranchPage = () => {
     };
 
     //select country
-    const handleSelectCountry = (country: any | OptionType, actionMeta: ActionMeta<any>) => {
+    const handleSelectCountry = (country: any | SelectOptionsType, actionMeta: ActionMeta<any>) => {
         setSelectAddress((preVal) => {
             return { ...preVal, country };
         });
     };
 
     //select state
-    const handleSelectState = (state: any | OptionType, actionMeta: ActionMeta<any>) => {
+    const handleSelectState = (state: any | SelectOptionsType, actionMeta: ActionMeta<any>) => {
         setSelectAddress((preVal) => {
             return { ...preVal, state };
         });
     };
 
     //select  city
-    const handleSelectCity = (city: any | OptionType, actionMeta: ActionMeta<any>) => {
+    const handleSelectCity = (city: any | SelectOptionsType, actionMeta: ActionMeta<any>) => {
         setSelectAddress((preVal) => {
             return { ...preVal, city };
         });

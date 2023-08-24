@@ -1,9 +1,9 @@
-import { Close } from '@/components/icons';
+import React, { Fragment } from 'react';
+import { ViewModalProps } from './viewModal.types';
 import { Dialog, Transition } from '@headlessui/react';
-import React, { Fragment, memo } from 'react';
-import { ConfirmationModalTypes } from './ConfirmationModal.types';
+import { Close } from '@/components/icons';
 
-const ConfirmationModal = ({ open, onClose, onSubmit, onDiscard, isBtnDisabled, title, description, btnDiscardText = 'Cancel', btnSubmitText = 'Submit' }: ConfirmationModalTypes) => {
+const ViewModal = ({ content, onClose, open, title }: ViewModalProps) => {
     return (
         <div className="mb-5">
             <Transition appear show={open} as={Fragment}>
@@ -30,13 +30,10 @@ const ConfirmationModal = ({ open, onClose, onSubmit, onDiscard, isBtnDisabled, 
                                         </button>
                                     </div>
                                     <div className="p-5">
-                                        <div className="text-center text-xl">{description}</div>
+                                        {content}
                                         <div className="mt-8 flex items-center justify-center">
-                                            <button type="button" className="btn btn-outline-success" onClick={onDiscard} disabled={isBtnDisabled}>
-                                                {btnDiscardText}
-                                            </button>
-                                            <button type="button" className="btn btn-danger ltr:ml-4 rtl:mr-4" onClick={onSubmit} disabled={isBtnDisabled}>
-                                                {btnSubmitText}
+                                            <button type="button" className="btn btn-primary ltr:ml-4 rtl:mr-4" onClick={onClose}>
+                                                Close
                                             </button>
                                         </div>
                                     </div>
@@ -50,4 +47,4 @@ const ConfirmationModal = ({ open, onClose, onSubmit, onDiscard, isBtnDisabled, 
     );
 };
 
-export default memo(ConfirmationModal);
+export default ViewModal;

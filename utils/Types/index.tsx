@@ -1,3 +1,10 @@
+//general types
+export type GetMethodResponseType = {
+    status: string;
+    data: any[];
+};
+
+
 export type SelectOptionsType = {
     value: string;
     label: string;
@@ -91,7 +98,10 @@ export interface ContactDataType {
     phoneNumber: string;
     email: string;
     assignedTo: string;
-    source: string;
+    source: {
+        name: string;
+        id: string;
+    };
     website: string;
     position: string;
     industry: string;
@@ -101,9 +111,37 @@ export interface ContactDataType {
     createdAt: string;
     updatedAt: string;
     location: {
-        address: string;
-        city: string;
-        state: string;
-        country: string;
+    address: string;
+    city: string;
+    state: string;
+    country: string;
     };
 }
+
+//branch page types //
+
+export type BranchDataType = {
+    name: string;
+    id: string;
+    address: string;
+    city: string;
+    state: string;
+    country: string;
+};
+
+
+///-------- Redux Toolkit Types - START -------------//
+
+export interface InitialStateProps {
+    data: ContactDataType[];
+    singleData: ContactDataType;
+    viewModal: boolean;
+    editModal: boolean;
+    deleteModal: boolean;
+    createModal: boolean;
+    isBtnDisabled: boolean;
+    isFetching: boolean;
+}
+
+///-------- Redux Toolkit Types - END -------------//
+

@@ -2,7 +2,7 @@ import type { AppProps } from 'next/app';
 import { ReactElement, ReactNode, Suspense } from 'react';
 import DefaultLayout from '../components/Layouts/DefaultLayout';
 import { Provider } from 'react-redux';
-import store from '../store/index';
+import { store } from '@/store';
 import Head from 'next/head';
 
 import { appWithI18Next } from 'ni18n';

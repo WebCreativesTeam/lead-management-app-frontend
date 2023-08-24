@@ -179,7 +179,6 @@ const TaskPriorityPage = () => {
             });
             const taskPriority = res?.data?.data;
             setData(taskPriority);
-            console.log(taskPriority);
             setLoading(false);
         } catch (error: any) {
             if (typeof error?.response?.data?.message === 'object') {

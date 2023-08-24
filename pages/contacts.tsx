@@ -2,42 +2,36 @@
 import React, { useEffect, useState, Fragment, useDeferredValue } from 'react';
 import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
-import axios from 'axios';
-import { Dialog, Transition } from '@headlessui/react';
-import { useFormik } from 'formik';
-import { contactSchema } from '@/utils/schemas';
 import Swal from 'sweetalert2';
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
 import { sortBy } from 'lodash';
-import { Close, Delete, Edit, Plus, View, WalkingMan } from '@/components/icons';
+import { Delete, Edit, Plus, View } from '@/components/icons';
 import PageHeadingSection from '@/components/__Shared/PageHeadingSection/index.';
 import ConfirmationModal from '@/components/__Shared/ConfirmationModal';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { setPageTitle } from '@/store/themeConfigSlice';
-import { ContactDataType } from '@/utils/Types';
+import { ContactDataType, GetMethodResponseType } from '@/utils/Types';
+import { ApiClient } from '@/utils/http';
+import { getAllContacts, setEditModal, setDeleteModal, setCreateModal, setViewModal, setFetching, setDisableBtn } from '@/store/Slices/contactSlice';
+import ContactViewModal from '@/components/Contact/ContactViewModal';
+import { IRootState } from '@/store';
+import ContactCreateModal from '@/components/Contact/ContactCreateModal';
+import ContactEditModal from '@/components/Contact/ContactEditModal';
 
 const Contacts = () => {
     const dispatch = useDispatch();
     useEffect(() => {
-        dispatch(setPageTitle('Track Leads | Contacts'));
+        dispatch(setPageTitle('Contacts'));
     });
-
     //hooks
-    const [data, setData] = useState<ContactDataType[]>([]);
-    const [createModal, setCreateModal] = useState<boolean>(false);
-    const [editModal, setEditModal] = useState<boolean>(false);
-    const [viewModal, setViewModal] = useState<boolean>(false);
-    const [deleteModal, setDeleteModal] = useState<boolean>(false);
-    const [singleContact, setSingleContact] = useState<any>({});
-    const [singleViewContact, setSingleViewContact] = useState<any>({});
-    const [singleDeleteContact, setSingleDeleteContact] = useState<any>('');
-    const [disableBtn, setDisableBtn] = useState<boolean>(false);
-    const [serverErrors, setServerErrors] = useState('');
-    const [forceRender, setForceRender] = useState<boolean>(false);
+    const data: ContactDataType[] = useSelector((state: IRootState) => state.contacts.data);
+    const fetching: boolean = useSelector((state: IRootState) => state.contacts.isFetching);
+    const isBtnDisabled: boolean = useSelector((state: IRootState) => state.contacts.isBtnDisabled);
+    const deleteModal: boolean = useSelector((state: IRootState) => state.contacts.deleteModal);
+    const singleContact: ContactDataType = useSelector((state: IRootState) => state.contacts.singleData);
     const [searchInputText, setSearchInputText] = useState<string>('');
     const [searchedData, setSearchedData] = useState<ContactDataType[]>(data);
     const [loading, setLoading] = useState<boolean>(false);
-    const [fetching, setFetching] = useState<boolean>(false);
 
     //datatable
     const [page, setPage] = useState(1);
@@ -46,7 +40,7 @@ const Contacts = () => {
     const [initialRecords, setInitialRecords] = useState(sortBy(searchedData, 'name'));
     const [recordsData, setRecordsData] = useState(initialRecords);
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
-        columnAccessor: 'firstName',
+        columnAccessor: 'name',
         direction: 'asc',
     });
     useEffect(() => {
@@ -71,195 +65,34 @@ const Contacts = () => {
         setInitialRecords(data);
     }, [data]);
 
-    // set initialValues when open modal
-    const initialValues = {
-        name: '',
-    };
-
-    //useDefferedValue hook for search query
+    // useDefferedValue hook for search query
     const searchQuery = useDeferredValue(searchInputText);
-
-    //form handling
-    const { values, handleChange, handleSubmit, setFieldValue, errors, handleBlur, resetForm } = useFormik({
-        initialValues,
-        validationSchema: contactSchema,
-        validateOnChange: false,
-        enableReinitialize: true,
-        onSubmit: async (value, action) => {
-            setFetching(true);
-            try {
-                if (editModal) {
-                    setDisableBtn(true);
-                    const editContactObj = {
-                        name: value.name,
-                    };
-                    await axios.patch(process.env.NEXT_PUBLIC_API_LINK + 'Contacts/' + singleContact.id, editContactObj, {
-                        headers: {
-                            Authorization: `Bearer ${localStorage.getItem('loginToken')}`,
-                        },
-                    });
-                    setDisableBtn(false);
-                    action.resetForm();
-                    setEditModal(false);
-                } else if (createModal) {
-                    setDisableBtn(true);
-                    const createContactObj = {
-                        name: value.name,
-                    };
-                    await axios.post(process.env.NEXT_PUBLIC_API_LINK + 'contacts/', createContactObj, {
-                        headers: {
-                            Authorization: `Bearer ${localStorage.getItem('loginToken')}`,
-                        },
-                    });
-                    setDisableBtn(false);
-                    setCreateModal(false);
-                    action.resetForm();
-                }
-            } catch (error: any) {
-                setDisableBtn(true);
-                if (typeof error?.response?.data?.message === 'object') {
-                    setServerErrors(error?.response?.data?.message.join(' , '));
-                } else {
-                    setServerErrors(error?.response?.data?.message);
-                }
-                setServerErrors(error?.response?.data?.message);
-                setDisableBtn(false);
-            }
-            setFetching(false);
-        },
-    });
-    useEffect(() => {
-        showServerAlert();
-    }, [errors, serverErrors, forceRender]);
-    useEffect(() => {}, [forceRender]);
-
-    //server alerts
-    const showServerAlert = () => {
-        if (serverErrors) {
-            const toast = Swal.mixin({
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 3000,
-            });
-            toast.fire({
-                icon: 'error',
-                title: serverErrors,
-                padding: '10px 20px',
-            });
-        }
-        setServerErrors('');
-    };
-
-    //get single contact by id
-    const handleEditContact = (id: string): void => {
-        setEditModal(true);
-        const findContact: any = data?.find((item: ContactDataType) => {
-            return item.id === id;
-        });
-        setFieldValue('name', findContact?.name);
-        setSingleContact(findContact);
-    };
 
     //get all Contact list
     const getContactList = async () => {
-        try {
-            setLoading(true);
-            const res = await axios.get(process.env.NEXT_PUBLIC_API_LINK + 'Contacts/', {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem('loginToken')}`,
-                },
-            });
-            const contacts = res?.data?.data;
-            setData(contacts);
-            setLoading(false);
-        } catch (error: any) {
-            if (typeof error?.response?.data?.message === 'object') {
-                setServerErrors(error?.response?.data?.message.join(' , '));
-            } else {
-                setServerErrors(error?.response?.data?.message);
-            }
-            setServerErrors(error?.response?.data?.message);
+        setLoading(true);
+        const res: GetMethodResponseType = await new ApiClient().get('contacts');
+        const contacts: ContactDataType[] = res?.data;
+        if (Object.keys(contacts).length === 0) {
+            dispatch(getAllContacts([] as ContactDataType[]));
+            return;
         }
-    };
-
-    //showing validation error
-    const showAlert = async () => {
-        if (errors.name) {
-            const toast = Swal.mixin({
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 3000,
-            });
-            toast.fire({
-                icon: 'error',
-                title: errors.name,
-                padding: '10px 20px',
-            });
-        }
-    };
-    //alert and server alert execution
-    const handleClickSubmit = () => {
-        errors && showAlert();
-        if (serverErrors) {
-            if (forceRender === false) {
-                setForceRender(true);
-            } else {
-                setForceRender(false);
-            }
-        }
-    };
-
-    const handleDiscard = () => {
-        setEditModal(false);
-        setDeleteModal(false);
-        setCreateModal(false);
-        resetForm();
-    };
-
-    // get single contact for view modal
-    const handleViewContact = (id: string) => {
-        setViewModal(true);
-        const findContact = data?.find((item: ContactDataType) => {
-            return item.id === id;
-        });
-        setSingleViewContact(findContact);
-    };
-
-    // delete contact by id
-
-    const handleDeleteContact = (id: string) => {
-        setDeleteModal(true);
-        const findContact = data?.find((item: ContactDataType) => {
-            return item.id === id;
-        });
-        setSingleDeleteContact(findContact?.id);
+        dispatch(getAllContacts(contacts));
+        setLoading(false);
     };
 
     //deleting contact
     const onDeleteContact = async () => {
-        setFetching(true);
-        try {
-            setDisableBtn(true);
-            await axios.delete(process.env.NEXT_PUBLIC_API_LINK + 'contacts/' + singleDeleteContact, {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem('loginToken')}`,
-                },
-            });
-            setDisableBtn(false);
-            setDeleteModal(false);
-        } catch (error: any) {
-            setDisableBtn(true);
-            if (typeof error?.response?.data?.message === 'object') {
-                setServerErrors(error?.response?.data?.message.join(' , '));
-            } else {
-                setServerErrors(error?.response?.data?.message);
-            }
-            setServerErrors(error?.response?.data?.message);
-            setDisableBtn(false);
+        dispatch(setFetching(true));
+        dispatch(setDisableBtn(true));
+        const deleteContact: ContactDataType = await new ApiClient().delete('contacts/' + singleContact.id);
+        if (Object.keys(deleteContact).length === 0) {
+            dispatch(setDisableBtn(false));
+            return;
         }
-        setFetching(false);
+        dispatch(setDisableBtn(false));
+        dispatch(setDeleteModal({ open: false }));
+        dispatch(setFetching(false));
     };
 
     //search contact
@@ -272,7 +105,7 @@ const Contacts = () => {
             );
         });
         setSearchedData(searchContactData);
-        setRecordsData(searchedData);
+        setRecordsData(searchContactData);
     };
 
     return (
@@ -280,7 +113,7 @@ const Contacts = () => {
             <PageHeadingSection description="Identify and categorize lead contacts. Update descriptions. Add or remove contact channels." heading="Track Leads" />
             <div className="my-6 flex flex-col gap-5 sm:flex-row ">
                 <div className="flex-1">
-                    <button className="btn btn-primary h-full w-full max-w-[200px] max-sm:mx-auto" type="button" onClick={() => setCreateModal(true)}>
+                    <button className="btn btn-primary h-full w-full max-w-[200px] max-sm:mx-auto" type="button" onClick={() => dispatch(setCreateModal(true))}>
                         <Plus />
                         Add New Contact
                     </button>
@@ -291,7 +124,7 @@ const Contacts = () => {
                         placeholder="Find A Contact"
                         className="form-input py-3 ltr:pr-[100px] rtl:pl-[100px]"
                         onChange={(e) => setSearchInputText(e.target.value)}
-                        value={searchQuery}
+                        value={searchInputText}
                     />
                     <button type="button" className="btn btn-primary absolute top-1 shadow-none ltr:right-1 rtl:left-1" onClick={handleSearchContact}>
                         Search
@@ -336,19 +169,19 @@ const Contacts = () => {
                             render: ({ industry }) => <div>{industry}</div>,
                         },
                         {
-                            accessor: 'location',
+                            accessor: 'city',
                             title: 'City',
                             sortable: true,
                             render: ({ location }) => <div>{location.city}</div>,
                         },
                         {
-                            accessor: 'location',
+                            accessor: 'state',
                             title: 'State',
                             sortable: true,
                             render: ({ location }) => <div>{location.state}</div>,
                         },
                         {
-                            accessor: 'location',
+                            accessor: 'country',
                             title: 'Country',
                             sortable: true,
                             render: ({ location }) => <div>{location.country}</div>,
@@ -372,17 +205,17 @@ const Contacts = () => {
                             render: ({ id }) => (
                                 <div className="flex justify-center gap-2  p-3 text-center ">
                                     <Tippy content="View">
-                                        <button type="button" onClick={() => handleViewContact(id)}>
+                                        <button type="button" onClick={() => dispatch(setViewModal({ id, open: true }))}>
                                             <View />
                                         </button>
                                     </Tippy>
                                     <Tippy content="Edit">
-                                        <button type="button" onClick={() => handleEditContact(id)}>
+                                        <button type="button" onClick={() => dispatch(setEditModal({ id, open: true }))}>
                                             <Edit />
                                         </button>
                                     </Tippy>
                                     <Tippy content="Delete">
-                                        <button type="button" onClick={() => handleDeleteContact(id)}>
+                                        <button type="button" onClick={() => dispatch(setDeleteModal({ id, open: true }))}>
                                             <Delete />
                                         </button>
                                     </Tippy>
@@ -390,7 +223,7 @@ const Contacts = () => {
                             ),
                         },
                     ]}
-                    totalRecords={initialRecords.length}
+                    totalRecords={initialRecords?.length}
                     recordsPerPage={pageSize}
                     page={page}
                     onPageChange={(p) => setPage(p)}
@@ -405,216 +238,25 @@ const Contacts = () => {
             </div>
 
             {/* edit modal */}
-            <div className="mb-5">
-                <Transition appear show={editModal} as={Fragment}>
-                    <Dialog as="div" open={editModal} onClose={handleDiscard}>
-                        <Transition.Child
-                            as={Fragment}
-                            enter="ease-out duration-300"
-                            enterFrom="opacity-0"
-                            enterTo="opacity-100"
-                            leave="ease-in duration-200"
-                            leaveFrom="opacity-100"
-                            leaveTo="opacity-0"
-                        >
-                            <div className="fixed inset-0" />
-                        </Transition.Child>
-                        <div className="fixed inset-0 z-[999] overflow-y-auto bg-[black]/60">
-                            <div className="flex min-h-screen items-center justify-center px-4 ">
-                                <Transition.Child
-                                    as={Fragment}
-                                    enter="ease-out duration-300"
-                                    enterFrom="opacity-0 scale-95"
-                                    enterTo="opacity-100 scale-100"
-                                    leave="ease-in duration-200"
-                                    leaveFrom="opacity-100 scale-100"
-                                    leaveTo="opacity-0 scale-95"
-                                >
-                                    <Dialog.Panel as="div" className="panel my-8 w-full max-w-lg  overflow-visible rounded-lg border-0 p-0 text-black dark:text-white-dark">
-                                        <div className="flex items-center justify-between rounded-t-lg bg-[#fbfbfb] px-5 py-3 dark:bg-[#121c2c]">
-                                            <h5 className="text-lg font-bold">Edit Contact</h5>
-                                            <button type="button" className="text-white-dark hover:text-dark" onClick={handleDiscard}>
-                                                <Close />
-                                            </button>
-                                        </div>
-                                        <div className="p-5">
-                                            <form className="space-y-5" onSubmit={handleSubmit}>
-                                                <div>
-                                                    <label htmlFor="createContact">Contact Name</label>
-                                                    <input
-                                                        onChange={handleChange}
-                                                        onBlur={handleBlur}
-                                                        value={values.name}
-                                                        id="createContact"
-                                                        name="name"
-                                                        type="text"
-                                                        placeholder="Contact Name"
-                                                        className="form-input"
-                                                    />
-                                                </div>
-                                                <div className="mt-8 flex items-center justify-end">
-                                                    <button type="button" className="btn btn-outline-danger" onClick={handleDiscard} disabled={disableBtn}>
-                                                        Discard
-                                                    </button>
-                                                    <button type="submit" className="btn btn-primary cursor-pointer ltr:ml-4 rtl:mr-4" disabled={values.name && !disableBtn ? false : true}>
-                                                        Edit Contact
-                                                    </button>
-                                                </div>
-                                            </form>
-                                        </div>
-                                    </Dialog.Panel>
-                                </Transition.Child>
-                            </div>
-                        </div>
-                    </Dialog>
-                </Transition>
-            </div>
+            <ContactEditModal />
 
             {/* view modal */}
-            <div className="mb-5">
-                <Transition appear show={viewModal} as={Fragment}>
-                    <Dialog as="div" open={viewModal} onClose={() => setViewModal(false)}>
-                        <Transition.Child
-                            as={Fragment}
-                            enter="ease-out duration-300"
-                            enterFrom="opacity-0"
-                            enterTo="opacity-100"
-                            leave="ease-in duration-200"
-                            leaveFrom="opacity-100"
-                            leaveTo="opacity-0"
-                        >
-                            <div className="fixed inset-0" />
-                        </Transition.Child>
-                        <div className="fixed inset-0 z-[999] overflow-y-auto bg-[black]/60">
-                            <div className="flex min-h-screen items-center justify-center px-4">
-                                <Transition.Child
-                                    as={Fragment}
-                                    enter="ease-out duration-300"
-                                    enterFrom="opacity-0 scale-95"
-                                    enterTo="opacity-100 scale-100"
-                                    leave="ease-in duration-200"
-                                    leaveFrom="opacity-100 scale-100"
-                                    leaveTo="opacity-0 scale-95"
-                                >
-                                    <Dialog.Panel as="div" className="panel my-8 w-full max-w-lg overflow-hidden rounded-lg border-0 p-0 text-black dark:text-white-dark">
-                                        <div className="flex items-center justify-between bg-[#fbfbfb] px-5 py-3 dark:bg-[#121c2c]">
-                                            <h5 className="text-lg font-bold">View Contact</h5>
-                                            <button type="button" className="text-white-dark hover:text-dark" onClick={() => setViewModal(false)}>
-                                                <Close />
-                                            </button>
-                                        </div>
-                                        <div className="p-5">
-                                            <ul className="flex flex-col gap-4">
-                                                <li className="flex flex-wrap">
-                                                    <span className="flex-1 text-lg font-bold">Contact Name</span>
-                                                    <p className="flex-[2]">{singleViewContact.name}</p>
-                                                </li>
-                                                <li className="flex flex-wrap">
-                                                    <span className="flex-1 text-lg font-bold">Contact Created</span>
-                                                    <p className="flex-[2]">{new Date(singleViewContact.createdAt).toLocaleString()}</p>
-                                                </li>
-                                                <li className="flex flex-wrap">
-                                                    <span className="flex-1 text-lg font-bold">Last Updated</span>
-                                                    <p className="flex-[2]">{new Date(singleViewContact.updatedAt).toLocaleString()}</p>
-                                                </li>
-                                            </ul>
-                                            <div className="mt-8 flex items-center justify-center">
-                                                <button type="button" className="btn btn-primary ltr:ml-4 rtl:mr-4" onClick={() => setViewModal(false)}>
-                                                    Close
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </Dialog.Panel>
-                                </Transition.Child>
-                            </div>
-                        </div>
-                    </Dialog>
-                </Transition>
-            </div>
+            <ContactViewModal />
 
             {/* delete modal */}
             <ConfirmationModal
                 open={deleteModal}
-                onClose={() => setDeleteModal(false)}
-                onDiscard={() => setDeleteModal(false)}
+                onClose={() => dispatch(setDeleteModal({ open: false }))}
+                onDiscard={() => dispatch(setDeleteModal({ open: false }))}
                 description={<>Are you sure you want to delete this Contact? It will also remove form database.</>}
                 title="Delete task priority"
-                isBtnDisabled={disableBtn}
+                isBtnDisabled={isBtnDisabled}
                 onSubmit={onDeleteContact}
                 btnSubmitText="Delete"
             />
 
             {/* create modal */}
-            <div className="mb-5">
-                <Transition appear show={createModal} as={Fragment}>
-                    <Dialog as="div" open={createModal} onClose={handleDiscard}>
-                        <Transition.Child
-                            as={Fragment}
-                            enter="ease-out duration-300"
-                            enterFrom="opacity-0"
-                            enterTo="opacity-100"
-                            leave="ease-in duration-200"
-                            leaveFrom="opacity-100"
-                            leaveTo="opacity-0"
-                        >
-                            <div className="fixed inset-0" />
-                        </Transition.Child>
-                        <div className="fixed inset-0 z-[999] overflow-y-auto bg-[black]/60">
-                            <div className="flex min-h-screen items-center justify-center px-4 ">
-                                <Transition.Child
-                                    as={Fragment}
-                                    enter="ease-out duration-300"
-                                    enterFrom="opacity-0 scale-95"
-                                    enterTo="opacity-100 scale-100"
-                                    leave="ease-in duration-200"
-                                    leaveFrom="opacity-100 scale-100"
-                                    leaveTo="opacity-0 scale-95"
-                                >
-                                    <Dialog.Panel as="div" className="panel my-8 w-full max-w-lg  overflow-visible rounded-lg border-0 p-0 text-black dark:text-white-dark ">
-                                        <div className="flex items-center justify-between rounded-t-lg bg-[#fbfbfb] px-5 py-3 dark:bg-[#121c2c]">
-                                            <h5 className="text-lg font-bold">Create Contact</h5>
-                                            <button type="button" className="text-white-dark hover:text-dark" onClick={handleDiscard}>
-                                                <Close />
-                                            </button>
-                                        </div>
-                                        <div className="p-5">
-                                            <form className="space-y-5" onSubmit={handleSubmit}>
-                                                <div>
-                                                    <label htmlFor="createContact">Contact Name</label>
-                                                    <input
-                                                        onChange={handleChange}
-                                                        onBlur={handleBlur}
-                                                        value={values.name}
-                                                        id="createContact"
-                                                        name="name"
-                                                        type="text"
-                                                        placeholder="Contact Name"
-                                                        className="form-input"
-                                                    />
-                                                </div>
-
-                                                <div className="mt-8 flex items-center justify-end">
-                                                    <button type="button" className="btn btn-outline-danger" onClick={handleDiscard} disabled={disableBtn}>
-                                                        Discard
-                                                    </button>
-                                                    <button
-                                                        type="submit"
-                                                        className="btn btn-primary cursor-pointer ltr:ml-4 rtl:mr-4"
-                                                        onClick={handleClickSubmit}
-                                                        disabled={values.name && !disableBtn ? false : true}
-                                                    >
-                                                        Create Contact
-                                                    </button>
-                                                </div>
-                                            </form>
-                                        </div>
-                                    </Dialog.Panel>
-                                </Transition.Child>
-                            </div>
-                        </div>
-                    </Dialog>
-                </Transition>
-            </div>
+            <ContactCreateModal />
         </div>
     );
 };

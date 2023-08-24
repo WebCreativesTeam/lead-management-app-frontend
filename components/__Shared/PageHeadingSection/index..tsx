@@ -1,4 +1,4 @@
-import React from 'react';
+import React,{memo} from 'react';
 import { SnackLine, WalkingMan } from '../../icons';
 import { PageHeadingSectionProps } from './PageHeading.types';
 
@@ -24,4 +24,4 @@ const PageHeadingSection = ({ heading, description }: PageHeadingSectionProps) =
     );
 };
 
-export default PageHeadingSection;
+export default memo(PageHeadingSection);

@@ -180,7 +180,6 @@ const TaskStatusPage = () => {
             });
             const taskStatus = res?.data?.data;
             setData(taskStatus);
-            console.log(taskStatus);
             setLoading(false);
         } catch (error: any) {
             if (typeof error?.response?.data?.message === 'object') {

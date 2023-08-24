@@ -1,13 +1,15 @@
 import { ReactNode } from "react";
 
-export interface ConfirmationModalTypes {
+export interface ModalProps {
     open: boolean;
     onClose: () => void;
-    onSubmit: () => void;
+    onSubmit?: () => void;
     onDiscard: () => void;
     isBtnDisabled?: boolean;
     title: string;
-    description: string | ReactNode;
+    content: string | ReactNode;
     btnDiscardText?: string;
     btnSubmitText?: string;
+    size?: "medium" | "large" | "xLarge";
+    disabledDiscardBtn?: boolean;
 }

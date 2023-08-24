@@ -69,10 +69,10 @@ export const taskStatusSchema = Yup.object().shape({
 });
 
 export const contactSchema = Yup.object().shape({
-    title: Yup.string().required('Please enter title'),
+    title: Yup.string().required('Please select title'),
     name: Yup.string().required('Please enter name'),
     phoneNumber: Yup.string().required('Please enter Phone number'),
-    email: Yup.string().required('Please enter email'),
+    email: Yup.string().email("Please enter valid email").required('Please enter email'),
     assignedTo: Yup.string().required('Please select assign to option'),
     source: Yup.string().required('Please select source'),
     website: Yup.string().required('Please enter website'),
