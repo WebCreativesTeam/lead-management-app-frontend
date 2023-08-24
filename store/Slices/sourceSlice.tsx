@@ -1,9 +1,9 @@
-import { ContactDataType, ContactInitialStateProps } from '@/utils/Types';
+import { SourceDataType, SourceInitialStateProps } from '@/utils/Types';
 import { createSlice } from '@reduxjs/toolkit';
 
-const initialState: ContactInitialStateProps = {
-    data: [] as ContactDataType[],
-    singleData: {} as ContactDataType,
+const initialState: SourceInitialStateProps = {
+    data: [] as SourceDataType[],
+    singleData: {} as SourceDataType,
     createModal: false,
     editModal: false,
     deleteModal: false,
@@ -12,30 +12,30 @@ const initialState: ContactInitialStateProps = {
     isFetching: false,
 };
 
-const contactSlice = createSlice({
+const sourceSlice = createSlice({
     initialState,
-    name: 'contact',
+    name: 'source',
     reducers: {
         setViewModal(state, action) {
             const { open, id } = action.payload;
             state.viewModal = open;
-            const findRequestedData: ContactDataType | undefined = state.data.find((item: ContactDataType) => item.id === id);
+            const findRequestedData: SourceDataType | undefined = state.data.find((item: SourceDataType) => item.id === id);
 
             if (findRequestedData && state.viewModal) {
                 state.singleData = findRequestedData;
             } else {
-                state.singleData = {} as ContactDataType;
+                state.singleData = {} as SourceDataType;
             }
         },
         setEditModal(state, action) {
             const { open, id } = action.payload;
             state.editModal = open;
-            const findRequestedData: ContactDataType | undefined = state.data.find((item: ContactDataType) => item.id === id);
+            const findRequestedData: SourceDataType | undefined = state.data.find((item: SourceDataType) => item.id === id);
 
             if (findRequestedData && state.editModal) {
                 state.singleData = findRequestedData;
             } else {
-                state.singleData = {} as ContactDataType;
+                state.singleData = {} as SourceDataType;
             }
         },
         setCreateModal(state, action) {
@@ -44,15 +44,15 @@ const contactSlice = createSlice({
         setDeleteModal(state, action) {
             const { open, id } = action.payload;
             state.deleteModal = open;
-            const findRequestedData: ContactDataType | undefined = state.data.find((item: ContactDataType) => item.id === id);
+            const findRequestedData: SourceDataType | undefined = state.data.find((item: SourceDataType) => item.id === id);
 
             if (findRequestedData && state.deleteModal) {
                 state.singleData = findRequestedData;
             } else {
-                state.singleData = {} as ContactDataType;
+                state.singleData = {} as SourceDataType;
             }
         },
-        getAllContacts(state, action) {
+        getAllSources(state, action) {
             state.data = action.payload;
         },
         setDisableBtn(state, action) {
@@ -64,5 +64,5 @@ const contactSlice = createSlice({
     },
 });
 
-export const { setCreateModal, setDeleteModal, setEditModal, setViewModal, getAllContacts,setDisableBtn,setFetching } = contactSlice.actions;
-export default contactSlice.reducer;
+export const { setCreateModal, setDeleteModal, setEditModal, setViewModal, getAllSources, setDisableBtn, setFetching } = sourceSlice.actions;
+export default sourceSlice.reducer;

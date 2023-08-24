@@ -4,7 +4,6 @@ export type GetMethodResponseType = {
     data: any[];
 };
 
-
 export type SelectOptionsType = {
     value: string;
     label: string;
@@ -38,6 +37,14 @@ export type UserDataType = {
         name: string;
         description: string;
     }[];
+};
+
+//source page
+export type SourceDataType = {
+    name: string;
+    createdAt: string;
+    updatedAt: string;
+    id: string;
 };
 
 //taskPage
@@ -111,10 +118,10 @@ export interface ContactDataType {
     createdAt: string;
     updatedAt: string;
     location: {
-    address: string;
-    city: string;
-    state: string;
-    country: string;
+        address: string;
+        city: string;
+        state: string;
+        country: string;
     };
 }
 
@@ -129,12 +136,9 @@ export type BranchDataType = {
     country: string;
 };
 
-
 ///-------- Redux Toolkit Types - START -------------//
 
 export interface InitialStateProps {
-    data: ContactDataType[];
-    singleData: ContactDataType;
     viewModal: boolean;
     editModal: boolean;
     deleteModal: boolean;
@@ -143,5 +147,16 @@ export interface InitialStateProps {
     isFetching: boolean;
 }
 
-///-------- Redux Toolkit Types - END -------------//
+//contact slice initial props
+export interface ContactInitialStateProps extends InitialStateProps {
+    data: ContactDataType[];
+    singleData: ContactDataType;
+}
 
+//contact slice initial props
+export interface SourceInitialStateProps extends InitialStateProps {
+    data: SourceDataType[];
+    singleData: SourceDataType;
+}
+
+///-------- Redux Toolkit Types - END -------------//

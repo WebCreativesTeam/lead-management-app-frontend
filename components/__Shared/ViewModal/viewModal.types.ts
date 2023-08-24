@@ -4,5 +4,6 @@ export interface ViewModalProps {
     open: boolean;
     onClose: () => any;
     title: string;
-    content: string | React.ReactNode ;
+    content: string | React.ReactNode;
+    size?: 'medium' | 'large' | 'xLarge';
 }

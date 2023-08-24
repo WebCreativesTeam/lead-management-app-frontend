@@ -3,7 +3,7 @@ import { ViewModalProps } from './viewModal.types';
 import { Dialog, Transition } from '@headlessui/react';
 import { Close } from '@/components/icons';
 
-const ViewModal = ({ content, onClose, open, title }: ViewModalProps) => {
+const ViewModal = ({ content, onClose, open, title,size}: ViewModalProps) => {
     return (
         <div className="mb-5">
             <Transition appear show={open} as={Fragment}>
@@ -22,7 +22,11 @@ const ViewModal = ({ content, onClose, open, title }: ViewModalProps) => {
                                 leaveFrom="opacity-100 scale-100"
                                 leaveTo="opacity-0 scale-95"
                             >
-                                <Dialog.Panel as="div" className="panel my-8 w-full max-w-lg overflow-hidden rounded-lg border-0 p-0 text-black dark:text-white-dark">
+                                <Dialog.Panel
+                                    as="div"
+                                    className="panel my-8 w-full max-w-lg overflow-hidden rounded-lg border-0 p-0 text-black dark:text-white-dark"
+                                    style={{ maxWidth: size === 'medium' ? '32rem' : size === 'large' ? '48rem' : size === 'xLarge' ? '72rem' : size }}
+                                >
                                     <div className="flex items-center justify-between bg-[#fbfbfb] px-5 py-3 dark:bg-[#121c2c]">
                                         <h5 className="text-lg font-bold">{title}</h5>
                                         <button type="button" className="text-white-dark hover:text-dark" onClick={onClose}>
