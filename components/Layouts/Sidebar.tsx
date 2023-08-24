@@ -9,7 +9,7 @@ import AnimateHeight from 'react-animate-height';
 import { IRootState } from '../../store';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { Branch, Global, Phone, Shield, Tasks, User } from '../icons';
+import { Branch, Global, Phone, Shield, Tasks, User } from '../../utils/icons';
 
 const Sidebar = () => {
     const router = useRouter();
@@ -118,7 +118,7 @@ const Sidebar = () => {
                             <li className="menu nav-item">
                                 <Link href="/users" className="group">
                                     <div className="flex items-center">
-                                       <User/>
+                                        <User />
                                         <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Users')}</span>
                                     </div>
                                 </Link>
@@ -128,7 +128,7 @@ const Sidebar = () => {
                             <li className="menu nav-item">
                                 <Link href="/branches" className="group">
                                     <div className="flex items-center">
-                                       <Branch/>
+                                        <Branch />
                                         <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Branches')}</span>
                                     </div>
                                 </Link>
@@ -138,7 +138,7 @@ const Sidebar = () => {
                             <li className="menu nav-item">
                                 <Link href="/policies" className="group">
                                     <div className="flex items-center">
-                                        <Shield/>
+                                        <Shield />
                                         <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Policies')}</span>
                                     </div>
                                 </Link>
@@ -148,7 +148,7 @@ const Sidebar = () => {
                             <li className="menu nav-item">
                                 <Link href="/sources" className="group">
                                     <div className="flex items-center">
-                                        <Global/>
+                                        <Global />
                                         <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Sources')}</span>
                                     </div>
                                 </Link>
@@ -158,7 +158,7 @@ const Sidebar = () => {
                             <li className="menu nav-item">
                                 <Link href="/contacts" className="group">
                                     <div className="flex items-center">
-                                        <Phone/>
+                                        <Phone />
                                         <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Contacts')}</span>
                                     </div>
                                 </Link>

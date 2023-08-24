@@ -1,4 +1,4 @@
-import { Close } from '@/components/icons';
+import { Close } from '@/utils/icons';
 import { Dialog, Transition } from '@headlessui/react';
 import React, { Fragment, memo } from 'react';
 import { ConfirmationModalTypes } from './ConfirmationModal.types';

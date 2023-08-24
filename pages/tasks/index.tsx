@@ -12,7 +12,7 @@ import { sortBy, valuesIn } from 'lodash';
 import Flatpickr from 'react-flatpickr';
 import Select, { ActionMeta } from 'react-select';
 import 'flatpickr/dist/flatpickr.css';
-import { Close, Delete, Edit, Plus, View } from '@/components/icons';
+import { Close, Delete, Edit, Plus, View } from '@/utils/icons';
 import PageHeadingSection from '@/components/__Shared/PageHeadingSection/index.';
 import { SelectOptionsType, TaskSelectOptions } from '@/utils/Types';
 import { TaskDataType } from '@/utils/Types';
@@ -433,7 +433,7 @@ const TaskPage = () => {
         setDisableBtn(false);
     };
     //change task priority
-    const onChangePriority = async() => {
+    const onChangePriority = async () => {
         setDisableBtn(true);
         setFetching(true);
         try {

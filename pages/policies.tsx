@@ -10,7 +10,7 @@ import Swal from 'sweetalert2';
 import usePermission from '@/utils/Hooks/usePermissions';
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
 import { sortBy } from 'lodash';
-import { Close, Delete, Edit, Plus, SnackLine, View, WalkingMan } from '@/components/icons';
+import { Close, Delete, Edit, Plus, SnackLine, View, WalkingMan } from '@/utils/icons';
 import PageHeadingSection from '@/components/__Shared/PageHeadingSection/index.';
 import ConfirmationModal from '@/components/__Shared/ConfirmationModal';
 import { useDispatch } from 'react-redux';
@@ -30,7 +30,6 @@ type Permission = {
 };
 
 const PolicyPage = () => {
-
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('Define Access | Policies'));

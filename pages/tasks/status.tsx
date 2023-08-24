@@ -9,7 +9,7 @@ import { taskStatusSchema } from '@/utils/schemas';
 import Swal from 'sweetalert2';
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
 import { sortBy } from 'lodash';
-import { Close, Delete, Edit, Plus, View } from '@/components/icons';
+import { Close, Delete, Edit, Plus, View } from '@/utils/icons';
 import PageHeadingSection from '@/components/__Shared/PageHeadingSection/index.';
 import { TaskStatusType } from '@/utils/Types';
 import ConfirmationModal from '@/components/__Shared/ConfirmationModal';
@@ -17,11 +17,10 @@ import { useDispatch } from 'react-redux';
 import { setPageTitle } from '@/store/themeConfigSlice';
 
 const TaskStatusPage = () => {
-
-     const dispatch = useDispatch();
-     useEffect(() => {
-         dispatch(setPageTitle('Tasks Status Page'));
-     });
+    const dispatch = useDispatch();
+    useEffect(() => {
+        dispatch(setPageTitle('Tasks Status Page'));
+    });
 
     //hooks
     const [data, setData] = useState<TaskStatusType[]>([]);

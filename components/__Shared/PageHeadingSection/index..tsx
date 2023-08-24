@@ -1,5 +1,5 @@
-import React,{memo} from 'react';
-import { SnackLine, WalkingMan } from '../../icons';
+import React, { memo } from 'react';
+import { SnackLine, WalkingMan } from '../../../utils/icons';
 import { PageHeadingSectionProps } from './PageHeading.types';
 
 const PageHeadingSection = ({ heading, description }: PageHeadingSectionProps) => {

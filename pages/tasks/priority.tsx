@@ -9,7 +9,7 @@ import { taskPrioritySchema } from '@/utils/schemas';
 import Swal from 'sweetalert2';
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
 import { sortBy } from 'lodash';
-import { Close, Delete, Edit, Plus, View } from '@/components/icons';
+import { Close, Delete, Edit, Plus, View } from '@/utils/icons';
 import PageHeadingSection from '@/components/__Shared/PageHeadingSection/index.';
 import { TaskPriorityType } from '@/utils/Types';
 import ConfirmationModal from '@/components/__Shared/ConfirmationModal';
@@ -19,7 +19,7 @@ import { setPageTitle } from '@/store/themeConfigSlice';
 const TaskPriorityPage = () => {
     const dispatch = useDispatch();
     useEffect(() => {
-        dispatch(setPageTitle('Tasks Priority Page' ));
+        dispatch(setPageTitle('Tasks Priority Page'));
     });
 
     //hooks

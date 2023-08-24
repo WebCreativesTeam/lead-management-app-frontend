@@ -10,7 +10,7 @@ import Swal from 'sweetalert2';
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
 import { sortBy } from 'lodash';
 import Select, { ActionMeta } from 'react-select';
-import { Close, Delete, Edit, Plus, Shield, SnackLine, View, WalkingMan } from '@/components/icons';
+import { Close, Delete, Edit, Plus, Shield, SnackLine, View, WalkingMan } from '@/utils/icons';
 import { UserDataType, SelectOptionsType, Permission, PolicyDataType } from '@/utils/Types';
 import PageHeadingSection from '@/components/__Shared/PageHeadingSection/index.';
 import ConfirmationModal from '@/components/__Shared/ConfirmationModal';
@@ -18,7 +18,6 @@ import { setPageTitle } from '@/store/themeConfigSlice';
 import { useDispatch } from 'react-redux';
 
 const Users = () => {
-
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('Manage Users'));
@@ -745,11 +744,7 @@ const Users = () => {
                 open={deleteModal}
                 onClose={() => setDeleteModal(false)}
                 onDiscard={() => setDeleteModal(false)}
-                description={
-                    <>
-                        Are you sure you want to delete this User? It will also remove form database. And, It will not revert!
-                    </>
-                }
+                description={<>Are you sure you want to delete this User? It will also remove form database. And, It will not revert!</>}
                 title="Delete task priority"
                 isBtnDisabled={disableBtn}
                 onSubmit={onDeleteUser}

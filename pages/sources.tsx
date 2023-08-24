@@ -6,7 +6,7 @@ import 'tippy.js/dist/tippy.css';
 import Swal from 'sweetalert2';
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
 import { sortBy } from 'lodash';
-import { Delete, Edit, Plus, View } from '@/components/icons';
+import { Delete, Edit, Plus, View } from '@/utils/icons';
 import PageHeadingSection from '@/components/__Shared/PageHeadingSection/index.';
 import ConfirmationModal from '@/components/__Shared/ConfirmationModal';
 import { useDispatch, useSelector } from 'react-redux';
@@ -14,18 +14,16 @@ import { setPageTitle } from '@/store/themeConfigSlice';
 import { GetMethodResponseType, SourceDataType } from '@/utils/Types';
 import { ApiClient } from '@/utils/http';
 import { IRootState } from '@/store';
-import {getAllSources,setCreateModal,setDeleteModal,setDisableBtn,setEditModal,setFetching, setViewModal } from '@/store/Slices/sourceSlice';
+import { getAllSources, setCreateModal, setDeleteModal, setDisableBtn, setEditModal, setFetching, setViewModal } from '@/store/Slices/sourceSlice';
 import SourceViewModal from '@/components/Sources/SourceViewModal';
 import SourceCreateModal from '@/components/Sources/SourceCreateModal';
 import SourceEditModal from '@/components/Sources/SourceEditModal';
 
-
 const Source = () => {
-
-     const dispatch = useDispatch();
-     useEffect(() => {
-         dispatch(setPageTitle('Track Leads | Sources'));
-     });
+    const dispatch = useDispatch();
+    useEffect(() => {
+        dispatch(setPageTitle('Track Leads | Sources'));
+    });
     const data: SourceDataType[] = useSelector((state: IRootState) => state.source.data);
     const fetching: boolean = useSelector((state: IRootState) => state.source.isFetching);
     const isBtnDisabled: boolean = useSelector((state: IRootState) => state.source.isBtnDisabled);
@@ -71,29 +69,29 @@ const Source = () => {
     const searchQuery = useDeferredValue(searchInputText);
     //get all Source list
     const getSourceList = async () => {
-         setLoading(true);
-         const res: GetMethodResponseType = await new ApiClient().get('sources');
-         const source: SourceDataType[] = res?.data;
-         if (Object.keys(source).length === 0) {
-             dispatch(getAllSources([] as SourceDataType[]));
-             return;
-         }
-         dispatch(getAllSources(source));
-         setLoading(false);
+        setLoading(true);
+        const res: GetMethodResponseType = await new ApiClient().get('sources');
+        const source: SourceDataType[] = res?.data;
+        if (Object.keys(source).length === 0) {
+            dispatch(getAllSources([] as SourceDataType[]));
+            return;
+        }
+        dispatch(getAllSources(source));
+        setLoading(false);
     };
 
     //deleting source
     const onDeleteSource = async () => {
-       dispatch(setFetching(true));
-       dispatch(setDisableBtn(true));
-       const deleteSource: SourceDataType = await new ApiClient().delete('sources/' + singleSource.id);
-       if (Object.keys(deleteSource).length === 0) {
-           dispatch(setDisableBtn(false));
-           return;
-       }
-       dispatch(setDisableBtn(false));
-       dispatch(setDeleteModal({ open: false }));
-       dispatch(setFetching(false));
+        dispatch(setFetching(true));
+        dispatch(setDisableBtn(true));
+        const deleteSource: SourceDataType = await new ApiClient().delete('sources/' + singleSource.id);
+        if (Object.keys(deleteSource).length === 0) {
+            dispatch(setDisableBtn(false));
+            return;
+        }
+        dispatch(setDisableBtn(false));
+        dispatch(setDeleteModal({ open: false }));
+        dispatch(setFetching(false));
     };
 
     //search source
@@ -199,8 +197,8 @@ const Source = () => {
             {/* delete modal */}
             <ConfirmationModal
                 open={deleteModal}
-                onClose={() => dispatch(setDeleteModal({open:false}))}
-                onDiscard={() => dispatch(setDeleteModal({open:false}))}
+                onClose={() => dispatch(setDeleteModal({ open: false }))}
+                onDiscard={() => dispatch(setDeleteModal({ open: false }))}
                 description={<>Are you sure you want to delete this Source? It will also remove form database.</>}
                 title="Delete task priority"
                 isBtnDisabled={isBtnDisabled}

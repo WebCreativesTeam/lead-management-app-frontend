@@ -1,9 +1,9 @@
 import React, { Fragment } from 'react';
 import { ViewModalProps } from './viewModal.types';
 import { Dialog, Transition } from '@headlessui/react';
-import { Close } from '@/components/icons';
+import { Close } from '@/utils/icons';
 
-const ViewModal = ({ content, onClose, open, title,size}: ViewModalProps) => {
+const ViewModal = ({ content, onClose, open, title, size }: ViewModalProps) => {
     return (
         <div className="mb-5">
             <Transition appear show={open} as={Fragment}>

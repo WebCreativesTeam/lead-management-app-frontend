@@ -1,7 +1,7 @@
 import React, { Fragment } from 'react';
 import { ModalProps } from './modal.types';
 import { Dialog, Transition } from '@headlessui/react';
-import { Close } from '@/components/icons';
+import { Close } from '@/utils/icons';
 
 const Modal = ({ content, onClose, onDiscard, onSubmit, open, title, btnDiscardText = 'Discard', btnSubmitText = 'Submit', isBtnDisabled, size = 'medium', disabledDiscardBtn }: ModalProps) => {
     return (

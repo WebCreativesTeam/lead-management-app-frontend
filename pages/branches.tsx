@@ -11,7 +11,7 @@ import Swal from 'sweetalert2';
 import Select, { ActionMeta } from 'react-select';
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
 import { sortBy } from 'lodash';
-import { Close, Delete, Edit, Plus, SnackLine, View, WalkingMan } from '@/components/icons';
+import { Close, Delete, Edit, Plus, SnackLine, View, WalkingMan } from '@/utils/icons';
 import PageHeadingSection from '@/components/__Shared/PageHeadingSection/index.';
 import ConfirmationModal from '@/components/__Shared/ConfirmationModal';
 import { setPageTitle } from '@/store/themeConfigSlice';
@@ -25,11 +25,10 @@ type SelectAddress = {
     city: SelectOptionsType;
 };
 const BranchPage = () => {
-
-     const dispatch = useDispatch();
-     useEffect(() => {
-         dispatch(setPageTitle('Organize Offices | Branches'));
-     });
+    const dispatch = useDispatch();
+    useEffect(() => {
+        dispatch(setPageTitle('Organize Offices | Branches'));
+    });
 
     //hooks
     const [data, setData] = useState<BranchDataType[]>([]);
