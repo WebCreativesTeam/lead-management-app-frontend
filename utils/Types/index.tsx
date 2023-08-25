@@ -28,11 +28,11 @@ export type UserDataType = {
     lastName: string;
     id: string;
     email: string;
-    permissions: string[];
+    permissions: Permission[];
     isActive: boolean;
     isVerified: boolean;
-    deactivatedAt: any;
-    policiesIncluded?: {
+    deactivatedAt: string;
+    policiesIncluded: {
         id: string;
         name: string;
         description: string;
@@ -165,6 +165,16 @@ export interface SourceInitialStateProps extends InitialStateProps {
 export interface BranchInitialStateProps extends InitialStateProps {
     data: BranchDataType[];
     singleData: BranchDataType;
+}
+
+//branch slice initial props
+export interface UserInitialStateProps extends InitialStateProps {
+    data: UserDataType[];
+    policies: PolicyDataType[];
+    singleData: UserDataType;
+    policyModal: boolean;
+    deactivateModal: boolean;
+    deactivateValue: boolean;
 }
 
 ///-------- Redux Toolkit Types - END -------------//
