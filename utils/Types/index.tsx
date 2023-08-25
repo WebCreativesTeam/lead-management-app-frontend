@@ -134,6 +134,8 @@ export type BranchDataType = {
     city: string;
     state: string;
     country: string;
+    createdAt: string;
+    updatedAt: string;
 };
 
 ///-------- Redux Toolkit Types - START -------------//
@@ -153,10 +155,16 @@ export interface ContactInitialStateProps extends InitialStateProps {
     singleData: ContactDataType;
 }
 
-//contact slice initial props
+//source slice initial props
 export interface SourceInitialStateProps extends InitialStateProps {
     data: SourceDataType[];
     singleData: SourceDataType;
+}
+
+//branch slice initial props
+export interface BranchInitialStateProps extends InitialStateProps {
+    data: BranchDataType[];
+    singleData: BranchDataType;
 }
 
 ///-------- Redux Toolkit Types - END -------------//
