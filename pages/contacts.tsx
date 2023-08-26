@@ -248,7 +248,7 @@ const Contacts = () => {
                 onClose={() => dispatch(setDeleteModal({ open: false }))}
                 onDiscard={() => dispatch(setDeleteModal({ open: false }))}
                 description={<>Are you sure you want to delete this Contact? It will also remove form database.</>}
-                title="Delete task priority"
+                title="Delete Contact"
                 isBtnDisabled={isBtnDisabled}
                 onSubmit={onDeleteContact}
                 btnSubmitText="Delete"

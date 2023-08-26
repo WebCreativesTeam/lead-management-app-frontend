@@ -17,9 +17,9 @@ export const signInSchema = Yup.object().shape({
     password: Yup.string().required('Please enter your password').min(8, 'Password should be atleast 8 characters'),
 });
 
-export const policyEditSchema = Yup.object().shape({
-    policyName: Yup.string().required('Please enter policy name'),
-    policyDescription: Yup.string().required('Please enter policy description'),
+export const policySchema = Yup.object().shape({
+    name: Yup.string().required('Please enter policy name'),
+    description: Yup.string().min(20,"Description must be 20 characters").required('Please enter policy description'),
 });
 
 //Create User Schema

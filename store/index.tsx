@@ -4,6 +4,7 @@ import sourceSlice from './Slices/sourceSlice';
 import contactSlice from './Slices/contactSlice';
 import branchSlice from './Slices/branchSlice';
 import userSlice from './Slices/userSlice';
+import policySlice from './Slices/policySlice';
 
 const rootReducer = combineReducers({
     themeConfig: themeConfigSlice,
@@ -11,6 +12,7 @@ const rootReducer = combineReducers({
     source: sourceSlice,
     branch: branchSlice,
     user: userSlice,
+    policy:policySlice,
 });
 
 export const store = configureStore({

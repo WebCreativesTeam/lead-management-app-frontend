@@ -19,6 +19,7 @@ export type PolicyDataType = {
     id: string;
     description: string;
     permissions: string[];
+    isDefault: boolean;
 };
 
 //users Page
@@ -159,6 +160,15 @@ export interface ContactInitialStateProps extends InitialStateProps {
 export interface SourceInitialStateProps extends InitialStateProps {
     data: SourceDataType[];
     singleData: SourceDataType;
+}
+
+//policy slice initial props
+export interface PolicyInitialStateProps extends InitialStateProps {
+    data: PolicyDataType[];
+    singleData: PolicyDataType;
+    permissions: Permission[];
+    permissionKeyArr: string[];
+    defaultPolicyModal: boolean;
 }
 
 //branch slice initial props
