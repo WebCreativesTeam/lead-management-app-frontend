@@ -2,24 +2,25 @@
 import React, { useEffect, useState, Fragment, useDeferredValue } from 'react';
 import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
-import axios from 'axios';
-import { Dialog, Transition } from '@headlessui/react';
-import { useFormik } from 'formik';
-import { taskSchema } from '@/utils/schemas';
-import Swal from 'sweetalert2';
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
-import { sortBy, valuesIn } from 'lodash';
-import Flatpickr from 'react-flatpickr';
-import Select, { ActionMeta } from 'react-select';
+import { sortBy } from 'lodash';
 import 'flatpickr/dist/flatpickr.css';
-import { Close, Delete, Edit, Plus, View } from '@/utils/icons';
+import { Delete, Edit, Plus, View } from '@/utils/icons';
 import PageHeadingSection from '@/components/__Shared/PageHeadingSection/index.';
-import { SelectOptionsType, TaskSelectOptions } from '@/utils/Types';
+import { GetMethodResponseType, TaskSelectOptions } from '@/utils/Types';
 import { TaskDataType } from '@/utils/Types';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { setPageTitle } from '@/store/themeConfigSlice';
-import ConfirmationModal from '@/components/__Shared/ConfirmationModal';
 import Dropdown from '@/components/Dropdown';
+import { IRootState } from '@/store';
+import { getAllTaskPriorities, getAllTaskStatus, getAllTasks, setChangePriorityModal, setChangeStatusModal, setCreateModal, setDeleteModal, setEditModal, setViewModal } from '@/store/Slices/taskSlice/manageTaskSlice';
+import { ApiClient } from '@/utils/http';
+import DeleteTaskModal from '@/components/Tasks/ManageTasks/DeleteTaskModal';
+import CreateTaskModal from '@/components/Tasks/ManageTasks/CreateTaskModal';
+import EditTaskModal from '@/components/Tasks/ManageTasks/EditTaskModal';
+import ViewTaskModal from '@/components/Tasks/ManageTasks/ViewTaskModal';
+import ChangeTaskPriorityModal from '@/components/Tasks/ManageTasks/ChangeTaskPriorityModal';
+import ChangeTaskStatusModal from '@/components/Tasks/ManageTasks/ChangeTaskStatusModal';
 
 const TaskPage = () => {
     const dispatch = useDispatch();
@@ -28,29 +29,11 @@ const TaskPage = () => {
     });
 
     //hooks
-    const [data, setData] = useState<TaskDataType[]>([]);
-    const [createModal, setCreateModal] = useState<boolean>(false);
-    const [editModal, setEditModal] = useState<boolean>(false);
-    const [viewModal, setViewModal] = useState<boolean>(false);
-    const [deleteModal, setDeleteModal] = useState<boolean>(false);
-    const [statusModal, setStatusModal] = useState<boolean>(false);
-    const [priorityModal, setPriorityModal] = useState<boolean>(false);
-    const [singleTask, setSingleTask] = useState<any>({});
-    const [singleStatusId, setSingleStatusId] = useState<any>({});
-    const [singlePriorityId, setSinglePriorityId] = useState<any>({});
-    const [singleViewTask, setSingleViewTask] = useState<any>({});
-    const [singleDeleteTask, setSingleDeleteTask] = useState<any>('');
-    const [disableBtn, setDisableBtn] = useState<boolean>(false);
-    const [serverErrors, setServerErrors] = useState('');
-    const [forceRender, setForceRender] = useState<boolean>(false);
+    const { data, isFetching, taskPriorityList, taskStatusList } = useSelector((state: IRootState) => state.task);
     const [searchInputText, setSearchInputText] = useState<string>('');
     const [searchedData, setSearchedData] = useState<TaskDataType[]>(data);
     const [loading, setLoading] = useState<boolean>(false);
-    const [fetching, setFetching] = useState<boolean>(false);
-    const [priorityOptions, setPriorityOptions] = useState<SelectOptionsType[]>([]);
     const [filter, setFilter] = useState<string>('assigned-by-me');
-    const [allPriority, setAllPriority] = useState<TaskSelectOptions[]>([]);
-    const [allStatus, setAllStatus] = useState<TaskSelectOptions[]>([]);
 
     //useDefferedValue hook for search query
     const searchQuery = useDeferredValue(searchInputText);
@@ -80,11 +63,11 @@ const TaskPage = () => {
     //get all task after page render
     useEffect(() => {
         getTasksList();
-    }, [fetching, filter]);
+    }, [isFetching, filter]);
 
     useEffect(() => {
         getTasksPriority();
-        getTasksStatus();
+        getTaskStatus();
     }, []);
 
     useEffect(() => {
@@ -92,282 +75,41 @@ const TaskPage = () => {
         setInitialRecords(data);
     }, [data]);
 
-    // set initialValues when open modal
-    const initialValues = {
-        title: '',
-        lead: '64c90bd5c7cd824f606addcd',
-        priority: {
-            value: '',
-            label: '',
-        },
-        startDate: '',
-        endDate: '',
-        assignedTo: '64c90bd5c7cd824f606addce',
-        observer: '64c90bd5c7cd824f606addd0',
-        description: '',
-        isActive: false,
-        comment: '',
-    };
-
-    //form handling
-    const { values, handleChange, handleSubmit, setFieldValue, errors, handleBlur, resetForm } = useFormik({
-        initialValues,
-        validationSchema: taskSchema,
-        validateOnChange: false,
-        enableReinitialize: true,
-        onSubmit: async (value, action) => {
-            setFetching(true);
-            try {
-                if (editModal) {
-                    setDisableBtn(true);
-                    const editTaskObj = {
-                        title: value.title,
-                        comment: value.comment,
-                        isActive: value.isActive,
-                        startDate: new Date(value.startDate).toISOString(),
-                        endDate: new Date(value.endDate).toISOString(),
-                        description: value.description,
-                        lead: values.lead,
-                    };
-                    await axios.patch(process.env.NEXT_PUBLIC_API_LINK + 'tasks/' + singleTask.id, editTaskObj, {
-                        headers: {
-                            Authorization: `Bearer ${localStorage.getItem('loginToken')}`,
-                        },
-                    });
-                    setDisableBtn(false);
-                    action.resetForm();
-                    setEditModal(false);
-                } else if (createModal) {
-                    setDisableBtn(true);
-                    const createTaskObj = {
-                        title: value.title,
-                        comment: value.comment,
-                        isActive: value.isActive,
-                        startDate: new Date(value.startDate).toISOString(),
-                        endDate: new Date(value.endDate).toISOString(),
-                        description: value.description,
-                        lead: values.lead,
-                        observer: values.observer,
-                        priority: value.priority.value,
-                        assignedTo: values.assignedTo,
-                    };
-                    await axios.post(process.env.NEXT_PUBLIC_API_LINK + 'tasks/', createTaskObj, {
-                        headers: {
-                            Authorization: `Bearer ${localStorage.getItem('loginToken')}`,
-                        },
-                    });
-                    setDisableBtn(false);
-                    setCreateModal(false);
-                    action.resetForm();
-                }
-            } catch (error: any) {
-                setDisableBtn(true);
-                if (typeof error?.response?.data?.message === 'object') {
-                    setServerErrors(error?.response?.data?.message.join(' , '));
-                } else {
-                    setServerErrors(error?.response?.data?.message);
-                }
-                setServerErrors(error?.response?.data?.message);
-                setDisableBtn(false);
-            }
-            setFetching(false);
-        },
-    });
-
-    useEffect(() => {
-        showServerAlert();
-    }, [errors, serverErrors, forceRender]);
-    useEffect(() => {}, [forceRender]);
-
-    //server alerts
-    const showServerAlert = () => {
-        if (serverErrors) {
-            const toast = Swal.mixin({
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 3000,
-            });
-            toast.fire({
-                icon: 'error',
-                title: serverErrors,
-                padding: '10px 20px',
-            });
-        }
-        setServerErrors('');
-    };
-    //get single task by id
-    const handleEditTask = (id: string): void => {
-        setEditModal(true);
-        const findTask: TaskDataType | any = data?.find((item: TaskDataType) => {
-            return item.id === id;
-        });
-        setFieldValue('title', findTask?.title);
-        setFieldValue('startDate', findTask?.startDate);
-        setFieldValue('endDate', findTask?.endDate);
-        setFieldValue('description', findTask?.description);
-        setFieldValue('comment', findTask?.comment);
-        setSingleTask(findTask);
-    };
-
     //get all tasks list
     const getTasksList = async () => {
-        try {
-            setLoading(true);
-            const res = await axios.get(process.env.NEXT_PUBLIC_API_LINK + 'tasks/' + filter, {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem('loginToken')}`,
-                },
-            });
-            const tasks = res?.data?.data;
-            setData(tasks);
-            setLoading(false);
-        } catch (error: any) {
-            if (typeof error?.response?.data?.message === 'object') {
-                setServerErrors(error?.response?.data?.message.join(' , '));
-            } else {
-                setServerErrors(error?.response?.data?.message);
-            }
-            setServerErrors(error?.response?.data?.message);
+        setLoading(true);
+        const res: GetMethodResponseType = await new ApiClient().get('tasks?sort=-isDefault');
+        const policies: TaskDataType[] = res?.data;
+        if (Object.keys(policies).length === 0) {
+            dispatch(getAllTasks([] as TaskDataType[]));
+            return;
         }
+        dispatch(getAllTasks(policies));
+        setLoading(false);
     };
 
-    //get all task priority list obj
+    //get all task priority list
     const getTasksPriority = async () => {
-        try {
-            setLoading(true);
-            const res = await axios.get(process.env.NEXT_PUBLIC_API_LINK + 'task-priorities/', {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem('loginToken')}`,
-                },
-            });
-            const taskPriorityAllData: TaskSelectOptions[] = res?.data?.data;
-            setAllPriority(taskPriorityAllData);
-            const createTaskPriorityOptions: SelectOptionsType[] | any = taskPriorityAllData?.map((item: TaskSelectOptions) => {
-                return {
-                    value: item.id,
-                    label: item.name,
-                };
-            });
-            setPriorityOptions(createTaskPriorityOptions);
-            // setData(tasks);
-            setLoading(false);
-        } catch (error: any) {
-            if (typeof error?.response?.data?.message === 'object') {
-                setServerErrors(error?.response?.data?.message.join(' , '));
-            } else {
-                setServerErrors(error?.response?.data?.message);
-            }
-            setServerErrors(error?.response?.data?.message);
+        setLoading(true);
+        const taskPriorityList: GetMethodResponseType = await new ApiClient().get('task-priorities');
+        const priorities: TaskSelectOptions[] = taskPriorityList?.data;
+        if (Object.keys(priorities).length === 0) {
+            dispatch(getAllTaskPriorities([] as TaskSelectOptions[]));
+            return;
         }
+        dispatch(getAllTaskPriorities(priorities));
     };
-    const getTasksStatus = async () => {
-        try {
-            setLoading(true);
-            const res = await axios.get(process.env.NEXT_PUBLIC_API_LINK + 'task-status/', {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem('loginToken')}`,
-                },
-            });
-            const taskStatusAllData: TaskSelectOptions[] = res?.data?.data;
-            setAllStatus(taskStatusAllData);
-            const createTaskPriorityOptions: SelectOptionsType[] | any = taskStatusAllData?.map((item: TaskSelectOptions) => {
-                return {
-                    value: item.id,
-                    label: item.name,
-                };
-            });
-            setPriorityOptions(createTaskPriorityOptions);
-            // setData(tasks);
-            setLoading(false);
-        } catch (error: any) {
-            if (typeof error?.response?.data?.message === 'object') {
-                setServerErrors(error?.response?.data?.message.join(' , '));
-            } else {
-                setServerErrors(error?.response?.data?.message);
-            }
-            setServerErrors(error?.response?.data?.message);
+
+    //get all task status list
+    const getTaskStatus = async () => {
+        setLoading(true);
+        const taskStatusList: GetMethodResponseType = await new ApiClient().get('task-status');
+        const status: TaskSelectOptions[] = taskStatusList?.data;
+        if (Object.keys(status).length === 0) {
+            dispatch(getAllTaskStatus([] as TaskSelectOptions[]));
+            return;
         }
-    };
-
-    //showing validation error
-    const showAlert = async () => {
-        if (errors.title) {
-            const toast = Swal.mixin({
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 3000,
-            });
-            toast.fire({
-                icon: 'error',
-                title: errors.title,
-                padding: '10px 20px',
-            });
-        }
-    };
-    //alert and server alert execution
-    const handleClickSubmit = () => {
-        errors && showAlert();
-        if (serverErrors) {
-            if (forceRender === false) {
-                setForceRender(true);
-            } else {
-                setForceRender(false);
-            }
-        }
-    };
-
-    const handleDiscard = () => {
-        setEditModal(false);
-        setDeleteModal(false);
-        setCreateModal(false);
-        setSingleTask({});
-        resetForm();
-    };
-
-    // get single task for view modal
-    const handleViewTask = (id: string) => {
-        setViewModal(true);
-        const findTask = data?.find((item: TaskDataType) => {
-            return item.id === id;
-        });
-        setSingleViewTask(findTask);
-    };
-
-    // delete task by id
-
-    const handleDeleteTask = (id: string) => {
-        setDeleteModal(true);
-        const findTask = data?.find((item: TaskDataType) => {
-            return item.id === id;
-        });
-        setSingleDeleteTask(findTask?.id);
-    };
-
-    //deleting task
-    const onDeleteTask = async () => {
-        setFetching(true);
-        try {
-            setDisableBtn(true);
-            await axios.delete(process.env.NEXT_PUBLIC_API_LINK + 'tasks/' + singleDeleteTask, {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem('loginToken')}`,
-                },
-            });
-            setDisableBtn(false);
-            setDeleteModal(false);
-        } catch (error: any) {
-            setDisableBtn(true);
-            if (typeof error?.response?.data?.message === 'object') {
-                setServerErrors(error?.response?.data?.message.join(' , '));
-            } else {
-                setServerErrors(error?.response?.data?.message);
-            }
-            setServerErrors(error?.response?.data?.message);
-            setDisableBtn(false);
-        }
-        setFetching(false);
+        dispatch(getAllTaskStatus(status));
     };
 
     //search task
@@ -383,87 +125,12 @@ const TaskPage = () => {
         setRecordsData(searchTaskData);
     };
 
-    const handleOpenStatusModal = (statusId: string, taskId: string) => {
-        setStatusModal(true);
-        const findTaskStatus: any = allStatus?.find((item: TaskSelectOptions) => {
-            return item.id === statusId;
-        });
-        const findTask: any = data?.find((item: TaskDataType) => {
-            return item.id === taskId;
-        });
-        setSingleTask(findTask);
-        setSingleStatusId(findTaskStatus.id);
-    };
-    const handleOpenPriorityModal = (priorityId: string, taskId: string) => {
-        setPriorityModal(true);
-        const findTaskPriority: any = allPriority?.find((item: TaskSelectOptions) => {
-            return item.id === priorityId;
-        });
-        const findTask: any = data?.find((item: TaskDataType) => {
-            return item.id === taskId;
-        });
-        setSingleTask(findTask);
-        setSinglePriorityId(findTaskPriority.id);
-    };
-
-    //change task status
-    const onChangeStatus = async () => {
-        setDisableBtn(true);
-        setFetching(true);
-        try {
-            await axios.patch(
-                process.env.NEXT_PUBLIC_API_LINK + 'tasks/' + singleTask.id + '/status',
-                { status: singleStatusId },
-                {
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem('loginToken')}`,
-                    },
-                }
-            );
-            setStatusModal(false);
-        } catch (error: any) {
-            if (typeof error?.response?.data?.message === 'object') {
-                setServerErrors(error?.response?.data?.message.join(' , '));
-            } else {
-                setServerErrors(error?.response?.data?.message);
-            }
-            setServerErrors(error?.response?.data?.message);
-        }
-        setFetching(false);
-        setDisableBtn(false);
-    };
-    //change task priority
-    const onChangePriority = async () => {
-        setDisableBtn(true);
-        setFetching(true);
-        try {
-            await axios.patch(
-                process.env.NEXT_PUBLIC_API_LINK + 'tasks/' + singleTask.id + '/priority',
-                { priority: singlePriorityId },
-                {
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem('loginToken')}`,
-                    },
-                }
-            );
-            setPriorityModal(false);
-        } catch (error: any) {
-            if (typeof error?.response?.data?.message === 'object') {
-                setServerErrors(error?.response?.data?.message.join(' , '));
-            } else {
-                setServerErrors(error?.response?.data?.message);
-            }
-            setServerErrors(error?.response?.data?.message);
-        }
-        setFetching(false);
-        setDisableBtn(false);
-    };
     return (
         <div>
             <PageHeadingSection description="View, create, update, and close tasks. Organize by status, priority, and due date. Stay on top of work." heading="Task Management" />
             <div className="my-6 flex gap-5 ">
                 <div className="flex flex-1 gap-5 ">
-                    <button className="btn btn-primary h-full w-full max-w-[200px] max-sm:mx-auto" type="button" onClick={() => setCreateModal(true)}>
+                    <button className="btn btn-primary h-full w-full max-w-[200px] max-sm:mx-auto" type="button" onClick={() => dispatch(setCreateModal(true))}>
                         <Plus />
                         Add New Task
                     </button>
@@ -550,13 +217,13 @@ const TaskPage = () => {
                                         }
                                     >
                                         <ul className="!min-w-[170px]">
-                                            {allStatus.map((status: TaskSelectOptions, i: number) => {
+                                            {taskStatusList.map((status: TaskSelectOptions, i: number) => {
                                                 return (
                                                     <li key={i}>
                                                         <button
                                                             className={`mr-2 rounded px-2.5 py-0.5 text-sm font-medium dark:bg-blue-900 dark:text-blue-300`}
                                                             style={{ color: status.color, backgroundColor: status.color + '20' }}
-                                                            onClick={() => handleOpenStatusModal(status?.id, id)}
+                                                            onClick={() => dispatch(setChangeStatusModal({ statusId: status.id, taskId: id, open: true }))}
                                                         >
                                                             {status.name}
                                                         </button>
@@ -588,13 +255,13 @@ const TaskPage = () => {
                                         }
                                     >
                                         <ul className="!min-w-[170px]">
-                                            {allPriority.map((priority: TaskSelectOptions, i: number) => {
+                                            {taskPriorityList.map((priority: TaskSelectOptions, i: number) => {
                                                 return (
                                                     <li key={i}>
                                                         <button
                                                             className={`mr-2 rounded px-2.5 py-0.5 text-sm font-medium dark:bg-blue-900 dark:text-blue-300`}
                                                             style={{ color: priority.color, backgroundColor: priority.color + '20' }}
-                                                            onClick={() => handleOpenPriorityModal(priority.id, id)}
+                                                            onClick={() => dispatch(setChangePriorityModal({ priorityId: priority.id, taskId: id, open: true }))}
                                                         >
                                                             {priority.name}
                                                         </button>
@@ -619,17 +286,17 @@ const TaskPage = () => {
                             render: ({ id }) => (
                                 <div className="flex justify-center gap-2  p-3 text-center ">
                                     <Tippy content="View">
-                                        <button type="button" onClick={() => handleViewTask(id)}>
+                                        <button type="button" onClick={() => dispatch(setViewModal({ id, open: true }))}>
                                             <View />
                                         </button>
                                     </Tippy>
                                     <Tippy content="Edit">
-                                        <button type="button" onClick={() => handleEditTask(id)}>
+                                        <button type="button" onClick={() => dispatch(setEditModal({ id, open: true }))}>
                                             <Edit />
                                         </button>
                                     </Tippy>
                                     <Tippy content="Delete">
-                                        <button type="button" onClick={() => handleDeleteTask(id)}>
+                                        <button type="button" onClick={() => dispatch(setDeleteModal({ id, open: true }))}>
                                             <Delete />
                                         </button>
                                     </Tippy>
@@ -652,490 +319,22 @@ const TaskPage = () => {
             </div>
 
             {/* edit modal */}
-
-            <div className="mb-5">
-                <Transition appear show={editModal} as={Fragment}>
-                    <Dialog as="div" open={editModal} onClose={handleDiscard}>
-                        <Transition.Child
-                            as={Fragment}
-                            enter="ease-out duration-300"
-                            enterFrom="opacity-0"
-                            enterTo="opacity-100"
-                            leave="ease-in duration-200"
-                            leaveFrom="opacity-100"
-                            leaveTo="opacity-0"
-                        >
-                            <div className="fixed inset-0" />
-                        </Transition.Child>
-                        <div className="fixed inset-0 z-[999] overflow-y-auto bg-[black]/60 ">
-                            <div className="flex min-h-screen items-center justify-center px-4 ">
-                                <Transition.Child
-                                    as={Fragment}
-                                    enter="ease-out duration-300"
-                                    enterFrom="opacity-0 scale-95"
-                                    enterTo="opacity-100 scale-100"
-                                    leave="ease-in duration-200"
-                                    leaveFrom="opacity-100 scale-100"
-                                    leaveTo="opacity-0 scale-95"
-                                >
-                                    <Dialog.Panel as="div" className="panel my-8 w-full  overflow-visible rounded-lg border-0 p-0 text-black dark:text-white-dark sm:w-[43rem]">
-                                        <div className="flex items-center justify-between rounded-t-lg bg-[#fbfbfb] px-5 py-3 dark:bg-[#121c2c]">
-                                            <h5 className="text-lg font-bold">Edit Task</h5>
-                                            <button type="button" className="text-white-dark hover:text-dark" onClick={handleDiscard}>
-                                                <Close />
-                                            </button>
-                                        </div>
-                                        <div className="p-5">
-                                            <form className="space-y-5" onSubmit={handleSubmit}>
-                                                <div className="flex flex-col gap-4 sm:flex-row">
-                                                    <div className="flex-1">
-                                                        <label htmlFor="createTask">Task Title</label>
-                                                        <input
-                                                            onChange={handleChange}
-                                                            onBlur={handleBlur}
-                                                            value={values.title}
-                                                            id="createTask"
-                                                            name="title"
-                                                            type="text"
-                                                            placeholder="Task Title"
-                                                            className="form-input"
-                                                        />
-                                                    </div>
-                                                    <div className="flex-1">
-                                                        <label htmlFor="chooseLead">Choose Lead</label>
-                                                        <input
-                                                            onChange={handleChange}
-                                                            onBlur={handleBlur}
-                                                            value={values.lead}
-                                                            id="chooseLead"
-                                                            name="lead"
-                                                            type="text"
-                                                            placeholder="Choose Lead"
-                                                            className="form-input"
-                                                        />
-                                                    </div>
-                                                </div>
-                                                <div className="flex flex-col gap-4 sm:flex-row">
-                                                    <div className="flex-1">
-                                                        <label>Task Start Date</label>
-                                                        <Flatpickr
-                                                            data-enable-time
-                                                            options={{
-                                                                enableTime: true,
-                                                                dateFormat: 'Y-m-d H:i',
-                                                                position: 'auto',
-                                                            }}
-                                                            id="taskStartDate"
-                                                            name="startDate"
-                                                            className="form-input"
-                                                            onChange={(e) => setFieldValue('startDate', e)}
-                                                            value={values.startDate}
-                                                        />
-                                                    </div>
-                                                    <div className="flex-1">
-                                                        <label>Task End Date</label>
-                                                        <Flatpickr
-                                                            data-enable-time
-                                                            options={{
-                                                                enableTime: true,
-                                                                dateFormat: 'Y-m-d H:i',
-                                                                position: 'auto',
-                                                            }}
-                                                            id="taskEndDate"
-                                                            name="endDate"
-                                                            className="form-input"
-                                                            onChange={(e) => setFieldValue('endDate', e)}
-                                                            value={values.endDate}
-                                                        />
-                                                    </div>
-                                                </div>
-                                                <div>
-                                                    <label htmlFor="taskDescription">Task Description</label>
-                                                    <textarea
-                                                        id="taskDescription"
-                                                        rows={5}
-                                                        name="description"
-                                                        className="form-textarea"
-                                                        placeholder="Enter Task Description"
-                                                        onChange={handleChange}
-                                                        onBlur={handleBlur}
-                                                        value={values.description}
-                                                    ></textarea>
-                                                </div>
-                                                <div>
-                                                    <label htmlFor="taskComment"> Comment</label>
-                                                    <textarea
-                                                        id="taskComment"
-                                                        rows={5}
-                                                        className="form-textarea"
-                                                        placeholder="Enter Task Comment"
-                                                        name="comment"
-                                                        onChange={handleChange}
-                                                        onBlur={handleBlur}
-                                                        value={values.comment}
-                                                    ></textarea>
-                                                </div>
-                                                <div>
-                                                    <label className="inline-flex" htmlFor="taskActiveStatus">
-                                                        <input
-                                                            type="checkbox"
-                                                            className="peer form-checkbox outline-success"
-                                                            id="taskActiveStatus"
-                                                            name="isActive"
-                                                            defaultChecked={singleTask?.isActive}
-                                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFieldValue('isActive', e.target.checked)}
-                                                        />
-                                                        <span className="peer-checked:text-success">Is Task Active</span>
-                                                    </label>
-                                                </div>
-                                                <div className="mt-8 flex items-center justify-end">
-                                                    <button type="button" className="btn btn-outline-danger" onClick={handleDiscard} disabled={disableBtn}>
-                                                        Discard
-                                                    </button>
-                                                    <button
-                                                        type="submit"
-                                                        className="btn btn-primary cursor-pointer ltr:ml-4 rtl:mr-4"
-                                                        onClick={handleClickSubmit}
-                                                        disabled={values.title && !disableBtn ? false : true}
-                                                    >
-                                                        Edit Task
-                                                    </button>
-                                                </div>
-                                            </form>
-                                        </div>
-                                    </Dialog.Panel>
-                                </Transition.Child>
-                            </div>
-                        </div>
-                    </Dialog>
-                </Transition>
-            </div>
+            <EditTaskModal />
 
             {/* view modal */}
-
-            <div className="mb-5">
-                <Transition appear show={viewModal} as={Fragment}>
-                    <Dialog as="div" open={viewModal} onClose={() => setViewModal(false)}>
-                        <Transition.Child
-                            as={Fragment}
-                            enter="ease-out duration-300"
-                            enterFrom="opacity-0"
-                            enterTo="opacity-100"
-                            leave="ease-in duration-200"
-                            leaveFrom="opacity-100"
-                            leaveTo="opacity-0"
-                        >
-                            <div className="fixed inset-0" />
-                        </Transition.Child>
-                        <div className="fixed inset-0 z-[999] overflow-y-auto bg-[black]/60">
-                            <div className="flex min-h-screen items-center justify-center px-4">
-                                <Transition.Child
-                                    as={Fragment}
-                                    enter="ease-out duration-300"
-                                    enterFrom="opacity-0 scale-95"
-                                    enterTo="opacity-100 scale-100"
-                                    leave="ease-in duration-200"
-                                    leaveFrom="opacity-100 scale-100"
-                                    leaveTo="opacity-0 scale-95"
-                                >
-                                    <Dialog.Panel as="div" className="panel my-8 w-full max-w-lg overflow-hidden rounded-lg border-0 p-0 text-black dark:text-white-dark">
-                                        <div className="flex items-center justify-between bg-[#fbfbfb] px-5 py-3 dark:bg-[#121c2c]">
-                                            <h5 className="text-lg font-bold">View Task</h5>
-                                            <button type="button" className="text-white-dark hover:text-dark" onClick={() => setViewModal(false)}>
-                                                <Close />
-                                            </button>
-                                        </div>
-                                        <div className="p-5">
-                                            <ul className="flex flex-col gap-4">
-                                                <li className="flex flex-wrap">
-                                                    <span className="flex-1 text-lg font-bold">Task Name</span>
-                                                    <p className="flex-[2]">{singleViewTask.title}</p>
-                                                </li>
-                                                <li className="flex flex-wrap">
-                                                    <span className="flex-1 text-lg font-bold">Task Description</span>
-                                                    <p className="flex-[2]">{singleViewTask.description}</p>
-                                                </li>
-                                                <li className="flex flex-wrap">
-                                                    <span className="flex-1 text-lg font-bold">Task Comment</span>
-                                                    <p className="flex-[2]">{singleViewTask.comment}</p>
-                                                </li>
-                                                <li className="flex flex-wrap">
-                                                    <span className="flex-1 text-lg font-bold">Task Created</span>
-                                                    <p className="flex-[2]">{new Date(singleViewTask.createdAt).toLocaleString()}</p>
-                                                </li>
-                                                <li className="flex flex-wrap">
-                                                    <span className="flex-1 text-lg font-bold">Last Updated</span>
-                                                    <p className="flex-[2]">{new Date(singleViewTask.updatedAt).toLocaleString()}</p>
-                                                </li>
-                                                <li className="flex flex-wrap">
-                                                    <span className="flex-1 text-lg font-bold">Task StartDate</span>
-                                                    <p className="flex-[2]">{new Date(singleViewTask.startDate).toLocaleString()}</p>
-                                                </li>
-                                                <li className="flex flex-wrap">
-                                                    <span className="flex-1 text-lg font-bold">Task EndDate</span>
-                                                    <p className="flex-[2]">{new Date(singleViewTask.endDate).toLocaleString()}</p>
-                                                </li>
-                                                <li className="flex flex-wrap">
-                                                    <span className="flex-1 text-lg font-bold">Task Status</span>
-                                                    <p className="flex-[2]">{singleViewTask?.status?.name}</p>
-                                                </li>
-                                                <li className="flex flex-wrap">
-                                                    <span className="flex-1 text-lg font-bold">Task AssignBy</span>
-                                                    <p className="flex-[2]">{singleViewTask?.assignedBy?.firstName + ' ' + singleViewTask?.assignedBy?.lastName}</p>
-                                                </li>
-                                            </ul>
-                                            <div className="mt-8 flex items-center justify-center">
-                                                <button type="button" className="btn btn-primary ltr:ml-4 rtl:mr-4" onClick={() => setViewModal(false)}>
-                                                    Close
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </Dialog.Panel>
-                                </Transition.Child>
-                            </div>
-                        </div>
-                    </Dialog>
-                </Transition>
-            </div>
+            <ViewTaskModal />
 
             {/* delete modal */}
-            <ConfirmationModal
-                open={deleteModal}
-                onClose={() => setDeleteModal(false)}
-                onDiscard={() => setDeleteModal(false)}
-                description={
-                    <>
-                        Are you sure you want to delete this Task? <br /> It will not revert!
-                    </>
-                }
-                title="Delete task priority"
-                isBtnDisabled={disableBtn}
-                onSubmit={onDeleteTask}
-                btnSubmitText="Delete"
-            />
+            <DeleteTaskModal />
+
             {/* change Status modal */}
-            <ConfirmationModal
-                open={statusModal}
-                onClose={() => setStatusModal(false)}
-                onDiscard={() => setStatusModal(false)}
-                description={
-                    <>
-                        Are you sure you want to change this Task status? <br /> It will not revert!
-                    </>
-                }
-                title="Change task status"
-                isBtnDisabled={disableBtn}
-                onSubmit={onChangeStatus}
-                btnSubmitText="Change Status"
-            />
+            <ChangeTaskStatusModal />
+
             {/* change task priority modal */}
-            <ConfirmationModal
-                open={priorityModal}
-                onClose={() => setPriorityModal(false)}
-                onDiscard={() => setPriorityModal(false)}
-                description={
-                    <>
-                        Are you sure you want to change this Task priority? <br /> It will not revert!
-                    </>
-                }
-                title="Change task priority"
-                isBtnDisabled={disableBtn}
-                onSubmit={onChangePriority}
-                btnSubmitText="Change Priority"
-            />
+            <ChangeTaskPriorityModal />
 
             {/* create modal */}
-
-            <div className="mb-5">
-                <Transition appear show={createModal} as={Fragment}>
-                    <Dialog as="div" open={createModal} onClose={handleDiscard}>
-                        <Transition.Child
-                            as={Fragment}
-                            enter="ease-out duration-300"
-                            enterFrom="opacity-0"
-                            enterTo="opacity-100"
-                            leave="ease-in duration-200"
-                            leaveFrom="opacity-100"
-                            leaveTo="opacity-0"
-                        >
-                            <div className="fixed inset-0" />
-                        </Transition.Child>
-                        <div className="fixed inset-0 z-[999] overflow-y-auto bg-[black]/60 ">
-                            <div className="flex min-h-screen items-center justify-center px-4 ">
-                                <Transition.Child
-                                    as={Fragment}
-                                    enter="ease-out duration-300"
-                                    enterFrom="opacity-0 scale-95"
-                                    enterTo="opacity-100 scale-100"
-                                    leave="ease-in duration-200"
-                                    leaveFrom="opacity-100 scale-100"
-                                    leaveTo="opacity-0 scale-95"
-                                >
-                                    <Dialog.Panel as="div" className="panel my-8 w-full  overflow-visible rounded-lg border-0 p-0 text-black dark:text-white-dark sm:w-[43rem]">
-                                        <div className="flex items-center justify-between rounded-t-lg bg-[#fbfbfb] px-5 py-3 dark:bg-[#121c2c]">
-                                            <h5 className="text-lg font-bold">Create Task</h5>
-                                            <button type="button" className="text-white-dark hover:text-dark" onClick={handleDiscard}>
-                                                <Close />
-                                            </button>
-                                        </div>
-                                        <div className="p-5">
-                                            <form className="space-y-5" onSubmit={handleSubmit}>
-                                                <div className="flex flex-col gap-4 sm:flex-row">
-                                                    <div className="flex-1">
-                                                        <label htmlFor="createTask">Task Title</label>
-                                                        <input
-                                                            onChange={handleChange}
-                                                            onBlur={handleBlur}
-                                                            value={values.title}
-                                                            id="createTask"
-                                                            name="title"
-                                                            type="text"
-                                                            placeholder="Task Title"
-                                                            className="form-input"
-                                                        />
-                                                    </div>
-                                                    <div className="flex-1">
-                                                        <label htmlFor="chooseLead">Choose Lead</label>
-                                                        <input
-                                                            onChange={handleChange}
-                                                            onBlur={handleBlur}
-                                                            value={values.lead}
-                                                            id="chooseLead"
-                                                            name="lead"
-                                                            type="text"
-                                                            placeholder="Choose Lead"
-                                                            className="form-input"
-                                                        />
-                                                    </div>
-                                                </div>
-                                                <div className="flex flex-col gap-4 sm:flex-row">
-                                                    <div className="flex-1">
-                                                        <label>Task Start Date</label>
-                                                        <Flatpickr
-                                                            data-enable-time
-                                                            options={{
-                                                                enableTime: true,
-                                                                dateFormat: 'Y-m-d H:i',
-                                                                position: 'auto',
-                                                            }}
-                                                            id="taskStartDate"
-                                                            name="startDate"
-                                                            className="form-input"
-                                                            onChange={(e) => setFieldValue('startDate', e)}
-                                                            value={values.startDate}
-                                                        />
-                                                    </div>
-                                                    <div className="flex-1">
-                                                        <label>Task End Date</label>
-                                                        <Flatpickr
-                                                            data-enable-time
-                                                            options={{
-                                                                enableTime: true,
-                                                                dateFormat: 'Y-m-d H:i',
-                                                                position: 'auto',
-                                                            }}
-                                                            id="taskEndDate"
-                                                            name="endDate"
-                                                            className="form-input"
-                                                            onChange={(e) => setFieldValue('endDate', e)}
-                                                            value={values.endDate}
-                                                        />
-                                                    </div>
-                                                </div>
-                                                <div className="flex flex-col gap-4 sm:flex-row">
-                                                    <div className="flex-1">
-                                                        <label htmlFor="taskAssignTo">Task Assign To</label>
-                                                        <input
-                                                            onChange={handleChange}
-                                                            onBlur={handleBlur}
-                                                            value={values.assignedTo}
-                                                            id="taskAssignTo"
-                                                            name="assignedTo"
-                                                            type="text"
-                                                            placeholder="Task Assign to"
-                                                            className="form-input"
-                                                        />
-                                                    </div>
-                                                    <div className="flex-1">
-                                                        <label htmlFor="taskObserver">Task Observer</label>
-                                                        <input
-                                                            onChange={handleChange}
-                                                            onBlur={handleBlur}
-                                                            value={values.observer}
-                                                            id="taskObserver"
-                                                            name="observer"
-                                                            type="text"
-                                                            placeholder="Task Observer"
-                                                            className="form-input"
-                                                        />
-                                                    </div>
-                                                </div>
-                                                <div className="flex flex-col gap-4 sm:flex-row">
-                                                    <div className="flex-1">
-                                                        <label htmlFor="taskPriority">Task Priority</label>
-                                                        <Select placeholder="Select task priority" options={priorityOptions} id="taskPriority" onChange={(e) => setFieldValue('priority', e)} />
-                                                    </div>
-                                                </div>
-                                                <div>
-                                                    <label htmlFor="taskDescription">Task Description</label>
-                                                    <textarea
-                                                        id="taskDescription"
-                                                        rows={5}
-                                                        name="description"
-                                                        className="form-textarea"
-                                                        placeholder="Enter Task Description"
-                                                        onChange={handleChange}
-                                                        onBlur={handleBlur}
-                                                        value={values.description}
-                                                    ></textarea>
-                                                </div>
-                                                <div>
-                                                    <label htmlFor="taskComment"> Comment</label>
-                                                    <textarea
-                                                        id="taskComment"
-                                                        rows={5}
-                                                        className="form-textarea"
-                                                        placeholder="Enter Task Comment"
-                                                        name="comment"
-                                                        onChange={handleChange}
-                                                        onBlur={handleBlur}
-                                                        value={values.comment}
-                                                    ></textarea>
-                                                </div>
-                                                <div>
-                                                    <label className="inline-flex" htmlFor="taskActiveStatus">
-                                                        <input
-                                                            type="checkbox"
-                                                            className="peer form-checkbox outline-success"
-                                                            id="taskActiveStatus"
-                                                            name="isActive"
-                                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFieldValue('isActive', e.target.checked)}
-                                                        />
-                                                        <span className="peer-checked:text-success">Is Task Active</span>
-                                                    </label>
-                                                </div>
-                                                <div className="mt-8 flex items-center justify-end">
-                                                    <button type="button" className="btn btn-outline-danger" onClick={handleDiscard} disabled={disableBtn}>
-                                                        Discard
-                                                    </button>
-                                                    <button
-                                                        type="submit"
-                                                        className="btn btn-primary cursor-pointer ltr:ml-4 rtl:mr-4"
-                                                        onClick={handleClickSubmit}
-                                                        disabled={values.title && !disableBtn ? false : true}
-                                                    >
-                                                        Create Task
-                                                    </button>
-                                                </div>
-                                            </form>
-                                        </div>
-                                    </Dialog.Panel>
-                                </Transition.Child>
-                            </div>
-                        </div>
-                    </Dialog>
-                </Transition>
-            </div>
+            <CreateTaskModal />
         </div>
     );
 };

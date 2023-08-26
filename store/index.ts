@@ -5,6 +5,7 @@ import contactSlice from './Slices/contactSlice';
 import branchSlice from './Slices/branchSlice';
 import userSlice from './Slices/userSlice';
 import policySlice from './Slices/policySlice';
+import manageTaskSlice from './Slices/taskSlice/manageTaskSlice';
 
 const rootReducer = combineReducers({
     themeConfig: themeConfigSlice,
@@ -12,7 +13,8 @@ const rootReducer = combineReducers({
     source: sourceSlice,
     branch: branchSlice,
     user: userSlice,
-    policy:policySlice,
+    policy: policySlice,
+    task:manageTaskSlice,
 });
 
 export const store = configureStore({

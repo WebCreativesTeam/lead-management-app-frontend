@@ -61,6 +61,10 @@ export type TaskDataType = {
     comment: string;
     isActive: boolean;
     lead: string;
+    assignedBy: {
+        firstName: string;
+        lastName: string;
+    };
     status: {
         color: string;
         id: string;
@@ -154,6 +158,17 @@ export interface InitialStateProps {
 export interface ContactInitialStateProps extends InitialStateProps {
     data: ContactDataType[];
     singleData: ContactDataType;
+}
+//manage task slice initial props
+export interface ManageTaskInitialStateProps extends InitialStateProps {
+    data: TaskDataType[];
+    singleData: TaskDataType;
+    taskPriorityList: TaskSelectOptions[];
+    taskStatusList: TaskSelectOptions[];
+    changePriorityModal: boolean;
+    changeStatusModal: boolean;
+    singlePriority: TaskSelectOptions;
+    singleStatus: TaskSelectOptions;
 }
 
 //source slice initial props

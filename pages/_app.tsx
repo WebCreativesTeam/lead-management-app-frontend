@@ -1,5 +1,5 @@
 import type { AppProps } from 'next/app';
-import { ReactElement, ReactNode, Suspense } from 'react';
+import { ReactElement, ReactNode } from 'react';
 import DefaultLayout from '../components/Layouts/DefaultLayout';
 import { Provider } from 'react-redux';
 import { store } from '@/store';
