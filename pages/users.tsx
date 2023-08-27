@@ -80,7 +80,7 @@ const Users = () => {
         setLoading(true);
         const res: GetMethodResponseType = await new ApiClient().get('users');
         const users: UserDataType[] = res?.data;
-        if (Object.keys(users).length === 0) {
+        if (typeof users === "undefined") {
             dispatch(getAllUsers([] as UserDataType[]));
             return;
         }
@@ -91,7 +91,7 @@ const Users = () => {
         setLoading(true);
         const res: GetMethodResponseType = await new ApiClient().get('policies');
         const policies: PolicyDataType[] = res?.data;
-        if (Object.keys(policies).length === 0) {
+        if (typeof policies === "undefined") {
             dispatch(getAllPolicies([] as PolicyDataType[]));
             return;
         }

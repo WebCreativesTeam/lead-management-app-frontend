@@ -70,7 +70,7 @@ const TaskStatusPage = () => {
         setLoading(true);
         const res: GetMethodResponseType = await new ApiClient().get('task-status?sort=-isDefault');
         const status: TaskStatusType[] = res?.data;
-        if (Object.keys(status).length === 0) {
+        if (typeof status === 'undefined') {
             dispatch(getAllTaskStatus([] as TaskStatusType[]));
             return;
         }

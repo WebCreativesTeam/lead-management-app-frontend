@@ -72,7 +72,7 @@ const Source = () => {
         setLoading(true);
         const res: GetMethodResponseType = await new ApiClient().get('sources');
         const source: SourceDataType[] = res?.data;
-        if (Object.keys(source).length === 0) {
+        if (typeof source ==="undefined") {
             dispatch(getAllSources([] as SourceDataType[]));
             return;
         }

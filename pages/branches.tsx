@@ -73,7 +73,7 @@ const BranchPage = () => {
         setLoading(true);
         const res: GetMethodResponseType = await new ApiClient().get('branches');
         const branches: BranchDataType[] = res?.data;
-        if (Object.keys(branches).length === 0) {
+        if (typeof branches === "undefined") {
             dispatch(getAllBranches([] as BranchDataType[]));
             return;
         }

@@ -72,7 +72,7 @@ const Contacts = () => {
         setLoading(true);
         const res: GetMethodResponseType = await new ApiClient().get('contacts');
         const contacts: ContactDataType[] = res?.data;
-        if (Object.keys(contacts).length === 0) {
+        if (typeof contacts === "undefined") {
             dispatch(getAllContacts([] as ContactDataType[]));
             return;
         }

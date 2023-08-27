@@ -34,12 +34,15 @@ export class ApiClient implements IApiClient {
         try {
             const response = await this.client.get<TResponse>(path);
             return response?.data;
-        } catch (error:any) {
-            showToastAlert(error?.response)
-            console.log(error)
+        } catch (error: any) {
+            if (typeof error?.response === 'string') {
+                showToastAlert(error?.response);
+            } else if (typeof error?.response?.data?.error === 'string') {
+                showToastAlert(error?.response?.data?.error);
+            }
+            console.log(error);
         }
-        return {} as TResponse;
-        
+        return null as TResponse;
     }
     public async patch<TRequest, TResponse>(path: string, body: TRequest): Promise<TResponse> {
         const response = await this.client.patch<TResponse>(path, body);

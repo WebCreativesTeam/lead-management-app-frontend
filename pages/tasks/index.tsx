@@ -13,7 +13,17 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setPageTitle } from '@/store/themeConfigSlice';
 import Dropdown from '@/components/Dropdown';
 import { IRootState } from '@/store';
-import { getAllTaskPriorities, getAllTaskStatus, getAllTasks, setChangePriorityModal, setChangeStatusModal, setCreateModal, setDeleteModal, setEditModal, setViewModal } from '@/store/Slices/taskSlice/manageTaskSlice';
+import {
+    getAllTaskPriorities,
+    getAllTaskStatus,
+    getAllTasks,
+    setChangePriorityModal,
+    setChangeStatusModal,
+    setCreateModal,
+    setDeleteModal,
+    setEditModal,
+    setViewModal,
+} from '@/store/Slices/taskSlice/manageTaskSlice';
 import { ApiClient } from '@/utils/http';
 import DeleteTaskModal from '@/components/Tasks/ManageTasks/DeleteTaskModal';
 import CreateTaskModal from '@/components/Tasks/ManageTasks/CreateTaskModal';
@@ -78,13 +88,13 @@ const TaskPage = () => {
     //get all tasks list
     const getTasksList = async () => {
         setLoading(true);
-        const res: GetMethodResponseType = await new ApiClient().get('tasks?sort=-isDefault');
-        const policies: TaskDataType[] = res?.data;
-        if (Object.keys(policies).length === 0) {
+        const res: GetMethodResponseType = await new ApiClient().get('tasks/' + filter);
+        const tasks: TaskDataType[] | undefined = res?.data;
+        if (typeof tasks === 'undefined') {
             dispatch(getAllTasks([] as TaskDataType[]));
             return;
         }
-        dispatch(getAllTasks(policies));
+        dispatch(getAllTasks(tasks));
         setLoading(false);
     };
 
@@ -93,7 +103,7 @@ const TaskPage = () => {
         setLoading(true);
         const taskPriorityList: GetMethodResponseType = await new ApiClient().get('task-priorities');
         const priorities: TaskSelectOptions[] = taskPriorityList?.data;
-        if (Object.keys(priorities).length === 0) {
+        if (typeof priorities ==="undefined") {
             dispatch(getAllTaskPriorities([] as TaskSelectOptions[]));
             return;
         }
@@ -105,7 +115,7 @@ const TaskPage = () => {
         setLoading(true);
         const taskStatusList: GetMethodResponseType = await new ApiClient().get('task-status');
         const status: TaskSelectOptions[] = taskStatusList?.data;
-        if (Object.keys(status).length === 0) {
+        if (typeof status === "undefined") {
             dispatch(getAllTaskStatus([] as TaskSelectOptions[]));
             return;
         }
@@ -160,7 +170,7 @@ const TaskPage = () => {
                     </div>
                 </div>
                 <div className="relative  flex-1">
-                    <input type="text" placeholder="Find A Policy" className="form-input py-3 ltr:pr-[100px] rtl:pl-[100px]" onChange={(e) => setSearchInputText(e.target.value)} value={searchQuery} />
+                    <input type="text" placeholder="Find A Task" className="form-input py-3 ltr:pr-[100px] rtl:pl-[100px]" onChange={(e) => setSearchInputText(e.target.value)} value={searchQuery} />
                     <button type="button" className="btn btn-primary absolute top-1 shadow-none ltr:right-1 rtl:left-1" onClick={() => handleSearchTask()}>
                         Search
                     </button>

@@ -74,7 +74,7 @@ const PolicyPage = () => {
         setLoading(true);
         const res: GetMethodResponseType = await new ApiClient().get('policies?sort=-isDefault');
         const policies: PolicyDataType[] = res?.data;
-        if (Object.keys(policies).length === 0) {
+        if (typeof policies === "undefined") {
             dispatch(getAllPolicies([] as PolicyDataType[]));
             return;
         }
@@ -87,7 +87,7 @@ const PolicyPage = () => {
         setLoading(true);
         const res: GetMethodResponseType = await new ApiClient().get('policies/rules');
         const permissions: Permission[] = res?.data;
-        if (Object.keys(permissions).length === 0) {
+        if (typeof permissions === "undefined") {
             dispatch(getAllPermissions([] as Permission[]));
             return;
         }

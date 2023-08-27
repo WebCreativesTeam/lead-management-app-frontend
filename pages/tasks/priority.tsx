@@ -71,7 +71,7 @@ const TaskPriorityPage = () => {
         setLoading(true);
         const res: GetMethodResponseType = await new ApiClient().get('task-priorities?sort=-isDefault');
         const priority: TaskPriorityType[] = res?.data;
-        if (Object.keys(priority).length === 0) {
+        if (typeof priority === 'undefined') {
             dispatch(getAllTaskPriorities([] as TaskPriorityType[]));
             return;
         }
