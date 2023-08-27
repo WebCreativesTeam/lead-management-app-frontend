@@ -6,6 +6,8 @@ import branchSlice from './Slices/branchSlice';
 import userSlice from './Slices/userSlice';
 import policySlice from './Slices/policySlice';
 import manageTaskSlice from './Slices/taskSlice/manageTaskSlice';
+import taskStatusSlice from './Slices/taskSlice/taskStatusSlice';
+import taskPrioritySlice from './Slices/taskSlice/taskPrioritySlice';
 
 const rootReducer = combineReducers({
     themeConfig: themeConfigSlice,
@@ -14,7 +16,9 @@ const rootReducer = combineReducers({
     branch: branchSlice,
     user: userSlice,
     policy: policySlice,
-    task:manageTaskSlice,
+    task: manageTaskSlice,
+    taskStatus: taskStatusSlice,
+    taskPriority:taskPrioritySlice
 });
 
 export const store = configureStore({

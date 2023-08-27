@@ -186,6 +186,20 @@ export interface PolicyInitialStateProps extends InitialStateProps {
     defaultPolicyModal: boolean;
 }
 
+//task status slice initial props
+export interface TaskStatusInitialStateProps extends InitialStateProps {
+    data: TaskStatusType[];
+    singleData: TaskStatusType;
+    defaultStatusModal: boolean;
+}
+
+//task priority slice initial props
+export interface TaskPriorityInitialStateProps extends InitialStateProps {
+    data: TaskPriorityType[];
+    singleData: TaskPriorityType;
+    defaultPriorityModal: boolean;
+}
+
 //branch slice initial props
 export interface BranchInitialStateProps extends InitialStateProps {
     data: BranchDataType[];

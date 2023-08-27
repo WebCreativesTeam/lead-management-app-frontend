@@ -50,9 +50,14 @@ const policySlice = createSlice({
         },
         setDeleteModal(state, action) {
             const { open, id } = action.payload;
-            state.deleteModal = open;
             const findRequestedData: PolicyDataType | undefined = state.data.find((item: PolicyDataType) => item.id === id);
 
+            if (findRequestedData?.isDefault === true) {
+                showToastAlert('Make Other policy default to delete this policy');
+                return;
+            }
+
+            state.deleteModal = open;
             if (findRequestedData && state.deleteModal) {
                 state.singleData = findRequestedData;
             } else {
