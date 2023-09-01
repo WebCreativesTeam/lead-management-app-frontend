@@ -2,9 +2,9 @@ import React from 'react';
 
 const TextField = ({ name, type = 'text', placeholder, value, onBlur, onChange, label, id, className }: TextFieldProps) => {
     return (
-        <div>
+        <div className={className}>
             <label htmlFor={id}>{label}</label>
-            <input onChange={onChange} onBlur={onBlur} value={value} id={id} name={name} type={type} placeholder={placeholder} className={`${className} form-input`} />
+            <input onChange={onChange} onBlur={onBlur} value={value} id={id} name={name} type={type} placeholder={placeholder} className="form-input" />
         </div>
     );
 };

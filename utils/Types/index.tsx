@@ -143,6 +143,18 @@ export type BranchDataType = {
     updatedAt: string;
 };
 
+//emails page types
+
+//bulk emails page types
+export interface IEmails {
+    name: string;
+    subject: string;
+    message: string;
+    createdAt: string;
+    updatedAt: string;
+    id: string;
+}
+
 ///-------- Redux Toolkit Types - START -------------//
 
 export interface InitialStateProps {
@@ -206,7 +218,7 @@ export interface BranchInitialStateProps extends InitialStateProps {
     singleData: BranchDataType;
 }
 
-//branch slice initial props
+//user slice initial props
 export interface UserInitialStateProps extends InitialStateProps {
     data: UserDataType[];
     policies: PolicyDataType[];
@@ -214,6 +226,16 @@ export interface UserInitialStateProps extends InitialStateProps {
     policyModal: boolean;
     deactivateModal: boolean;
     deactivateValue: boolean;
+}
+
+//bulk email slice initial props
+export interface EmailsInitialStateProps {
+    data: IEmails[];
+    singleData: IEmails;
+    deleteModal: boolean;
+    isBtnDisabled: boolean;
+    isFetching: boolean;
+    viewModal: boolean;
 }
 
 ///-------- Redux Toolkit Types - END -------------//

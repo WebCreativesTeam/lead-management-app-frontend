@@ -18,7 +18,7 @@ const PageHeadingSection = ({ heading, description }: PageHeadingSectionProps) =
                     </div>
                     <div className="mb-2 text-center text-2xl font-bold dark:text-white md:text-5xl">{heading}</div>
                 </div>
-                <p className="my-9 text-center text-base font-semibold">{description}</p>
+                <p className="my-9 text-center text-base font-semibold sm:max-w-[80%] sm:mx-auto">{description}</p>
             </div>
         </div>
     );

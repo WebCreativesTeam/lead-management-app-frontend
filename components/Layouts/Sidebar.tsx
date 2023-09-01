@@ -9,7 +9,7 @@ import AnimateHeight from 'react-animate-height';
 import { IRootState } from '../../store';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { Branch, Global, Phone, Shield, Tasks, User } from '../../utils/icons';
+import { ArrowRight, Branch, Email, Global, Phone, Shield, Tasks, User } from '../../utils/icons';
 
 const Sidebar = () => {
     const router = useRouter();
@@ -93,9 +93,7 @@ const Sidebar = () => {
                                     </div>
 
                                     <div className={currentMenu === 'Tasks' ? 'rotate-90' : 'rtl:rotate-180'}>
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M9 5L15 12L9 19" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                                        </svg>
+                                       <ArrowRight/>
                                     </div>
                                 </button>
 
@@ -110,6 +108,33 @@ const Sidebar = () => {
                                         <li>
                                             <Link href="/tasks/status">{t('Status')}</Link>
                                         </li>
+                                    </ul>
+                                </AnimateHeight>
+                            </li>
+                            {/* emails */}
+                            <li className="menu nav-item">
+                                <button type="button" className={`${currentMenu === 'Tasks' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('Emails')}>
+                                    <div className="flex items-center">
+                                        <Email />
+                                        <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Emails')}</span>
+                                    </div>
+
+                                    <div className={currentMenu === 'Emails' ? 'rotate-90' : 'rtl:rotate-180'}>
+                                       <ArrowRight/>
+                                    </div>
+                                </button>
+
+                                <AnimateHeight duration={300} height={currentMenu === 'Emails' ? 'auto' : 0}>
+                                    <ul className="sub-menu text-gray-500">
+                                        <li>
+                                            <Link href="/emails/bulk-emails">{t('Bulk Emails')}</Link>
+                                        </li>
+                                        {/* <li>
+                                            <Link href="/tasks/priority">{t('Priority')}</Link>
+                                        </li>
+                                        <li>
+                                            <Link href="/tasks/status">{t('Status')}</Link>
+                                        </li> */}
                                     </ul>
                                 </AnimateHeight>
                             </li>

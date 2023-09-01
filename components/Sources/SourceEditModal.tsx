@@ -7,18 +7,16 @@ import { setEditModal, setDisableBtn, setFetching } from '@/store/Slices/sourceS
 import { useFormik } from 'formik';
 import { sourceSchema } from '@/utils/schemas';
 import { ApiClient } from '@/utils/http';
-import { SourceDataType } from '@/utils/Types';
 import { showToastAlert } from '@/utils/contant';
+import Loader from '../__Shared/Loader';
 
 const SourceEditModal = () => {
-    const editModal: boolean = useSelector((state: IRootState) => state.source.editModal);
-    const isBtnDisabled: boolean = useSelector((state: IRootState) => state.source.isBtnDisabled);
-    const singleSource: SourceDataType = useSelector((state: IRootState) => state.source.singleData);
+    const { editModal, singleData, isBtnDisabled, isFetching } = useSelector((state: IRootState) => state.source);
 
     const dispatch = useDispatch();
     useEffect(() => {
-        setFieldValue('name', singleSource?.name);
-    }, [singleSource]);
+        setFieldValue('name', singleData?.name);
+    }, [singleData]);
 
     const { values, handleChange, submitForm, handleSubmit, setFieldValue, errors, handleBlur, resetForm } = useFormik({
         initialValues: {
@@ -31,7 +29,7 @@ const SourceEditModal = () => {
             dispatch(setFetching(true));
             try {
                 dispatch(setDisableBtn(true));
-                await new ApiClient().patch('sources/' + singleSource.id, { name: value.name });
+                await new ApiClient().patch('sources/' + singleData.id, { name: value.name });
 
                 action.resetForm();
                 dispatch(setEditModal({ open: false }));
@@ -64,12 +62,16 @@ const SourceEditModal = () => {
             disabledDiscardBtn={isBtnDisabled}
             isBtnDisabled={values.name && !isBtnDisabled ? false : true}
             content={
-                <form className="space-y-5" onSubmit={handleSubmit}>
-                    <div>
-                        <label htmlFor="editSource">Source Name</label>
-                        <input onChange={handleChange} onBlur={handleBlur} value={values.name} id="editSource" name="name" type="text" placeholder="Source Name" className="form-input" />
-                    </div>
-                </form>
+                isFetching ? (
+                    <Loader />
+                ) : (
+                    <form className="space-y-5" onSubmit={handleSubmit}>
+                        <div>
+                            <label htmlFor="editSource">Source Name</label>
+                            <input onChange={handleChange} onBlur={handleBlur} value={values.name} id="editSource" name="name" type="text" placeholder="Source Name" className="form-input" />
+                        </div>
+                    </form>
+                )
             }
         />
     );

@@ -3,8 +3,8 @@ import * as Yup from 'yup';
 //authentication schemas
 
 export const signUpSchema = Yup.object().shape({
-    firstname: Yup.string().required('Please enter your firstName'),
-    lastname: Yup.string().required('Please enter your lastName'),
+    firstName: Yup.string().required('Please enter your firstName'),
+    lastName: Yup.string().required('Please enter your lastName'),
     email: Yup.string().email().required('Please enter your email'),
     password: Yup.string().required('Please enter your password').min(8, 'Password should be atleast 8 characters'),
     confirmPassword: Yup.string()
@@ -19,7 +19,7 @@ export const signInSchema = Yup.object().shape({
 
 export const policySchema = Yup.object().shape({
     name: Yup.string().required('Please enter policy name'),
-    description: Yup.string().min(20,"Description must be 20 characters").required('Please enter policy description'),
+    description: Yup.string().min(20, 'Description must be 20 characters').required('Please enter policy description'),
 });
 
 //Create User Schema
@@ -71,7 +71,7 @@ export const contactSchema = Yup.object().shape({
     title: Yup.string().required('Please select title'),
     name: Yup.string().required('Please enter name'),
     phoneNumber: Yup.string().required('Please enter Phone number'),
-    email: Yup.string().email("Please enter valid email").required('Please enter email'),
+    email: Yup.string().email('Please enter valid email').required('Please enter email'),
     assignedTo: Yup.string().required('Please select assign to option'),
     source: Yup.string().required('Please select source'),
     website: Yup.string().required('Please enter website'),
@@ -84,4 +84,10 @@ export const contactSchema = Yup.object().shape({
     city: Yup.string().required('Please select city'),
     state: Yup.string().required('Please select state'),
     country: Yup.string().required('Please select country'),
+});
+
+export const emailSchema = Yup.object().shape({
+    name: Yup.string().required('Please Enter Template Name'),
+    subject: Yup.string().required('Please Enter Template Subject'),
+    message: Yup.string().required('Please Enter Message'),
 });
