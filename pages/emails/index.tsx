@@ -16,10 +16,10 @@ import EmailDeleteModal from '@/components/emails/EmailDeleteModal';
 import { useRouter } from 'next/router';
 import EmailViewModal from '@/components/emails/EmailViewModal';
 
-const BulkEmails = () => {
+const EmailTemplates = () => {
     const dispatch = useDispatch();
     useEffect(() => {
-        dispatch(setPageTitle('Bulk Emails | Emails'));
+        dispatch(setPageTitle('Email Templates | Emails'));
     });
     //hooks
     const { data, isFetching } = useSelector((state: IRootState) => state.emails);
@@ -95,7 +95,7 @@ const BulkEmails = () => {
             />
             <div className="my-6 flex flex-col gap-5 sm:flex-row ">
                 <div className="flex-1">
-                    <button className="btn btn-primary h-full w-full max-w-[250px] max-sm:mx-auto" type="button" onClick={() => router.push('/emails/bulk-emails/create-email-template')}>
+                    <button className="btn btn-primary h-full w-full max-w-[250px] max-sm:mx-auto" type="button" onClick={() => router.push('/emails/create-email-template')}>
                         <Plus />
                         Create New Template
                     </button>
@@ -106,7 +106,7 @@ const BulkEmails = () => {
                         placeholder="Find Email Templates"
                         className="form-input py-3 ltr:pr-[100px] rtl:pl-[100px]"
                         onChange={(e) => setSearchInputText(e.target.value)}
-                        value={searchQuery}
+                        value={searchInputText}
                     />
                     <button type="button" className="btn btn-primary absolute top-1 shadow-none ltr:right-1 rtl:left-1" onClick={handleSearchEmail}>
                         Search
@@ -162,7 +162,7 @@ const BulkEmails = () => {
                                         </button>
                                     </Tippy>
                                     <Tippy content="Edit">
-                                        <button type="button" onClick={() => router.push('/emails/bulk-emails/edit-email-template/' + id)}>
+                                        <button type="button" onClick={() => router.push('/emails/edit-email-template/' + id)}>
                                             <Edit />
                                         </button>
                                     </Tippy>
@@ -198,4 +198,4 @@ const BulkEmails = () => {
     );
 };
 
-export default BulkEmails;
+export default EmailTemplates;

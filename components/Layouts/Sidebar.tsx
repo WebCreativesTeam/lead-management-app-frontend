@@ -93,7 +93,7 @@ const Sidebar = () => {
                                     </div>
 
                                     <div className={currentMenu === 'Tasks' ? 'rotate-90' : 'rtl:rotate-180'}>
-                                       <ArrowRight/>
+                                        <ArrowRight />
                                     </div>
                                 </button>
 
@@ -111,32 +111,42 @@ const Sidebar = () => {
                                     </ul>
                                 </AnimateHeight>
                             </li>
+
                             {/* emails */}
-                            <li className="menu nav-item">
-                                <button type="button" className={`${currentMenu === 'Tasks' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('Emails')}>
+                            {/* <li className="menu nav-item">
+                                <button type="button" className={`${currentMenu === 'Emails' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('Emails')}>
                                     <div className="flex items-center">
                                         <Email />
                                         <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Emails')}</span>
                                     </div>
 
                                     <div className={currentMenu === 'Emails' ? 'rotate-90' : 'rtl:rotate-180'}>
-                                       <ArrowRight/>
+                                        <ArrowRight />
                                     </div>
                                 </button>
 
                                 <AnimateHeight duration={300} height={currentMenu === 'Emails' ? 'auto' : 0}>
                                     <ul className="sub-menu text-gray-500">
                                         <li>
-                                            <Link href="/emails/bulk-emails">{t('Bulk Emails')}</Link>
+                                            <Link href="/emails">{t('Emails')}</Link>
                                         </li>
-                                        {/* <li>
+                                        <li>
                                             <Link href="/tasks/priority">{t('Priority')}</Link>
                                         </li>
                                         <li>
                                             <Link href="/tasks/status">{t('Status')}</Link>
-                                        </li> */}
+                                        </li>
                                     </ul>
                                 </AnimateHeight>
+                            </li> */}
+
+                            <li className="menu nav-item">
+                                <Link href="/emails" className="group">
+                                    <div className="flex items-center">
+                                        <Email />
+                                        <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Emails')}</span>
+                                    </div>
+                                </Link>
                             </li>
 
                             {/* Users */}

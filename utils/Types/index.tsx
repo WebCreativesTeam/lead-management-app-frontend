@@ -145,7 +145,7 @@ export type BranchDataType = {
 
 //emails page types
 
-//bulk emails page types
+// emails page types
 export interface IEmails {
     name: string;
     subject: string;
@@ -228,7 +228,7 @@ export interface UserInitialStateProps extends InitialStateProps {
     deactivateValue: boolean;
 }
 
-//bulk email slice initial props
+// email slice initial props
 export interface EmailsInitialStateProps {
     data: IEmails[];
     singleData: IEmails;

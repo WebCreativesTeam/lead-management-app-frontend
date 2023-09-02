@@ -103,7 +103,7 @@ const TaskPage = () => {
         setLoading(true);
         const taskPriorityList: GetMethodResponseType = await new ApiClient().get('task-priorities');
         const priorities: TaskSelectOptions[] = taskPriorityList?.data;
-        if (typeof priorities ==="undefined") {
+        if (typeof priorities === 'undefined') {
             dispatch(getAllTaskPriorities([] as TaskSelectOptions[]));
             return;
         }
@@ -115,7 +115,7 @@ const TaskPage = () => {
         setLoading(true);
         const taskStatusList: GetMethodResponseType = await new ApiClient().get('task-status');
         const status: TaskSelectOptions[] = taskStatusList?.data;
-        if (typeof status === "undefined") {
+        if (typeof status === 'undefined') {
             dispatch(getAllTaskStatus([] as TaskSelectOptions[]));
             return;
         }
@@ -218,7 +218,7 @@ const TaskPage = () => {
                                         button={
                                             <>
                                                 <span
-                                                    className={`mr-2 rounded px-2.5 py-0.5 text-sm font-medium dark:bg-blue-900 dark:text-blue-300`}
+                                                    className={`rounded px-2.5 py-0.5 text-sm font-medium dark:bg-blue-900 dark:text-blue-300`}
                                                     style={{ color: status.color, backgroundColor: status.color + '20' }}
                                                 >
                                                     {status.name}
@@ -226,16 +226,17 @@ const TaskPage = () => {
                                             </>
                                         }
                                     >
-                                        <ul className="!min-w-[170px]">
-                                            {taskStatusList.map((status: TaskSelectOptions, i: number) => {
+                                        <ul className="max-h-32 !min-w-[170px] overflow-y-auto">
+                                            {taskStatusList.map((status2: TaskSelectOptions, i: number) => {
                                                 return (
                                                     <li key={i}>
                                                         <button
-                                                            className={`mr-2 rounded px-2.5 py-0.5 text-sm font-medium dark:bg-blue-900 dark:text-blue-300`}
-                                                            style={{ color: status.color, backgroundColor: status.color + '20' }}
-                                                            onClick={() => dispatch(setChangeStatusModal({ statusId: status.id, taskId: id, open: true }))}
+                                                            className={`mr-2 rounded px-2.5 py-0.5 text-sm font-medium disabled:cursor-not-allowed disabled:text-gray-400 dark:bg-blue-900 
+                                                            dark:text-blue-300`}
+                                                            onClick={() => dispatch(setChangeStatusModal({ statusId: status2.id, taskId: id, open: true }))}
+                                                            disabled={status2?.id === status?.id}
                                                         >
-                                                            {status.name}
+                                                            {status2.name}
                                                         </button>
                                                     </li>
                                                 );
@@ -264,16 +265,17 @@ const TaskPage = () => {
                                             </>
                                         }
                                     >
-                                        <ul className="!min-w-[170px]">
-                                            {taskPriorityList.map((priority: TaskSelectOptions, i: number) => {
+                                        <ul className="max-h-32 !min-w-[170px] overflow-y-auto">
+                                            {taskPriorityList.map((priority2: TaskSelectOptions, i: number) => {
                                                 return (
                                                     <li key={i}>
                                                         <button
-                                                            className={`mr-2 rounded px-2.5 py-0.5 text-sm font-medium dark:bg-blue-900 dark:text-blue-300`}
-                                                            style={{ color: priority.color, backgroundColor: priority.color + '20' }}
-                                                            onClick={() => dispatch(setChangePriorityModal({ priorityId: priority.id, taskId: id, open: true }))}
+                                                            className={`rounded px-2.5 py-0.5 text-sm font-medium disabled:cursor-not-allowed disabled:text-gray-400 dark:bg-blue-900 
+                                                            dark:text-blue-300`}
+                                                            onClick={() => dispatch(setChangePriorityModal({ priorityId: priority2.id, taskId: id, open: true }))}
+                                                            disabled={priority2?.id === priority?.id}
                                                         >
-                                                            {priority.name}
+                                                            {priority2.name}
                                                         </button>
                                                     </li>
                                                 );
