@@ -1,4 +1,5 @@
 import React from 'react';
+import { TextFieldProps } from './TextField.types';
 
 const TextField = ({ name, type = 'text', placeholder, value, onBlur, onChange, label, id, className }: TextFieldProps) => {
     return (

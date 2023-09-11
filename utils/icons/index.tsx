@@ -13,4 +13,5 @@ export * from './User';
 export * from './Global';
 export * from './Email';
 export * from './ArrowRight';
-                      
+export * from './Lock';
+export * from './UserFilled';

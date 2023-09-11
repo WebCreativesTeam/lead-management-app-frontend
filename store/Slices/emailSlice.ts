@@ -36,15 +36,6 @@ const emailSlice = createSlice({
                 state.singleData = {} as IEmails;
             }
         },
-        getEmail(state, action) {
-            const findRequestedData: IEmails | undefined = state.data.find((item: IEmails) => item.id === action.payload.id);
-
-            if (findRequestedData) {
-                state.singleData = findRequestedData;
-            } else {
-                state.singleData = {} as IEmails;
-            }
-        },
         getAllEmails(state, action) {
             state.data = action.payload;
         },

@@ -1,5 +1,5 @@
 
-interface TextFieldProps extends React.HTMLAttributes<HTMLInputElement>{
+export interface TextFieldProps extends React.HTMLAttributes<HTMLInputElement>{
     name?: string;
     type?: string;
     placeholder?: string;
