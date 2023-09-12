@@ -1,4 +1,5 @@
 import { SourceDataType, SourceInitialStateProps } from '@/utils/Types';
+import { fetchUserPolicyArray } from '@/utils/contant';
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState: SourceInitialStateProps = {
@@ -10,11 +11,23 @@ const initialState: SourceInitialStateProps = {
     viewModal: false,
     isBtnDisabled: false,
     isFetching: false,
+    isAbleToRead: false,
+    isAbleToCreate: false,
+    isAbleToUpdate: false,
+    isAbleToDelete: false,
+    userPolicyArr: [] as string[],
 };
 
 const sourceSlice = createSlice({
     initialState,
     name: 'source',
+    extraReducers(builder) {
+        builder.addCase(fetchUserPolicyArray.fulfilled, (state, action) => {
+            if (action.payload) {
+                state.userPolicyArr = action.payload;
+            }
+        });
+    },
     reducers: {
         setViewModal(state, action) {
             const { open, id } = action.payload;
@@ -61,8 +74,24 @@ const sourceSlice = createSlice({
         setFetching(state, action) {
             state.isFetching = action.payload;
         },
+        setSourceReadPolicy(state, action) {
+            const verifyPolicy: boolean = state.userPolicyArr.includes(action.payload);
+            state.isAbleToRead = verifyPolicy;
+        },
+        setSourceCreatePolicy(state, action) {
+            const verifyPolicy: boolean = state.userPolicyArr.includes(action.payload);
+            state.isAbleToCreate = verifyPolicy;
+        },
+        setSourceUpdatePolicy(state, action) {
+            const verifyPolicy: boolean = state.userPolicyArr.includes(action.payload);
+            state.isAbleToUpdate = verifyPolicy;
+        },
+        setSourceDeletePolicy(state, action) {
+            const verifyPolicy: boolean = state.userPolicyArr.includes(action.payload);
+            state.isAbleToDelete = verifyPolicy;
+        },
     },
 });
 
-export const { setCreateModal, setDeleteModal, setEditModal, setViewModal, getAllSources, setDisableBtn, setFetching } = sourceSlice.actions;
+export const { setCreateModal, setDeleteModal, setEditModal, setViewModal, getAllSources, setDisableBtn, setFetching,setSourceCreatePolicy,setSourceDeletePolicy,setSourceReadPolicy,setSourceUpdatePolicy } = sourceSlice.actions;
 export default sourceSlice.reducer;

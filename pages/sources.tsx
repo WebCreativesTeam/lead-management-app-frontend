@@ -18,17 +18,16 @@ import { getAllSources, setCreateModal, setDeleteModal, setDisableBtn, setEditMo
 import SourceViewModal from '@/components/Sources/SourceViewModal';
 import SourceCreateModal from '@/components/Sources/SourceCreateModal';
 import SourceEditModal from '@/components/Sources/SourceEditModal';
+import { useRouter } from 'next/router';
 
 const Source = () => {
     const dispatch = useDispatch();
+    const router = useRouter();
     useEffect(() => {
         dispatch(setPageTitle('Track Leads | Sources'));
     });
-    const data: SourceDataType[] = useSelector((state: IRootState) => state.source.data);
-    const fetching: boolean = useSelector((state: IRootState) => state.source.isFetching);
-    const isBtnDisabled: boolean = useSelector((state: IRootState) => state.source.isBtnDisabled);
-    const deleteModal: boolean = useSelector((state: IRootState) => state.source.deleteModal);
-    const singleSource: SourceDataType = useSelector((state: IRootState) => state.source.singleData);
+    const { data, isFetching, isBtnDisabled, deleteModal, singleData, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate, userPolicyArr } = useSelector((state: IRootState) => state.source);
+
     //hooks
     const [searchInputText, setSearchInputText] = useState<string>('');
     const [searchedData, setSearchedData] = useState<SourceDataType[]>(data);
@@ -55,10 +54,18 @@ const Source = () => {
         setPage(1);
     }, [sortStatus]);
 
+    // //route user if dont have permission to access source page
+    // useEffect(() => {
+    //     if (!isAbleToRead && userPolicyArr.length > 0) {
+    //         router.push('/');
+    //         return;
+    //     }
+    // }, []);
+
     //get all source after page render
     useEffect(() => {
         getSourceList();
-    }, [fetching]);
+    }, [isFetching]);
 
     useEffect(() => {
         setSearchedData(data);
@@ -72,7 +79,7 @@ const Source = () => {
         setLoading(true);
         const res: GetMethodResponseType = await new ApiClient().get('sources');
         const source: SourceDataType[] = res?.data;
-        if (typeof source ==="undefined") {
+        if (typeof source === 'undefined') {
             dispatch(getAllSources([] as SourceDataType[]));
             return;
         }
@@ -84,7 +91,7 @@ const Source = () => {
     const onDeleteSource = async () => {
         dispatch(setFetching(true));
         dispatch(setDisableBtn(true));
-        const deleteSource: SourceDataType = await new ApiClient().delete('sources/' + singleSource.id);
+        const deleteSource: SourceDataType = await new ApiClient().delete('sources/' + singleData.id);
         if (Object.keys(deleteSource).length === 0) {
             dispatch(setDisableBtn(false));
             return;
@@ -107,16 +114,20 @@ const Source = () => {
         setRecordsData(searchSourceData);
     };
 
-    return (
+    return !isAbleToRead ? null : (
         <div>
             <PageHeadingSection description="Identify and categorize lead sources. Update descriptions. Add or remove source channels." heading="Track Leads" />
             <div className="my-6 flex flex-col gap-5 sm:flex-row ">
-                <div className="flex-1">
-                    <button className="btn btn-primary h-full w-full max-w-[200px] max-sm:mx-auto" type="button" onClick={() => dispatch(setCreateModal(true))}>
-                        <Plus />
-                        Add New Source
-                    </button>
-                </div>
+                {!isAbleToCreate ? (
+                    <div className="flex-1"></div>
+                ) : (
+                    <div className="flex-1">
+                        <button className="btn btn-primary h-full w-full max-w-[200px] max-sm:mx-auto" type="button" onClick={() => dispatch(setCreateModal(true))}>
+                            <Plus />
+                            Add New Source
+                        </button>
+                    </div>
+                )}
                 <div className="relative  flex-1">
                     <input type="text" placeholder="Find A Source" className="form-input py-3 ltr:pr-[100px] rtl:pl-[100px]" onChange={(e) => setSearchInputText(e.target.value)} value={searchQuery} />
                     <button type="button" className="btn btn-primary absolute top-1 shadow-none ltr:right-1 rtl:left-1" onClick={handleSearchSource}>
@@ -160,16 +171,20 @@ const Source = () => {
                                             <View />
                                         </button>
                                     </Tippy>
-                                    <Tippy content="Edit">
-                                        <button type="button" onClick={() => dispatch(setEditModal({ id, open: true }))}>
-                                            <Edit />
-                                        </button>
-                                    </Tippy>
-                                    <Tippy content="Delete">
-                                        <button type="button" onClick={() => dispatch(setDeleteModal({ id, open: true }))}>
-                                            <Delete />
-                                        </button>
-                                    </Tippy>
+                                    {isAbleToUpdate && (
+                                        <Tippy content="Edit">
+                                            <button type="button" onClick={() => dispatch(setEditModal({ id, open: true }))}>
+                                                <Edit />
+                                            </button>
+                                        </Tippy>
+                                    )}
+                                    {isAbleToDelete && (
+                                        <Tippy content="Delete">
+                                            <button type="button" onClick={() => dispatch(setDeleteModal({ id, open: true }))}>
+                                                <Delete />
+                                            </button>
+                                        </Tippy>
+                                    )}
                                 </div>
                             ),
                         },

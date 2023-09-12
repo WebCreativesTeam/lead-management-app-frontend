@@ -155,6 +155,16 @@ export interface IEmails {
     id: string;
 }
 
+// ----------------- authentication types : start -------------------//
+
+export interface ISignInResponse {
+    status: string;
+    token: string;
+    data: UserDataType;
+}
+
+// ----------------- authentication types : end -------------------//
+
 ///-------- Redux Toolkit Types - START -------------//
 
 export interface InitialStateProps {
@@ -164,6 +174,11 @@ export interface InitialStateProps {
     createModal: boolean;
     isBtnDisabled: boolean;
     isFetching: boolean;
+    isAbleToRead: boolean;
+    isAbleToCreate: boolean;
+    isAbleToUpdate: boolean;
+    isAbleToDelete: boolean;
+    userPolicyArr: string[];
 }
 
 //contact slice initial props
@@ -226,6 +241,7 @@ export interface UserInitialStateProps extends InitialStateProps {
     policyModal: boolean;
     deactivateModal: boolean;
     deactivateValue: boolean;
+    isAbleToUpdatePolicy: boolean;
 }
 
 // email slice initial props

@@ -26,11 +26,9 @@ const Users = () => {
         dispatch(setPageTitle('Manage Users'));
     });
     //hooks
-    const data: UserDataType[] = useSelector((state: IRootState) => state.user.data);
-    const fetching: boolean = useSelector((state: IRootState) => state.user.isFetching);
-    const isBtnDisabled: boolean = useSelector((state: IRootState) => state.user.isBtnDisabled);
-    const deleteModal: boolean = useSelector((state: IRootState) => state.user.deleteModal);
-    const singleUser: UserDataType = useSelector((state: IRootState) => state.user.singleData);
+    const { data, isFetching, isBtnDisabled, deleteModal, singleData, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate, isAbleToUpdatePolicy } = useSelector(
+        (state: IRootState) => state.user
+    );
 
     const [searchInputText, setSearchInputText] = useState<string>('');
     const [searchedData, setSearchedData] = useState<UserDataType[]>(data);
@@ -61,7 +59,7 @@ const Users = () => {
     //get all user after page render
     useEffect(() => {
         getUsersList();
-    }, [fetching]);
+    }, [isFetching]);
 
     useEffect(() => {
         getPolicyList();
@@ -80,7 +78,7 @@ const Users = () => {
         setLoading(true);
         const res: GetMethodResponseType = await new ApiClient().get('users');
         const users: UserDataType[] = res?.data;
-        if (typeof users === "undefined") {
+        if (typeof users === 'undefined') {
             dispatch(getAllUsers([] as UserDataType[]));
             return;
         }
@@ -91,7 +89,7 @@ const Users = () => {
         setLoading(true);
         const res: GetMethodResponseType = await new ApiClient().get('policies');
         const policies: PolicyDataType[] = res?.data;
-        if (typeof policies === "undefined") {
+        if (typeof policies === 'undefined') {
             dispatch(getAllPolicies([] as PolicyDataType[]));
             return;
         }
@@ -103,7 +101,7 @@ const Users = () => {
     const onDeleteUser = async () => {
         dispatch(setFetching(true));
         dispatch(setDisableBtn(true));
-        await new ApiClient().delete('users/' + singleUser.id);
+        await new ApiClient().delete('users/' + singleData.id);
         dispatch(setDisableBtn(false));
         dispatch(setDeleteModal({ open: false }));
         dispatch(setFetching(false));
@@ -132,12 +130,16 @@ const Users = () => {
         <div>
             <PageHeadingSection description="Add, edit, or remove users. Assign roles. Track activity. Personalize user experience." heading="Manage Users" />
             <div className="my-6 flex flex-col gap-5 sm:flex-row ">
-                <div className="flex-1">
-                    <button className="btn btn-primary h-full w-full max-w-[200px] max-sm:mx-auto" type="button" onClick={() => dispatch(setCreateModal(true))}>
-                        <Plus />
-                        Add New User
-                    </button>
-                </div>
+                {!isAbleToCreate ? (
+                    <div className="flex-1"></div>
+                ) : (
+                    <div className="flex-1">
+                        <button className="btn btn-primary h-full w-full max-w-[200px] max-sm:mx-auto" type="button" onClick={() => dispatch(setCreateModal(true))}>
+                            <Plus />
+                            Add New User
+                        </button>
+                    </div>
+                )}
                 <div className="relative  flex-1">
                     <input
                         type="text"
@@ -221,21 +223,27 @@ const Users = () => {
                                             <View />
                                         </button>
                                     </Tippy>
-                                    <Tippy content="Edit">
-                                        <button type="button" onClick={() => dispatch(setEditModal({ id, open: true }))}>
-                                            <Edit />
-                                        </button>
-                                    </Tippy>
-                                    <Tippy content="Policy">
-                                        <button type="button" onClick={() => dispatch(setPolicyModal({ id, open: true }))}>
-                                            <Shield />
-                                        </button>
-                                    </Tippy>
-                                    <Tippy content="Delete">
-                                        <button type="button" onClick={() => dispatch(setDeleteModal({ id, open: true }))}>
-                                            <Delete />
-                                        </button>
-                                    </Tippy>
+                                    {isAbleToUpdate && (
+                                        <Tippy content="Edit">
+                                            <button type="button" onClick={() => dispatch(setEditModal({ id, open: true }))}>
+                                                <Edit />
+                                            </button>
+                                        </Tippy>
+                                    )}
+                                    {isAbleToUpdatePolicy && (
+                                        <Tippy content="Policy">
+                                            <button type="button" onClick={() => dispatch(setPolicyModal({ id, open: true }))}>
+                                                <Shield />
+                                            </button>
+                                        </Tippy>
+                                    )}
+                                    {isAbleToDelete && (
+                                        <Tippy content="Delete">
+                                            <button type="button" onClick={() => dispatch(setDeleteModal({ id, open: true }))}>
+                                                <Delete />
+                                            </button>
+                                        </Tippy>
+                                    )}
                                 </div>
                             ),
                         },

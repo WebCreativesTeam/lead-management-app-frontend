@@ -12,6 +12,7 @@ import { ApiClient } from '@/utils/http';
 import { showToastAlert } from '@/utils/contant';
 import Loader from '@/components/__Shared/Loader';
 import { Email, Lock } from '@/utils/icons';
+import { ISignInResponse } from '@/utils/Types';
 
 const LoginPage = () => {
     const dispatch = useDispatch();
@@ -33,11 +34,12 @@ const LoginPage = () => {
             setDisableBtn(true);
             setLoading(true);
             try {
-                const res: any = await new ApiClient().post('/auth/sign-in', {
+                const res: ISignInResponse = await new ApiClient().post('/auth/sign-in', {
                     email: value.email,
                     password: value.password,
                 });
                 localStorage.setItem('loginToken', res?.token);
+                localStorage.setItem('uid', res?.data?.id);
                 action.resetForm();
                 router.push('/tasks');
             } catch (error: any) {

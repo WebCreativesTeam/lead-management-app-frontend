@@ -1,4 +1,5 @@
-import { BranchDataType, BranchInitialStateProps } from '@/utils/Types';
+import { BranchDataType, BranchInitialStateProps, Permission, UserDataType } from '@/utils/Types';
+import { fetchUserPolicyArray } from '@/utils/contant';
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState: BranchInitialStateProps = {
@@ -10,11 +11,23 @@ const initialState: BranchInitialStateProps = {
     viewModal: false,
     isBtnDisabled: false,
     isFetching: false,
+    isAbleToRead: false,
+    isAbleToCreate: false,
+    isAbleToUpdate: false,
+    isAbleToDelete: false,
+    userPolicyArr: [] as string[],
 };
 
 const branchSlice = createSlice({
     initialState,
     name: 'branch',
+    extraReducers(builder) {
+        builder.addCase(fetchUserPolicyArray.fulfilled, (state, action) => {
+            if (action.payload) {
+                state.userPolicyArr = action.payload;
+            }
+        });
+    },
     reducers: {
         setViewModal(state, action) {
             const { open, id } = action.payload;
@@ -61,8 +74,36 @@ const branchSlice = createSlice({
         setFetching(state, action) {
             state.isFetching = action.payload;
         },
+        setBranchReadPolicy(state, action) {
+            const verifyPolicy: boolean = state.userPolicyArr.includes(action.payload);
+            state.isAbleToRead = verifyPolicy;
+        },
+        setBranchCreatePolicy(state, action) {
+            const verifyPolicy: boolean = state.userPolicyArr.includes(action.payload);
+            state.isAbleToCreate = verifyPolicy;
+        },
+        setBranchUpdatePolicy(state, action) {
+            const verifyPolicy: boolean = state.userPolicyArr.includes(action.payload);
+            state.isAbleToUpdate = verifyPolicy;
+        },
+        setBranchDeletePolicy(state, action) {
+            const verifyPolicy: boolean = state.userPolicyArr.includes(action.payload);
+            state.isAbleToDelete = verifyPolicy;
+        },
     },
 });
 
-export const { setCreateModal, setDeleteModal, setEditModal, setViewModal, getAllBranches, setDisableBtn, setFetching } = branchSlice.actions;
+export const {
+    setCreateModal,
+    setDeleteModal,
+    setEditModal,
+    setViewModal,
+    getAllBranches,
+    setDisableBtn,
+    setFetching,
+    setBranchCreatePolicy,
+    setBranchDeletePolicy,
+    setBranchReadPolicy,
+    setBranchUpdatePolicy,
+} = branchSlice.actions;
 export default branchSlice.reducer;

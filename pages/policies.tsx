@@ -25,7 +25,7 @@ const PolicyPage = () => {
     });
 
     //hooks
-    const { data, isFetching } = useSelector((state: IRootState) => state.policy);
+    const { data, isFetching, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate } = useSelector((state: IRootState) => state.policy);
     const [searchInputText, setSearchInputText] = useState<string>('');
     const [searchedData, setSearchedData] = useState<PolicyDataType[]>(data);
     const [loading, setLoading] = useState<boolean>(false);
@@ -74,7 +74,7 @@ const PolicyPage = () => {
         setLoading(true);
         const res: GetMethodResponseType = await new ApiClient().get('policies?sort=-isDefault');
         const policies: PolicyDataType[] = res?.data;
-        if (typeof policies === "undefined") {
+        if (typeof policies === 'undefined') {
             dispatch(getAllPolicies([] as PolicyDataType[]));
             return;
         }
@@ -87,7 +87,7 @@ const PolicyPage = () => {
         setLoading(true);
         const res: GetMethodResponseType = await new ApiClient().get('policies/rules');
         const permissions: Permission[] = res?.data;
-        if (typeof permissions === "undefined") {
+        if (typeof permissions === 'undefined') {
             dispatch(getAllPermissions([] as Permission[]));
             return;
         }
@@ -108,16 +108,21 @@ const PolicyPage = () => {
         setRecordsData(searchPolicyData);
     };
 
-    return (
+    return !isAbleToRead ? null : (
         <div>
             <PageHeadingSection description="Craft policies for in-app permissions. Link to users. Ensure secure and relevant access." heading="Define Access" />
+
             <div className="my-6 flex flex-col gap-5 sm:flex-row ">
-                <div className="flex-1">
-                    <button className="btn btn-primary h-full w-full max-w-[200px] max-sm:mx-auto" type="button" onClick={() => dispatch(setCreateModal(true))}>
-                        <Plus />
-                        Add New Policy
-                    </button>
-                </div>
+                {!isAbleToCreate ? (
+                    <div className="flex-1"></div>
+                ) : (
+                    <div className="flex-1">
+                        <button className="btn btn-primary h-full w-full max-w-[200px] max-sm:mx-auto" type="button" onClick={() => dispatch(setCreateModal(true))}>
+                            <Plus />
+                            Add New Policy
+                        </button>
+                    </div>
+                )}
                 <div className="relative  flex-1">
                     <input
                         type="text"
@@ -182,16 +187,20 @@ const PolicyPage = () => {
                                             <View />
                                         </button>
                                     </Tippy>
-                                    <Tippy content="Edit">
-                                        <button type="button" onClick={() => dispatch(setEditModal({ id, open: true }))}>
-                                            <Edit />
-                                        </button>
-                                    </Tippy>
-                                    <Tippy content="Delete">
-                                        <button type="button" onClick={() => dispatch(setDeleteModal({ id, open: true }))}>
-                                            <Delete />
-                                        </button>
-                                    </Tippy>
+                                    {isAbleToUpdate && (
+                                        <Tippy content="Edit">
+                                            <button type="button" onClick={() => dispatch(setEditModal({ id, open: true }))}>
+                                                <Edit />
+                                            </button>
+                                        </Tippy>
+                                    )}
+                                    {isAbleToDelete && (
+                                        <Tippy content="Delete">
+                                            <button type="button" onClick={() => dispatch(setDeleteModal({ id, open: true }))}>
+                                                <Delete />
+                                            </button>
+                                        </Tippy>
+                                    )}
                                 </div>
                             ),
                         },

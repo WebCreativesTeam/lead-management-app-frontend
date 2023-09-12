@@ -16,18 +16,18 @@ import ContactViewModal from '@/components/Contact/ContactViewModal';
 import { IRootState } from '@/store';
 import ContactCreateModal from '@/components/Contact/ContactCreateModal';
 import ContactEditModal from '@/components/Contact/ContactEditModal';
+import { useRouter } from 'next/router';
 
 const Contacts = () => {
     const dispatch = useDispatch();
+    const router = useRouter();
     useEffect(() => {
         dispatch(setPageTitle('Contacts'));
     });
     //hooks
-    const data: ContactDataType[] = useSelector((state: IRootState) => state.contacts.data);
-    const fetching: boolean = useSelector((state: IRootState) => state.contacts.isFetching);
-    const isBtnDisabled: boolean = useSelector((state: IRootState) => state.contacts.isBtnDisabled);
-    const deleteModal: boolean = useSelector((state: IRootState) => state.contacts.deleteModal);
-    const singleContact: ContactDataType = useSelector((state: IRootState) => state.contacts.singleData);
+    const { data, isFetching, isBtnDisabled, deleteModal, singleData, isAbleToCreate, isAbleToDelete, isAbleToUpdate, isAbleToRead, userPolicyArr } = useSelector(
+        (state: IRootState) => state.contacts
+    );
     const [searchInputText, setSearchInputText] = useState<string>('');
     const [searchedData, setSearchedData] = useState<ContactDataType[]>(data);
     const [loading, setLoading] = useState<boolean>(false);
@@ -54,10 +54,18 @@ const Contacts = () => {
         setPage(1);
     }, [sortStatus]);
 
+    //router user if dont have permission to access branch page
+    useEffect(() => {
+        if (!isAbleToRead && userPolicyArr.length > 0) {
+            router.push('/');
+            return;
+        }
+    }, []);
+
     //get all contact after page render
     useEffect(() => {
         getContactList();
-    }, [fetching]);
+    }, [isFetching]);
 
     useEffect(() => {
         setSearchedData(data);
@@ -72,7 +80,7 @@ const Contacts = () => {
         setLoading(true);
         const res: GetMethodResponseType = await new ApiClient().get('contacts');
         const contacts: ContactDataType[] = res?.data;
-        if (typeof contacts === "undefined") {
+        if (typeof contacts === 'undefined') {
             dispatch(getAllContacts([] as ContactDataType[]));
             return;
         }
@@ -84,7 +92,7 @@ const Contacts = () => {
     const onDeleteContact = async () => {
         dispatch(setFetching(true));
         dispatch(setDisableBtn(true));
-        const deleteContact: ContactDataType = await new ApiClient().delete('contacts/' + singleContact.id);
+        const deleteContact: ContactDataType = await new ApiClient().delete('contacts/' + singleData.id);
         if (Object.keys(deleteContact).length === 0) {
             dispatch(setDisableBtn(false));
             return;
@@ -208,6 +216,7 @@ const Contacts = () => {
                                             <View />
                                         </button>
                                     </Tippy>
+                                    
                                     <Tippy content="Edit">
                                         <button type="button" onClick={() => dispatch(setEditModal({ id, open: true }))}>
                                             <Edit />

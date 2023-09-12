@@ -1,5 +1,5 @@
 import { TaskStatusInitialStateProps, TaskStatusType } from '@/utils/Types';
-import { showToastAlert } from '@/utils/contant';
+import { fetchUserPolicyArray, showToastAlert } from '@/utils/contant';
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState: TaskStatusInitialStateProps = {
@@ -12,11 +12,23 @@ const initialState: TaskStatusInitialStateProps = {
     isBtnDisabled: false,
     isFetching: false,
     defaultStatusModal: false,
+    isAbleToRead: false,
+    isAbleToCreate: false,
+    isAbleToUpdate: false,
+    isAbleToDelete: false,
+    userPolicyArr: [] as string[],
 };
 
 const taskStatusSlice = createSlice({
     initialState,
     name: 'task status',
+    extraReducers(builder) {
+        builder.addCase(fetchUserPolicyArray.fulfilled, (state, action) => {
+            if (action.payload) {
+                state.userPolicyArr = action.payload;
+            }
+        });
+    },
     reducers: {
         setViewModal(state, action) {
             const { open, id } = action.payload;
@@ -46,7 +58,7 @@ const taskStatusSlice = createSlice({
         setDeleteModal(state, action) {
             const { open, id } = action.payload;
             const findRequestedData: TaskStatusType | undefined = state.data.find((item: TaskStatusType) => item.id === id);
-            if (findRequestedData?.isDefault ===true) {
+            if (findRequestedData?.isDefault === true) {
                 showToastAlert('Please make other option default to Delete this Status');
                 return;
             }
@@ -81,8 +93,37 @@ const taskStatusSlice = createSlice({
         setFetching(state, action) {
             state.isFetching = action.payload;
         },
+        setTaskStatusReadPolicy(state, action) {
+            const verifyPolicy: boolean = state.userPolicyArr.includes(action.payload);
+            state.isAbleToRead = verifyPolicy;
+        },
+        setTaskStatusCreatePolicy(state, action) {
+            const verifyPolicy: boolean = state.userPolicyArr.includes(action.payload);
+            state.isAbleToCreate = verifyPolicy;
+        },
+        setTaskStatusUpdatePolicy(state, action) {
+            const verifyPolicy: boolean = state.userPolicyArr.includes(action.payload);
+            state.isAbleToUpdate = verifyPolicy;
+        },
+        setTaskStatusDeletePolicy(state, action) {
+            const verifyPolicy: boolean = state.userPolicyArr.includes(action.payload);
+            state.isAbleToDelete = verifyPolicy;
+        },
     },
 });
 
-export const { setCreateModal, setDeleteModal, setEditModal, setViewModal, getAllTaskStatus, setDisableBtn, setFetching, setDefaultStatusModal } = taskStatusSlice.actions;
+export const {
+    setCreateModal,
+    setDeleteModal,
+    setEditModal,
+    setViewModal,
+    getAllTaskStatus,
+    setDisableBtn,
+    setFetching,
+    setDefaultStatusModal,
+    setTaskStatusCreatePolicy,
+    setTaskStatusDeletePolicy,
+    setTaskStatusReadPolicy,
+    setTaskStatusUpdatePolicy,
+} = taskStatusSlice.actions;
 export default taskStatusSlice.reducer;

@@ -1,4 +1,5 @@
 import { ContactDataType, ContactInitialStateProps } from '@/utils/Types';
+import { fetchUserPolicyArray, showToastAlert } from '@/utils/contant';
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState: ContactInitialStateProps = {
@@ -10,11 +11,23 @@ const initialState: ContactInitialStateProps = {
     viewModal: false,
     isBtnDisabled: false,
     isFetching: false,
+    isAbleToCreate: false,
+    isAbleToDelete: false,
+    isAbleToRead: false,
+    isAbleToUpdate: false,
+    userPolicyArr: [] as string[],
 };
 
 const contactSlice = createSlice({
     initialState,
     name: 'contact',
+    extraReducers(builder) {
+        builder.addCase(fetchUserPolicyArray.fulfilled, (state, action) => {
+            if (action.payload) {
+                state.userPolicyArr = action.payload;
+            }
+        });
+    },
     reducers: {
         setViewModal(state, action) {
             const { open, id } = action.payload;
@@ -61,8 +74,36 @@ const contactSlice = createSlice({
         setFetching(state, action) {
             state.isFetching = action.payload;
         },
+        setContactReadPolicy(state, action) {
+            const verifyPolicy: boolean = state.userPolicyArr.includes(action.payload);
+            state.isAbleToRead = verifyPolicy;
+        },
+        setContactCreatePolicy(state, action) {
+            const verifyPolicy: boolean = state.userPolicyArr.includes(action.payload);
+            state.isAbleToCreate = verifyPolicy;
+        },
+        setContactUpdatePolicy(state, action) {
+            const verifyPolicy: boolean = state.userPolicyArr.includes(action.payload);
+            state.isAbleToUpdate = verifyPolicy;
+        },
+        setContactDeletePolicy(state, action) {
+            const verifyPolicy: boolean = state.userPolicyArr.includes(action.payload);
+            state.isAbleToDelete = verifyPolicy;
+        },
     },
 });
 
-export const { setCreateModal, setDeleteModal, setEditModal, setViewModal, getAllContacts,setDisableBtn,setFetching } = contactSlice.actions;
+export const {
+    setCreateModal,
+    setDeleteModal,
+    setEditModal,
+    setViewModal,
+    getAllContacts,
+    setDisableBtn,
+    setFetching,
+    setContactCreatePolicy,
+    setContactDeletePolicy,
+    setContactReadPolicy,
+    setContactUpdatePolicy,
+} = contactSlice.actions;
 export default contactSlice.reducer;

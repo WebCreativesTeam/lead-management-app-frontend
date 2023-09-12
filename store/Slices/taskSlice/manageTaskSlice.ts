@@ -1,4 +1,5 @@
 import { TaskDataType, ManageTaskInitialStateProps, TaskSelectOptions } from '@/utils/Types';
+import { fetchUserPolicyArray } from '@/utils/contant';
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState: ManageTaskInitialStateProps = {
@@ -16,11 +17,23 @@ const initialState: ManageTaskInitialStateProps = {
     taskStatusList: [] as TaskSelectOptions[],
     changePriorityModal: false,
     changeStatusModal: false,
+    isAbleToRead: false,
+    isAbleToCreate: false,
+    isAbleToUpdate: false,
+    isAbleToDelete: false,
+    userPolicyArr: [] as string[],
 };
 
 const manageTaskSlice = createSlice({
     initialState,
     name: 'manage tasks',
+    extraReducers(builder) {
+        builder.addCase(fetchUserPolicyArray.fulfilled, (state, action) => {
+            if (action.payload) {
+                state.userPolicyArr = action.payload;
+            }
+        });
+    },
     reducers: {
         setViewModal(state, action) {
             const { open, id } = action.payload;
@@ -101,6 +114,22 @@ const manageTaskSlice = createSlice({
         setFetching(state, action) {
             state.isFetching = action.payload;
         },
+        setTaskReadPolicy(state, action) {
+            const verifyPolicy: boolean = state.userPolicyArr.includes(action.payload);
+            state.isAbleToRead = verifyPolicy;
+        },
+        setTaskCreatePolicy(state, action) {
+            const verifyPolicy: boolean = state.userPolicyArr.includes(action.payload);
+            state.isAbleToCreate = verifyPolicy;
+        },
+        setTaskUpdatePolicy(state, action) {
+            const verifyPolicy: boolean = state.userPolicyArr.includes(action.payload);
+            state.isAbleToUpdate = verifyPolicy;
+        },
+        setTaskDeletePolicy(state, action) {
+            const verifyPolicy: boolean = state.userPolicyArr.includes(action.payload);
+            state.isAbleToDelete = verifyPolicy;
+        },
     },
 });
 
@@ -116,5 +145,9 @@ export const {
     getAllTaskStatus,
     setChangePriorityModal,
     setChangeStatusModal,
+    setTaskCreatePolicy,
+    setTaskDeletePolicy,
+    setTaskReadPolicy,
+    setTaskUpdatePolicy
 } = manageTaskSlice.actions;
 export default manageTaskSlice.reducer;

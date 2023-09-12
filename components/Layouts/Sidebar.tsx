@@ -6,13 +6,22 @@ import { useDispatch, useSelector } from 'react-redux';
 import Link from 'next/link';
 import { toggleSidebar } from '../../store/themeConfigSlice';
 import AnimateHeight from 'react-animate-height';
-import { IRootState } from '../../store';
+import { AppDispatch, IRootState } from '../../store';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { ArrowRight, Branch, Email, Global, Phone, Shield, Tasks, User } from '../../utils/icons';
+import { setBranchCreatePolicy, setBranchDeletePolicy, setBranchReadPolicy, setBranchUpdatePolicy } from '@/store/Slices/branchSlice';
+import { fetchUserPolicyArray } from '@/utils/contant';
+import { setContactCreatePolicy, setContactDeletePolicy, setContactReadPolicy, setContactUpdatePolicy } from '@/store/Slices/contactSlice';
+import { setSourceCreatePolicy, setSourceDeletePolicy, setSourceReadPolicy, setSourceUpdatePolicy } from '@/store/Slices/sourceSlice';
+import { setChangeUsersPolicy, setUserCreatePolicy, setUserDeletePolicy, setUserReadPolicy, setUserUpdatePolicy } from '@/store/Slices/userSlice';
+import { setTaskCreatePolicy, setTaskDeletePolicy, setTaskReadPolicy, setTaskUpdatePolicy } from '@/store/Slices/taskSlice/manageTaskSlice';
+import { setTaskPriorityCreatePolicy, setTaskPriorityDeletePolicy, setTaskPriorityReadPolicy, setTaskPriorityUpdatePolicy } from '@/store/Slices/taskSlice/taskPrioritySlice';
+import { setPolicyCreatePermission, setPolicyDeletePermission, setPolicyReadPermission, setPolicyUpdatePermission } from '@/store/Slices/policySlice';
 
 const Sidebar = () => {
     const router = useRouter();
+    const dispatch = useDispatch<AppDispatch>();
     const [currentMenu, setCurrentMenu] = useState<string>('');
     const themeConfig = useSelector((state: IRootState) => state.themeConfig);
     const semidark = useSelector((state: IRootState) => state.themeConfig.semidark);
@@ -21,6 +30,87 @@ const Sidebar = () => {
             return oldValue === value ? '' : value;
         });
     };
+
+    const isAbleToReadBranch: boolean = useSelector((state: IRootState) => state.branch.isAbleToRead);
+    const userPolicyBranchArray: string[] = useSelector((state: IRootState) => state.branch.userPolicyArr);
+
+    const userPolicyContactArray: string[] = useSelector((state: IRootState) => state.contacts.userPolicyArr);
+
+    const userPolicySourceArray: string[] = useSelector((state: IRootState) => state.source.userPolicyArr);
+    const isAbleToReadSource: boolean = useSelector((state: IRootState) => state.source.isAbleToRead);
+
+    const userPolicyUsersArray: string[] = useSelector((state: IRootState) => state.user.userPolicyArr);
+    const isAbleToReadUsers: boolean = useSelector((state: IRootState) => state.user.isAbleToRead);
+
+    const userPolicyTaskArray: string[] = useSelector((state: IRootState) => state.task.userPolicyArr);
+    const isAbleToReadTask: boolean = useSelector((state: IRootState) => state.task.isAbleToRead);
+
+    const userPolicyPermissonArray: string[] = useSelector((state: IRootState) => state.policy.userPolicyArr);
+    const isAbleToReadPolicy: boolean = useSelector((state: IRootState) => state.policy.isAbleToRead);
+
+    // const userPolicyTaskPriorityArray: string[] = useSelector((state: IRootState) => state.taskPriority.userPolicyArr);
+
+    // const userPolicyTaskStatusArray: string[] = useSelector((state: IRootState) => state.taskStatus.userPolicyArr);
+    useEffect(() => {
+        dispatch(fetchUserPolicyArray());
+    }, []);
+
+    //access for branch page
+    useEffect(() => {
+        dispatch(setBranchReadPolicy('branches:Read::Documents'));
+        dispatch(setBranchCreatePolicy('branches:Create'));
+        dispatch(setBranchUpdatePolicy('branches:Update'));
+        dispatch(setBranchDeletePolicy('branches:Delete'));
+    }, [userPolicyBranchArray]);
+
+    //access for source page
+    useEffect(() => {
+        dispatch(setSourceReadPolicy('sources:Read::Documents'));
+        dispatch(setSourceCreatePolicy('sources:Create'));
+        dispatch(setSourceUpdatePolicy('sources:Update'));
+        dispatch(setSourceDeletePolicy('sources:Delete'));
+    }, [userPolicySourceArray]);
+
+    //access for users page
+    useEffect(() => {
+        dispatch(setUserReadPolicy('users:Read::Documents'));
+        dispatch(setUserCreatePolicy('users:Create'));
+        dispatch(setUserUpdatePolicy('users:Update::BasicFields'));
+        dispatch(setUserDeletePolicy('users:Delete'));
+        dispatch(setChangeUsersPolicy('users:Add::Policy'));
+    }, [userPolicyUsersArray]);
+
+    //access for Manage Task page
+    useEffect(() => {
+        dispatch(setTaskReadPolicy('tasks:Read::Documents'));
+        dispatch(setTaskCreatePolicy('tasks:Create'));
+        dispatch(setTaskUpdatePolicy('tasks:Update'));
+        dispatch(setTaskDeletePolicy('tasks:Delete'));
+    }, [userPolicyTaskArray]);
+
+    // //access for Task Priority page
+    // useEffect(() => {
+    //     dispatch(setTaskPriorityReadPolicy('tasks:Read::Documents'));
+    //     dispatch(setTaskPriorityCreatePolicy('tasks:Create'));
+    //     dispatch(setTaskPriorityUpdatePolicy('tasks:Update'));
+    //     dispatch(setTaskPriorityDeletePolicy('tasks:Delete'));
+    // }, [userPolicyTaskPriorityArray]);
+
+    //access for Policy page
+    useEffect(() => {
+        dispatch(setPolicyReadPermission('policies:Read::Documents'));
+        dispatch(setPolicyCreatePermission('policies:Create'));
+        dispatch(setPolicyUpdatePermission('policies:Update'));
+        dispatch(setPolicyDeletePermission('policies:Delete'));
+    }, [userPolicyPermissonArray]);
+
+    //access for contact page
+    // useEffect(() => {
+    //     dispatch(setContactReadPolicy('branches:Read::Documents'));
+    //     dispatch(setContactCreatePolicy('branches:Create'));
+    //     dispatch(setContactUpdatePolicy('branches:Update'));
+    //     dispatch(setContactDeletePolicy('branches:Delete'));
+    // }, [userPolicyContactArray]);
 
     useEffect(() => {
         const selector = document.querySelector('.sidebar ul a[href="' + window.location.pathname + '"]');
@@ -56,7 +146,6 @@ const Sidebar = () => {
         selector?.classList.add('active');
     };
 
-    const dispatch = useDispatch();
     const { t } = useTranslation();
 
     return (
@@ -85,61 +174,37 @@ const Sidebar = () => {
                     <PerfectScrollbar className="relative h-[calc(100vh-80px)]">
                         <ul className="relative space-y-0.5 p-4 py-0 font-semibold">
                             {/* tasks */}
-                            <li className="menu nav-item">
-                                <button type="button" className={`${currentMenu === 'Tasks' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('Tasks')}>
-                                    <div className="flex items-center">
-                                        <Tasks />
-                                        <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Tasks')}</span>
-                                    </div>
+                            {isAbleToReadTask && (
+                                <li className="menu nav-item">
+                                    <button type="button" className={`${currentMenu === 'Tasks' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('Tasks')}>
+                                        <div className="flex items-center">
+                                            <Tasks />
+                                            <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Tasks')}</span>
+                                        </div>
 
-                                    <div className={currentMenu === 'Tasks' ? 'rotate-90' : 'rtl:rotate-180'}>
-                                        <ArrowRight />
-                                    </div>
-                                </button>
+                                        <div className={currentMenu === 'Tasks' ? 'rotate-90' : 'rtl:rotate-180'}>
+                                            <ArrowRight />
+                                        </div>
+                                    </button>
 
-                                <AnimateHeight duration={300} height={currentMenu === 'Tasks' ? 'auto' : 0}>
-                                    <ul className="sub-menu text-gray-500">
-                                        <li>
-                                            <Link href="/tasks">{t('Manage Tasks')}</Link>
-                                        </li>
-                                        <li>
-                                            <Link href="/tasks/priority">{t('Priority')}</Link>
-                                        </li>
-                                        <li>
-                                            <Link href="/tasks/status">{t('Status')}</Link>
-                                        </li>
-                                    </ul>
-                                </AnimateHeight>
-                            </li>
+                                    <AnimateHeight duration={300} height={currentMenu === 'Tasks' ? 'auto' : 0}>
+                                        <ul className="sub-menu text-gray-500">
+                                            <li>
+                                                <Link href="/tasks">{t('Manage Tasks')}</Link>
+                                            </li>
+
+                                            <li>
+                                                <Link href="/tasks/priority">{t('Priority')}</Link>
+                                            </li>
+                                            <li>
+                                                <Link href="/tasks/status">{t('Status')}</Link>
+                                            </li>
+                                        </ul>
+                                    </AnimateHeight>
+                                </li>
+                            )}
 
                             {/* emails */}
-                            {/* <li className="menu nav-item">
-                                <button type="button" className={`${currentMenu === 'Emails' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('Emails')}>
-                                    <div className="flex items-center">
-                                        <Email />
-                                        <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Emails')}</span>
-                                    </div>
-
-                                    <div className={currentMenu === 'Emails' ? 'rotate-90' : 'rtl:rotate-180'}>
-                                        <ArrowRight />
-                                    </div>
-                                </button>
-
-                                <AnimateHeight duration={300} height={currentMenu === 'Emails' ? 'auto' : 0}>
-                                    <ul className="sub-menu text-gray-500">
-                                        <li>
-                                            <Link href="/emails">{t('Emails')}</Link>
-                                        </li>
-                                        <li>
-                                            <Link href="/tasks/priority">{t('Priority')}</Link>
-                                        </li>
-                                        <li>
-                                            <Link href="/tasks/status">{t('Status')}</Link>
-                                        </li>
-                                    </ul>
-                                </AnimateHeight>
-                            </li> */}
-
                             <li className="menu nav-item">
                                 <Link href="/emails" className="group">
                                     <div className="flex items-center">
@@ -150,44 +215,51 @@ const Sidebar = () => {
                             </li>
 
                             {/* Users */}
-                            <li className="menu nav-item">
-                                <Link href="/users" className="group">
-                                    <div className="flex items-center">
-                                        <User />
-                                        <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Users')}</span>
-                                    </div>
-                                </Link>
-                            </li>
+                            {isAbleToReadUsers && (
+                                <li className="menu nav-item">
+                                    <Link href="/users" className="group">
+                                        <div className="flex items-center">
+                                            <User />
+                                            <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Users')}</span>
+                                        </div>
+                                    </Link>
+                                </li>
+                            )}
 
                             {/* Branches */}
-                            <li className="menu nav-item">
-                                <Link href="/branches" className="group">
-                                    <div className="flex items-center">
-                                        <Branch />
-                                        <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Branches')}</span>
-                                    </div>
-                                </Link>
-                            </li>
-
+                            {isAbleToReadBranch && (
+                                <li className="menu nav-item">
+                                    <Link href="/branches" className="group">
+                                        <div className="flex items-center">
+                                            <Branch />
+                                            <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Branches')}</span>
+                                        </div>
+                                    </Link>
+                                </li>
+                            )}
                             {/* policies */}
-                            <li className="menu nav-item">
-                                <Link href="/policies" className="group">
-                                    <div className="flex items-center">
-                                        <Shield />
-                                        <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Policies')}</span>
-                                    </div>
-                                </Link>
-                            </li>
+                            {isAbleToReadPolicy && (
+                                <li className="menu nav-item">
+                                    <Link href="/policies" className="group">
+                                        <div className="flex items-center">
+                                            <Shield />
+                                            <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Policies')}</span>
+                                        </div>
+                                    </Link>
+                                </li>
+                            )}
 
                             {/* sources */}
-                            <li className="menu nav-item">
-                                <Link href="/sources" className="group">
-                                    <div className="flex items-center">
-                                        <Global />
-                                        <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Sources')}</span>
-                                    </div>
-                                </Link>
-                            </li>
+                            {isAbleToReadSource && (
+                                <li className="menu nav-item">
+                                    <Link href="/sources" className="group">
+                                        <div className="flex items-center">
+                                            <Global />
+                                            <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Sources')}</span>
+                                        </div>
+                                    </Link>
+                                </li>
+                            )}
 
                             {/* contacts */}
                             <li className="menu nav-item">

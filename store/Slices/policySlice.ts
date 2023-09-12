@@ -1,5 +1,5 @@
 import { Permission, PolicyDataType, PolicyInitialStateProps } from '@/utils/Types';
-import { showToastAlert } from '@/utils/contant';
+import { fetchUserPolicyArray, showToastAlert } from '@/utils/contant';
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 
 const initialState: PolicyInitialStateProps = {
@@ -14,11 +14,23 @@ const initialState: PolicyInitialStateProps = {
     isBtnDisabled: false,
     isFetching: false,
     permissionKeyArr: [] as string[],
+    isAbleToRead: false,
+    isAbleToCreate: false,
+    isAbleToUpdate: false,
+    isAbleToDelete: false,
+    userPolicyArr: [] as string[],
 };
 
 const policySlice = createSlice({
     initialState,
     name: 'policy',
+    extraReducers(builder) {
+        builder.addCase(fetchUserPolicyArray.fulfilled, (state, action) => {
+            if (action.payload) {
+                state.userPolicyArr = action.payload;
+            }
+        });
+    },
     reducers: {
         setViewModal(state, action) {
             const { open, id } = action.payload;
@@ -102,9 +114,39 @@ const policySlice = createSlice({
         setFetching(state, action) {
             state.isFetching = action.payload;
         },
+        setPolicyReadPermission(state, action) {
+            const verifyPolicy: boolean = state.userPolicyArr.includes(action.payload);
+            state.isAbleToRead = verifyPolicy;
+        },
+        setPolicyCreatePermission(state, action) {
+            const verifyPolicy: boolean = state.userPolicyArr.includes(action.payload);
+            state.isAbleToCreate = verifyPolicy;
+        },
+        setPolicyUpdatePermission(state, action) {
+            const verifyPolicy: boolean = state.userPolicyArr.includes(action.payload);
+            state.isAbleToUpdate = verifyPolicy;
+        },
+        setPolicyDeletePermission(state, action) {
+            const verifyPolicy: boolean = state.userPolicyArr.includes(action.payload);
+            state.isAbleToDelete = verifyPolicy;
+        },
     },
 });
 
-export const { setCreateModal, setDeleteModal, setEditModal, setViewModal, getAllPolicies, setDisableBtn, setFetching, getAllPermissions, setPermissionKeyArr, setDefaultPolicyModal } =
-    policySlice.actions;
+export const {
+    setCreateModal,
+    setDeleteModal,
+    setEditModal,
+    setViewModal,
+    getAllPolicies,
+    setDisableBtn,
+    setFetching,
+    getAllPermissions,
+    setPermissionKeyArr,
+    setDefaultPolicyModal,
+    setPolicyCreatePermission,
+    setPolicyDeletePermission,
+    setPolicyReadPermission,
+    setPolicyUpdatePermission,
+} = policySlice.actions;
 export default policySlice.reducer;

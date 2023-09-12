@@ -1,9 +1,10 @@
 import { PolicyDataType, UserDataType, UserInitialStateProps } from '@/utils/Types';
+import { fetchUserPolicyArray } from '@/utils/contant';
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState: UserInitialStateProps = {
     data: [] as UserDataType[],
-    policies:[] as PolicyDataType[],
+    policies: [] as PolicyDataType[],
     singleData: {} as UserDataType,
     createModal: false,
     editModal: false,
@@ -14,11 +15,25 @@ const initialState: UserInitialStateProps = {
     isFetching: false,
     deactivateModal: false,
     deactivateValue: false,
+    isAbleToRead: false,
+    isAbleToCreate: false,
+    isAbleToUpdate: false,
+    isAbleToDelete: false,
+    isAbleToUpdatePolicy:false,
+    userPolicyArr: [] as string[],
 };
 
 const userSlice = createSlice({
     initialState,
     name: 'user',
+    extraReducers(builder) {
+        builder.addCase(fetchUserPolicyArray.fulfilled, (state, action) => {
+            if (action.payload) {
+                state.userPolicyArr = action.payload;
+            }
+        });
+    },
+
     reducers: {
         setViewModal(state, action) {
             const { open, id } = action.payload;
@@ -91,8 +106,44 @@ const userSlice = createSlice({
         setFetching(state, action) {
             state.isFetching = action.payload;
         },
+        setUserReadPolicy(state, action) {
+            const verifyPolicy: boolean = state.userPolicyArr.includes(action.payload);
+            state.isAbleToRead = verifyPolicy;
+        },
+        setUserCreatePolicy(state, action) {
+            const verifyPolicy: boolean = state.userPolicyArr.includes(action.payload);
+            state.isAbleToCreate = verifyPolicy;
+        },
+        setUserUpdatePolicy(state, action) {
+            const verifyPolicy: boolean = state.userPolicyArr.includes(action.payload);
+            state.isAbleToUpdate = verifyPolicy;
+        },
+        setUserDeletePolicy(state, action) {
+            const verifyPolicy: boolean = state.userPolicyArr.includes(action.payload);
+            state.isAbleToDelete = verifyPolicy;
+        },
+        setChangeUsersPolicy(state, action) {
+            const verifyPolicy: boolean = state.userPolicyArr.includes(action.payload);
+            state.isAbleToUpdatePolicy = verifyPolicy;
+        },
     },
 });
 
-export const { setCreateModal, setDeleteModal, setEditModal, setViewModal, getAllUsers, setDisableBtn, setFetching, setPolicyModal, setDeactivateModal,getAllPolicies } = userSlice.actions;
+export const {
+    setCreateModal,
+    setDeleteModal,
+    setEditModal,
+    setViewModal,
+    getAllUsers,
+    setDisableBtn,
+    setFetching,
+    setPolicyModal,
+    setDeactivateModal,
+    getAllPolicies,
+    setUserCreatePolicy,
+    setUserDeletePolicy,
+    setUserReadPolicy,
+    setUserUpdatePolicy,
+    setChangeUsersPolicy,
+} = userSlice.actions;
 export default userSlice.reducer;

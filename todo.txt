@@ -1,0 +1,25 @@
+*-------------- Todo ::: Frontend -------------------*
+
+
+
+
+*-------------- Todo ::: backend --------------------*
+
+1. Some policies provided to user is not avilable in Retrieve Permission Rules endpoint.
+
+2. Admin don't have permission to read all sources. sources:Read::Documents.
+
+3. No one have contact page, read,create, update, delete permission. so its pending.
+
+4. No one have task priority page, read,create, update, delete permission. so it is Pending.
+
+5. No one have task Status page, read,create, update, delete permission. so it is Pending.
+
+6. No one have task Email Template, read,create, update, delete permission. so it is Pending.
+
+7. if create new user and this user have permission to read tasks but not getting task data from backend, api call was success but receive empty array.
+
+8.change default policy permission is not available for permission page. so any user can read policy:Read::Documents can change default permission. same as for change default task status and task priority.
+
+9.
+

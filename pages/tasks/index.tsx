@@ -39,7 +39,7 @@ const TaskPage = () => {
     });
 
     //hooks
-    const { data, isFetching, taskPriorityList, taskStatusList } = useSelector((state: IRootState) => state.task);
+    const { data, isFetching, taskPriorityList, taskStatusList, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate } = useSelector((state: IRootState) => state.task);
     const [searchInputText, setSearchInputText] = useState<string>('');
     const [searchedData, setSearchedData] = useState<TaskDataType[]>(data);
     const [loading, setLoading] = useState<boolean>(false);
@@ -90,6 +90,7 @@ const TaskPage = () => {
         setLoading(true);
         const res: GetMethodResponseType = await new ApiClient().get('tasks/' + filter);
         const tasks: TaskDataType[] | undefined = res?.data;
+        console.log(res);
         if (typeof tasks === 'undefined') {
             dispatch(getAllTasks([] as TaskDataType[]));
             return;
@@ -135,7 +136,7 @@ const TaskPage = () => {
         setRecordsData(searchTaskData);
     };
 
-    return (
+    return !isAbleToRead ? null : (
         <div>
             <PageHeadingSection description="View, create, update, and close tasks. Organize by status, priority, and due date. Stay on top of work." heading="Task Management" />
             <div className="my-6 flex gap-5 ">
@@ -302,16 +303,20 @@ const TaskPage = () => {
                                             <View />
                                         </button>
                                     </Tippy>
-                                    <Tippy content="Edit">
-                                        <button type="button" onClick={() => dispatch(setEditModal({ id, open: true }))}>
-                                            <Edit />
-                                        </button>
-                                    </Tippy>
-                                    <Tippy content="Delete">
-                                        <button type="button" onClick={() => dispatch(setDeleteModal({ id, open: true }))}>
-                                            <Delete />
-                                        </button>
-                                    </Tippy>
+                                    {isAbleToUpdate && (
+                                        <Tippy content="Edit">
+                                            <button type="button" onClick={() => dispatch(setEditModal({ id, open: true }))}>
+                                                <Edit />
+                                            </button>
+                                        </Tippy>
+                                    )}
+                                    {isAbleToDelete && (
+                                        <Tippy content="Delete">
+                                            <button type="button" onClick={() => dispatch(setDeleteModal({ id, open: true }))}>
+                                                <Delete />
+                                            </button>
+                                        </Tippy>
+                                    )}
                                 </div>
                             ),
                         },
