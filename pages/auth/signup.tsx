@@ -34,7 +34,7 @@ const SignUpPage = () => {
     const { values, handleChange, handleSubmit, errors, handleBlur } = useFormik({
         initialValues,
         validationSchema: signUpSchema,
-        validateOnChange: false,
+        validateOnChange: true,
         onSubmit: async (value, action) => {
             setDisableBtn(true);
             setLoading(true);

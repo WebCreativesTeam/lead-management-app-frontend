@@ -29,7 +29,7 @@ const LoginPage = () => {
             password: '',
         },
         validationSchema: signInSchema,
-        validateOnChange: false,
+        validateOnChange: true,
         onSubmit: async (value, action) => {
             setDisableBtn(true);
             setLoading(true);
@@ -62,9 +62,7 @@ const LoginPage = () => {
             showToastAlert(errors?.password);
         }
     };
-
-    console.log(errors);
-
+    
     return (
         <div>
             <div className="absolute inset-0">
