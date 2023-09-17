@@ -5,32 +5,29 @@ import { useSelector, useDispatch } from 'react-redux';
 import { IRootState } from '@/store';
 import { setDisableBtn, setFetching, setPolicyModal } from '@/store/Slices/userSlice';
 import { ApiClient } from '@/utils/http';
-import { GetMethodResponseType, PolicyDataType, SelectOptionsType, UserDataType } from '@/utils/Types';
+import { PolicyDataType, SelectOptionsType, UserDataType } from '@/utils/Types';
 import { showToastAlert } from '@/utils/contant';
 import Select, { ActionMeta } from 'react-select';
 
 const UserPolicyModal = () => {
-    const policyModal: boolean = useSelector((state: IRootState) => state.user.policyModal);
-    const isBtnDisabled: boolean = useSelector((state: IRootState) => state.user.isBtnDisabled);
-    const singleUser: UserDataType = useSelector((state: IRootState) => state.user.singleData);
-    const allPolicies: PolicyDataType[] = useSelector((state: IRootState) => state.user.policies);
+    const {policyModal,isBtnDisabled,singleData,policies} = useSelector((state: IRootState) => state.user);
     const [policiesData, setPoliciesData] = useState<SelectOptionsType[]>([]);
     const [defaultSelectedPolicy, setDefaultSelectedPolicy] = useState<SelectOptionsType[]>([]);
 
     useEffect(() => {
         handlePolicy();
-    }, [singleUser]);
+    }, [singleData]);
 
     const dispatch = useDispatch();
 
     const handlePolicy = async () => {
         setPolicyModal(true);
-        const createPolicyObj: SelectOptionsType[] = allPolicies.map((policy: PolicyDataType) => {
+        const createPolicyObj: SelectOptionsType[] = policies.map((policy: PolicyDataType) => {
             return { value: policy.id, label: policy.name };
         });
         setPoliciesData(createPolicyObj);
 
-        const selectedPolicyIdArr: string[] = singleUser?.policiesIncluded?.map((item: any) => {
+        const selectedPolicyIdArr: string[] = singleData?.policiesIncluded?.map((item: any) => {
             return item.id;
         });
         const preSelectedPolicy: SelectOptionsType[] = createPolicyObj.filter((item: SelectOptionsType) => {
@@ -49,7 +46,7 @@ const UserPolicyModal = () => {
                 return policy.value;
             });
             dispatch(setDisableBtn(true));
-            await new ApiClient().post(process.env.NEXT_PUBLIC_API_LINK + 'users/' + singleUser.id + '/policies', { policies: selectedPolicyArr });
+            await new ApiClient().post(process.env.NEXT_PUBLIC_API_LINK + 'users/' + singleData?.id + '/policies', { policies: selectedPolicyArr });
             dispatch(setPolicyModal({ open: false }));
         } catch (error: any) {
             if (typeof error?.response?.data?.message === 'object') {

@@ -10,9 +10,7 @@ import { showToastAlert } from '@/utils/contant';
 import Swal from 'sweetalert2';
 
 const UserCreateModal = () => {
-    const createModal: boolean = useSelector((state: IRootState) => state.user.createModal);
-    const isBtnDisabled: boolean = useSelector((state: IRootState) => state.user.isBtnDisabled);
-    const isFetching: boolean = useSelector((state: IRootState) => state.user.isFetching);
+    const { createModal, isBtnDisabled, isFetching } = useSelector((state: IRootState) => state.user);
     const dispatch = useDispatch();
 
     const { values, handleChange, submitForm, handleSubmit, errors, handleBlur, resetForm } = useFormik({

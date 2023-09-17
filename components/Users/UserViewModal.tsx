@@ -6,10 +6,9 @@ import { Permission, UserDataType } from '@/utils/Types';
 import { IRootState } from '@/store';
 
 const UserViewModal = () => {
-    const viewModal: boolean = useSelector((state: IRootState) => state.user.viewModal);
-    const singleUser: UserDataType = useSelector((state: any) => state?.user?.singleData);
+    const { viewModal, singleData } = useSelector((state: IRootState) => state.user);
     const dispatch = useDispatch();
-    const { deactivatedAt, email, firstName, id, isActive, isVerified, lastName, permissions, policiesIncluded } = singleUser;
+    const { email, firstName, lastName, permissions } = singleData;
 
     return (
         <ViewModal

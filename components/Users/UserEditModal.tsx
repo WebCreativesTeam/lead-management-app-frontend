@@ -11,15 +11,13 @@ import { UserDataType } from '@/utils/Types';
 import { showToastAlert } from '@/utils/contant';
 
 const UserEditModal = () => {
-    const editModal: boolean = useSelector((state: IRootState) => state.user.editModal);
-    const isBtnDisabled: boolean = useSelector((state: IRootState) => state.user.isBtnDisabled);
-    const singleUser: UserDataType = useSelector((state: IRootState) => state.user.singleData);
+    const {editModal,isBtnDisabled,singleData} = useSelector((state: IRootState) => state.user);
 
     const dispatch = useDispatch();
     useEffect(() => {
-        setFieldValue('firstName', singleUser?.firstName);
-        setFieldValue('lastName', singleUser?.lastName);
-    }, [singleUser]);
+        setFieldValue('firstName', singleData?.firstName);
+        setFieldValue('lastName', singleData?.lastName);
+    }, [singleData]);
 
     const { values, handleChange, submitForm, handleSubmit, setFieldValue, errors, handleBlur, resetForm } = useFormik({
         initialValues: {
@@ -33,7 +31,7 @@ const UserEditModal = () => {
             dispatch(setFetching(true));
             try {
                 dispatch(setDisableBtn(true));
-                await new ApiClient().patch('users/' + singleUser.id, value);
+                await new ApiClient().patch('users/' + singleData.id, value);
                 action.resetForm();
                 dispatch(setEditModal({ open: false }));
             } catch (error: any) {

@@ -21,5 +21,6 @@
 
 8.change default policy permission is not available for permission page. so any user can read policy:Read::Documents can change default permission. same as for change default task status and task priority.
 
-9.
+9. any user who have read permission can deactivate user. no permission available for deactivate.
+
 

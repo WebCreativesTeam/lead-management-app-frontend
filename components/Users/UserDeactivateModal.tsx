@@ -8,16 +8,13 @@ import React, { Fragment } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 const UserDeactivateModal = () => {
-    const deactivateModal: boolean = useSelector((state: IRootState) => state.user.deactivateModal);
-    const isBtnDisabled: boolean = useSelector((state: IRootState) => state.user.isBtnDisabled);
-    const deactivateValue: boolean = useSelector((state: IRootState) => state.user.deactivateValue);
-    const singleUser: UserDataType = useSelector((state: IRootState) => state.user.singleData);
+    const { deactivateModal, isBtnDisabled, deactivateValue, singleData } = useSelector((state: IRootState) => state.user);
     const dispatch = useDispatch();
 
     const onDeactivateUser = async () => {
         dispatch(setFetching(true));
         dispatch(setDisableBtn(true));
-        const deactivateUser: UserDataType = await new ApiClient().patch(`users/${singleUser.id}/internal`, { isActive: deactivateValue });
+        const deactivateUser: UserDataType = await new ApiClient().patch(`users/${singleData?.id}/internal`, { isActive: deactivateValue });
         if (Object.keys(deactivateUser).length === 0) {
             dispatch(setDisableBtn(false));
             return;
