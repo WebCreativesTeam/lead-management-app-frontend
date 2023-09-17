@@ -16,6 +16,7 @@ export class ApiClient implements IApiClient {
             baseURL: process.env.NEXT_PUBLIC_API_LINK,
             headers: {
                 'Content-Type': 'application/json',
+                'x-tenant-id': localStorage.getItem('uid'),
             },
             withCredentials: true,
         });
