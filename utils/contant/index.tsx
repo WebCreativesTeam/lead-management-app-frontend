@@ -22,7 +22,8 @@ export const fetchUserPolicyArray = createAsyncThunk('user/id', async (arg, thun
     const id: string | null = localStorage.getItem('uid');
     if (id) {
         try {
-            const userData: { status: string; data: UserDataType } = await new ApiClient().get('users/' + id);
+            const userData: { status: string; data: UserDataType } = await new ApiClient().get('user/' + id);
+            console.log(userData);
             const createPolicyArray = userData?.data?.permissions?.map((item: Permission) => item?.key);
             return createPolicyArray;
         } catch (error: any) {

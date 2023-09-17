@@ -17,7 +17,10 @@ export class ApiClient implements IApiClient {
             headers: {
                 'Content-Type': 'application/json',
                 Authorization: `Bearer ${localStorage.getItem('loginToken')}`,
+                'x-tenant-id': localStorage.getItem('uid'),
+                credentials: 'include',
             },
+            withCredentials: true,
         });
     }
 

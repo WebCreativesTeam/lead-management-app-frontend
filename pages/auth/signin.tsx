@@ -38,7 +38,7 @@ const LoginPage = () => {
                     email: value.email,
                     password: value.password,
                 });
-                localStorage.setItem('loginToken', res?.token);
+                localStorage.setItem('loginToken', res?.data?.token);
                 localStorage.setItem('uid', res?.data?.id);
                 action.resetForm();
                 router.push('/tasks');
@@ -62,7 +62,7 @@ const LoginPage = () => {
             showToastAlert(errors?.password);
         }
     };
-    
+
     return (
         <div>
             <div className="absolute inset-0">

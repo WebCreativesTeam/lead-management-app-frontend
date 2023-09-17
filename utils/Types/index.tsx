@@ -38,6 +38,7 @@ export type UserDataType = {
         name: string;
         description: string;
     }[];
+    token: string;
 };
 
 //source page
@@ -159,7 +160,6 @@ export interface IEmails {
 
 export interface ISignInResponse {
     status: string;
-    token: string;
     data: UserDataType;
 }
 
