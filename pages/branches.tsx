@@ -117,7 +117,7 @@ const BranchPage = () => {
     return !isAbleToRead ? null : (
         <div>
             <PageHeadingSection description="List company branches. Add new locations. Update details. Remove obsolete branches." heading="Organize Offices" />
-            <div className="my-6 flex flex-col gap-5 sm:flex-row ">
+            <div className="flex flex-col gap-5 my-6 sm:flex-row ">
                 {isAbleToCreate ? (
                     <div className="flex-1">
                         <button className="btn btn-primary h-full w-full max-w-[200px] max-sm:mx-auto" type="button" onClick={() => dispatch(setCreateModal(true))}>
@@ -129,7 +129,7 @@ const BranchPage = () => {
                     <div className="flex-1"></div>
                 )}
 
-                <div className="relative  flex-1">
+                <div className="relative flex-1">
                     <input
                         type="text"
                         placeholder="Find A Branch"
@@ -137,14 +137,14 @@ const BranchPage = () => {
                         onChange={(e) => setSearchInputText(e.target.value)}
                         value={searchInputText}
                     />
-                    <button type="button" className="btn btn-primary absolute top-1 shadow-none ltr:right-1 rtl:left-1" onClick={handleSearchBranch}>
+                    <button type="button" className="absolute shadow-none btn btn-primary top-1 ltr:right-1 rtl:left-1" onClick={handleSearchBranch}>
                         Search
                     </button>
                 </div>
             </div>
 
             {/* Branch List table*/}
-            <div className="datatables panel mt-6">
+            <div className="mt-6 datatables panel">
                 <DataTable
                     className="table-hover whitespace-nowrap"
                     records={recordsData}
@@ -252,3 +252,5 @@ const BranchPage = () => {
 };
 
 export default BranchPage;
+
+//
