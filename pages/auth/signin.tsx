@@ -61,7 +61,7 @@ const LoginPage = () => {
             showToastAlert(errors?.password);
         }
     };
-    
+
     return (
         <div>
             <div className="absolute inset-0">
