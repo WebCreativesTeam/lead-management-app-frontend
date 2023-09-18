@@ -20,6 +20,7 @@ const initialState: UserInitialStateProps = {
     isAbleToUpdate: false,
     isAbleToDelete: false,
     isAbleToUpdatePolicy:false,
+    isAbleToChangeActiveStatus:false,
     userPolicyArr: [] as string[],
 };
 
@@ -126,6 +127,10 @@ const userSlice = createSlice({
             const verifyPolicy: boolean = state.userPolicyArr.includes(action.payload);
             state.isAbleToUpdatePolicy = verifyPolicy;
         },
+        setChangeActiveStatusPermission(state, action) {
+            const verifyPolicy: boolean = state.userPolicyArr.includes(action.payload);
+            state.isAbleToChangeActiveStatus = verifyPolicy;
+        },
     },
 });
 
@@ -145,5 +150,6 @@ export const {
     setUserReadPolicy,
     setUserUpdatePolicy,
     setChangeUsersPolicy,
+    setChangeActiveStatusPermission
 } = userSlice.actions;
 export default userSlice.reducer;

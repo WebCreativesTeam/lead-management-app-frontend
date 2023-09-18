@@ -61,9 +61,15 @@ export class ApiClient implements IApiClient {
             const response = await this.client.delete<TResponse>(path);
             return response?.data;
         } catch (error: any) {
-            showToastAlert(error.response.data);
+            if (typeof error?.response === 'string') {
+                showToastAlert(error?.response);
+            } else if (typeof error?.response?.data?.error === 'string') {
+                showToastAlert(error?.response?.data?.error);
+            } else if (typeof error?.response?.data?.message) {
+                showToastAlert(error?.response?.data?.message);
+            }
             console.log(error);
         }
-        return {} as TResponse;
+        return null as TResponse;
     }
 }

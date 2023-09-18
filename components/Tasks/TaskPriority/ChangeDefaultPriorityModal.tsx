@@ -14,7 +14,7 @@ const ChangeDefaultPriorityModal = () => {
     const onSubmitDefaultPriority = async () => {
         dispatch(setFetching(true));
         dispatch(setDisableBtn(true));
-        const defaultPriority: TaskPriorityType = await new ApiClient().get(`task-priorities/${singleData.id}/set-default`);
+        const defaultPriority: TaskPriorityType = await new ApiClient().get(`task-priority/${singleData.id}/set-default`);
 
         if (Object.keys(defaultPriority).length === 0) {
             dispatch(setDisableBtn(false));

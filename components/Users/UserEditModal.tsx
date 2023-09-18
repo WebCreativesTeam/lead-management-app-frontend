@@ -31,7 +31,7 @@ const UserEditModal = () => {
             dispatch(setFetching(true));
             try {
                 dispatch(setDisableBtn(true));
-                await new ApiClient().patch('users/' + singleData.id, value);
+                await new ApiClient().patch('user/' + singleData.id, value);
                 action.resetForm();
                 dispatch(setEditModal({ open: false }));
             } catch (error: any) {

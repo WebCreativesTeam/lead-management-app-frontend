@@ -7,7 +7,7 @@ import { useFormik } from 'formik';
 import { createUserSchema } from '@/utils/schemas';
 import { ApiClient } from '@/utils/http';
 import { showToastAlert } from '@/utils/contant';
-import Swal from 'sweetalert2';
+import { omit } from 'lodash';
 
 const UserCreateModal = () => {
     const { createModal, isBtnDisabled, isFetching } = useSelector((state: IRootState) => state.user);
@@ -26,9 +26,10 @@ const UserCreateModal = () => {
         enableReinitialize: true,
         onSubmit: async (value, action) => {
             dispatch(setFetching(true));
+            const { firstName, email, lastName, password } = value;
             try {
                 dispatch(setDisableBtn(true));
-                await new ApiClient().post('users', value);
+                await new ApiClient().post('user', { firstName, email, lastName, password });
                 dispatch(setCreateModal(false));
                 action.resetForm();
             } catch (error: any) {
@@ -50,65 +51,15 @@ const UserCreateModal = () => {
 
     const showAlert = async () => {
         if (errors.firstName) {
-            const toast = Swal.mixin({
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 3000,
-            });
-            toast.fire({
-                icon: 'error',
-                title: errors.firstName,
-                padding: '10px 20px',
-            });
+            showToastAlert(errors.firstName);
         } else if (errors.lastName) {
-            const toast = Swal.mixin({
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 3000,
-            });
-            toast.fire({
-                icon: 'error',
-                title: errors.lastName,
-                padding: '10px 20px',
-            });
+            showToastAlert(errors.lastName);
         } else if (errors.email) {
-            const toast = Swal.mixin({
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 3000,
-            });
-            toast.fire({
-                icon: 'error',
-                title: errors.email,
-                padding: '10px 20px',
-            });
+            showToastAlert(errors.email);
         } else if (errors.password) {
-            const toast = Swal.mixin({
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 3000,
-            });
-            toast.fire({
-                icon: 'error',
-                title: errors.password,
-                padding: '10px 20px',
-            });
+            showToastAlert(errors.password);
         } else if (errors.passwordConfirm) {
-            const toast = Swal.mixin({
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 3000,
-            });
-            toast.fire({
-                icon: 'error',
-                title: errors.passwordConfirm,
-                padding: '10px 20px',
-            });
+            showToastAlert(errors.passwordConfirm);
         }
     };
     return (
@@ -128,7 +79,7 @@ const UserCreateModal = () => {
             disabledDiscardBtn={isBtnDisabled}
             content={
                 isFetching ? (
-                    <div className='flex items-center min-h-[10rem]'>
+                    <div className="flex min-h-[10rem] items-center">
                         <span className="m-auto inline-block h-14 w-14 animate-[spin_3s_linear_infinite] rounded-full border-8 border-b-success border-l-primary border-r-warning border-t-danger align-middle"></span>
                     </div>
                 ) : (

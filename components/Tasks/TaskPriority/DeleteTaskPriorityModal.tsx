@@ -13,15 +13,15 @@ const TaskPriorityDeleteModal = () => {
     const onDeleteTaskPriority = async () => {
         dispatch(setFetching(true));
         dispatch(setDisableBtn(true));
-        const deleteTaskPriority: TaskPriorityType = await new ApiClient().delete('task-priorities/' + singleData.id);
-        if (Object.keys(deleteTaskPriority).length === 0) {
+        const deleteTaskPriority: TaskPriorityType = await new ApiClient().delete('task-priority/' + singleData.id);
+        if (deleteTaskPriority === null) {
             dispatch(setDisableBtn(false));
             return;
         }
-        
+
         dispatch(setDisableBtn(false));
-        dispatch(setDeleteModal({ open: false }));
         dispatch(setFetching(false));
+        dispatch(setDeleteModal({ open: false }));
     };
     return (
         <ConfirmationModal

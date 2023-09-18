@@ -9,10 +9,10 @@ import { useFormik } from 'formik';
 import { contactSchema } from '@/utils/schemas';
 import { ApiClient } from '@/utils/http';
 import { showToastAlert } from '@/utils/contant';
+import Loader from '../__Shared/Loader';
 
 const ContactCreateModal = () => {
-    const createModal: boolean = useSelector((state: IRootState) => state.contacts.createModal);
-    const isBtnDisabled: boolean = useSelector((state: IRootState) => state.contacts.isBtnDisabled);
+    const { isFetching, createModal, isBtnDisabled } = useSelector((state: IRootState) => state.contacts);
     const dispatch = useDispatch();
     const initialValues = {
         name: '',
@@ -47,8 +47,8 @@ const ContactCreateModal = () => {
                     name,
                     phoneNumber,
                     email,
-                    assignedTo,
-                    source,
+                    assignedToId: assignedTo,
+                    sourceId: source,
                     website,
                     position,
                     industry,
@@ -58,11 +58,11 @@ const ContactCreateModal = () => {
                     location: {
                         address,
                         city,
-                        state,
                         country,
+                        state,
                     },
                 };
-                await new ApiClient().post('contacts', createContactObj);
+                await new ApiClient().post('contact', createContactObj);
                 dispatch(setCreateModal(false));
                 action.resetForm();
             } catch (error: any) {
@@ -81,6 +81,7 @@ const ContactCreateModal = () => {
         dispatch(setCreateModal(false));
         resetForm();
     };
+    console.log(errors)
     return (
         <Modal
             open={createModal}
@@ -111,131 +112,153 @@ const ContactCreateModal = () => {
             }
             disabledDiscardBtn={isBtnDisabled}
             content={
-                <form className="space-y-5" onSubmit={handleSubmit}>
-                    <div className="flex flex-col gap-4 sm:flex-row">
-                        <div className="flex-1">
-                            <label htmlFor="state">Prefix</label>
-                            <Select placeholder="Prefix" options={namePrefix} onChange={(data: any) => setFieldValue('title', data.value)} />
+                isFetching ? (
+                    <Loader />
+                ) : (
+                    <form className="space-y-5" onSubmit={handleSubmit}>
+                        <div className="flex flex-col gap-4 sm:flex-row">
+                            <div className="flex-1">
+                                <label htmlFor="state">Prefix</label>
+                                <Select placeholder="Prefix" options={namePrefix} onChange={(data: any) => setFieldValue('title', data.value)} />
+                            </div>
+                            <div className="flex-1">
+                                <label htmlFor="createContactName">Contact Name</label>
+                                <input
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    value={values.name}
+                                    id="createContactName"
+                                    name="name"
+                                    type="text"
+                                    placeholder="Contact Name"
+                                    className="form-input"
+                                />
+                            </div>
                         </div>
-                        <div className="flex-1">
-                            <label htmlFor="createContactName">Contact Name</label>
-                            <input onChange={handleChange} onBlur={handleBlur} value={values.name} id="createContactName" name="name" type="text" placeholder="Contact Name" className="form-input" />
+                        <div className="flex flex-col gap-4 sm:flex-row">
+                            <div className="flex-1">
+                                <label htmlFor="createPhoneNo"> Phone Number</label>
+                                <input
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    value={values.phoneNumber}
+                                    id="createPhoneNo"
+                                    name="phoneNumber"
+                                    type="text"
+                                    placeholder="Phone Number"
+                                    className="form-input"
+                                />
+                            </div>
+                            <div className="flex-1">
+                                <label htmlFor="createEmail">Email</label>
+                                <input onChange={handleChange} onBlur={handleBlur} value={values.email} id="createEmail" name="email" type="email" placeholder="Your Email" className="form-input" />
+                            </div>
                         </div>
-                    </div>
-                    <div className="flex flex-col gap-4 sm:flex-row">
-                        <div className="flex-1">
-                            <label htmlFor="createPhoneNo"> Phone Number</label>
-                            <input
+                        <div className="flex flex-col gap-4 sm:flex-row">
+                            <div className="flex-1">
+                                <label htmlFor="createAssignedTo">Assign To</label>
+                                <input
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    value={values.assignedTo}
+                                    id="createAssignedTo"
+                                    name="assignedTo"
+                                    type="text"
+                                    placeholder="Assign To"
+                                    className="form-input"
+                                />
+                            </div>
+                            <div className="flex-1">
+                                <label htmlFor="createSource">Source</label>
+                                <input onChange={handleChange} onBlur={handleBlur} value={values.source} id="createSource" name="source" type="text" placeholder="Source" className="form-input" />
+                            </div>
+                        </div>
+                        <div className="flex flex-col gap-4 sm:flex-row">
+                            <div className="flex-1">
+                                <label htmlFor="designation">Position</label>
+                                <input onChange={handleChange} onBlur={handleBlur} value={values.position} id="designation" name="position" type="text" placeholder="Position" className="form-input" />
+                            </div>
+                            <div className="flex-1">
+                                <label htmlFor="createIndustry">Industry</label>
+                                <input
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    value={values.industry}
+                                    id="createIndustry"
+                                    name="industry"
+                                    type="text"
+                                    placeholder="Industry"
+                                    className="form-input"
+                                />
+                            </div>
+                        </div>
+                        <div className="flex flex-col gap-4 sm:flex-row">
+                            <div className="flex-1">
+                                <label htmlFor="createFacebookProfile">FacebookProfile</label>
+                                <input
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    value={values.facebookProfile}
+                                    id="createIndustry"
+                                    name="facebookProfile"
+                                    type="text"
+                                    placeholder="FacebookProfile"
+                                    className="form-input"
+                                />
+                            </div>
+                            <div className="flex-1">
+                                <label htmlFor="createTwitterProfile">TwitterProfile</label>
+                                <input
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    value={values.twitterProfile}
+                                    id="createTwitterProfile"
+                                    name="twitterProfile"
+                                    type="text"
+                                    placeholder="TwitterProfile"
+                                    className="form-input"
+                                />
+                            </div>
+                        </div>
+                        <div className="flex flex-col gap-4 sm:flex-row">
+                            <div className="flex-1">
+                                <label htmlFor="createWebsite">Website</label>
+                                <input onChange={handleChange} onBlur={handleBlur} value={values.website} id="createWebsite" name="website" type="text" placeholder="Website" className="form-input" />
+                            </div>
+                            <div className="flex-1">
+                                <label htmlFor="createAddress">Address</label>
+                                <input onChange={handleChange} onBlur={handleBlur} value={values.address} id="createAddress" name="address" type="text" placeholder="Address" className="form-input" />
+                            </div>
+                        </div>
+                        <div className="flex flex-col gap-4 sm:flex-row">
+                            <div className="flex-1">
+                                <label htmlFor="state">Country</label>
+                                <Select placeholder="select country" options={countryData} onChange={(data: any) => setFieldValue('country', data.value)} />
+                            </div>
+                            <div className="flex-1">
+                                <label htmlFor="state">State</label>
+                                <Select placeholder="select state" options={countryData} onChange={(data: any) => setFieldValue('state', data.value)} />
+                            </div>
+                            <div className="flex-1">
+                                <label htmlFor="state">City</label>
+                                <Select placeholder="select city" options={countryData} onChange={(data: any) => setFieldValue('city', data.value)} />
+                            </div>
+                        </div>
+                        <div>
+                            <label htmlFor="contactComment"> Comment</label>
+                            <textarea
+                                id="contactComment"
+                                rows={5}
+                                className="form-textarea"
+                                placeholder="Enter Your Comment"
+                                name="comment"
                                 onChange={handleChange}
                                 onBlur={handleBlur}
-                                value={values.phoneNumber}
-                                id="createPhoneNo"
-                                name="phoneNumber"
-                                type="text"
-                                placeholder="Phone Number"
-                                className="form-input"
-                            />
+                                value={values.comment}
+                            ></textarea>
                         </div>
-                        <div className="flex-1">
-                            <label htmlFor="createEmail">Email</label>
-                            <input onChange={handleChange} onBlur={handleBlur} value={values.email} id="createEmail" name="email" type="email" placeholder="Your Email" className="form-input" />
-                        </div>
-                    </div>
-                    <div className="flex flex-col gap-4 sm:flex-row">
-                        <div className="flex-1">
-                            <label htmlFor="createAssignedTo">Assign To</label>
-                            <input
-                                onChange={handleChange}
-                                onBlur={handleBlur}
-                                value={values.assignedTo}
-                                id="createAssignedTo"
-                                name="assignedTo"
-                                type="text"
-                                placeholder="Assign To"
-                                className="form-input"
-                            />
-                        </div>
-                        <div className="flex-1">
-                            <label htmlFor="createSource">Source</label>
-                            <input onChange={handleChange} onBlur={handleBlur} value={values.source} id="createSource" name="source" type="text" placeholder="Source" className="form-input" />
-                        </div>
-                    </div>
-                    <div className="flex flex-col gap-4 sm:flex-row">
-                        <div className="flex-1">
-                            <label htmlFor="designation">Position</label>
-                            <input onChange={handleChange} onBlur={handleBlur} value={values.position} id="designation" name="position" type="text" placeholder="Position" className="form-input" />
-                        </div>
-                        <div className="flex-1">
-                            <label htmlFor="createIndustry">Industry</label>
-                            <input onChange={handleChange} onBlur={handleBlur} value={values.industry} id="createIndustry" name="industry" type="text" placeholder="Industry" className="form-input" />
-                        </div>
-                    </div>
-                    <div className="flex flex-col gap-4 sm:flex-row">
-                        <div className="flex-1">
-                            <label htmlFor="createFacebookProfile">FacebookProfile</label>
-                            <input
-                                onChange={handleChange}
-                                onBlur={handleBlur}
-                                value={values.facebookProfile}
-                                id="createIndustry"
-                                name="facebookProfile"
-                                type="text"
-                                placeholder="FacebookProfile"
-                                className="form-input"
-                            />
-                        </div>
-                        <div className="flex-1">
-                            <label htmlFor="createTwitterProfile">TwitterProfile</label>
-                            <input
-                                onChange={handleChange}
-                                onBlur={handleBlur}
-                                value={values.twitterProfile}
-                                id="createTwitterProfile"
-                                name="twitterProfile"
-                                type="text"
-                                placeholder="TwitterProfile"
-                                className="form-input"
-                            />
-                        </div>
-                    </div>
-                    <div className="flex flex-col gap-4 sm:flex-row">
-                        <div className="flex-1">
-                            <label htmlFor="createWebsite">Website</label>
-                            <input onChange={handleChange} onBlur={handleBlur} value={values.website} id="createWebsite" name="website" type="text" placeholder="Website" className="form-input" />
-                        </div>
-                        <div className="flex-1">
-                            <label htmlFor="createAddress">Address</label>
-                            <input onChange={handleChange} onBlur={handleBlur} value={values.address} id="createAddress" name="address" type="text" placeholder="Address" className="form-input" />
-                        </div>
-                    </div>
-                    <div className="flex flex-col gap-4 sm:flex-row">
-                        <div className="flex-1">
-                            <label htmlFor="state">Country</label>
-                            <Select placeholder="select country" options={countryData} onChange={(data: any) => setFieldValue('country', data.value)} />
-                        </div>
-                        <div className="flex-1">
-                            <label htmlFor="state">State</label>
-                            <Select placeholder="select state" options={countryData} onChange={(data: any) => setFieldValue('state', data.value)} />
-                        </div>
-                        <div className="flex-1">
-                            <label htmlFor="state">City</label>
-                            <Select placeholder="select city" options={countryData} onChange={(data: any) => setFieldValue('city', data.value)} />
-                        </div>
-                    </div>
-                    <div>
-                        <label htmlFor="contactComment"> Comment</label>
-                        <textarea
-                            id="contactComment"
-                            rows={5}
-                            className="form-textarea"
-                            placeholder="Enter Your Comment"
-                            name="comment"
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                            value={values.comment}
-                        ></textarea>
-                    </div>
-                </form>
+                    </form>
+                )
             }
         />
     );

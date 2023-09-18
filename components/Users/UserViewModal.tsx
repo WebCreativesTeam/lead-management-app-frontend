@@ -2,7 +2,7 @@ import React, { memo } from 'react';
 import ViewModal from '../__Shared/ViewModal';
 import { useDispatch, useSelector } from 'react-redux';
 import { setViewModal } from '@/store/Slices/userSlice';
-import { Permission, UserDataType } from '@/utils/Types';
+import { Permission } from '@/utils/Types';
 import { IRootState } from '@/store';
 
 const UserViewModal = () => {
@@ -34,10 +34,10 @@ const UserViewModal = () => {
                         <li className="flex">
                             <span className="flex-1 text-lg font-bold">Permissions</span>
                             <div className="grid flex-[3] grid-cols-3 gap-x-3 gap-y-1">
-                                {permissions?.map((item: Permission, i: number) => {
+                                {permissions?.map((item:string, i: number) => {
                                     return (
                                         <span key={i} className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">
-                                            {item.value}
+                                            {item}
                                         </span>
                                     );
                                 })}

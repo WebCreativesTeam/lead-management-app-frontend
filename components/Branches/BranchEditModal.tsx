@@ -9,34 +9,32 @@ import { countryData, namePrefix } from '@/utils/Raw Data';
 import { useFormik } from 'formik';
 import { branchSchema } from '@/utils/schemas';
 import { ApiClient } from '@/utils/http';
-import { BranchDataType, SelectOptionsType } from '@/utils/Types';
+import { SelectOptionsType } from '@/utils/Types';
 import { showToastAlert } from '@/utils/contant';
 
 const BranchEditModal = () => {
-    const editModal: boolean = useSelector((state: IRootState) => state.branch.editModal);
-    const isBtnDisabled: boolean = useSelector((state: IRootState) => state.branch.isBtnDisabled);
-    const singleBranch: BranchDataType = useSelector((state: IRootState) => state.branch.singleData);
+    const {editModal,isBtnDisabled,singleData} = useSelector((state: IRootState) => state.branch);
     const [defaultState, setDefaultState] = useState<SelectOptionsType>({} as SelectOptionsType);
     const [defaultCity, setDefaultCity] = useState<SelectOptionsType>({} as SelectOptionsType);
     const [defaultCountry, setDefaultCountry] = useState<SelectOptionsType>({} as SelectOptionsType);
 
     const dispatch = useDispatch();
     useEffect(() => {
-        setFieldValue('name', singleBranch?.name);
-        setFieldValue('address', singleBranch?.address);
-        setFieldValue('state', singleBranch?.state);
-        setFieldValue('country', singleBranch?.country);
-        setFieldValue('city', singleBranch?.city);
+        setFieldValue('name', singleData?.name);
+        setFieldValue('address', singleData?.address);
+        setFieldValue('state', singleData?.state);
+        setFieldValue('country', singleData?.country);
+        setFieldValue('city', singleData?.city);
 
-        const findState: any = countryData.find((item: SelectOptionsType) => item.value === singleBranch?.state);
+        const findState: any = countryData.find((item: SelectOptionsType) => item.value === singleData?.state);
         setDefaultState(findState);
 
-        const findCity: any = countryData.find((item: SelectOptionsType) => item.value === singleBranch?.city);
+        const findCity: any = countryData.find((item: SelectOptionsType) => item.value === singleData?.city);
         setDefaultCity(findCity);
 
-        const findCountry: any = countryData.find((item: SelectOptionsType) => item.value === singleBranch.country);
+        const findCountry: any = countryData.find((item: SelectOptionsType) => item.value === singleData.country);
         setDefaultCountry(findCountry);
-    }, [singleBranch]);
+    }, [singleData]);
 
     const { values, handleChange, submitForm, handleSubmit, setFieldValue, errors, handleBlur, resetForm } = useFormik({
         initialValues: {
@@ -53,7 +51,7 @@ const BranchEditModal = () => {
             dispatch(setFetching(true));
             try {
                 dispatch(setDisableBtn(true));
-                await new ApiClient().patch('branches/' + singleBranch.id, value);
+                await new ApiClient().patch('branch/' + singleData.id, value);
 
                 action.resetForm();
                 dispatch(setEditModal({ open: false }));

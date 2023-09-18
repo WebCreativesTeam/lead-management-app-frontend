@@ -25,7 +25,7 @@ const PolicyPage = () => {
     });
 
     //hooks
-    const { data, isFetching, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate } = useSelector((state: IRootState) => state.policy);
+    const { data, isFetching, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate, isAbleToChangeDefaultPolicy } = useSelector((state: IRootState) => state.policy);
     const [searchInputText, setSearchInputText] = useState<string>('');
     const [searchedData, setSearchedData] = useState<PolicyDataType[]>(data);
     const [loading, setLoading] = useState<boolean>(false);
@@ -72,7 +72,7 @@ const PolicyPage = () => {
     //get all policy list
     const getPolicyList = async () => {
         setLoading(true);
-        const res: GetMethodResponseType = await new ApiClient().get('policies?sort=-isDefault');
+        const res: GetMethodResponseType = await new ApiClient().get('policy?sortBy=-isDefault');
         const policies: PolicyDataType[] = res?.data;
         if (typeof policies === 'undefined') {
             dispatch(getAllPolicies([] as PolicyDataType[]));
@@ -85,7 +85,7 @@ const PolicyPage = () => {
     //get all policy list
     const getPermissionList = async () => {
         setLoading(true);
-        const res: GetMethodResponseType = await new ApiClient().get('policies/rules');
+        const res: GetMethodResponseType = await new ApiClient().get('policy/rules');
         const permissions: Permission[] = res?.data;
         if (typeof permissions === 'undefined') {
             dispatch(getAllPermissions([] as Permission[]));
@@ -154,27 +154,32 @@ const PolicyPage = () => {
                             accessor: 'description',
                             title: 'Description',
                             sortable: true,
-                            render: ({ description }) => <div>{description}</div>,
+                            render: ({ description }) => <div className='max-w-sm overflow-hidden'>{description.slice(0,55)+"..."}</div>,
                         },
                         {
                             accessor: 'isDefault',
                             title: 'Default Policy',
                             sortable: true,
-                            render: ({ isDefault, id }) => (
-                                <div>
-                                    <label className="relative h-6 w-12">
-                                        <input
-                                            type="checkbox"
-                                            className="custom_switch peer absolute z-10 h-full w-full cursor-pointer opacity-0"
-                                            id="custom_switch_checkbox1"
-                                            name="permission"
-                                            checked={isDefault}
-                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => dispatch(setDefaultPolicyModal({ id, open: true, switchValue: e.target.checked }))}
-                                        />
-                                        <span className="block h-full rounded-full bg-[#ebedf2] before:absolute before:bottom-1 before:left-1 before:h-4 before:w-4 before:rounded-full before:bg-white before:transition-all before:duration-300 peer-checked:bg-primary peer-checked:before:left-7 dark:bg-dark dark:before:bg-white-dark dark:peer-checked:before:bg-white"></span>
-                                    </label>
-                                </div>
-                            ),
+                            render: ({ isDefault, id }) =>
+                                isAbleToChangeDefaultPolicy ? (
+                                    <div>
+                                        <label className="relative h-6 w-12">
+                                            <input
+                                                type="checkbox"
+                                                className="custom_switch peer absolute z-10 h-full w-full cursor-pointer opacity-0"
+                                                id="custom_switch_checkbox1"
+                                                name="permission"
+                                                checked={isDefault}
+                                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => dispatch(setDefaultPolicyModal({ id, open: true, switchValue: e.target.checked }))}
+                                            />
+                                            <span className="block h-full rounded-full bg-[#ebedf2] before:absolute before:bottom-1 before:left-1 before:h-4 before:w-4 before:rounded-full before:bg-white before:transition-all before:duration-300 peer-checked:bg-primary peer-checked:before:left-7 dark:bg-dark dark:before:bg-white-dark dark:peer-checked:before:bg-white"></span>
+                                        </label>
+                                    </div>
+                                ) : isDefault ? (
+                                    <div>
+                                        <span className="mr-2 rounded bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-300">Default</span>
+                                    </div>
+                                ) : null,
                         },
                         {
                             accessor: 'action',

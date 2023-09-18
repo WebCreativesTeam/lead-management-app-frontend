@@ -47,7 +47,7 @@ const EditTaskStatusModal = () => {
         },
     });
     const handleDiscard = () => {
-        dispatch(setEditModal(false));
+        dispatch(setEditModal({open:false}));
         resetForm();
     };
      useEffect(() => {
@@ -59,7 +59,7 @@ const EditTaskStatusModal = () => {
         <Modal
             open={editModal}
             onClose={() => {
-                dispatch(setEditModal(false));
+                dispatch(setEditModal({open:false}));
             }}
             onDiscard={handleDiscard}
             size="medium"

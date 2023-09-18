@@ -2,14 +2,12 @@ import React, { memo } from 'react';
 import ViewModal from '../__Shared/ViewModal';
 import { useDispatch, useSelector } from 'react-redux';
 import { setViewModal } from '@/store/Slices/branchSlice';
-import { BranchDataType } from '@/utils/Types';
 import { IRootState } from '@/store';
 
 const BranchViewModal = () => {
-    const viewModal: boolean = useSelector((state: IRootState) => state.branch.viewModal);
-    const singleBranch: BranchDataType = useSelector((state: any) => state.branch.singleData);
+    const { viewModal, singleData } = useSelector((state: IRootState) => state.branch);
     const dispatch = useDispatch();
-    const { name, address, city, country, state, createdAt, updatedAt } = singleBranch;
+    const { name, address, city, country, state, createdAt, updatedAt } = singleData;
 
     const reqData: any = {
         name: name,

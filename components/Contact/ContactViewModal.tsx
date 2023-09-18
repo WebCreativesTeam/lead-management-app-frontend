@@ -6,10 +6,9 @@ import { ContactDataType } from '@/utils/Types';
 import { IRootState } from '@/store';
 
 const ContactViewModal = () => {
-    const viewModal: boolean = useSelector((state: IRootState) => state.contacts.viewModal);
-    const singleContact: ContactDataType = useSelector((state: any) => state?.contacts?.singleData);
+    const { viewModal, singleData } = useSelector((state: IRootState) => state.contacts);
     const dispatch = useDispatch();
-    const { location, assignedTo, comment, createdAt, email, facebookProfile, industry, name, phoneNumber, position, source, title, twitterProfile, updatedAt, website } = singleContact;
+    const { location, assignedTo, comment, createdAt, email, facebookProfile, industry, name, phoneNumber, position, source, title, twitterProfile, updatedAt, website } = singleData;
 
     const reqData: any = {
         name: title + ' ' + name,

@@ -30,7 +30,7 @@ export const createUserSchema = Yup.object().shape({
     password: Yup.string().required('Please enter your password').min(8, 'Password should be atleast 8 characters'),
     passwordConfirm: Yup.string()
         .oneOf([Yup.ref('password')], 'Password and confirm password not matched')
-        .required('Please enter confirm password'),
+        .required('Please enter confirm password'), 
 });
 
 //Edit User Schema

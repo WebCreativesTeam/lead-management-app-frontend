@@ -14,7 +14,7 @@ const TaskStatusDeleteModal = () => {
         dispatch(setFetching(true));
         dispatch(setDisableBtn(true));
         const deleteTaskStatus: TaskStatusType = await new ApiClient().delete('task-status/' + singleData.id);
-        if (Object.keys(deleteTaskStatus).length === 0) {
+        if (deleteTaskStatus === null) {
             dispatch(setDisableBtn(false));
             return;
         }

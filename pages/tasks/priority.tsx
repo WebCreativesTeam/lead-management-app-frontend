@@ -26,7 +26,7 @@ const TaskPriorityPage = () => {
     });
 
     //hooks
-    const { data, isFetching } = useSelector((state: IRootState) => state.taskPriority);
+    const { data, isFetching, isAbleToChangeDefaultPriority, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate } = useSelector((state: IRootState) => state.taskPriority);
     const [searchInputText, setSearchInputText] = useState<string>('');
     const [searchedData, setSearchedData] = useState<TaskPriorityType[]>(data);
     const [loading, setLoading] = useState<boolean>(false);
@@ -69,7 +69,7 @@ const TaskPriorityPage = () => {
     //get all TaskPriority list
     const getTaskPriorityList = async () => {
         setLoading(true);
-        const res: GetMethodResponseType = await new ApiClient().get('task-priorities?sort=-isDefault');
+        const res: GetMethodResponseType = await new ApiClient().get('task-priority?sortBy=-isDefault');
         const priority: TaskPriorityType[] = res?.data;
         if (typeof priority === 'undefined') {
             dispatch(getAllTaskPriorities([] as TaskPriorityType[]));
@@ -92,16 +92,20 @@ const TaskPriorityPage = () => {
         setRecordsData(searchTaskPriorityData);
     };
 
-    return (
+    return !isAbleToRead ? null : (
         <div>
             <PageHeadingSection description="Define task priorities. Arrange by urgency. Optimize task distribution. Enhance productivity." heading="Task Importance" />
             <div className="my-6 flex flex-col gap-5 sm:flex-row ">
-                <div className="flex-1">
-                    <button className="btn btn-primary h-full w-full max-w-[250px] max-sm:mx-auto" type="button" onClick={() => dispatch(setCreateModal(true))}>
-                        <Plus />
-                        Add New Task Priority
-                    </button>
-                </div>
+                {!isAbleToCreate ? (
+                    <div className="flex-1"></div>
+                ) : (
+                    <div className="flex-1">
+                        <button className="btn btn-primary h-full w-full max-w-[250px] max-sm:mx-auto" type="button" onClick={() => dispatch(setCreateModal(true))}>
+                            <Plus />
+                            Add New Task Priority
+                        </button>
+                    </div>
+                )}
                 <div className="relative  flex-1">
                     <input
                         type="text"
@@ -148,21 +152,26 @@ const TaskPriorityPage = () => {
                             accessor: 'isDefault',
                             title: 'Default Priority',
                             sortable: true,
-                            render: ({ isDefault, id }) => (
-                                <div>
-                                    <label className="relative h-6 w-12">
-                                        <input
-                                            type="checkbox"
-                                            className="custom_switch peer absolute z-10 h-full w-full cursor-pointer opacity-0"
-                                            id="custom_switch_checkbox1"
-                                            name="permission"
-                                            checked={isDefault}
-                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => dispatch(setDefaultPriorityModal({ switchValue: e.target.checked, id, open: true }))}
-                                        />
-                                        <span className="block h-full rounded-full bg-[#ebedf2] before:absolute before:bottom-1 before:left-1 before:h-4 before:w-4 before:rounded-full before:bg-white before:transition-all before:duration-300 peer-checked:bg-primary peer-checked:before:left-7 dark:bg-dark dark:before:bg-white-dark dark:peer-checked:before:bg-white"></span>
-                                    </label>
-                                </div>
-                            ),
+                            render: ({ isDefault, id }) =>
+                                isAbleToChangeDefaultPriority ? (
+                                    <div>
+                                        <label className="relative h-6 w-12">
+                                            <input
+                                                type="checkbox"
+                                                className="custom_switch peer absolute z-10 h-full w-full cursor-pointer opacity-0"
+                                                id="custom_switch_checkbox1"
+                                                name="permission"
+                                                checked={isDefault}
+                                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => dispatch(setDefaultPriorityModal({ switchValue: e.target.checked, id, open: true }))}
+                                            />
+                                            <span className="block h-full rounded-full bg-[#ebedf2] before:absolute before:bottom-1 before:left-1 before:h-4 before:w-4 before:rounded-full before:bg-white before:transition-all before:duration-300 peer-checked:bg-primary peer-checked:before:left-7 dark:bg-dark dark:before:bg-white-dark dark:peer-checked:before:bg-white"></span>
+                                        </label>
+                                    </div>
+                                ) : isDefault ? (
+                                    <div>
+                                        <span className="mr-2 rounded bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-300">Default</span>
+                                    </div>
+                                ) : null,
                         },
                         {
                             accessor: 'action',
@@ -175,16 +184,20 @@ const TaskPriorityPage = () => {
                                             <View />
                                         </button>
                                     </Tippy>
-                                    <Tippy content="Edit">
-                                        <button type="button" onClick={() => dispatch(setEditModal({ id, open: true }))}>
-                                            <Edit />
-                                        </button>
-                                    </Tippy>
-                                    <Tippy content="Delete">
-                                        <button type="button" onClick={() => dispatch(setDeleteModal({ id, open: true }))}>
-                                            <Delete />
-                                        </button>
-                                    </Tippy>
+                                    {isAbleToUpdate && (
+                                        <Tippy content="Edit">
+                                            <button type="button" onClick={() => dispatch(setEditModal({ id, open: true }))}>
+                                                <Edit />
+                                            </button>
+                                        </Tippy>
+                                    )}
+                                    {isAbleToDelete && (
+                                        <Tippy content="Delete">
+                                            <button type="button" onClick={() => dispatch(setDeleteModal({ id, open: true }))}>
+                                                <Delete />
+                                            </button>
+                                        </Tippy>
+                                    )}
                                 </div>
                             ),
                         },

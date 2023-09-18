@@ -14,7 +14,7 @@ const UserDeactivateModal = () => {
     const onDeactivateUser = async () => {
         dispatch(setFetching(true));
         dispatch(setDisableBtn(true));
-        const deactivateUser: UserDataType = await new ApiClient().patch(`users/${singleData?.id}/internal`, { isActive: deactivateValue });
+        const deactivateUser: UserDataType = await new ApiClient().patch(`user/${singleData?.id}/internals`, { isActive: deactivateValue });
         if (Object.keys(deactivateUser).length === 0) {
             dispatch(setDisableBtn(false));
             return;

@@ -38,7 +38,6 @@ const LoginPage = () => {
                     email: value.email,
                     password: value.password,
                 });
-                localStorage.setItem('loginToken', res?.token);
                 localStorage.setItem('uid', res?.data?.id);
                 action.resetForm();
                 router.push('/tasks');

@@ -17,6 +17,7 @@ import { IRootState } from '@/store';
 import ContactCreateModal from '@/components/Contact/ContactCreateModal';
 import ContactEditModal from '@/components/Contact/ContactEditModal';
 import { useRouter } from 'next/router';
+import Loader from '@/components/__Shared/Loader';
 
 const Contacts = () => {
     const dispatch = useDispatch();
@@ -78,7 +79,7 @@ const Contacts = () => {
     //get all Contact list
     const getContactList = async () => {
         setLoading(true);
-        const res: GetMethodResponseType = await new ApiClient().get('contacts');
+        const res: GetMethodResponseType = await new ApiClient().get('contact');
         const contacts: ContactDataType[] = res?.data;
         if (typeof contacts === 'undefined') {
             dispatch(getAllContacts([] as ContactDataType[]));
@@ -92,14 +93,14 @@ const Contacts = () => {
     const onDeleteContact = async () => {
         dispatch(setFetching(true));
         dispatch(setDisableBtn(true));
-        const deleteContact: ContactDataType = await new ApiClient().delete('contacts/' + singleData.id);
-        if (Object.keys(deleteContact).length === 0) {
+        const deleteContact: ContactDataType = await new ApiClient().delete('contact/' + singleData.id);
+        if (deleteContact === null) {
             dispatch(setDisableBtn(false));
             return;
         }
         dispatch(setDisableBtn(false));
-        dispatch(setDeleteModal({ open: false }));
         dispatch(setFetching(false));
+        dispatch(setDeleteModal({ open: false }));
     };
 
     //search contact
@@ -115,16 +116,20 @@ const Contacts = () => {
         setRecordsData(searchContactData);
     };
 
-    return (
+    return !isAbleToRead ? null : (
         <div>
             <PageHeadingSection description="Identify and categorize lead contacts. Update descriptions. Add or remove contact channels." heading="Track Leads" />
             <div className="my-6 flex flex-col gap-5 sm:flex-row ">
-                <div className="flex-1">
-                    <button className="btn btn-primary h-full w-full max-w-[200px] max-sm:mx-auto" type="button" onClick={() => dispatch(setCreateModal(true))}>
-                        <Plus />
-                        Add New Contact
-                    </button>
-                </div>
+                {!isAbleToCreate ? (
+                    <div className="flex-1"></div>
+                ) : (
+                    <div className="flex-1">
+                        <button className="btn btn-primary h-full w-full max-w-[200px] max-sm:mx-auto" type="button" onClick={() => dispatch(setCreateModal(true))}>
+                            <Plus />
+                            Add New Contact
+                        </button>
+                    </div>
+                )}
                 <div className="relative  flex-1">
                     <input
                         type="text"
@@ -216,17 +221,20 @@ const Contacts = () => {
                                             <View />
                                         </button>
                                     </Tippy>
-                                    
-                                    <Tippy content="Edit">
-                                        <button type="button" onClick={() => dispatch(setEditModal({ id, open: true }))}>
-                                            <Edit />
-                                        </button>
-                                    </Tippy>
-                                    <Tippy content="Delete">
-                                        <button type="button" onClick={() => dispatch(setDeleteModal({ id, open: true }))}>
-                                            <Delete />
-                                        </button>
-                                    </Tippy>
+                                    {isAbleToUpdate && (
+                                        <Tippy content="Edit">
+                                            <button type="button" onClick={() => dispatch(setEditModal({ id, open: true }))}>
+                                                <Edit />
+                                            </button>
+                                        </Tippy>
+                                    )}
+                                    {isAbleToDelete && (
+                                        <Tippy content="Delete">
+                                            <button type="button" onClick={() => dispatch(setDeleteModal({ id, open: true }))}>
+                                                <Delete />
+                                            </button>
+                                        </Tippy>
+                                    )}
                                 </div>
                             ),
                         },
@@ -256,7 +264,7 @@ const Contacts = () => {
                 open={deleteModal}
                 onClose={() => dispatch(setDeleteModal({ open: false }))}
                 onDiscard={() => dispatch(setDeleteModal({ open: false }))}
-                description={<>Are you sure you want to delete this Contact? It will also remove form database.</>}
+                description={isFetching ? <Loader /> : <>Are you sure you want to delete this Contact? It will also remove form database.</>}
                 title="Delete Contact"
                 isBtnDisabled={isBtnDisabled}
                 onSubmit={onDeleteContact}

@@ -29,7 +29,7 @@ const SourceEditModal = () => {
             dispatch(setFetching(true));
             try {
                 dispatch(setDisableBtn(true));
-                await new ApiClient().patch('sources/' + singleData.id, { name: value.name });
+                await new ApiClient().patch('source/' + singleData.id, { name: value.name });
 
                 action.resetForm();
                 dispatch(setEditModal({ open: false }));

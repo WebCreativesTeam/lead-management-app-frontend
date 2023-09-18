@@ -9,13 +9,12 @@ import { countryData, namePrefix } from '@/utils/Raw Data';
 import { useFormik } from 'formik';
 import { contactSchema } from '@/utils/schemas';
 import { ApiClient } from '@/utils/http';
-import { ContactDataType, SelectOptionsType } from '@/utils/Types';
+import { SelectOptionsType } from '@/utils/Types';
 import { showToastAlert } from '@/utils/contant';
+import Loader from '../__Shared/Loader';
 
 const ContactEditModal = () => {
-    const editModal: boolean = useSelector((state: IRootState) => state.contacts.editModal);
-     const isBtnDisabled: boolean = useSelector((state: IRootState) => state.contacts.isBtnDisabled);
-    const singleContact: ContactDataType = useSelector((state: IRootState) => state.contacts.singleData);
+    const { editModal, isBtnDisabled, singleData, isFetching } = useSelector((state: IRootState) => state.contacts);
     const [defaultState, setDefaultState] = useState<SelectOptionsType>({} as SelectOptionsType);
     const [defaultCity, setDefaultCity] = useState<SelectOptionsType>({} as SelectOptionsType);
     const [defaultCountry, setDefaultCountry] = useState<SelectOptionsType>({} as SelectOptionsType);
@@ -23,35 +22,36 @@ const ContactEditModal = () => {
 
     const dispatch = useDispatch();
     useEffect(() => {
-        setFieldValue('email', singleContact?.email);
-        setFieldValue('comment', singleContact?.comment);
-        setFieldValue('name', singleContact?.name);
-        setFieldValue('phoneNumber', singleContact?.phoneNumber);
-        setFieldValue('position', singleContact?.position);
-        setFieldValue('assignedTo', singleContact?.assignedTo);
-        setFieldValue('facebookProfile', singleContact?.facebookProfile);
-        setFieldValue('twitterProfile', singleContact?.twitterProfile);
-        setFieldValue('source', singleContact?.source?.name);
-        setFieldValue('industry', singleContact?.industry);
-        setFieldValue('address', singleContact?.location?.address);
-        setFieldValue('website', singleContact?.website);
-        setFieldValue('title', singleContact?.title);
-        setFieldValue('state', singleContact?.location?.state);
-        setFieldValue('country', singleContact?.location?.country);
-        setFieldValue('city', singleContact?.location?.city);
+        const { email, comment, name, phoneNumber, position, assignedTo, facebookProfile, twitterProfile, industry, location, source, title, website } = singleData;
+        setFieldValue('email', email);
+        setFieldValue('comment', comment);
+        setFieldValue('name', name);
+        setFieldValue('phoneNumber', phoneNumber);
+        setFieldValue('position', position);
+        setFieldValue('assignedTo', `${assignedTo?.firstName} ${assignedTo?.lastName}`);
+        setFieldValue('facebookProfile', facebookProfile);
+        setFieldValue('twitterProfile', twitterProfile);
+        setFieldValue('source', source?.name);
+        setFieldValue('industry', industry);
+        setFieldValue('address', location?.address);
+        setFieldValue('website', website);
+        setFieldValue('title', title);
+        setFieldValue('state', location?.state);
+        setFieldValue('country', location?.country);
+        setFieldValue('city', location?.city);
 
-        const findState: any = countryData.find((item: SelectOptionsType) => item.value === singleContact?.location?.state);
+        const findState: any = countryData.find((item: SelectOptionsType) => item.value === location?.state);
         setDefaultState(findState);
 
-        const findCity: any = countryData.find((item: SelectOptionsType) => item.value === singleContact?.location?.city);
+        const findCity: any = countryData.find((item: SelectOptionsType) => item.value === location?.city);
         setDefaultCity(findCity);
 
-        const findCountry: any = countryData.find((item: SelectOptionsType) => item.value === singleContact.location?.country);
+        const findCountry: any = countryData.find((item: SelectOptionsType) => item.value === location?.country);
         setDefaultCountry(findCountry);
 
-        const findNamePrefix: any = namePrefix.find((item: SelectOptionsType) => item.value === singleContact.title);
+        const findNamePrefix: any = namePrefix.find((item: SelectOptionsType) => item.value === title);
         setDefaultTitle(findNamePrefix);
-    }, [singleContact]);
+    }, [singleData]);
 
     const initialValues = {
         name: '',
@@ -85,8 +85,8 @@ const ContactEditModal = () => {
                     name,
                     phoneNumber,
                     email,
-                    assignedTo,
-                    source,
+                    assignedToId: assignedTo,
+                    sourceId: source,
                     website,
                     position,
                     industry,
@@ -96,12 +96,12 @@ const ContactEditModal = () => {
                     location: {
                         address,
                         city,
-                        state,
                         country,
+                        state,
                     },
                 };
                 dispatch(setDisableBtn(true));
-                await new ApiClient().patch('contacts/' + singleContact.id, editContactObj);
+                await new ApiClient().patch('contact/' + singleData.id, editContactObj);
 
                 action.resetForm();
                 dispatch(setEditModal({ open: false }));
@@ -151,131 +151,153 @@ const ContactEditModal = () => {
                     : true
             }
             content={
-                <form className="space-y-5" onSubmit={handleSubmit}>
-                    <div className="flex flex-col gap-4 sm:flex-row">
-                        <div className="flex-1">
-                            <label htmlFor="state">Prefix</label>
-                            <Select defaultValue={defaultTitle} placeholder="Prefix" options={namePrefix} onChange={(data: any) => setFieldValue('title', data.value)} />
+                isFetching ? (
+                    <Loader />
+                ) : (
+                    <form className="space-y-5" onSubmit={handleSubmit}>
+                        <div className="flex flex-col gap-4 sm:flex-row">
+                            <div className="flex-1">
+                                <label htmlFor="state">Prefix</label>
+                                <Select defaultValue={defaultTitle} placeholder="Prefix" options={namePrefix} onChange={(data: any) => setFieldValue('title', data.value)} />
+                            </div>
+                            <div className="flex-1">
+                                <label htmlFor="createContactName">Contact Name</label>
+                                <input
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    value={values.name}
+                                    id="createContactName"
+                                    name="name"
+                                    type="text"
+                                    placeholder="Contact Name"
+                                    className="form-input"
+                                />
+                            </div>
                         </div>
-                        <div className="flex-1">
-                            <label htmlFor="createContactName">Contact Name</label>
-                            <input onChange={handleChange} onBlur={handleBlur} value={values.name} id="createContactName" name="name" type="text" placeholder="Contact Name" className="form-input" />
+                        <div className="flex flex-col gap-4 sm:flex-row">
+                            <div className="flex-1">
+                                <label htmlFor="createPhoneNo"> Phone Number</label>
+                                <input
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    value={values.phoneNumber}
+                                    id="createPhoneNo"
+                                    name="phoneNumber"
+                                    type="text"
+                                    placeholder="Phone Number"
+                                    className="form-input"
+                                />
+                            </div>
+                            <div className="flex-1">
+                                <label htmlFor="createEmail">Email</label>
+                                <input onChange={handleChange} onBlur={handleBlur} value={values.email} id="createEmail" name="email" type="email" placeholder="Your Email" className="form-input" />
+                            </div>
                         </div>
-                    </div>
-                    <div className="flex flex-col gap-4 sm:flex-row">
-                        <div className="flex-1">
-                            <label htmlFor="createPhoneNo"> Phone Number</label>
-                            <input
+                        <div className="flex flex-col gap-4 sm:flex-row">
+                            <div className="flex-1">
+                                <label htmlFor="createAssignedTo">Assign To</label>
+                                <input
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    value={values.assignedTo}
+                                    id="createAssignedTo"
+                                    name="assignedTo"
+                                    type="text"
+                                    placeholder="Assign To"
+                                    className="form-input"
+                                />
+                            </div>
+                            <div className="flex-1">
+                                <label htmlFor="createSource">Source</label>
+                                <input onChange={handleChange} onBlur={handleBlur} value={values.source} id="createSource" name="source" type="text" placeholder="Source" className="form-input" />
+                            </div>
+                        </div>
+                        <div className="flex flex-col gap-4 sm:flex-row">
+                            <div className="flex-1">
+                                <label htmlFor="designation">Position</label>
+                                <input onChange={handleChange} onBlur={handleBlur} value={values.position} id="designation" name="position" type="text" placeholder="Position" className="form-input" />
+                            </div>
+                            <div className="flex-1">
+                                <label htmlFor="createIndustry">Industry</label>
+                                <input
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    value={values.industry}
+                                    id="createIndustry"
+                                    name="industry"
+                                    type="text"
+                                    placeholder="Industry"
+                                    className="form-input"
+                                />
+                            </div>
+                        </div>
+                        <div className="flex flex-col gap-4 sm:flex-row">
+                            <div className="flex-1">
+                                <label htmlFor="createFacebookProfile">FacebookProfile</label>
+                                <input
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    value={values.facebookProfile}
+                                    id="createIndustry"
+                                    name="facebookProfile"
+                                    type="text"
+                                    placeholder="FacebookProfile"
+                                    className="form-input"
+                                />
+                            </div>
+                            <div className="flex-1">
+                                <label htmlFor="createTwitterProfile">TwitterProfile</label>
+                                <input
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    value={values.twitterProfile}
+                                    id="createTwitterProfile"
+                                    name="twitterProfile"
+                                    type="text"
+                                    placeholder="TwitterProfile"
+                                    className="form-input"
+                                />
+                            </div>
+                        </div>
+                        <div className="flex flex-col gap-4 sm:flex-row">
+                            <div className="flex-1">
+                                <label htmlFor="createWebsite">Website</label>
+                                <input onChange={handleChange} onBlur={handleBlur} value={values.website} id="createWebsite" name="website" type="text" placeholder="Website" className="form-input" />
+                            </div>
+                            <div className="flex-1">
+                                <label htmlFor="createAddress">Address</label>
+                                <input onChange={handleChange} onBlur={handleBlur} value={values.address} id="createAddress" name="address" type="text" placeholder="Address" className="form-input" />
+                            </div>
+                        </div>
+                        <div className="flex flex-col gap-4 sm:flex-row">
+                            <div className="flex-1">
+                                <label htmlFor="state">Country</label>
+                                <Select placeholder="select country" defaultValue={defaultCountry} options={countryData} onChange={(data: any) => setFieldValue('country', data.value)} />
+                            </div>
+                            <div className="flex-1">
+                                <label htmlFor="state">State</label>
+                                <Select placeholder="select state" defaultValue={defaultState} options={countryData} onChange={(data: any) => setFieldValue('state', data.value)} />
+                            </div>
+                            <div className="flex-1">
+                                <label htmlFor="state">City</label>
+                                <Select placeholder="select city" defaultValue={defaultCity} options={countryData} onChange={(data: any) => setFieldValue('city', data.value)} />
+                            </div>
+                        </div>
+                        <div>
+                            <label htmlFor="contactComment"> Comment</label>
+                            <textarea
+                                id="contactComment"
+                                rows={5}
+                                className="form-textarea"
+                                placeholder="Enter Your Comment"
+                                name="comment"
                                 onChange={handleChange}
                                 onBlur={handleBlur}
-                                value={values.phoneNumber}
-                                id="createPhoneNo"
-                                name="phoneNumber"
-                                type="text"
-                                placeholder="Phone Number"
-                                className="form-input"
-                            />
+                                value={values.comment}
+                            ></textarea>
                         </div>
-                        <div className="flex-1">
-                            <label htmlFor="createEmail">Email</label>
-                            <input onChange={handleChange} onBlur={handleBlur} value={values.email} id="createEmail" name="email" type="email" placeholder="Your Email" className="form-input" />
-                        </div>
-                    </div>
-                    <div className="flex flex-col gap-4 sm:flex-row">
-                        <div className="flex-1">
-                            <label htmlFor="createAssignedTo">Assign To</label>
-                            <input
-                                onChange={handleChange}
-                                onBlur={handleBlur}
-                                value={values.assignedTo}
-                                id="createAssignedTo"
-                                name="assignedTo"
-                                type="text"
-                                placeholder="Assign To"
-                                className="form-input"
-                            />
-                        </div>
-                        <div className="flex-1">
-                            <label htmlFor="createSource">Source</label>
-                            <input onChange={handleChange} onBlur={handleBlur} value={values.source} id="createSource" name="source" type="text" placeholder="Source" className="form-input" />
-                        </div>
-                    </div>
-                    <div className="flex flex-col gap-4 sm:flex-row">
-                        <div className="flex-1">
-                            <label htmlFor="designation">Position</label>
-                            <input onChange={handleChange} onBlur={handleBlur} value={values.position} id="designation" name="position" type="text" placeholder="Position" className="form-input" />
-                        </div>
-                        <div className="flex-1">
-                            <label htmlFor="createIndustry">Industry</label>
-                            <input onChange={handleChange} onBlur={handleBlur} value={values.industry} id="createIndustry" name="industry" type="text" placeholder="Industry" className="form-input" />
-                        </div>
-                    </div>
-                    <div className="flex flex-col gap-4 sm:flex-row">
-                        <div className="flex-1">
-                            <label htmlFor="createFacebookProfile">FacebookProfile</label>
-                            <input
-                                onChange={handleChange}
-                                onBlur={handleBlur}
-                                value={values.facebookProfile}
-                                id="createIndustry"
-                                name="facebookProfile"
-                                type="text"
-                                placeholder="FacebookProfile"
-                                className="form-input"
-                            />
-                        </div>
-                        <div className="flex-1">
-                            <label htmlFor="createTwitterProfile">TwitterProfile</label>
-                            <input
-                                onChange={handleChange}
-                                onBlur={handleBlur}
-                                value={values.twitterProfile}
-                                id="createTwitterProfile"
-                                name="twitterProfile"
-                                type="text"
-                                placeholder="TwitterProfile"
-                                className="form-input"
-                            />
-                        </div>
-                    </div>
-                    <div className="flex flex-col gap-4 sm:flex-row">
-                        <div className="flex-1">
-                            <label htmlFor="createWebsite">Website</label>
-                            <input onChange={handleChange} onBlur={handleBlur} value={values.website} id="createWebsite" name="website" type="text" placeholder="Website" className="form-input" />
-                        </div>
-                        <div className="flex-1">
-                            <label htmlFor="createAddress">Address</label>
-                            <input onChange={handleChange} onBlur={handleBlur} value={values.address} id="createAddress" name="address" type="text" placeholder="Address" className="form-input" />
-                        </div>
-                    </div>
-                    <div className="flex flex-col gap-4 sm:flex-row">
-                        <div className="flex-1">
-                            <label htmlFor="state">Country</label>
-                            <Select placeholder="select country" defaultValue={defaultCountry} options={countryData} onChange={(data: any) => setFieldValue('country', data.value)} />
-                        </div>
-                        <div className="flex-1">
-                            <label htmlFor="state">State</label>
-                            <Select placeholder="select state" defaultValue={defaultState} options={countryData} onChange={(data: any) => setFieldValue('state', data.value)} />
-                        </div>
-                        <div className="flex-1">
-                            <label htmlFor="state">City</label>
-                            <Select placeholder="select city" defaultValue={defaultCity} options={countryData} onChange={(data: any) => setFieldValue('city', data.value)} />
-                        </div>
-                    </div>
-                    <div>
-                        <label htmlFor="contactComment"> Comment</label>
-                        <textarea
-                            id="contactComment"
-                            rows={5}
-                            className="form-textarea"
-                            placeholder="Enter Your Comment"
-                            name="comment"
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                            value={values.comment}
-                        ></textarea>
-                    </div>
-                </form>
+                    </form>
+                )
             }
         />
     );

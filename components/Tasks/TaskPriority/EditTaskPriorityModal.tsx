@@ -34,7 +34,7 @@ const EditPriorityModal = () => {
                     name: value.name,
                     color: inputColor,
                 };
-                await new ApiClient().patch(`task-priorities/${singleData?.id}`, EditTaskPriorityObj);
+                await new ApiClient().patch(`task-priority/${singleData?.id}`, EditTaskPriorityObj);
                 dispatch(setEditModal({ open: false }));
                 action.resetForm();
             } catch (error: any) {
@@ -50,7 +50,7 @@ const EditPriorityModal = () => {
         },
     });
     const handleDiscard = () => {
-        dispatch(setEditModal(false));
+        dispatch(setEditModal({open:false}));
         resetForm();
     };
     useEffect(() => {
@@ -61,7 +61,7 @@ const EditPriorityModal = () => {
         <Modal
             open={editModal}
             onClose={() => {
-                dispatch(setEditModal(false));
+                dispatch(setEditModal({open :false}));
             }}
             onDiscard={handleDiscard}
             size="medium"

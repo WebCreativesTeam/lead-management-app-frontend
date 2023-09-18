@@ -17,18 +17,15 @@ export function showToastAlert(errMsg: string) {
     });
 }
 
-
-export const fetchUserPolicyArray = createAsyncThunk('user/id', async (arg, thunkApi) => {
+export const fetchUserPolicyArray: any = createAsyncThunk('user/id', async (arg, thunkApi) => {
     const id: string | null = localStorage.getItem('uid');
     if (id) {
         try {
-            const userData: { status: string; data: UserDataType } = await new ApiClient().get('users/' + id);
-            const createPolicyArray = userData?.data?.permissions?.map((item: Permission) => item?.key);
-            return createPolicyArray;
+            const userData: { status: string; data: UserDataType } = await new ApiClient().get('user/' + id);
+            return userData?.data?.permissions;
         } catch (error: any) {
             showToastAlert(error?.message);
             return thunkApi.rejectWithValue(error?.message);
         }
     }
 });
-

@@ -14,7 +14,7 @@ const ChangeDefaultPolicyModal = () => {
     const onSubmitDefaultPolicy = async () => {
         dispatch(setFetching(true));
         dispatch(setDisableBtn(true));
-        const defaultPolicy: PolicyDataType = await new ApiClient().get(`policies/${singleData.id}/set-default`);
+        const defaultPolicy: PolicyDataType = await new ApiClient().get(`policy/${singleData.id}/set-default`);
 
         if (Object.keys(defaultPolicy).length === 0) {
             dispatch(setDisableBtn(false));

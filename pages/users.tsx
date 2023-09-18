@@ -2,7 +2,6 @@
 import React, { useEffect, useState, Fragment, useDeferredValue, ChangeEvent } from 'react';
 import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
-import Swal from 'sweetalert2';
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
 import { Delete, Edit, Plus, Shield, View } from '@/utils/icons';
 import { UserDataType, PolicyDataType, GetMethodResponseType } from '@/utils/Types';
@@ -26,7 +25,7 @@ const Users = () => {
         dispatch(setPageTitle('Manage Users'));
     });
     //hooks
-    const { data, isFetching, isBtnDisabled, deleteModal, singleData, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate, isAbleToUpdatePolicy } = useSelector(
+    const { data, isFetching, isBtnDisabled, deleteModal, singleData, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate, isAbleToUpdatePolicy, isAbleToChangeActiveStatus } = useSelector(
         (state: IRootState) => state.user
     );
 
@@ -76,7 +75,7 @@ const Users = () => {
     //get all users list
     const getUsersList = async () => {
         setLoading(true);
-        const res: GetMethodResponseType = await new ApiClient().get('users');
+        const res: GetMethodResponseType = await new ApiClient().get('user');
         const users: UserDataType[] = res?.data;
         if (typeof users === 'undefined') {
             dispatch(getAllUsers([] as UserDataType[]));
@@ -87,7 +86,7 @@ const Users = () => {
     };
     const getPolicyList = async () => {
         setLoading(true);
-        const res: GetMethodResponseType = await new ApiClient().get('policies');
+        const res: GetMethodResponseType = await new ApiClient().get('policy');
         const policies: PolicyDataType[] = res?.data;
         if (typeof policies === 'undefined') {
             dispatch(getAllPolicies([] as PolicyDataType[]));
@@ -101,10 +100,14 @@ const Users = () => {
     const onDeleteUser = async () => {
         dispatch(setFetching(true));
         dispatch(setDisableBtn(true));
-        await new ApiClient().delete('users/' + singleData.id);
+        const deleteUser = await new ApiClient().delete('user/' + singleData.id);
+        dispatch(setFetching(false));
+        if (deleteUser === null) {
+            dispatch(setDisableBtn(false));
+            return;
+        }
         dispatch(setDisableBtn(false));
         dispatch(setDeleteModal({ open: false }));
-        dispatch(setFetching(false));
     };
 
     //search user
@@ -126,7 +129,7 @@ const Users = () => {
         setRecordsData(searchUserData);
     };
 
-    return (
+    return !isAbleToRead ? null : (
         <div>
             <PageHeadingSection description="Add, edit, or remove users. Assign roles. Track activity. Personalize user experience." heading="Manage Users" />
             <div className="my-6 flex flex-col gap-5 sm:flex-row ">
@@ -182,21 +185,30 @@ const Users = () => {
                             accessor: 'isActive',
                             title: 'Activate Status',
                             sortable: true,
-                            render: ({ isActive, id }) => (
-                                <div>
-                                    <label className="relative h-6 w-12">
-                                        <input
-                                            type="checkbox"
-                                            className="custom_switch peer absolute z-10 h-full w-full cursor-pointer opacity-0"
-                                            id="custom_switch_checkbox1"
-                                            name="permission"
-                                            checked={isActive}
-                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => dispatch(setDeactivateModal({ open: true, id, value: e.target.checked }))}
-                                        />
-                                        <span className="block h-full rounded-full bg-[#ebedf2] before:absolute before:bottom-1 before:left-1 before:h-4 before:w-4 before:rounded-full before:bg-white before:transition-all before:duration-300 peer-checked:bg-primary peer-checked:before:left-7 dark:bg-dark dark:before:bg-white-dark dark:peer-checked:before:bg-white"></span>
-                                    </label>
-                                </div>
-                            ),
+                            render: ({ isActive, id }) =>
+                                isAbleToChangeActiveStatus ? (
+                                    <div>
+                                        <label className="relative h-6 w-12">
+                                            <input
+                                                type="checkbox"
+                                                className="custom_switch peer absolute z-10 h-full w-full cursor-pointer opacity-0"
+                                                id="custom_switch_checkbox1"
+                                                name="permission"
+                                                checked={isActive}
+                                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => dispatch(setDeactivateModal({ open: true, id, value: e.target.checked }))}
+                                            />
+                                            <span className="block h-full rounded-full bg-[#ebedf2] before:absolute before:bottom-1 before:left-1 before:h-4 before:w-4 before:rounded-full before:bg-white before:transition-all before:duration-300 peer-checked:bg-primary peer-checked:before:left-7 dark:bg-dark dark:before:bg-white-dark dark:peer-checked:before:bg-white"></span>
+                                        </label>
+                                    </div>
+                                ) : (
+                                    <div className="text-center">
+                                        {isActive ? (
+                                            <span className="mr-2 rounded bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-green-800 dark:bg-blue-900 dark:text-blue-300">Active</span>
+                                        ) : (
+                                            <span className="mr-2 rounded bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-800 dark:bg-red-900 dark:text-red-300">In Active</span>
+                                        )}
+                                    </div>
+                                ),
                         },
                         {
                             accessor: 'isVerified',

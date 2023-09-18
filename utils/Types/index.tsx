@@ -29,11 +29,11 @@ export type UserDataType = {
     lastName: string;
     id: string;
     email: string;
-    permissions: Permission[];
+    permissions: string[];
     isActive: boolean;
     isVerified: boolean;
     deactivatedAt: string;
-    policiesIncluded: {
+    policies: {
         id: string;
         name: string;
         description: string;
@@ -109,9 +109,18 @@ export interface ContactDataType {
     name: string;
     phoneNumber: string;
     email: string;
-    assignedTo: string;
+    assignedTo: {
+        firstName: string;
+        lastName: string;
+        id: string;
+    };
     source: {
         name: string;
+        id: string;
+    };
+    addedBy: {
+        firstName: string;
+        lastName: string;
         id: string;
     };
     website: string;
@@ -211,6 +220,7 @@ export interface PolicyInitialStateProps extends InitialStateProps {
     permissions: Permission[];
     permissionKeyArr: string[];
     defaultPolicyModal: boolean;
+    isAbleToChangeDefaultPolicy: boolean;
 }
 
 //task status slice initial props
@@ -218,6 +228,7 @@ export interface TaskStatusInitialStateProps extends InitialStateProps {
     data: TaskStatusType[];
     singleData: TaskStatusType;
     defaultStatusModal: boolean;
+    isAbleToChangeDefaultStatus: boolean;
 }
 
 //task priority slice initial props
@@ -225,6 +236,7 @@ export interface TaskPriorityInitialStateProps extends InitialStateProps {
     data: TaskPriorityType[];
     singleData: TaskPriorityType;
     defaultPriorityModal: boolean;
+    isAbleToChangeDefaultPriority: boolean;
 }
 
 //branch slice initial props
@@ -242,6 +254,7 @@ export interface UserInitialStateProps extends InitialStateProps {
     deactivateModal: boolean;
     deactivateValue: boolean;
     isAbleToUpdatePolicy: boolean;
+    isAbleToChangeActiveStatus: boolean;
 }
 
 // email slice initial props

@@ -10,7 +10,7 @@ import { showToastAlert } from '@/utils/contant';
 import Select, { ActionMeta } from 'react-select';
 
 const UserPolicyModal = () => {
-    const {policyModal,isBtnDisabled,singleData,policies} = useSelector((state: IRootState) => state.user);
+    const { policyModal, isBtnDisabled, singleData, policies } = useSelector((state: IRootState) => state.user);
     const [policiesData, setPoliciesData] = useState<SelectOptionsType[]>([]);
     const [defaultSelectedPolicy, setDefaultSelectedPolicy] = useState<SelectOptionsType[]>([]);
 
@@ -27,9 +27,11 @@ const UserPolicyModal = () => {
         });
         setPoliciesData(createPolicyObj);
 
-        const selectedPolicyIdArr: string[] = singleData?.policiesIncluded?.map((item: any) => {
+        
+        const selectedPolicyIdArr: string[] = singleData?.policies?.map((item: any) => {
             return item.id;
         });
+        console.log(singleData);
         const preSelectedPolicy: SelectOptionsType[] = createPolicyObj.filter((item: SelectOptionsType) => {
             return selectedPolicyIdArr?.includes(item.value);
         });
@@ -46,7 +48,7 @@ const UserPolicyModal = () => {
                 return policy.value;
             });
             dispatch(setDisableBtn(true));
-            await new ApiClient().post(process.env.NEXT_PUBLIC_API_LINK + 'users/' + singleData?.id + '/policies', { policies: selectedPolicyArr });
+            await new ApiClient().post(process.env.NEXT_PUBLIC_API_LINK + 'user/' + singleData?.id + '/policy', { policiesId: selectedPolicyArr });
             dispatch(setPolicyModal({ open: false }));
         } catch (error: any) {
             if (typeof error?.response?.data?.message === 'object') {

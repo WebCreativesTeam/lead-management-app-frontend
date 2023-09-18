@@ -13,14 +13,13 @@ const PolicyDeleteModal = () => {
     const onDeletePolicy = async () => {
         dispatch(setFetching(true));
         dispatch(setDisableBtn(true));
-        const deletePolicy: PolicyDataType = await new ApiClient().delete('policies/' + singleData.id);
-        if (Object.keys(deletePolicy).length === 0) {
-            dispatch(setDisableBtn(false));
+        const deletePolicy: PolicyDataType = await new ApiClient().delete('policy/' + singleData.id);
+        dispatch(setFetching(false));
+        dispatch(setDisableBtn(false));
+        if (deletePolicy === null) {
             return;
         }
-        dispatch(setDisableBtn(false));
         dispatch(setDeleteModal({ open: false }));
-        dispatch(setFetching(false));
     };
     return (
         <ConfirmationModal

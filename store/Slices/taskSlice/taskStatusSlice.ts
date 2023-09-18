@@ -16,6 +16,7 @@ const initialState: TaskStatusInitialStateProps = {
     isAbleToCreate: false,
     isAbleToUpdate: false,
     isAbleToDelete: false,
+    isAbleToChangeDefaultStatus:false,
     userPolicyArr: [] as string[],
 };
 
@@ -109,6 +110,10 @@ const taskStatusSlice = createSlice({
             const verifyPolicy: boolean = state.userPolicyArr.includes(action.payload);
             state.isAbleToDelete = verifyPolicy;
         },
+        setChangeDefaultTaskStatusPermission(state, action) {
+            const verifyPolicy: boolean = state.userPolicyArr.includes(action.payload);
+            state.isAbleToChangeDefaultStatus = verifyPolicy;
+        },
     },
 });
 
@@ -125,5 +130,6 @@ export const {
     setTaskStatusDeletePolicy,
     setTaskStatusReadPolicy,
     setTaskStatusUpdatePolicy,
+    setChangeDefaultTaskStatusPermission
 } = taskStatusSlice.actions;
 export default taskStatusSlice.reducer;

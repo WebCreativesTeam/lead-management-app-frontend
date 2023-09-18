@@ -30,7 +30,7 @@ const CreatePriorityModal = () => {
                     name: value.name,
                     color: inputColor,
                 };
-                await new ApiClient().post('task-priorities', createTaskPriorityObj);
+                await new ApiClient().post('task-priority', createTaskPriorityObj);
                 dispatch(setCreateModal(false));
                 action.resetForm();
             } catch (error: any) {

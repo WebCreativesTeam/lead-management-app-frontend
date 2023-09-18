@@ -27,7 +27,7 @@ const PolicyCreateModal = () => {
             dispatch(setFetching(true));
             try {
                 dispatch(setDisableBtn(true));
-                await new ApiClient().post('policies', { ...value, permissions: permissionKeyArr });
+                await new ApiClient().post('policy', { ...value, permissions: permissionKeyArr });
                 dispatch(setCreateModal(false));
                 action.resetForm();
             } catch (error: any) {

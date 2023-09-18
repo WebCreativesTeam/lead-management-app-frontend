@@ -1,4 +1,5 @@
 *-------------- Todo ::: Frontend -------------------*
+user:Update::DocumentInternals : what is this permission?
 
 
 
@@ -24,3 +25,9 @@
 9. any user who have read permission can deactivate user. no permission available for deactivate.
 
 
+completed
+task status
+task priority
+manage task (all tasks)
+branches
+contact

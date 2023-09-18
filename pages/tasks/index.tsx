@@ -88,9 +88,8 @@ const TaskPage = () => {
     //get all tasks list
     const getTasksList = async () => {
         setLoading(true);
-        const res: GetMethodResponseType = await new ApiClient().get('tasks/' + filter);
+        const res: GetMethodResponseType = await new ApiClient().get('task');
         const tasks: TaskDataType[] | undefined = res?.data;
-        console.log(res);
         if (typeof tasks === 'undefined') {
             dispatch(getAllTasks([] as TaskDataType[]));
             return;
@@ -102,7 +101,7 @@ const TaskPage = () => {
     //get all task priority list
     const getTasksPriority = async () => {
         setLoading(true);
-        const taskPriorityList: GetMethodResponseType = await new ApiClient().get('task-priorities');
+        const taskPriorityList: GetMethodResponseType = await new ApiClient().get('task-priority');
         const priorities: TaskSelectOptions[] = taskPriorityList?.data;
         if (typeof priorities === 'undefined') {
             dispatch(getAllTaskPriorities([] as TaskSelectOptions[]));
@@ -141,10 +140,12 @@ const TaskPage = () => {
             <PageHeadingSection description="View, create, update, and close tasks. Organize by status, priority, and due date. Stay on top of work." heading="Task Management" />
             <div className="my-6 flex gap-5 ">
                 <div className="flex flex-1 gap-5 ">
-                    <button className="btn btn-primary h-full w-full max-w-[200px] max-sm:mx-auto" type="button" onClick={() => dispatch(setCreateModal(true))}>
-                        <Plus />
-                        Add New Task
-                    </button>
+                    {isAbleToCreate && (
+                        <button className="btn btn-primary h-full w-full max-w-[200px] max-sm:mx-auto" type="button" onClick={() => dispatch(setCreateModal(true))}>
+                            <Plus />
+                            Add New Task
+                        </button>
+                    )}
                     <div className="dropdown">
                         <Dropdown
                             placement="bottom-start"

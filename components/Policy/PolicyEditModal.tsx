@@ -32,7 +32,7 @@ const PolicyEditModal = () => {
             dispatch(setFetching(true));
             try {
                 dispatch(setDisableBtn(true));
-                await new ApiClient().patch('policies/' + singleData?.id, { ...value, permissions: permissionKeyArr });
+                await new ApiClient().patch('policy/' + singleData?.id, { ...value, permissions: permissionKeyArr });
                 dispatch(setEditModal({ open: false }));
                 action.resetForm();
             } catch (error: any) {

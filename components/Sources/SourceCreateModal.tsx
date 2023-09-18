@@ -24,7 +24,7 @@ const CreateSourceModal = () => {
             dispatch(setFetching(true));
             try {
                 dispatch(setDisableBtn(true));
-                await new ApiClient().post('sources', { name: value.name });
+                await new ApiClient().post('source', { name: value.name });
                 dispatch(setCreateModal(false));
                 action.resetForm();
             } catch (error: any) {

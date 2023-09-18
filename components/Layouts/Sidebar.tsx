@@ -14,10 +14,23 @@ import { setBranchCreatePolicy, setBranchDeletePolicy, setBranchReadPolicy, setB
 import { fetchUserPolicyArray } from '@/utils/contant';
 import { setContactCreatePolicy, setContactDeletePolicy, setContactReadPolicy, setContactUpdatePolicy } from '@/store/Slices/contactSlice';
 import { setSourceCreatePolicy, setSourceDeletePolicy, setSourceReadPolicy, setSourceUpdatePolicy } from '@/store/Slices/sourceSlice';
-import { setChangeUsersPolicy, setUserCreatePolicy, setUserDeletePolicy, setUserReadPolicy, setUserUpdatePolicy } from '@/store/Slices/userSlice';
+import { setChangeActiveStatusPermission, setChangeUsersPolicy, setUserCreatePolicy, setUserDeletePolicy, setUserReadPolicy, setUserUpdatePolicy } from '@/store/Slices/userSlice';
 import { setTaskCreatePolicy, setTaskDeletePolicy, setTaskReadPolicy, setTaskUpdatePolicy } from '@/store/Slices/taskSlice/manageTaskSlice';
-import { setTaskPriorityCreatePolicy, setTaskPriorityDeletePolicy, setTaskPriorityReadPolicy, setTaskPriorityUpdatePolicy } from '@/store/Slices/taskSlice/taskPrioritySlice';
-import { setPolicyCreatePermission, setPolicyDeletePermission, setPolicyReadPermission, setPolicyUpdatePermission } from '@/store/Slices/policySlice';
+import {
+    setChangeDefaultTaskPriorityPermission,
+    setTaskPriorityCreatePolicy,
+    setTaskPriorityDeletePolicy,
+    setTaskPriorityReadPolicy,
+    setTaskPriorityUpdatePolicy,
+} from '@/store/Slices/taskSlice/taskPrioritySlice';
+import { setChangeDefaultPolicyPermission, setPolicyCreatePermission, setPolicyDeletePermission, setPolicyReadPermission, setPolicyUpdatePermission } from '@/store/Slices/policySlice';
+import {
+    setChangeDefaultTaskStatusPermission,
+    setTaskStatusCreatePolicy,
+    setTaskStatusDeletePolicy,
+    setTaskStatusReadPolicy,
+    setTaskStatusUpdatePolicy,
+} from '@/store/Slices/taskSlice/taskStatusSlice';
 
 const Sidebar = () => {
     const router = useRouter();
@@ -48,69 +61,83 @@ const Sidebar = () => {
     const userPolicyPermissonArray: string[] = useSelector((state: IRootState) => state.policy.userPolicyArr);
     const isAbleToReadPolicy: boolean = useSelector((state: IRootState) => state.policy.isAbleToRead);
 
-    // const userPolicyTaskPriorityArray: string[] = useSelector((state: IRootState) => state.taskPriority.userPolicyArr);
+    const userPolicyTaskPriorityArray: string[] = useSelector((state: IRootState) => state.taskPriority.userPolicyArr);
+    const isAbleToReadTaskPriority: boolean = useSelector((state: IRootState) => state.taskPriority.isAbleToRead);
 
-    // const userPolicyTaskStatusArray: string[] = useSelector((state: IRootState) => state.taskStatus.userPolicyArr);
+    const userPolicyTaskStatusArray: string[] = useSelector((state: IRootState) => state.taskStatus.userPolicyArr);
+    const isAbleToReadTaskStatus: boolean = useSelector((state: IRootState) => state.taskStatus.isAbleToRead);
     useEffect(() => {
         dispatch(fetchUserPolicyArray());
     }, []);
 
     //access for branch page
     useEffect(() => {
-        dispatch(setBranchReadPolicy('branches:Read::Documents'));
-        dispatch(setBranchCreatePolicy('branches:Create'));
-        dispatch(setBranchUpdatePolicy('branches:Update'));
-        dispatch(setBranchDeletePolicy('branches:Delete'));
+        dispatch(setBranchReadPolicy('branch:Read::Documents'));
+        dispatch(setBranchCreatePolicy('branch:Create::Document'));
+        dispatch(setBranchUpdatePolicy('branch:Update::Document'));
+        dispatch(setBranchDeletePolicy('branch:Delete::Document'));
     }, [userPolicyBranchArray]);
 
     //access for source page
     useEffect(() => {
-        dispatch(setSourceReadPolicy('sources:Read::Documents'));
-        dispatch(setSourceCreatePolicy('sources:Create'));
-        dispatch(setSourceUpdatePolicy('sources:Update'));
-        dispatch(setSourceDeletePolicy('sources:Delete'));
+        dispatch(setSourceReadPolicy('source:Read::Documents'));
+        dispatch(setSourceCreatePolicy('source:Create::Document'));
+        dispatch(setSourceUpdatePolicy('source:Update::Document'));
+        dispatch(setSourceDeletePolicy('source:Delete::Document'));
     }, [userPolicySourceArray]);
 
     //access for users page
     useEffect(() => {
-        dispatch(setUserReadPolicy('users:Read::Documents'));
-        dispatch(setUserCreatePolicy('users:Create'));
-        dispatch(setUserUpdatePolicy('users:Update::BasicFields'));
-        dispatch(setUserDeletePolicy('users:Delete'));
-        dispatch(setChangeUsersPolicy('users:Add::Policy'));
+        dispatch(setUserReadPolicy('user:Read::Documents'));
+        dispatch(setUserCreatePolicy('user:Create::Document'));
+        dispatch(setUserUpdatePolicy('user:Update::DocumentBasic'));
+        dispatch(setUserDeletePolicy('user:Delete::Document'));
+        dispatch(setChangeUsersPolicy('user:Update::Policy'));
+        dispatch(setChangeActiveStatusPermission('user:Update::DocumentInternals'));
     }, [userPolicyUsersArray]);
 
     //access for Manage Task page
     useEffect(() => {
-        dispatch(setTaskReadPolicy('tasks:Read::Documents'));
-        dispatch(setTaskCreatePolicy('tasks:Create'));
-        dispatch(setTaskUpdatePolicy('tasks:Update'));
-        dispatch(setTaskDeletePolicy('tasks:Delete'));
+        dispatch(setTaskReadPolicy('task:Read::Documents'));
+        dispatch(setTaskCreatePolicy('task:Create::Document'));
+        dispatch(setTaskUpdatePolicy('task:Update::Document'));
+        dispatch(setTaskDeletePolicy('task:Delete::Document'));
     }, [userPolicyTaskArray]);
 
-    // //access for Task Priority page
-    // useEffect(() => {
-    //     dispatch(setTaskPriorityReadPolicy('tasks:Read::Documents'));
-    //     dispatch(setTaskPriorityCreatePolicy('tasks:Create'));
-    //     dispatch(setTaskPriorityUpdatePolicy('tasks:Update'));
-    //     dispatch(setTaskPriorityDeletePolicy('tasks:Delete'));
-    // }, [userPolicyTaskPriorityArray]);
+    //access for Task Status page
+    useEffect(() => {
+        dispatch(setTaskStatusReadPolicy('taskstatus:Read::Documents'));
+        dispatch(setTaskStatusCreatePolicy('taskstatus:Create::Document'));
+        dispatch(setTaskStatusUpdatePolicy('taskstatus:Update::Document'));
+        dispatch(setTaskStatusDeletePolicy('taskstatus:Delete::Document'));
+        dispatch(setChangeDefaultTaskStatusPermission('taskstatus:Update::DocumentDefault'));
+    }, [userPolicyTaskArray]);
+
+    //access for Task Priority page
+    useEffect(() => {
+        dispatch(setTaskPriorityReadPolicy('taskpriority:Read::Documents'));
+        dispatch(setTaskPriorityCreatePolicy('taskpriority:Create::Document'));
+        dispatch(setTaskPriorityUpdatePolicy('taskpriority:Update::Document'));
+        dispatch(setTaskPriorityDeletePolicy('taskpriority:Delete::Document'));
+        dispatch(setChangeDefaultTaskPriorityPermission('taskpriority:Update::DocumentDefault'));
+    }, [userPolicyTaskArray]);
 
     //access for Policy page
     useEffect(() => {
-        dispatch(setPolicyReadPermission('policies:Read::Documents'));
-        dispatch(setPolicyCreatePermission('policies:Create'));
-        dispatch(setPolicyUpdatePermission('policies:Update'));
-        dispatch(setPolicyDeletePermission('policies:Delete'));
+        dispatch(setPolicyReadPermission('policy:Read::Documents'));
+        dispatch(setPolicyCreatePermission('policy:Create::Document'));
+        dispatch(setPolicyUpdatePermission('policy:Update::Document'));
+        dispatch(setPolicyDeletePermission('policy:Delete::Document'));
+        dispatch(setChangeDefaultPolicyPermission('policy:Update::DocumentDefault'));
     }, [userPolicyPermissonArray]);
 
-    //access for contact page
-    // useEffect(() => {
-    //     dispatch(setContactReadPolicy('branches:Read::Documents'));
-    //     dispatch(setContactCreatePolicy('branches:Create'));
-    //     dispatch(setContactUpdatePolicy('branches:Update'));
-    //     dispatch(setContactDeletePolicy('branches:Delete'));
-    // }, [userPolicyContactArray]);
+    // access for contact page
+    useEffect(() => {
+        dispatch(setContactReadPolicy('contact:Read::Documents'));
+        dispatch(setContactCreatePolicy('contact:Create::Document'));
+        dispatch(setContactUpdatePolicy('contact:Update::Document'));
+        dispatch(setContactDeletePolicy('contact:Delete::Document'));
+    }, [userPolicyContactArray]);
 
     useEffect(() => {
         const selector = document.querySelector('.sidebar ul a[href="' + window.location.pathname + '"]');
@@ -174,7 +201,7 @@ const Sidebar = () => {
                     <PerfectScrollbar className="relative h-[calc(100vh-80px)]">
                         <ul className="relative space-y-0.5 p-4 py-0 font-semibold">
                             {/* tasks */}
-                            {isAbleToReadTask && (
+                            {!isAbleToReadTask && !isAbleToReadTaskPriority && !isAbleToReadTaskStatus ? null : (
                                 <li className="menu nav-item">
                                     <button type="button" className={`${currentMenu === 'Tasks' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('Tasks')}>
                                         <div className="flex items-center">
@@ -189,16 +216,21 @@ const Sidebar = () => {
 
                                     <AnimateHeight duration={300} height={currentMenu === 'Tasks' ? 'auto' : 0}>
                                         <ul className="sub-menu text-gray-500">
-                                            <li>
-                                                <Link href="/tasks">{t('Manage Tasks')}</Link>
-                                            </li>
-
-                                            <li>
-                                                <Link href="/tasks/priority">{t('Priority')}</Link>
-                                            </li>
-                                            <li>
-                                                <Link href="/tasks/status">{t('Status')}</Link>
-                                            </li>
+                                            {isAbleToReadTask && (
+                                                <li>
+                                                    <Link href="/tasks">{t('Manage Tasks')}</Link>
+                                                </li>
+                                            )}
+                                            {isAbleToReadTaskPriority && (
+                                                <li>
+                                                    <Link href="/tasks/priority">{t('Priority')}</Link>
+                                                </li>
+                                            )}
+                                            {isAbleToReadTaskStatus && (
+                                                <li>
+                                                    <Link href="/tasks/status">{t('Status')}</Link>
+                                                </li>
+                                            )}
                                         </ul>
                                     </AnimateHeight>
                                 </li>

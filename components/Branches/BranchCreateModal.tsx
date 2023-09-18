@@ -9,7 +9,6 @@ import { useFormik } from 'formik';
 import { branchSchema } from '@/utils/schemas';
 import { ApiClient } from '@/utils/http';
 import { showToastAlert } from '@/utils/contant';
-import { BranchDataType } from '@/utils/Types';
 
 const BranchCreateModal = () => {
     const createModal: boolean = useSelector((state: IRootState) => state.branch.createModal);
@@ -39,7 +38,7 @@ const BranchCreateModal = () => {
                     state,
                     country,
                 };
-                await new ApiClient().post('branches', createBranchObj);
+                await new ApiClient().post('branch', createBranchObj);
                 dispatch(setCreateModal(false));
                 action.resetForm();
             } catch (error: any) {

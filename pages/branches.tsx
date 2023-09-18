@@ -77,7 +77,7 @@ const BranchPage = () => {
     //get all Branch list
     const getBranchList = async () => {
         setLoading(true);
-        const res: GetMethodResponseType = await new ApiClient().get('branches');
+        const res: GetMethodResponseType = await new ApiClient().get('branch');
         const branches: BranchDataType[] = res?.data;
         if (typeof branches === 'undefined') {
             dispatch(getAllBranches([] as BranchDataType[]));
@@ -91,8 +91,8 @@ const BranchPage = () => {
     const onDeleteBranch = async () => {
         dispatch(setFetching(true));
         dispatch(setDisableBtn(true));
-        const deleteBranch: BranchDataType = await new ApiClient().delete('branches/' + singleData.id);
-        if (Object.keys(deleteBranch).length === 0) {
+        const deleteBranch: BranchDataType = await new ApiClient().delete('branch/' + singleData.id);
+        if (deleteBranch === null) {
             dispatch(setDisableBtn(false));
             return;
         }
@@ -239,7 +239,7 @@ const BranchPage = () => {
                 onClose={() => dispatch(setDeleteModal({ open: false }))}
                 onDiscard={() => dispatch(setDeleteModal({ open: false }))}
                 description={<>Are you sure you want to delete this Branch? It will also remove form database.</>}
-                title="Delete task priority"
+                title="Delete Branch"
                 isBtnDisabled={isBtnDisabled}
                 onSubmit={onDeleteBranch}
                 btnSubmitText="Delete"
