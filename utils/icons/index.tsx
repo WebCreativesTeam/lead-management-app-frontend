@@ -15,3 +15,4 @@ export * from './Email';
 export * from './ArrowRight';
 export * from './Lock';
 export * from './UserFilled';
+export * from './SignOut';

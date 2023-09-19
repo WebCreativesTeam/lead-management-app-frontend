@@ -13,7 +13,7 @@ const TaskDeleteModal = () => {
     const onDeleteTask = async () => {
         dispatch(setFetching(true));
         dispatch(setDisableBtn(true));
-        const deleteTask: TaskDataType = await new ApiClient().delete('tasks/' + singleData.id);
+        const deleteTask: TaskDataType = await new ApiClient().delete('task/' + singleData.id);
         if (Object.keys(deleteTask).length === 0) {
             dispatch(setDisableBtn(false));
             return;

@@ -58,7 +58,7 @@ const TaskEditModal = () => {
                     description: value.description,
                     lead: values.lead,
                 };
-                await new ApiClient().patch(`tasks/${singleData?.id}`, editTaskObj);
+                await new ApiClient().patch(`task/${singleData?.id}`, editTaskObj);
                 dispatch(setEditModal({ open: false }));
                 action.resetForm();
             } catch (error: any) {

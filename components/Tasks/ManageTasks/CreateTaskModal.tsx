@@ -54,7 +54,7 @@ const TaskCreateModal = () => {
                     priority: value.priority.value,
                     assignedTo: values.assignedTo,
                 };
-                await new ApiClient().post('tasks', createTaskObj);
+                await new ApiClient().post('task', createTaskObj);
                 dispatch(setCreateModal(false));
                 action.resetForm();
             } catch (error: any) {
