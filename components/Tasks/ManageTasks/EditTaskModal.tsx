@@ -27,15 +27,15 @@ const TaskEditModal = () => {
 
     const initialValues = {
         title: '',
-        lead: '64c90bd5c7cd824f606addcd',
+        // lead: '64c90bd5c7cd824f606addcd',
         priority: {
             value: '',
             label: '',
         },
         startDate: '',
         endDate: '',
-        assignedTo: '64c90bd5c7cd824f606addce',
-        observer: '64c90bd5c7cd824f606addd0',
+        assignedTo: '65081e4fb555280a3c8f4c44',
+        observer: '65081e4fb555280a3c8f4c44',
         description: '',
         isActive: false,
         comment: '',
@@ -56,7 +56,7 @@ const TaskEditModal = () => {
                     startDate: new Date(value.startDate).toISOString(),
                     endDate: new Date(value.endDate).toISOString(),
                     description: value.description,
-                    lead: values.lead,
+                    // lead: values.lead,
                 };
                 await new ApiClient().patch(`task/${singleData?.id}`, editTaskObj);
                 dispatch(setEditModal({ open: false }));
@@ -117,7 +117,7 @@ const TaskEditModal = () => {
                 submitForm();
             }}
             title="Edit Task"
-            isBtnDisabled={values.title && values.description && values.startDate && values.endDate && values.lead && values.comment && !isBtnDisabled ? false : true}
+            isBtnDisabled={values.title && values.description && values.startDate && values.endDate && values.comment && !isBtnDisabled ? false : true}
             disabledDiscardBtn={isBtnDisabled}
             content={
                 isFetching ? (
@@ -129,10 +129,10 @@ const TaskEditModal = () => {
                                 <label htmlFor="editTask">Task Title</label>
                                 <input onChange={handleChange} onBlur={handleBlur} value={values.title} id="editTask" name="title" type="text" placeholder="Task Title" className="form-input" />
                             </div>
-                            <div className="flex-1">
+                            {/* <div className="flex-1">
                                 <label htmlFor="chooseLead">Choose Lead</label>
                                 <input onChange={handleChange} onBlur={handleBlur} value={values.lead} id="chooseLead" name="lead" type="text" placeholder="Choose Lead" className="form-input" />
-                            </div>
+                            </div> */}
                         </div>
                         <div className="flex flex-col gap-4 sm:flex-row">
                             <div className="flex-1">

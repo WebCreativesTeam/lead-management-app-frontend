@@ -20,15 +20,15 @@ const TaskCreateModal = () => {
 
     const initialValues = {
         title: '',
-        lead: '64c90bd5c7cd824f606addcd',
+        lead: '6505ea97100a04d882ad5165',
         priority: {
             value: '',
             label: '',
         },
         startDate: '',
         endDate: '',
-        assignedTo: '64c90bd5c7cd824f606addce',
-        observer: '64c90bd5c7cd824f606addd0',
+        assignedTo: '65081e4fb555280a3c8f4c44',
+        observer: '65081e4fb555280a3c8f4c44',
         description: '',
         isActive: false,
         comment: '',
@@ -49,10 +49,10 @@ const TaskCreateModal = () => {
                     startDate: new Date(value.startDate).toISOString(),
                     endDate: new Date(value.endDate).toISOString(),
                     description: value.description,
-                    lead: values.lead,
-                    observer: values.observer,
-                    priority: value.priority.value,
-                    assignedTo: values.assignedTo,
+                    leadId: values.lead,
+                    observerId: values.observer,
+                    priorityId: value.priority.value,
+                    assignedToId: values.assignedTo,
                 };
                 await new ApiClient().post('task', createTaskObj);
                 dispatch(setCreateModal(false));

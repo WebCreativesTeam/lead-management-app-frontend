@@ -14,13 +14,13 @@ const TaskDeleteModal = () => {
         dispatch(setFetching(true));
         dispatch(setDisableBtn(true));
         const deleteTask: TaskDataType = await new ApiClient().delete('task/' + singleData.id);
-        if (Object.keys(deleteTask).length === 0) {
-            dispatch(setDisableBtn(false));
+        dispatch(setDisableBtn(false));
+        dispatch(setFetching(false));
+        if (deleteTask === null) {
             return;
         }
-        dispatch(setDisableBtn(false));
+
         dispatch(setDeleteModal({ open: false }));
-        dispatch(setFetching(false));
     };
     return (
         <ConfirmationModal
