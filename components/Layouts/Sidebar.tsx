@@ -32,6 +32,7 @@ import {
     setTaskStatusUpdatePolicy,
 } from '@/store/Slices/taskSlice/taskStatusSlice';
 import { setEmailTemplateCreatePermission, setEmailTemplateDeletePermission, setEmailTemplateReadPermission, setEmailTemplateUpdatePermission } from '@/store/Slices/emailSlice';
+import { setLeadCreatePolicy, setLeadDeletePolicy, setLeadReadPolicy, setLeadUpdatePolicy } from '@/store/Slices/leadSlice/manageLeadSlice';
 
 const Sidebar = () => {
     const router = useRouter();
@@ -162,6 +163,14 @@ const Sidebar = () => {
         dispatch(setEmailTemplateDeletePermission('emailtemplate:Delete::Document'));
     }, [userPolicyEmailTemplateArray]);
 
+    //access for Manage Lead page
+    useEffect(() => {
+        dispatch(setLeadReadPolicy('lead:Read::Documents'));
+        dispatch(setLeadCreatePolicy('lead:Create::Document'));
+        dispatch(setLeadUpdatePolicy('lead:Update::Document'));
+        dispatch(setLeadDeletePolicy('lead:Delete::Document'));
+    }, [userPolicyTaskArray]);
+
     useEffect(() => {
         const selector = document.querySelector('.sidebar ul a[href="' + window.location.pathname + '"]');
         if (selector) {
@@ -252,6 +261,42 @@ const Sidebar = () => {
                                             {isAbleToReadTaskStatus && (
                                                 <li>
                                                     <Link href="/tasks/status">{t('Status')}</Link>
+                                                </li>
+                                            )}
+                                        </ul>
+                                    </AnimateHeight>
+                                </li>
+                            )}
+
+                            {/* Leads */}
+                            {!isAbleToReadTask && !isAbleToReadTaskPriority && !isAbleToReadTaskStatus ? null : (
+                                <li className="menu nav-item">
+                                    <button type="button" className={`${currentMenu === 'Leads' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('Leads')}>
+                                        <div className="flex items-center">
+                                            <Tasks />
+                                            <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Leads')}</span>
+                                        </div>
+
+                                        <div className={currentMenu === 'Leads' ? 'rotate-90' : 'rtl:rotate-180'}>
+                                            <ArrowRight />
+                                        </div>
+                                    </button>
+
+                                    <AnimateHeight duration={300} height={currentMenu === 'Leads' ? 'auto' : 0}>
+                                        <ul className="sub-menu text-gray-500">
+                                            {isAbleToReadTask && (
+                                                <li>
+                                                    <Link href="/leads">{t('Manage Leads')}</Link>
+                                                </li>
+                                            )}
+                                            {isAbleToReadTaskPriority && (
+                                                <li>
+                                                    <Link href="/leads/priority">{t('Priority')}</Link>
+                                                </li>
+                                            )}
+                                            {isAbleToReadTaskStatus && (
+                                                <li>
+                                                    <Link href="/leads/status">{t('Status')}</Link>
                                                 </li>
                                             )}
                                         </ul>

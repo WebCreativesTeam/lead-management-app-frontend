@@ -7,43 +7,44 @@ import { sortBy } from 'lodash';
 import 'flatpickr/dist/flatpickr.css';
 import { Delete, Edit, Plus, View } from '@/utils/icons';
 import PageHeadingSection from '@/components/__Shared/PageHeadingSection/index.';
-import { GetMethodResponseType, LeadDataType, TaskSelectOptions, UserDataType } from '@/utils/Types';
-import { TaskDataType } from '@/utils/Types';
+import { BranchDataType, ContactDataType, GetMethodResponseType, LeadSelectOptions, SourceDataType } from '@/utils/Types';
+import { LeadDataType } from '@/utils/Types';
 import { useDispatch, useSelector } from 'react-redux';
 import { setPageTitle } from '@/store/themeConfigSlice';
 import Dropdown from '@/components/Dropdown';
 import { IRootState } from '@/store';
 import {
-    getAllLeadsForTask,
-    getAllTaskPriorities,
-    getAllTaskStatus,
-    getAllTasks,
-    getAllUsersForTask,
+    getAllBranchForLead,
+    getAllContactsForLead,
+    getAllLeadPriorities,
+    getAllLeadStatus,
+    getAllLeads,
+    getAllSourceForLead,
     setChangePriorityModal,
     setChangeStatusModal,
     setCreateModal,
     setDeleteModal,
     setEditModal,
     setViewModal,
-} from '@/store/Slices/taskSlice/manageTaskSlice';
+} from '@/store/Slices/leadSlice/manageLeadSlice';
 import { ApiClient } from '@/utils/http';
-import DeleteTaskModal from '@/components/Tasks/ManageTasks/DeleteTaskModal';
-import CreateTaskModal from '@/components/Tasks/ManageTasks/CreateTaskModal';
-import EditTaskModal from '@/components/Tasks/ManageTasks/EditTaskModal';
-import ViewTaskModal from '@/components/Tasks/ManageTasks/ViewTaskModal';
-import ChangeTaskPriorityModal from '@/components/Tasks/ManageTasks/ChangeTaskPriorityModal';
-import ChangeTaskStatusModal from '@/components/Tasks/ManageTasks/ChangeTaskStatusModal';
+import DeleteLeadModal from '@/components/Leads/ManageLeads/DeleteLeadModal';
+import CreateLeadModal from '@/components/Leads/ManageLeads/CreateLeadModal';
+import EditLeadModal from '@/components/Leads/ManageLeads/EditLeadModal';
+import ViewLeadModal from '@/components/Leads/ManageLeads/ViewLeadModal';
+import ChangeLeadPriorityModal from '@/components/Leads/ManageLeads/ChangeLeadPriorityModal';
+import ChangeLeadStatusModal from '@/components/Leads/ManageLeads/ChangeLeadStatusModal';
 
-const TaskPage = () => {
+const LeadPage = () => {
     const dispatch = useDispatch();
     useEffect(() => {
-        dispatch(setPageTitle('Manage Tasks'));
+        dispatch(setPageTitle('Manage Leads'));
     });
 
     //hooks
-    const { data, isFetching, taskPriorityList, taskStatusList, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate } = useSelector((state: IRootState) => state.task);
+    const { data, isFetching, leadPriorityList, leadStatusList, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate } = useSelector((state: IRootState) => state.lead);
     const [searchInputText, setSearchInputText] = useState<string>('');
-    const [searchedData, setSearchedData] = useState<TaskDataType[]>(data);
+    const [searchedData, setSearchedData] = useState<LeadDataType[]>(data);
     const [loading, setLoading] = useState<boolean>(false);
     const [filter, setFilter] = useState<string>('assigned-by-me');
 
@@ -72,16 +73,17 @@ const TaskPage = () => {
         setPage(1);
     }, [sortStatus]);
 
-    //get all task after page render
+    //get all lead after page render
     useEffect(() => {
-        getTasksList();
+        getLeadsList();
     }, [isFetching, filter]);
 
     useEffect(() => {
-        getTasksPriority();
-        getTaskStatus();
-        getUsersList();
-        getLeadsList();
+        getLeadsPriority();
+        getLeadStatus();
+        getContactsList();
+        getBranchList();
+        getSourceList();
     }, []);
 
     useEffect(() => {
@@ -89,91 +91,104 @@ const TaskPage = () => {
         setInitialRecords(data);
     }, [data]);
 
-    //get all tasks list
-    const getTasksList = async () => {
-        setLoading(true);
-        const res: GetMethodResponseType = await new ApiClient().get('task');
-        const tasks: TaskDataType[] | undefined = res?.data;
-        if (typeof tasks === 'undefined') {
-            dispatch(getAllTasks([] as TaskDataType[]));
-            return;
-        }
-        dispatch(getAllTasks(tasks));
-        setLoading(false);
-    };
-
-    //get all users list
-    const getUsersList = async () => {
-        setLoading(true);
-        const res: GetMethodResponseType = await new ApiClient().get('user');
-        const users: UserDataType[] = res?.data;
-        if (typeof users === 'undefined') {
-            dispatch(getAllUsersForTask([] as UserDataType[]));
-            return;
-        }
-        dispatch(getAllUsersForTask(users));
-        setLoading(false);
-    };
-
-    //get all Leads list
+    //get all leads list
     const getLeadsList = async () => {
         setLoading(true);
         const res: GetMethodResponseType = await new ApiClient().get('lead');
-        const leads: LeadDataType[] = res?.data;
+        const leads: LeadDataType[] | undefined = res?.data;
         if (typeof leads === 'undefined') {
-            dispatch(getAllUsersForTask([] as LeadDataType[]));
+            dispatch(getAllLeads([] as LeadDataType[]));
             return;
         }
-        dispatch(getAllLeadsForTask(leads));
+        dispatch(getAllLeads(leads));
         setLoading(false);
     };
 
-    //get all task priority list
-    const getTasksPriority = async () => {
+    //get all contacts list
+    const getContactsList = async () => {
         setLoading(true);
-        const taskPriorityList: GetMethodResponseType = await new ApiClient().get('task-priority');
-        const priorities: TaskSelectOptions[] = taskPriorityList?.data;
+        const res: GetMethodResponseType = await new ApiClient().get('contact');
+        const contacts: ContactDataType[] = res?.data;
+        if (typeof contacts === 'undefined') {
+            dispatch(getAllContactsForLead([] as ContactDataType[]));
+            return;
+        }
+        dispatch(getAllContactsForLead(contacts));
+        setLoading(false);
+    };
+
+    //get all branches list
+    const getBranchList = async () => {
+        setLoading(true);
+        const res: GetMethodResponseType = await new ApiClient().get('branch');
+        const branches: ContactDataType[] = res?.data;
+        if (typeof branches === 'undefined') {
+            dispatch(getAllBranchForLead([] as BranchDataType[]));
+            return;
+        }
+        dispatch(getAllBranchForLead(branches));
+        setLoading(false);
+    };
+
+    //get all source list
+    const getSourceList = async () => {
+        setLoading(true);
+        const res: GetMethodResponseType = await new ApiClient().get('source');
+        const branches: ContactDataType[] = res?.data;
+        if (typeof branches === 'undefined') {
+            dispatch(getAllSourceForLead([] as SourceDataType[]));
+            return;
+        }
+        dispatch(getAllSourceForLead(branches));
+        setLoading(false);
+    };
+
+    //get all lead priority list
+    const getLeadsPriority = async () => {
+        setLoading(true);
+        const leadPriorityList: GetMethodResponseType = await new ApiClient().get('lead-priority');
+        const priorities: LeadSelectOptions[] = leadPriorityList?.data;
         if (typeof priorities === 'undefined') {
-            dispatch(getAllTaskPriorities([] as TaskSelectOptions[]));
+            dispatch(getAllLeadPriorities([] as LeadSelectOptions[]));
             return;
         }
-        dispatch(getAllTaskPriorities(priorities));
+        dispatch(getAllLeadPriorities(priorities));
     };
 
-    //get all task status list
-    const getTaskStatus = async () => {
+    //get all lead status list
+    const getLeadStatus = async () => {
         setLoading(true);
-        const taskStatusList: GetMethodResponseType = await new ApiClient().get('task-status');
-        const status: TaskSelectOptions[] = taskStatusList?.data;
+        const leadStatusList: GetMethodResponseType = await new ApiClient().get('lead-status');
+        const status: LeadSelectOptions[] = leadStatusList?.data;
         if (typeof status === 'undefined') {
-            dispatch(getAllTaskStatus([] as TaskSelectOptions[]));
+            dispatch(getAllLeadStatus([] as LeadSelectOptions[]));
             return;
         }
-        dispatch(getAllTaskStatus(status));
+        dispatch(getAllLeadStatus(status));
     };
 
-    //search task
-    const handleSearchTask = () => {
-        const searchTaskData = data?.filter((task: TaskDataType) => {
+    //search lead
+    const handleSearchLead = () => {
+        const searchLeadData = data?.filter((lead: LeadDataType) => {
             return (
-                task.title.toLowerCase().startsWith(searchQuery.toLowerCase().trim(), 0) ||
-                task.title.toLowerCase().endsWith(searchQuery.toLowerCase().trim()) ||
-                task.title.toLowerCase().includes(searchQuery.toLowerCase().trim())
+                lead.DOB.toLowerCase().startsWith(searchQuery.toLowerCase().trim(), 0) ||
+                lead.DOB.toLowerCase().endsWith(searchQuery.toLowerCase().trim()) ||
+                lead.DOB.toLowerCase().includes(searchQuery.toLowerCase().trim())
             );
         });
-        setSearchedData(searchTaskData);
-        setRecordsData(searchTaskData);
+        setSearchedData(searchLeadData);
+        setRecordsData(searchLeadData);
     };
 
-    return !isAbleToRead ? null : (
+    return (
         <div>
-            <PageHeadingSection description="View, create, update, and close tasks. Organize by status, priority, and due date. Stay on top of work." heading="Task Management" />
+            <PageHeadingSection description="View, create, update, and close leads. Organize by status, priority, and due date. Stay on top of work." heading="Lead Management" />
             <div className="my-6 flex gap-5 ">
                 <div className="flex flex-1 gap-5 ">
                     {isAbleToCreate && (
                         <button className="btn btn-primary h-full w-full max-w-[200px] max-sm:mx-auto" type="button" onClick={() => dispatch(setCreateModal(true))}>
                             <Plus />
-                            Add New Task
+                            Add New Lead
                         </button>
                     )}
                     <div className="dropdown">
@@ -202,25 +217,19 @@ const TaskPage = () => {
                     </div>
                 </div>
                 <div className="relative  flex-1">
-                    <input type="text" placeholder="Find A Task" className="form-input py-3 ltr:pr-[100px] rtl:pl-[100px]" onChange={(e) => setSearchInputText(e.target.value)} value={searchQuery} />
-                    <button type="button" className="btn btn-primary absolute top-1 shadow-none ltr:right-1 rtl:left-1" onClick={() => handleSearchTask()}>
+                    <input type="text" placeholder="Find A Lead" className="form-input py-3 ltr:pr-[100px] rtl:pl-[100px]" onChange={(e) => setSearchInputText(e.target.value)} value={searchQuery} />
+                    <button type="button" className="btn btn-primary absolute top-1 shadow-none ltr:right-1 rtl:left-1" onClick={() => handleSearchLead()}>
                         Search
                     </button>
                 </div>
             </div>
 
-            {/* Tasks List table*/}
+            {/* Leads List table*/}
             <div className="datatables panel mt-6">
                 <DataTable
                     className="table-hover whitespace-nowrap"
                     records={recordsData}
                     columns={[
-                        {
-                            accessor: 'title',
-                            title: 'Task Name',
-                            sortable: true,
-                            render: ({ title }) => <div>{title}</div>,
-                        },
                         {
                             accessor: 'createdAt',
                             title: 'Created Date',
@@ -241,7 +250,7 @@ const TaskPage = () => {
                         },
                         {
                             accessor: 'status',
-                            title: 'Task Status',
+                            title: 'Lead Status',
                             sortable: true,
                             render: ({ status, id }) => (
                                 <div className="dropdown">
@@ -259,13 +268,13 @@ const TaskPage = () => {
                                         }
                                     >
                                         <ul className="max-h-32 !min-w-[170px] overflow-y-auto">
-                                            {taskStatusList.map((status2: TaskSelectOptions, i: number) => {
+                                            {leadStatusList.map((status2: LeadSelectOptions, i: number) => {
                                                 return (
                                                     <li key={i}>
                                                         <button
                                                             className={`mr-2 rounded px-2.5 py-0.5 text-sm font-medium disabled:cursor-not-allowed disabled:text-gray-400 dark:bg-blue-900 
                                                             dark:text-blue-300`}
-                                                            onClick={() => dispatch(setChangeStatusModal({ statusId: status2.id, taskId: id, open: true }))}
+                                                            onClick={() => dispatch(setChangeStatusModal({ statusId: status2.id, leadId: id, open: true }))}
                                                             disabled={status2?.id === status?.id}
                                                         >
                                                             {status2.name}
@@ -280,7 +289,7 @@ const TaskPage = () => {
                         },
                         {
                             accessor: 'priority',
-                            title: 'Task Priority',
+                            title: 'Lead Priority',
                             sortable: true,
                             render: ({ priority, id }) => (
                                 <div className="dropdown">
@@ -298,13 +307,13 @@ const TaskPage = () => {
                                         }
                                     >
                                         <ul className="max-h-32 !min-w-[170px] overflow-y-auto">
-                                            {taskPriorityList.map((priority2: TaskSelectOptions, i: number) => {
+                                            {leadPriorityList.map((priority2: LeadSelectOptions, i: number) => {
                                                 return (
                                                     <li key={i}>
                                                         <button
                                                             className={`rounded px-2.5 py-0.5 text-sm font-medium disabled:cursor-not-allowed disabled:text-gray-400 dark:bg-blue-900 
                                                             dark:text-blue-300`}
-                                                            onClick={() => dispatch(setChangePriorityModal({ priorityId: priority2.id, taskId: id, open: true }))}
+                                                            onClick={() => dispatch(setChangePriorityModal({ priorityId: priority2.id, leadId: id, open: true }))}
                                                             disabled={priority2?.id === priority?.id}
                                                         >
                                                             {priority2.name}
@@ -367,24 +376,24 @@ const TaskPage = () => {
             </div>
 
             {/* edit modal */}
-            <EditTaskModal />
+            <EditLeadModal />
 
             {/* view modal */}
-            <ViewTaskModal />
+            <ViewLeadModal />
 
             {/* delete modal */}
-            <DeleteTaskModal />
+            <DeleteLeadModal />
 
             {/* change Status modal */}
-            <ChangeTaskStatusModal />
+            <ChangeLeadStatusModal />
 
-            {/* change task priority modal */}
-            <ChangeTaskPriorityModal />
+            {/* change lead priority modal */}
+            <ChangeLeadPriorityModal />
 
             {/* create modal */}
-            <CreateTaskModal />
+            <CreateLeadModal />
         </div>
     );
 };
 
-export default TaskPage;
+export default LeadPage;

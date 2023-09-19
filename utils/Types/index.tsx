@@ -44,8 +44,6 @@ export type UserDataType = {
 //source page
 export type SourceDataType = {
     name: string;
-    createdAt: string;
-    updatedAt: string;
     id: string;
 };
 
@@ -79,6 +77,14 @@ export type TaskDataType = {
 };
 
 export type TaskSelectOptions = {
+    name: string;
+    color: string;
+    id: string;
+    createdAt: string;
+    updatedAt: string;
+};
+
+export type LeadSelectOptions = {
     name: string;
     color: string;
     id: string;
@@ -153,8 +159,6 @@ export type BranchDataType = {
     updatedAt: string;
 };
 
-//emails page types
-
 // emails page types
 export interface IEmailTemplate {
     name: string;
@@ -163,6 +167,52 @@ export interface IEmailTemplate {
     createdAt: string;
     updatedAt: string;
     id: string;
+}
+
+//lead page types
+
+export type LeadDataType = {
+    id: string;
+    createdAt: string;
+    updatedAt: string;
+    reference: string;
+    estimatedDate: string;
+    estimatedBudget: string;
+    DOB: string;
+    facebookCampaignName: string;
+    serviceInterestedIn: string;
+    job: string;
+    description: string;
+    status: {
+        color: string;
+        id: string;
+        name: string;
+    };
+    priority: {
+        color: string;
+        id: string;
+        name: string;
+    };
+    contact: ContactDataType;
+    source: SourceDataType;
+    branch: BranchDataType;
+};
+
+export interface ILeadStatus {
+    id: string;
+    name: string;
+    color: string;
+    isDefault: boolean;
+    createdAt: string;
+    updatedAt: string;
+}
+export interface ILeadPriority {
+    id: string;
+    name: string;
+    color: string;
+    isDefault: boolean;
+    createdAt: string;
+    updatedAt: string;
 }
 
 // ----------------- authentication types : start -------------------//
@@ -201,10 +251,26 @@ export interface ManageTaskInitialStateProps extends InitialStateProps {
     singleData: TaskDataType;
     taskPriorityList: TaskSelectOptions[];
     taskStatusList: TaskSelectOptions[];
+    usersList: UserDataType[];
+    ledsList: LeadDataType[];
     changePriorityModal: boolean;
     changeStatusModal: boolean;
     singlePriority: TaskSelectOptions;
     singleStatus: TaskSelectOptions;
+}
+//manage lead slice initial props
+export interface ManageLeadInitialStateProps extends InitialStateProps {
+    data: LeadDataType[];
+    singleData: LeadDataType;
+    leadPriorityList: ILeadPriority[];
+    leadStatusList: ILeadStatus[];
+    changePriorityModal: boolean;
+    changeStatusModal: boolean;
+    singlePriority: ILeadPriority;
+    singleStatus: ILeadStatus;
+    leadContactsList: ContactDataType[];
+    leadBranchList: BranchDataType[];
+    leadSourceList: SourceDataType[];
 }
 
 //source slice initial props

@@ -30,7 +30,7 @@ export const createUserSchema = Yup.object().shape({
     password: Yup.string().required('Please enter your password').min(8, 'Password should be atleast 8 characters'),
     passwordConfirm: Yup.string()
         .oneOf([Yup.ref('password')], 'Password and confirm password not matched')
-        .required('Please enter confirm password'), 
+        .required('Please enter confirm password'),
 });
 
 //Edit User Schema
@@ -55,6 +55,16 @@ export const sourceSchema = Yup.object().shape({
 
 export const taskSchema = Yup.object().shape({
     title: Yup.string().required('Please enter title'),
+});
+
+//task Schema
+export const leadSchema = Yup.object().shape({
+    reference: Yup.string().required('Enter Reference'),
+    estimatedBudget: Yup.number().required('Enter Budget'),
+    description: Yup.string().required('Enter Description'),
+    facebookCampaignName: Yup.string().required('Enter facebook Campaign Name'),
+    serviceInterestedIn: Yup.string().required('Enter Service Intrested'),
+    job: Yup.string().required('Enter Job'),
 });
 
 //task priority schema

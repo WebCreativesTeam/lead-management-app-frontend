@@ -85,6 +85,7 @@ const Users = () => {
         dispatch(getAllUsers(users));
         setLoading(false);
     };
+    
     const getPolicyList = async () => {
         setLoading(true);
         const res: GetMethodResponseType = await new ApiClient().get('policy');

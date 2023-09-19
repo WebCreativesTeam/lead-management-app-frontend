@@ -1,43 +1,41 @@
-import React, { memo } from 'react';
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, { memo, useEffect } from 'react';
 import Modal from '@/components/__Shared/Modal';
 import { useSelector, useDispatch } from 'react-redux';
 import { IRootState } from '@/store';
-import { setCreateModal, setDisableBtn, setFetching } from '@/store/Slices/taskSlice/manageTaskSlice';
+import { setDisableBtn, setEditModal, setFetching } from '@/store/Slices/taskSlice/manageTaskSlice';
 import { useFormik } from 'formik';
 import { taskSchema } from '@/utils/schemas';
 import { ApiClient } from '@/utils/http';
 import { showToastAlert } from '@/utils/contant';
 import Swal from 'sweetalert2';
 import Loader from '@/components/__Shared/Loader';
-import Select from 'react-select';
 import Flatpickr from 'react-flatpickr';
 import 'flatpickr/dist/flatpickr.css';
-import { LeadDataType, SelectOptionsType, TaskSelectOptions, UserDataType } from '@/utils/Types';
 
-const TaskCreateModal = () => {
+const LeadEditModal = () => {
     const dispatch = useDispatch();
-    const { isFetching, createModal, isBtnDisabled, taskPriorityList, usersList, ledsList } = useSelector((state: IRootState) => state.task);
+    const { isFetching, editModal, isBtnDisabled, singleData } = useSelector((state: IRootState) => state.task);
+
+    useEffect(() => {
+        setFieldValue('title', singleData?.title);
+        setFieldValue('description', singleData?.description);
+        setFieldValue('comment', singleData?.comment);
+        setFieldValue('startDate', singleData?.startDate);
+        setFieldValue('endDate', singleData?.endDate);
+    }, [singleData]);
 
     const initialValues = {
         title: '',
-        lead: {
-            value: '',
-            label: '',
-        },
+        // lead: '64c90bd5c7cd824f606addcd',
         priority: {
             value: '',
             label: '',
         },
         startDate: '',
         endDate: '',
-        assignedTo: {
-            value: '',
-            label: '',
-        },
-        observer: {
-            value: '',
-            label: '',
-        },
+        assignedTo: '65081e4fb555280a3c8f4c44',
+        observer: '65081e4fb555280a3c8f4c44',
         description: '',
         isActive: false,
         comment: '',
@@ -51,20 +49,17 @@ const TaskCreateModal = () => {
             dispatch(setFetching(true));
             try {
                 dispatch(setDisableBtn(true));
-                const createTaskObj = {
+                const editTaskObj = {
                     title: value.title,
                     comment: value.comment,
                     isActive: value.isActive,
                     startDate: new Date(value.startDate).toISOString(),
                     endDate: new Date(value.endDate).toISOString(),
                     description: value.description,
-                    leadId: values.lead.value,
-                    observerId: values.observer.value,
-                    priorityId: value.priority.value,
-                    assignedToId: values.assignedTo.value,
+                    // lead: values.lead,
                 };
-                await new ApiClient().post('task', createTaskObj);
-                dispatch(setCreateModal(false));
+                await new ApiClient().patch(`task/${singleData?.id}`, editTaskObj);
+                dispatch(setEditModal({ open: false }));
                 action.resetForm();
             } catch (error: any) {
                 if (typeof error?.response?.data?.message === 'object') {
@@ -79,37 +74,41 @@ const TaskCreateModal = () => {
         },
     });
 
-    const taskPriorityDropdown: SelectOptionsType[] = taskPriorityList?.map((item: TaskSelectOptions) => {
-        return { value: item.id, label: item.name };
-    });
-
-    const taskAssignToDropdown: SelectOptionsType[] = usersList?.map((item: UserDataType) => {
-        return { value: item.id, label: `${item.firstName} ${item.lastName}` };
-    });
-
-    const taskObserverDropdown: SelectOptionsType[] = usersList?.map((item: UserDataType) => {
-        return { value: item.id, label: `${item.firstName} ${item.lastName}` };
-    });
-
-    const taskLeadsDropdown: SelectOptionsType[] = ledsList?.map((item: LeadDataType) => {
-        return { value: item.id, label: item?.contact?.name };
-    });
-
     const showAlert = async () => {
         if (errors.title) {
-            showToastAlert(errors.title);
+            const toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+            });
+            toast.fire({
+                icon: 'error',
+                title: errors.title,
+                padding: '10px 20px',
+            });
         } else if (errors.description) {
-            showToastAlert(errors.description);
+            const toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+            });
+            toast.fire({
+                icon: 'error',
+                title: errors.description,
+                padding: '10px 20px',
+            });
         }
     };
     return (
         <Modal
-            open={createModal}
+            open={editModal}
             onClose={() => {
-                dispatch(setCreateModal(false));
+                dispatch(setEditModal({ open: false }));
             }}
             onDiscard={() => {
-                dispatch(setCreateModal(false));
+                dispatch(setEditModal({ open: false }));
                 resetForm();
             }}
             size="large"
@@ -117,21 +116,8 @@ const TaskCreateModal = () => {
                 errors && showAlert();
                 submitForm();
             }}
-            title="Create Task"
-            isBtnDisabled={
-                values.title &&
-                values.assignedTo.value &&
-                values.lead &&
-                values.startDate &&
-                values.endDate &&
-                values.observer.value &&
-                values.priority.value &&
-                values.description &&
-                values.comment &&
-                !isBtnDisabled
-                    ? false
-                    : true
-            }
+            title="Edit Task"
+            isBtnDisabled={values.title && values.description && values.startDate && values.endDate && values.comment && !isBtnDisabled ? false : true}
             disabledDiscardBtn={isBtnDisabled}
             content={
                 isFetching ? (
@@ -140,13 +126,13 @@ const TaskCreateModal = () => {
                     <form className="space-y-5" onSubmit={handleSubmit}>
                         <div className="flex flex-col gap-4 sm:flex-row">
                             <div className="flex-1">
-                                <label htmlFor="createTask">Task Title</label>
-                                <input onChange={handleChange} onBlur={handleBlur} value={values.title} id="createTask" name="title" type="text" placeholder="Task Title" className="form-input" />
+                                <label htmlFor="editTask">Task Title</label>
+                                <input onChange={handleChange} onBlur={handleBlur} value={values.title} id="editTask" name="title" type="text" placeholder="Task Title" className="form-input" />
                             </div>
-                            <div className="flex-1">
-                                <label htmlFor="taskLead">Select Lead</label>
-                                <Select placeholder="Select task Lead" options={taskLeadsDropdown} id="taskLead" onChange={(e) => setFieldValue('lead', e)} />
-                            </div>
+                            {/* <div className="flex-1">
+                                <label htmlFor="chooseLead">Choose Lead</label>
+                                <input onChange={handleChange} onBlur={handleBlur} value={values.lead} id="chooseLead" name="lead" type="text" placeholder="Choose Lead" className="form-input" />
+                            </div> */}
                         </div>
                         <div className="flex flex-col gap-4 sm:flex-row">
                             <div className="flex-1">
@@ -182,22 +168,6 @@ const TaskCreateModal = () => {
                                 />
                             </div>
                         </div>
-                        <div className="flex flex-col gap-4 sm:flex-row">
-                            <div className="flex-1">
-                                <label htmlFor="taskAssignTo">Task Assign To</label>
-                                <Select placeholder="Select task Assign To" options={taskAssignToDropdown} id="taskAssignTo" onChange={(e) => setFieldValue('assignedTo', e)} />
-                            </div>
-                            <div className="flex-1">
-                                <label htmlFor="taskObserver">Task Observer</label>
-                                <Select placeholder="Select task observer" options={taskObserverDropdown} id="taskObserver" onChange={(e) => setFieldValue('observer', e)} />
-                            </div>
-                        </div>
-                        <div className="flex flex-col gap-4 sm:flex-row">
-                            <div className="flex-1">
-                                <label htmlFor="taskPriority">Task Priority</label>
-                                <Select placeholder="Select task priority" options={taskPriorityDropdown} id="taskPriority" onChange={(e) => setFieldValue('priority', e)} />
-                            </div>
-                        </div>
                         <div>
                             <label htmlFor="taskDescription">Task Description</label>
                             <textarea
@@ -231,6 +201,7 @@ const TaskCreateModal = () => {
                                     className="peer form-checkbox outline-success"
                                     id="taskActiveStatus"
                                     name="isActive"
+                                    defaultChecked={singleData?.isActive}
                                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFieldValue('isActive', e.target.checked)}
                                 />
                                 <span className="peer-checked:text-success">Is Task Active</span>
@@ -243,4 +214,4 @@ const TaskCreateModal = () => {
     );
 };
 
-export default memo(TaskCreateModal);
+export default memo(LeadEditModal);

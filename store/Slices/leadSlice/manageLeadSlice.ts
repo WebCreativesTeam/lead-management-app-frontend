@@ -1,22 +1,23 @@
-import { TaskDataType, ManageTaskInitialStateProps, TaskSelectOptions, UserDataType, LeadDataType } from '@/utils/Types';
+import { LeadDataType, ManageLeadInitialStateProps, ILeadPriority, ILeadStatus, ContactDataType, BranchDataType, SourceDataType } from '@/utils/Types';
 import { fetchUserPermissionArray } from '@/utils/contant';
 import { createSlice } from '@reduxjs/toolkit';
 
-const initialState: ManageTaskInitialStateProps = {
-    data: [] as TaskDataType[],
-    singleData: {} as TaskDataType,
-    singlePriority: {} as TaskSelectOptions,
-    singleStatus: {} as TaskSelectOptions,
+const initialState: ManageLeadInitialStateProps = {
+    data: [] as LeadDataType[],
+    singleData: {} as LeadDataType,
+    singlePriority: {} as ILeadPriority,
+    singleStatus: {} as ILeadStatus,
     createModal: false,
     editModal: false,
     deleteModal: false,
     viewModal: false,
     isBtnDisabled: false,
     isFetching: false,
-    taskPriorityList: [] as TaskSelectOptions[],
-    taskStatusList: [] as TaskSelectOptions[],
-    usersList: [] as UserDataType[],
-    ledsList: [] as LeadDataType[],
+    leadPriorityList: [] as ILeadPriority[],
+    leadStatusList: [] as ILeadStatus[],
+    leadContactsList: [] as ContactDataType[],
+    leadBranchList: [] as BranchDataType[],
+    leadSourceList: [] as SourceDataType[],
     changePriorityModal: false,
     changeStatusModal: false,
     isAbleToRead: false,
@@ -26,9 +27,9 @@ const initialState: ManageTaskInitialStateProps = {
     userPolicyArr: [] as string[],
 };
 
-const manageTaskSlice = createSlice({
+const manageLeadSlice = createSlice({
     initialState,
-    name: 'manage tasks',
+    name: 'manage leads',
     extraReducers(builder) {
         builder.addCase(fetchUserPermissionArray.fulfilled, (state, action) => {
             if (action.payload) {
@@ -40,23 +41,23 @@ const manageTaskSlice = createSlice({
         setViewModal(state, action) {
             const { open, id } = action.payload;
             state.viewModal = open;
-            const findRequestedData: TaskDataType | undefined = state.data.find((item: TaskDataType) => item.id === id);
+            const findRequestedData: LeadDataType | undefined = state.data.find((item: LeadDataType) => item.id === id);
 
             if (findRequestedData && state.viewModal) {
                 state.singleData = findRequestedData;
             } else {
-                state.singleData = {} as TaskDataType;
+                state.singleData = {} as LeadDataType;
             }
         },
         setEditModal(state, action) {
             const { open, id } = action.payload;
             state.editModal = open;
-            const findRequestedData: TaskDataType | undefined = state.data.find((item: TaskDataType) => item.id === id);
+            const findRequestedData: LeadDataType | undefined = state.data.find((item: LeadDataType) => item.id === id);
 
             if (findRequestedData && state.editModal) {
                 state.singleData = findRequestedData;
             } else {
-                state.singleData = {} as TaskDataType;
+                state.singleData = {} as LeadDataType;
             }
         },
         setCreateModal(state, action) {
@@ -65,56 +66,59 @@ const manageTaskSlice = createSlice({
         setDeleteModal(state, action) {
             const { open, id } = action.payload;
             state.deleteModal = open;
-            const findRequestedData: TaskDataType | undefined = state.data.find((item: TaskDataType) => item.id === id);
+            const findRequestedData: LeadDataType | undefined = state.data.find((item: LeadDataType) => item.id === id);
 
             if (findRequestedData && state.deleteModal) {
                 state.singleData = findRequestedData;
             } else {
-                state.singleData = {} as TaskDataType;
+                state.singleData = {} as LeadDataType;
             }
         },
         setChangePriorityModal(state, action) {
-            const { priorityId, taskId, open } = action.payload;
+            const { priorityId, leadId, open } = action.payload;
             state.changePriorityModal = open;
-            const findRequestedData: TaskDataType | undefined = state.data.find((item: TaskDataType) => item.id === taskId);
+            const findRequestedData: LeadDataType | undefined = state.data.find((item: LeadDataType) => item.id === leadId);
 
-            const findSinglePriority: TaskSelectOptions | undefined = state?.taskPriorityList.find((item: TaskSelectOptions) => item.id === priorityId);
+            const findSinglePriority: ILeadPriority | undefined = state?.leadPriorityList.find((item: ILeadPriority) => item.id === priorityId);
 
             if (findRequestedData && state.changePriorityModal && findSinglePriority) {
                 state.singleData = findRequestedData;
                 state.singlePriority = findSinglePriority;
             } else {
-                state.singleData = {} as TaskDataType;
+                state.singleData = {} as LeadDataType;
             }
         },
         setChangeStatusModal(state, action) {
-            const { statusId, taskId, open } = action.payload;
+            const { statusId, leadId, open } = action.payload;
             state.changeStatusModal = open;
-            const findRequestedData: TaskDataType | undefined = state.data.find((item: TaskDataType) => item.id === taskId);
+            const findRequestedData: LeadDataType | undefined = state.data.find((item: LeadDataType) => item.id === leadId);
 
-            const findSingleStatus: TaskSelectOptions | undefined = state?.taskStatusList?.find((item: TaskSelectOptions) => item.id === statusId);
+            const findSingleStatus: ILeadStatus | undefined = state?.leadStatusList?.find((item: ILeadStatus) => item.id === statusId);
 
             if (findRequestedData && state.changeStatusModal && findSingleStatus) {
                 state.singleData = findRequestedData;
                 state.singleStatus = findSingleStatus;
             } else {
-                state.singleData = {} as TaskDataType;
+                state.singleData = {} as LeadDataType;
             }
         },
-        getAllTasks(state, action) {
+        getAllLeads(state, action) {
             state.data = action.payload;
         },
-        getAllUsersForTask(state, action) {
-            state.usersList = action.payload;
+        getAllContactsForLead(state, action) {
+            state.leadContactsList = action.payload;
         },
-        getAllLeadsForTask(state, action) {
-            state.ledsList = action.payload;
+        getAllBranchForLead(state, action) {
+            state.leadBranchList = action.payload;
         },
-        getAllTaskPriorities(state, action) {
-            state.taskPriorityList = action.payload;
+        getAllSourceForLead(state, action) {
+            state.leadSourceList = action.payload;
         },
-        getAllTaskStatus(state, action) {
-            state.taskStatusList = action.payload;
+        getAllLeadPriorities(state, action) {
+            state.leadPriorityList = action.payload;
+        },
+        getAllLeadStatus(state, action) {
+            state.leadStatusList = action.payload;
         },
         setDisableBtn(state, action) {
             state.isBtnDisabled = action.payload;
@@ -122,19 +126,19 @@ const manageTaskSlice = createSlice({
         setFetching(state, action) {
             state.isFetching = action.payload;
         },
-        setTaskReadPolicy(state, action) {
+        setLeadReadPolicy(state, action) {
             const verifyPolicy: boolean = state.userPolicyArr.includes(action.payload);
             state.isAbleToRead = verifyPolicy;
         },
-        setTaskCreatePolicy(state, action) {
+        setLeadCreatePolicy(state, action) {
             const verifyPolicy: boolean = state.userPolicyArr.includes(action.payload);
             state.isAbleToCreate = verifyPolicy;
         },
-        setTaskUpdatePolicy(state, action) {
+        setLeadUpdatePolicy(state, action) {
             const verifyPolicy: boolean = state.userPolicyArr.includes(action.payload);
             state.isAbleToUpdate = verifyPolicy;
         },
-        setTaskDeletePolicy(state, action) {
+        setLeadDeletePolicy(state, action) {
             const verifyPolicy: boolean = state.userPolicyArr.includes(action.payload);
             state.isAbleToDelete = verifyPolicy;
         },
@@ -146,18 +150,19 @@ export const {
     setDeleteModal,
     setEditModal,
     setViewModal,
-    getAllTasks,
-    getAllUsersForTask,
+    getAllLeads,
     setDisableBtn,
     setFetching,
-    getAllTaskPriorities,
-    getAllTaskStatus,
+    getAllLeadPriorities,
+    getAllLeadStatus,
     setChangePriorityModal,
     setChangeStatusModal,
-    setTaskCreatePolicy,
-    setTaskDeletePolicy,
-    setTaskReadPolicy,
-    setTaskUpdatePolicy,
-    getAllLeadsForTask,
-} = manageTaskSlice.actions;
-export default manageTaskSlice.reducer;
+    setLeadCreatePolicy,
+    setLeadDeletePolicy,
+    setLeadReadPolicy,
+    setLeadUpdatePolicy,
+    getAllContactsForLead,
+    getAllBranchForLead,
+    getAllSourceForLead,
+} = manageLeadSlice.actions;
+export default manageLeadSlice.reducer;
