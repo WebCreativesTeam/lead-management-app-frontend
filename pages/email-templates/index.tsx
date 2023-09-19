@@ -8,10 +8,10 @@ import { Delete, Edit, Plus, View } from '@/utils/icons';
 import PageHeadingSection from '@/components/__Shared/PageHeadingSection/index.';
 import { useDispatch, useSelector } from 'react-redux';
 import { setPageTitle } from '@/store/themeConfigSlice';
-import { GetMethodResponseType, IEmails } from '@/utils/Types';
+import { GetMethodResponseType, IEmailTemplate } from '@/utils/Types';
 import { ApiClient } from '@/utils/http';
 import { IRootState } from '@/store';
-import { getAllEmails, setDeleteModal, setViewModal } from '@/store/Slices/emailSlice';
+import { getAllEmailTemplates, setDeleteModal, setViewModal } from '@/store/Slices/emailSlice';
 import EmailDeleteModal from '@/components/emails/EmailDeleteModal';
 import { useRouter } from 'next/router';
 import EmailViewModal from '@/components/emails/EmailViewModal';
@@ -22,9 +22,9 @@ const EmailTemplates = () => {
         dispatch(setPageTitle('Email Templates | Emails'));
     });
     //hooks
-    const { data, isFetching } = useSelector((state: IRootState) => state.emails);
+    const { data, isFetching, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate } = useSelector((state: IRootState) => state.emailTemplate);
     const [searchInputText, setSearchInputText] = useState<string>('');
-    const [searchedData, setSearchedData] = useState<IEmails[]>(data);
+    const [searchedData, setSearchedData] = useState<IEmailTemplate[]>(data);
     const [loading, setLoading] = useState<boolean>(false);
     const router = useRouter();
     //datatable
@@ -64,19 +64,19 @@ const EmailTemplates = () => {
     //get all emails list
     const getEmailList = async () => {
         setLoading(true);
-        const res: GetMethodResponseType = await new ApiClient().get('email-templates');
-        const emails: IEmails[] = res?.data;
+        const res: GetMethodResponseType = await new ApiClient().get('email-template');
+        const emails: IEmailTemplate[] = res?.data;
         if (typeof emails === 'undefined') {
-            dispatch(getAllEmails([] as IEmails[]));
+            dispatch(getAllEmailTemplates([] as IEmailTemplate[]));
             return;
         }
-        dispatch(getAllEmails(emails));
+        dispatch(getAllEmailTemplates(emails));
         setLoading(false);
     };
 
     //search emails
     const handleSearchEmail = () => {
-        const searchEmailData = data?.filter((email: IEmails) => {
+        const searchEmailData = data?.filter((email: IEmailTemplate) => {
             return (
                 email.name.toLowerCase().startsWith(searchQuery.toLowerCase().trim(), 0) ||
                 email.name.toLowerCase().endsWith(searchQuery.toLowerCase().trim()) ||
@@ -87,19 +87,23 @@ const EmailTemplates = () => {
         setRecordsData(searchEmailData);
     };
 
-    return (
+    return !isAbleToRead ? null : (
         <div>
             <PageHeadingSection
                 description=" Design and save new email templates for various purposes.Modify existing email templates to match your current needs. Remove outdated or unused email templates from your collection."
                 heading="Email Templates"
             />
             <div className="my-6 flex flex-col gap-5 sm:flex-row ">
-                <div className="flex-1">
-                    <button className="btn btn-primary h-full w-full max-w-[250px] max-sm:mx-auto" type="button" onClick={() => router.push('/emails/create-email-template')}>
-                        <Plus />
-                        Create New Template
-                    </button>
-                </div>
+                {!isAbleToCreate ? (
+                    <div className="flex-1"></div>
+                ) : (
+                    <div className="flex-1">
+                        <button className="btn btn-primary h-full w-full max-w-[250px] max-sm:mx-auto" type="button" onClick={() => router.push('/email-templates/create-email-template')}>
+                            <Plus />
+                            Create New Template
+                        </button>
+                    </div>
+                )}
                 <div className="relative  flex-1">
                     <input
                         type="text"
@@ -161,16 +165,20 @@ const EmailTemplates = () => {
                                             <View />
                                         </button>
                                     </Tippy>
-                                    <Tippy content="Edit">
-                                        <button type="button" onClick={() => router.push('/emails/edit-email-template/' + id)}>
-                                            <Edit />
-                                        </button>
-                                    </Tippy>
-                                    <Tippy content="Delete">
-                                        <button type="button" onClick={() => dispatch(setDeleteModal({ id, open: true }))}>
-                                            <Delete />
-                                        </button>
-                                    </Tippy>
+                                    {isAbleToUpdate && (
+                                        <Tippy content="Edit">
+                                            <button type="button" onClick={() => router.push('/email-templates/edit-email-template/' + id)}>
+                                                <Edit />
+                                            </button>
+                                        </Tippy>
+                                    )}
+                                    {isAbleToDelete && (
+                                        <Tippy content="Delete">
+                                            <button type="button" onClick={() => dispatch(setDeleteModal({ id, open: true }))}>
+                                                <Delete />
+                                            </button>
+                                        </Tippy>
+                                    )}
                                 </div>
                             ),
                         },

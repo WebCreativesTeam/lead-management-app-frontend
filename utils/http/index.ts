@@ -1,5 +1,6 @@
 import axios, { AxiosInstance } from 'axios';
 import { showToastAlert } from '../contant';
+import Router from 'next/router';
 
 export interface IApiClient {
     get<TResponse>(path: string): Promise<TResponse>;
@@ -43,6 +44,9 @@ export class ApiClient implements IApiClient {
             } else if (typeof error?.response?.data?.message) {
                 showToastAlert(error?.response?.data?.message);
             }
+            if (error?.response?.status === 401) {
+                Router.push('/auth/signin');
+            }
             console.log(error);
         }
         return null as TResponse;
@@ -68,6 +72,9 @@ export class ApiClient implements IApiClient {
             } else if (typeof error?.response?.data?.message) {
                 showToastAlert(error?.response?.data?.message);
             }
+            // if (error?.response?.status === 401) {
+            //     Router.push('/auth/signin');
+            // }
             console.log(error);
         }
         return null as TResponse;

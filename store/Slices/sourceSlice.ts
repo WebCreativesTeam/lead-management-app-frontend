@@ -1,5 +1,5 @@
 import { SourceDataType, SourceInitialStateProps } from '@/utils/Types';
-import { fetchUserPolicyArray } from '@/utils/contant';
+import { fetchUserPermissionArray } from '@/utils/contant';
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState: SourceInitialStateProps = {
@@ -22,7 +22,7 @@ const sourceSlice = createSlice({
     initialState,
     name: 'source',
     extraReducers(builder) {
-        builder.addCase(fetchUserPolicyArray.fulfilled, (state, action) => {
+        builder.addCase(fetchUserPermissionArray.fulfilled, (state, action) => {
             if (action.payload) {
                 state.userPolicyArr = action.payload;
             }
@@ -93,5 +93,17 @@ const sourceSlice = createSlice({
     },
 });
 
-export const { setCreateModal, setDeleteModal, setEditModal, setViewModal, getAllSources, setDisableBtn, setFetching,setSourceCreatePolicy,setSourceDeletePolicy,setSourceReadPolicy,setSourceUpdatePolicy } = sourceSlice.actions;
+export const {
+    setCreateModal,
+    setDeleteModal,
+    setEditModal,
+    setViewModal,
+    getAllSources,
+    setDisableBtn,
+    setFetching,
+    setSourceCreatePolicy,
+    setSourceDeletePolicy,
+    setSourceReadPolicy,
+    setSourceUpdatePolicy,
+} = sourceSlice.actions;
 export default sourceSlice.reducer;

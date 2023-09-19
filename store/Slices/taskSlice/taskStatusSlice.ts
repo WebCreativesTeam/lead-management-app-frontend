@@ -1,5 +1,5 @@
 import { TaskStatusInitialStateProps, TaskStatusType } from '@/utils/Types';
-import { fetchUserPolicyArray, showToastAlert } from '@/utils/contant';
+import { fetchUserPermissionArray, showToastAlert } from '@/utils/contant';
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState: TaskStatusInitialStateProps = {
@@ -24,7 +24,7 @@ const taskStatusSlice = createSlice({
     initialState,
     name: 'task status',
     extraReducers(builder) {
-        builder.addCase(fetchUserPolicyArray.fulfilled, (state, action) => {
+        builder.addCase(fetchUserPermissionArray.fulfilled, (state, action) => {
             if (action.payload) {
                 state.userPolicyArr = action.payload;
             }

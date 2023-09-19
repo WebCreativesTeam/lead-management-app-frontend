@@ -11,7 +11,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { ArrowRight, Branch, Email, Global, Phone, Shield, Tasks, User } from '../../utils/icons';
 import { setBranchCreatePolicy, setBranchDeletePolicy, setBranchReadPolicy, setBranchUpdatePolicy } from '@/store/Slices/branchSlice';
-import { fetchUserPolicyArray } from '@/utils/contant';
+import { fetchUserPermissionArray } from '@/utils/contant';
 import { setContactCreatePolicy, setContactDeletePolicy, setContactReadPolicy, setContactUpdatePolicy } from '@/store/Slices/contactSlice';
 import { setSourceCreatePolicy, setSourceDeletePolicy, setSourceReadPolicy, setSourceUpdatePolicy } from '@/store/Slices/sourceSlice';
 import { setChangeActiveStatusPermission, setChangeUsersPolicy, setUserCreatePolicy, setUserDeletePolicy, setUserReadPolicy, setUserUpdatePolicy } from '@/store/Slices/userSlice';
@@ -31,6 +31,7 @@ import {
     setTaskStatusReadPolicy,
     setTaskStatusUpdatePolicy,
 } from '@/store/Slices/taskSlice/taskStatusSlice';
+import { setEmailTemplateCreatePermission, setEmailTemplateDeletePermission, setEmailTemplateReadPermission, setEmailTemplateUpdatePermission } from '@/store/Slices/emailSlice';
 
 const Sidebar = () => {
     const router = useRouter();
@@ -44,30 +45,44 @@ const Sidebar = () => {
         });
     };
 
+    //branch
     const isAbleToReadBranch: boolean = useSelector((state: IRootState) => state.branch.isAbleToRead);
     const userPolicyBranchArray: string[] = useSelector((state: IRootState) => state.branch.userPolicyArr);
 
+    //contacts
     const userPolicyContactArray: string[] = useSelector((state: IRootState) => state.contacts.userPolicyArr);
+    const isAbleToReadContact: boolean = useSelector((state: IRootState) => state.contacts.isAbleToRead);
 
+    // source
     const userPolicySourceArray: string[] = useSelector((state: IRootState) => state.source.userPolicyArr);
     const isAbleToReadSource: boolean = useSelector((state: IRootState) => state.source.isAbleToRead);
 
+    //user
     const userPolicyUsersArray: string[] = useSelector((state: IRootState) => state.user.userPolicyArr);
     const isAbleToReadUsers: boolean = useSelector((state: IRootState) => state.user.isAbleToRead);
 
+    //Manage Task
     const userPolicyTaskArray: string[] = useSelector((state: IRootState) => state.task.userPolicyArr);
     const isAbleToReadTask: boolean = useSelector((state: IRootState) => state.task.isAbleToRead);
 
+    //Policy page
     const userPolicyPermissonArray: string[] = useSelector((state: IRootState) => state.policy.userPolicyArr);
     const isAbleToReadPolicy: boolean = useSelector((state: IRootState) => state.policy.isAbleToRead);
 
+    //Task Priority
     const userPolicyTaskPriorityArray: string[] = useSelector((state: IRootState) => state.taskPriority.userPolicyArr);
     const isAbleToReadTaskPriority: boolean = useSelector((state: IRootState) => state.taskPriority.isAbleToRead);
 
+    //Task Status
     const userPolicyTaskStatusArray: string[] = useSelector((state: IRootState) => state.taskStatus.userPolicyArr);
     const isAbleToReadTaskStatus: boolean = useSelector((state: IRootState) => state.taskStatus.isAbleToRead);
+
+    //Task Status
+    const userPolicyEmailTemplateArray: string[] = useSelector((state: IRootState) => state.taskStatus.userPolicyArr);
+    const isAbleToReadEmailTemplates: boolean = useSelector((state: IRootState) => state.emailTemplate.isAbleToRead);
+    isAbleToReadEmailTemplates;
     useEffect(() => {
-        dispatch(fetchUserPolicyArray());
+        dispatch(fetchUserPermissionArray());
     }, []);
 
     //access for branch page
@@ -111,7 +126,7 @@ const Sidebar = () => {
         dispatch(setTaskStatusUpdatePolicy('taskstatus:Update::Document'));
         dispatch(setTaskStatusDeletePolicy('taskstatus:Delete::Document'));
         dispatch(setChangeDefaultTaskStatusPermission('taskstatus:Update::DocumentDefault'));
-    }, [userPolicyTaskArray]);
+    }, [userPolicyTaskStatusArray]);
 
     //access for Task Priority page
     useEffect(() => {
@@ -120,7 +135,7 @@ const Sidebar = () => {
         dispatch(setTaskPriorityUpdatePolicy('taskpriority:Update::Document'));
         dispatch(setTaskPriorityDeletePolicy('taskpriority:Delete::Document'));
         dispatch(setChangeDefaultTaskPriorityPermission('taskpriority:Update::DocumentDefault'));
-    }, [userPolicyTaskArray]);
+    }, [userPolicyTaskPriorityArray]);
 
     //access for Policy page
     useEffect(() => {
@@ -138,6 +153,14 @@ const Sidebar = () => {
         dispatch(setContactUpdatePolicy('contact:Update::Document'));
         dispatch(setContactDeletePolicy('contact:Delete::Document'));
     }, [userPolicyContactArray]);
+
+    // access for Email Template page
+    useEffect(() => {
+        dispatch(setEmailTemplateReadPermission('emailtemplate:Read::Documents'));
+        dispatch(setEmailTemplateCreatePermission('emailtemplate:Create::Document'));
+        dispatch(setEmailTemplateUpdatePermission('emailtemplate:Update::Document'));
+        dispatch(setEmailTemplateDeletePermission('emailtemplate:Delete::Document'));
+    }, [userPolicyEmailTemplateArray]);
 
     useEffect(() => {
         const selector = document.querySelector('.sidebar ul a[href="' + window.location.pathname + '"]');
@@ -236,15 +259,17 @@ const Sidebar = () => {
                                 </li>
                             )}
 
-                            {/* emails */}
-                            <li className="menu nav-item">
-                                <Link href="/emails" className="group">
-                                    <div className="flex items-center">
-                                        <Email />
-                                        <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Emails')}</span>
-                                    </div>
-                                </Link>
-                            </li>
+                            {/* email templates */}
+                            {isAbleToReadEmailTemplates && (
+                                <li className="menu nav-item">
+                                    <Link href="/email-templates" className="group">
+                                        <div className="flex items-center">
+                                            <Email />
+                                            <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Email Templates')}</span>
+                                        </div>
+                                    </Link>
+                                </li>
+                            )}
 
                             {/* Users */}
                             {isAbleToReadUsers && (
@@ -294,14 +319,16 @@ const Sidebar = () => {
                             )}
 
                             {/* contacts */}
-                            <li className="menu nav-item">
-                                <Link href="/contacts" className="group">
-                                    <div className="flex items-center">
-                                        <Phone />
-                                        <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Contacts')}</span>
-                                    </div>
-                                </Link>
-                            </li>
+                            {isAbleToReadContact && (
+                                <li className="menu nav-item">
+                                    <Link href="/contacts" className="group">
+                                        <div className="flex items-center">
+                                            <Phone />
+                                            <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Contacts')}</span>
+                                        </div>
+                                    </Link>
+                                </li>
+                            )}
                         </ul>
                     </PerfectScrollbar>
                 </div>

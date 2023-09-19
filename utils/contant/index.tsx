@@ -3,6 +3,7 @@ import Swal from 'sweetalert2';
 import { Permission, UserDataType } from '../Types';
 import { ApiClient } from '../http';
 
+
 export function showToastAlert(errMsg: string) {
     const toast = Swal.mixin({
         toast: true,
@@ -17,7 +18,7 @@ export function showToastAlert(errMsg: string) {
     });
 }
 
-export const fetchUserPolicyArray: any = createAsyncThunk('user/id', async (arg, thunkApi) => {
+export const fetchUserPermissionArray: any = createAsyncThunk('user/id', async (arg, thunkApi) => {
     const id: string | null = localStorage.getItem('uid');
     if (id) {
         try {

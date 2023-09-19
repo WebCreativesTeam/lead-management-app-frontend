@@ -23,11 +23,11 @@ const PolicyViewModal = () => {
                 <>
                     <ul className="flex flex-col gap-4">
                         <li className="flex flex-wrap">
-                            <span className="flex-1 text-lg font-bold">First Name</span>
+                            <span className="flex-1 text-lg font-bold">Policy Name</span>
                             <p className="flex-[3]">{singleData?.name}</p>
                         </li>
                         <li className="flex">
-                            <span className="flex-1 text-lg font-bold"> Last Name</span>
+                            <span className="flex-1 text-lg font-bold"> Policy Description</span>
                             <p className="flex-[3]">{singleData?.description}</p>
                         </li>
                         <li className="flex">

@@ -1,5 +1,5 @@
 import { BranchDataType, BranchInitialStateProps, Permission, UserDataType } from '@/utils/Types';
-import { fetchUserPolicyArray } from '@/utils/contant';
+import { fetchUserPermissionArray } from '@/utils/contant';
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState: BranchInitialStateProps = {
@@ -22,7 +22,7 @@ const branchSlice = createSlice({
     initialState,
     name: 'branch',
     extraReducers(builder) {
-        builder.addCase(fetchUserPolicyArray.fulfilled, (state, action) => {
+        builder.addCase(fetchUserPermissionArray.fulfilled, (state, action) => {
             if (action.payload) {
                 state.userPolicyArr = action.payload;
             }

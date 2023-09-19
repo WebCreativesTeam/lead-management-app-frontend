@@ -1,5 +1,5 @@
 import { TaskDataType, ManageTaskInitialStateProps, TaskSelectOptions } from '@/utils/Types';
-import { fetchUserPolicyArray } from '@/utils/contant';
+import { fetchUserPermissionArray } from '@/utils/contant';
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState: ManageTaskInitialStateProps = {
@@ -28,7 +28,7 @@ const manageTaskSlice = createSlice({
     initialState,
     name: 'manage tasks',
     extraReducers(builder) {
-        builder.addCase(fetchUserPolicyArray.fulfilled, (state, action) => {
+        builder.addCase(fetchUserPermissionArray.fulfilled, (state, action) => {
             if (action.payload) {
                 state.userPolicyArr = action.payload;
             }

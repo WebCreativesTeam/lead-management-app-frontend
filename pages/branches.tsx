@@ -17,6 +17,7 @@ import { ApiClient } from '@/utils/http';
 import BranchCreateModal from '@/components/Branches/BranchCreateModal';
 import BranchEditModal from '@/components/Branches/BranchEditModal';
 import { useRouter } from 'next/router';
+import Loader from '@/components/__Shared/Loader';
 
 const BranchPage = () => {
     const dispatch = useDispatch();
@@ -238,7 +239,7 @@ const BranchPage = () => {
                 open={deleteModal}
                 onClose={() => dispatch(setDeleteModal({ open: false }))}
                 onDiscard={() => dispatch(setDeleteModal({ open: false }))}
-                description={<>Are you sure you want to delete this Branch? It will also remove form database.</>}
+                description={isFetching ? <Loader /> : <>Are you sure you want to delete this Branch? It will also remove form database.</>}
                 title="Delete Branch"
                 isBtnDisabled={isBtnDisabled}
                 onSubmit={onDeleteBranch}

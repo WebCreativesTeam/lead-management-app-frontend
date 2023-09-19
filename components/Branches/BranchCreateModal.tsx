@@ -9,10 +9,10 @@ import { useFormik } from 'formik';
 import { branchSchema } from '@/utils/schemas';
 import { ApiClient } from '@/utils/http';
 import { showToastAlert } from '@/utils/contant';
+import Loader from '../__Shared/Loader';
 
 const BranchCreateModal = () => {
-    const createModal: boolean = useSelector((state: IRootState) => state.branch.createModal);
-    const isBtnDisabled: boolean = useSelector((state: IRootState) => state.branch.isBtnDisabled);
+    const { isFetching, createModal, isBtnDisabled } = useSelector((state: IRootState) => state.branch);
     const dispatch = useDispatch();
 
     const { values, handleChange, submitForm, handleSubmit, setFieldValue, errors, handleBlur, resetForm } = useFormik({
@@ -70,41 +70,45 @@ const BranchCreateModal = () => {
             isBtnDisabled={values.name && values.address && values.city && values.state && values.country && !isBtnDisabled ? false : true}
             disabledDiscardBtn={isBtnDisabled}
             content={
-                <form className="space-y-5" onSubmit={handleSubmit}>
-                    <div>
-                        <label htmlFor="createBranch">Branch Name</label>
-                        <input onChange={handleChange} onBlur={handleBlur} value={values.name} id="createBranch" name="name" type="text" placeholder="Branch Name" className="form-input" />
-                    </div>
-                    <div className="flex flex-col  gap-4 sm:flex-row">
-                        <div className="flex-1">
-                            <label htmlFor="createAddress">Address</label>
-                            <input
-                                onChange={handleChange}
-                                onBlur={handleBlur}
-                                value={values.address}
-                                id="createAddress"
-                                name="address"
-                                type="text"
-                                placeholder="Branch Address"
-                                className="form-input"
-                            />
+                isFetching ? (
+                    <Loader />
+                ) : (
+                    <form className="space-y-5" onSubmit={handleSubmit}>
+                        <div>
+                            <label htmlFor="createBranch">Branch Name</label>
+                            <input onChange={handleChange} onBlur={handleBlur} value={values.name} id="createBranch" name="name" type="text" placeholder="Branch Name" className="form-input" />
                         </div>
-                        <div className="flex-1">
-                            <label htmlFor="country">Select Country</label>
-                            <Select placeholder="select country" options={countryData} onChange={(data: any) => setFieldValue('country', data.value)} />
+                        <div className="flex flex-col  gap-4 sm:flex-row">
+                            <div className="flex-1">
+                                <label htmlFor="createAddress">Address</label>
+                                <input
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    value={values.address}
+                                    id="createAddress"
+                                    name="address"
+                                    type="text"
+                                    placeholder="Branch Address"
+                                    className="form-input"
+                                />
+                            </div>
+                            <div className="flex-1">
+                                <label htmlFor="country">Select Country</label>
+                                <Select placeholder="select country" options={countryData} onChange={(data: any) => setFieldValue('country', data.value)} />
+                            </div>
                         </div>
-                    </div>
-                    <section className="flex flex-col  gap-4 sm:flex-row">
-                        <div className="flex-1">
-                            <label htmlFor="state">Select State</label>
-                            <Select placeholder="select state" options={countryData} onChange={(data: any) => setFieldValue('state', data.value)} />
-                        </div>
-                        <div className="flex-1">
-                            <label htmlFor="state">Select City</label>
-                            <Select placeholder="select city" options={countryData} onChange={(data: any) => setFieldValue('city', data.value)} />
-                        </div>
-                    </section>
-                </form>
+                        <section className="flex flex-col  gap-4 sm:flex-row">
+                            <div className="flex-1">
+                                <label htmlFor="state">Select State</label>
+                                <Select placeholder="select state" options={countryData} onChange={(data: any) => setFieldValue('state', data.value)} />
+                            </div>
+                            <div className="flex-1">
+                                <label htmlFor="state">Select City</label>
+                                <Select placeholder="select city" options={countryData} onChange={(data: any) => setFieldValue('city', data.value)} />
+                            </div>
+                        </section>
+                    </form>
+                )
             }
         />
     );

@@ -43,7 +43,6 @@ const SignUpPage = () => {
                     lastName: value.lastName,
                     email: value.email,
                     password: value.password,
-                    // passwordConfirm: value.confirmPassword,
                 };
                 await new ApiClient().post('/auth/sign-up', createUserObj);
                 action.resetForm();

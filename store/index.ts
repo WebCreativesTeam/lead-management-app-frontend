@@ -8,7 +8,7 @@ import policySlice from './Slices/policySlice';
 import manageTaskSlice from './Slices/taskSlice/manageTaskSlice';
 import taskStatusSlice from './Slices/taskSlice/taskStatusSlice';
 import taskPrioritySlice from './Slices/taskSlice/taskPrioritySlice';
-import emailSlice from './Slices/emailSlice';
+import emailTemplateSlice from './Slices/emailSlice';
 
 const rootReducer = combineReducers({
     themeConfig: themeConfigSlice,
@@ -20,7 +20,7 @@ const rootReducer = combineReducers({
     task: manageTaskSlice,
     taskStatus: taskStatusSlice,
     taskPriority: taskPrioritySlice,
-    emails: emailSlice,
+    emailTemplate: emailTemplateSlice,
 });
 
 export const store = configureStore({

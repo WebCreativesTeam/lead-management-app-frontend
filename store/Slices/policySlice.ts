@@ -1,5 +1,5 @@
 import { Permission, PolicyDataType, PolicyInitialStateProps } from '@/utils/Types';
-import { fetchUserPolicyArray, showToastAlert } from '@/utils/contant';
+import { fetchUserPermissionArray, showToastAlert } from '@/utils/contant';
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 
 const initialState: PolicyInitialStateProps = {
@@ -26,7 +26,7 @@ const policySlice = createSlice({
     initialState,
     name: 'policy',
     extraReducers(builder) {
-        builder.addCase(fetchUserPolicyArray.fulfilled, (state, action) => {
+        builder.addCase(fetchUserPermissionArray.fulfilled, (state, action) => {
             if (action.payload) {
                 state.userPolicyArr = action.payload;
             }

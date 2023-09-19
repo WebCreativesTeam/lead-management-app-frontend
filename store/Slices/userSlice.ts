@@ -1,5 +1,5 @@
 import { PolicyDataType, UserDataType, UserInitialStateProps } from '@/utils/Types';
-import { fetchUserPolicyArray } from '@/utils/contant';
+import { fetchUserPermissionArray } from '@/utils/contant';
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState: UserInitialStateProps = {
@@ -19,8 +19,8 @@ const initialState: UserInitialStateProps = {
     isAbleToCreate: false,
     isAbleToUpdate: false,
     isAbleToDelete: false,
-    isAbleToUpdatePolicy:false,
-    isAbleToChangeActiveStatus:false,
+    isAbleToUpdatePolicy: false,
+    isAbleToChangeActiveStatus: false,
     userPolicyArr: [] as string[],
 };
 
@@ -28,7 +28,7 @@ const userSlice = createSlice({
     initialState,
     name: 'user',
     extraReducers(builder) {
-        builder.addCase(fetchUserPolicyArray.fulfilled, (state, action) => {
+        builder.addCase(fetchUserPermissionArray.fulfilled, (state, action) => {
             if (action.payload) {
                 state.userPolicyArr = action.payload;
             }
@@ -150,6 +150,6 @@ export const {
     setUserReadPolicy,
     setUserUpdatePolicy,
     setChangeUsersPolicy,
-    setChangeActiveStatusPermission
+    setChangeActiveStatusPermission,
 } = userSlice.actions;
 export default userSlice.reducer;

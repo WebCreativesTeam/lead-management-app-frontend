@@ -156,7 +156,7 @@ export type BranchDataType = {
 //emails page types
 
 // emails page types
-export interface IEmails {
+export interface IEmailTemplate {
     name: string;
     subject: string;
     message: string;
@@ -259,12 +259,17 @@ export interface UserInitialStateProps extends InitialStateProps {
 
 // email slice initial props
 export interface EmailsInitialStateProps {
-    data: IEmails[];
-    singleData: IEmails;
+    data: IEmailTemplate[];
+    singleData: IEmailTemplate;
     deleteModal: boolean;
     isBtnDisabled: boolean;
     isFetching: boolean;
     viewModal: boolean;
+    isAbleToRead: boolean;
+    isAbleToCreate: boolean;
+    isAbleToUpdate: boolean;
+    isAbleToDelete: boolean;
+    userPolicyArr: string[];
 }
 
 ///-------- Redux Toolkit Types - END -------------//

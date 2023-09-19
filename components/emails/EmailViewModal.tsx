@@ -5,7 +5,7 @@ import { setViewModal } from '@/store/Slices/emailSlice';
 import { IRootState } from '@/store';
 
 const EmailViewModal = () => {
-    const { viewModal, singleData } = useSelector((state: IRootState) => state.emails);
+    const { viewModal, singleData } = useSelector((state: IRootState) => state.emailTemplate);
     const dispatch = useDispatch();
 
     const EmailViewObject: any = {

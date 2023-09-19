@@ -3,24 +3,23 @@ import ConfirmationModal from '../__Shared/ConfirmationModal';
 import { useDispatch, useSelector } from 'react-redux';
 import { IRootState } from '@/store';
 import { setDeleteModal, setDisableBtn, setFetching } from '@/store/Slices/emailSlice';
-import { IEmails } from '@/utils/Types';
+import { IEmailTemplate } from '@/utils/Types';
 import { ApiClient } from '@/utils/http';
 import Loader from '../__Shared/Loader';
 
 const EmailDeleteModal = () => {
-    const { isFetching, isBtnDisabled, deleteModal, singleData } = useSelector((state: IRootState) => state.emails);
+    const { isFetching, isBtnDisabled, deleteModal, singleData } = useSelector((state: IRootState) => state.emailTemplate);
     const dispatch = useDispatch();
     const onDeleteEmailTemplate = async () => {
         dispatch(setFetching(true));
         dispatch(setDisableBtn(true));
-        const deleteTemplate: IEmails = await new ApiClient().delete('email-templates/' + singleData.id);
-        if (Object.keys(deleteTemplate).length === 0) {
-            dispatch(setDisableBtn(false));
+        const deleteTemplate: IEmailTemplate = await new ApiClient().delete('email-template/' + singleData.id);
+        dispatch(setDisableBtn(false));
+        dispatch(setFetching(false));
+        if (deleteTemplate === null) {
             return;
         }
-        dispatch(setDisableBtn(false));
         dispatch(setDeleteModal({ open: false }));
-        dispatch(setFetching(false));
     };
     return (
         <ConfirmationModal

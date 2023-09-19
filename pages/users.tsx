@@ -18,6 +18,7 @@ import UserEditModal from '@/components/Users/UserEditModal';
 import UserPolicyModal from '@/components/Users/UserPolicyModal';
 import UserDeactivateModal from '@/components/Users/UserDeactivateModal';
 import { sortBy } from 'lodash';
+import Loader from '@/components/__Shared/Loader';
 
 const Users = () => {
     const dispatch = useDispatch();
@@ -285,7 +286,7 @@ const Users = () => {
                 open={deleteModal}
                 onClose={() => dispatch(setDeleteModal({ open: false }))}
                 onDiscard={() => dispatch(setDeleteModal({ open: false }))}
-                description={<>Are you sure you want to delete this User? It will also remove form database. And, It will not revert!</>}
+                description={isFetching ? <Loader /> : <>Are you sure you want to delete this User? It will also remove form database. And, It will not revert!</>}
                 title="Delete User"
                 isBtnDisabled={isBtnDisabled}
                 onSubmit={onDeleteUser}
