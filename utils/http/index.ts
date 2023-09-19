@@ -37,6 +37,10 @@ export class ApiClient implements IApiClient {
             const response = await this.client.get<TResponse>(path);
             return response?.data;
         } catch (error: any) {
+            if (error?.response?.status === 401) {
+                Router.push('/auth/signin');
+                return null as TResponse;
+            }
             if (typeof error?.response === 'string') {
                 showToastAlert(error?.response);
             } else if (typeof error?.response?.data?.error === 'string') {
@@ -44,12 +48,9 @@ export class ApiClient implements IApiClient {
             } else if (typeof error?.response?.data?.message) {
                 showToastAlert(error?.response?.data?.message);
             }
-            if (error?.response?.status === 401) {
-                Router.push('/auth/signin');
-            }
             console.log(error);
+            return null as TResponse;
         }
-        return null as TResponse;
     }
     public async patch<TRequest, TResponse>(path: string, body: TRequest): Promise<TResponse> {
         const response = await this.client.patch<TResponse>(path, body);
