@@ -238,7 +238,7 @@ const Sidebar = () => {
                                 <li className="menu nav-item">
                                     <button type="button" className={`${currentMenu === 'Tasks' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('Tasks')}>
                                         <div className="flex items-center">
-                                            <Talegram/>
+                                            <Tasks />
                                             <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Tasks')}</span>
                                         </div>
 
@@ -274,7 +274,7 @@ const Sidebar = () => {
                                 <li className="menu nav-item">
                                     <button type="button" className={`${currentMenu === 'Leads' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('Leads')}>
                                         <div className="flex items-center">
-                                            <Tasks />
+                                            <Talegram />
                                             <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Leads')}</span>
                                         </div>
 
