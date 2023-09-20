@@ -47,6 +47,8 @@ const ContactEditModal = () => {
         setFieldValue('state', location?.state);
         setFieldValue('country', location?.country);
         setFieldValue('city', location?.city);
+        setFieldValue('assignedTo', assignedTo?.id);
+        setFieldValue('source', source?.id);
 
         const findState: any = countryData.find((item: SelectOptionsType) => item.value === location?.state);
         setDefaultState(findState);
@@ -138,6 +140,8 @@ const ContactEditModal = () => {
         dispatch(setEditModal({ open: false }));
         resetForm();
     };
+
+    console.log(values);
 
     return (
         <Modal
