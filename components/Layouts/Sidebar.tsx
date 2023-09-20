@@ -34,7 +34,20 @@ import {
 import { setEmailTemplateCreatePermission, setEmailTemplateDeletePermission, setEmailTemplateReadPermission, setEmailTemplateUpdatePermission } from '@/store/Slices/emailSlice';
 import { setLeadCreatePolicy, setLeadDeletePolicy, setLeadReadPolicy, setLeadUpdatePolicy } from '@/store/Slices/leadSlice/manageLeadSlice';
 import Talegram from '@/utils/icons/Talegram';
-import { setChangeDefaultLeadPriorityPermission, setLeadPriorityCreatePolicy, setLeadPriorityDeletePolicy, setLeadPriorityReadPolicy, setLeadPriorityUpdatePolicy } from '@/store/Slices/leadSlice/leadPrioritySlice';
+import {
+    setChangeDefaultLeadPriorityPermission,
+    setLeadPriorityCreatePolicy,
+    setLeadPriorityDeletePolicy,
+    setLeadPriorityReadPolicy,
+    setLeadPriorityUpdatePolicy,
+} from '@/store/Slices/leadSlice/leadPrioritySlice';
+import {
+    setChangeDefaultLeadStatusPermission,
+    setLeadStatusCreatePolicy,
+    setLeadStatusDeletePolicy,
+    setLeadStatusReadPolicy,
+    setLeadStatusUpdatePolicy,
+} from '@/store/Slices/leadSlice/leadStatusSlice';
 
 const Sidebar = () => {
     const router = useRouter();
@@ -76,13 +89,17 @@ const Sidebar = () => {
     const userPolicyTaskPriorityArray: string[] = useSelector((state: IRootState) => state.taskPriority.userPolicyArr);
     const isAbleToReadTaskPriority: boolean = useSelector((state: IRootState) => state.taskPriority.isAbleToRead);
 
-    //Task Priority
+    //Lead Priority
     const userPolicyLeadPriorityArray: string[] = useSelector((state: IRootState) => state.leadPriority.userPolicyArr);
     const isAbleToReadLeadPriority: boolean = useSelector((state: IRootState) => state.taskPriority.isAbleToRead);
 
     //Task Status
     const userPolicyTaskStatusArray: string[] = useSelector((state: IRootState) => state.taskStatus.userPolicyArr);
     const isAbleToReadTaskStatus: boolean = useSelector((state: IRootState) => state.taskStatus.isAbleToRead);
+
+    //Lead Status
+    const userPolicyLeadStatusArray: string[] = useSelector((state: IRootState) => state.leadStatus.userPolicyArr);
+    const isAbleToReadLeadStatus: boolean = useSelector((state: IRootState) => state.leadStatus.isAbleToRead);
 
     //email template
     const userPolicyEmailTemplateArray: string[] = useSelector((state: IRootState) => state.taskStatus.userPolicyArr);
@@ -139,6 +156,15 @@ const Sidebar = () => {
         dispatch(setTaskStatusDeletePolicy('taskstatus:Delete::Document'));
         dispatch(setChangeDefaultTaskStatusPermission('taskstatus:Update::DocumentDefault'));
     }, [userPolicyTaskStatusArray]);
+
+    //access for Lead Status page
+    useEffect(() => {
+        dispatch(setLeadStatusReadPolicy('leadstatus:Read::Documents'));
+        dispatch(setLeadStatusCreatePolicy('leadstatus:Create::Document'));
+        dispatch(setLeadStatusUpdatePolicy('leadstatus:Update::Document'));
+        dispatch(setLeadStatusDeletePolicy('leadstatus:Delete::Document'));
+        dispatch(setChangeDefaultLeadStatusPermission('leadstatus:Update::DocumentDefault'));
+    }, [userPolicyLeadStatusArray]);
 
     //access for Task Priority page
     useEffect(() => {
@@ -289,7 +315,7 @@ const Sidebar = () => {
                             )}
 
                             {/* Leads */}
-                            {!isAbleToReadLeads && !isAbleToReadLeadPriority && !isAbleToReadTaskStatus ? null : (
+                            {!isAbleToReadLeads && !isAbleToReadLeadPriority && !isAbleToReadLeadStatus ? null : (
                                 <li className="menu nav-item">
                                     <button type="button" className={`${currentMenu === 'Leads' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('Leads')}>
                                         <div className="flex items-center">
@@ -314,7 +340,7 @@ const Sidebar = () => {
                                                     <Link href="/leads/priority">{t('Priority')}</Link>
                                                 </li>
                                             )}
-                                            {isAbleToReadTaskStatus && (
+                                            {isAbleToReadLeadStatus && (
                                                 <li>
                                                     <Link href="/leads/status">{t('Status')}</Link>
                                                 </li>

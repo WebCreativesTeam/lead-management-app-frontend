@@ -82,6 +82,11 @@ export const taskStatusSchema = Yup.object().shape({
     name: Yup.string().required('Please enter task Status name'),
 });
 
+//lead status schema
+export const leadStatusSchema = Yup.object().shape({
+    name: Yup.string().required('Please enter lead Status name'),
+});
+
 export const contactSchema = Yup.object().shape({
     title: Yup.string().required('Please select title'),
     name: Yup.string().required('Please enter name'),

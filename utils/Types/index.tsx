@@ -117,6 +117,14 @@ export type TaskStatusType = {
     isDefault: boolean;
     color: string;
 };
+export type LeadStatusType = {
+    name: string;
+    id: string;
+    createdAt: string;
+    updatedAt: string;
+    isDefault: boolean;
+    color: string;
+};
 
 export interface ContactDataType {
     id: string;
@@ -303,6 +311,14 @@ export interface PolicyInitialStateProps extends InitialStateProps {
 export interface TaskStatusInitialStateProps extends InitialStateProps {
     data: TaskStatusType[];
     singleData: TaskStatusType;
+    defaultStatusModal: boolean;
+    isAbleToChangeDefaultStatus: boolean;
+}
+
+//task status slice initial props
+export interface LeadStatusInitialStateProps extends InitialStateProps {
+    data: LeadStatusType[];
+    singleData: LeadStatusType;
     defaultStatusModal: boolean;
     isAbleToChangeDefaultStatus: boolean;
 }
