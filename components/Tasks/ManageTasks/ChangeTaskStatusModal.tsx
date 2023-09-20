@@ -15,7 +15,7 @@ const ChangeTaskStatusModal = () => {
         dispatch(setDisableBtn(true));
         dispatch(setFetching(true));
         try {
-            await new ApiClient().patch(`task/${singleData?.id}/status`, { status: singleStatus.id });
+            await new ApiClient().patch(`task/${singleData?.id}/status`, { statusId: singleStatus.id });
             dispatch(setChangeStatusModal({ open: false }));
         } catch (error: any) {
             if (typeof error?.response?.data?.message === 'object') {

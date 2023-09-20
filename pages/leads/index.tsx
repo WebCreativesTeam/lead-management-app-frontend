@@ -32,8 +32,8 @@ import DeleteLeadModal from '@/components/Leads/ManageLeads/DeleteLeadModal';
 import CreateLeadModal from '@/components/Leads/ManageLeads/CreateLeadModal';
 import EditLeadModal from '@/components/Leads/ManageLeads/EditLeadModal';
 import ViewLeadModal from '@/components/Leads/ManageLeads/ViewLeadModal';
-// import ChangeLeadPriorityModal from '@/components/Leads/ManageLeads/ChangeLeadPriorityModal';
-// import ChangeLeadStatusModal from '@/components/Leads/ManageLeads/ChangeLeadStatusModal';
+import ChangeLeadPriorityModal from '@/components/Leads/ManageLeads/ChangeLeadPriorityModal';
+import ChangeLeadStatusModal from '@/components/Leads/ManageLeads/ChangeLeadStatusModal';
 
 const LeadPage = () => {
     const dispatch = useDispatch();
@@ -385,10 +385,10 @@ const LeadPage = () => {
             <DeleteLeadModal />
 
             {/* change Status modal */}
-            {/* <ChangeLeadStatusModal /> */}
+            <ChangeLeadStatusModal />
 
             {/* change lead priority modal */}
-            {/* <ChangeLeadPriorityModal /> */}
+            <ChangeLeadPriorityModal />
 
             {/* create modal */}
             <CreateLeadModal />
