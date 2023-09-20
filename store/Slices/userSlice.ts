@@ -1,6 +1,6 @@
 import { PolicyDataType, UserDataType, UserInitialStateProps } from '@/utils/Types';
-import { fetchUserPermissionArray } from '@/utils/contant';
-import { createSlice } from '@reduxjs/toolkit';
+import { fetchUserInfo } from '@/utils/contant';
+import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 
 const initialState: UserInitialStateProps = {
     data: [] as UserDataType[],
@@ -28,9 +28,9 @@ const userSlice = createSlice({
     initialState,
     name: 'user',
     extraReducers(builder) {
-        builder.addCase(fetchUserPermissionArray.fulfilled, (state, action) => {
+        builder.addCase(fetchUserInfo.fulfilled, (state, action: PayloadAction<UserDataType>) => {
             if (action.payload) {
-                state.userPolicyArr = action.payload;
+                state.userPolicyArr = action.payload.permissions;
             }
         });
     },

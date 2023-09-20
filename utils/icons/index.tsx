@@ -17,3 +17,4 @@ export * from './Lock';
 export * from './UserFilled';
 export * from './SignOut';
 export * from './Talegram';
+export * from './LockOutlined';

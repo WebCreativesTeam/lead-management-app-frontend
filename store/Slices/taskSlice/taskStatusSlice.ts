@@ -1,6 +1,6 @@
-import { TaskStatusInitialStateProps, TaskStatusType } from '@/utils/Types';
-import { fetchUserPermissionArray, showToastAlert } from '@/utils/contant';
-import { createSlice } from '@reduxjs/toolkit';
+import { TaskStatusInitialStateProps, TaskStatusType, UserDataType } from '@/utils/Types';
+import { fetchUserInfo, showToastAlert } from '@/utils/contant';
+import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 
 const initialState: TaskStatusInitialStateProps = {
     data: [] as TaskStatusType[],
@@ -16,7 +16,7 @@ const initialState: TaskStatusInitialStateProps = {
     isAbleToCreate: false,
     isAbleToUpdate: false,
     isAbleToDelete: false,
-    isAbleToChangeDefaultStatus:false,
+    isAbleToChangeDefaultStatus: false,
     userPolicyArr: [] as string[],
 };
 
@@ -24,9 +24,9 @@ const taskStatusSlice = createSlice({
     initialState,
     name: 'task status',
     extraReducers(builder) {
-        builder.addCase(fetchUserPermissionArray.fulfilled, (state, action) => {
+        builder.addCase(fetchUserInfo.fulfilled, (state, action: PayloadAction<UserDataType>) => {
             if (action.payload) {
-                state.userPolicyArr = action.payload;
+                state.userPolicyArr = action.payload.permissions;
             }
         });
     },
@@ -130,6 +130,6 @@ export const {
     setTaskStatusDeletePolicy,
     setTaskStatusReadPolicy,
     setTaskStatusUpdatePolicy,
-    setChangeDefaultTaskStatusPermission
+    setChangeDefaultTaskStatusPermission,
 } = taskStatusSlice.actions;
 export default taskStatusSlice.reducer;

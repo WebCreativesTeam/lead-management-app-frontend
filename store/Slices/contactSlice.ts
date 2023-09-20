@@ -1,6 +1,6 @@
-import { ContactDataType, ContactInitialStateProps } from '@/utils/Types';
-import { fetchUserPermissionArray, showToastAlert } from '@/utils/contant';
-import { createSlice } from '@reduxjs/toolkit';
+import { ContactDataType, ContactInitialStateProps, SourceDataType, UserDataType } from '@/utils/Types';
+import { fetchUserInfo, showToastAlert } from '@/utils/contant';
+import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 
 const initialState: ContactInitialStateProps = {
     data: [] as ContactDataType[],
@@ -16,15 +16,17 @@ const initialState: ContactInitialStateProps = {
     isAbleToRead: false,
     isAbleToUpdate: false,
     userPolicyArr: [] as string[],
+    usersList: [] as UserDataType[],
+    sourceList: [] as SourceDataType[],
 };
 
 const contactSlice = createSlice({
     initialState,
     name: 'contact',
     extraReducers(builder) {
-        builder.addCase(fetchUserPermissionArray.fulfilled, (state, action) => {
+        builder.addCase(fetchUserInfo.fulfilled, (state, action: PayloadAction<UserDataType>) => {
             if (action.payload) {
-                state.userPolicyArr = action.payload;
+                state.userPolicyArr = action.payload.permissions;
             }
         });
     },
@@ -68,6 +70,12 @@ const contactSlice = createSlice({
         getAllContacts(state, action) {
             state.data = action.payload;
         },
+        getAllUsersForContact(state, action) {
+            state.usersList = action.payload;
+        },
+        getAllSourceForContact(state, action) {
+            state.sourceList = action.payload;
+        },
         setDisableBtn(state, action) {
             state.isBtnDisabled = action.payload;
         },
@@ -105,5 +113,7 @@ export const {
     setContactDeletePolicy,
     setContactReadPolicy,
     setContactUpdatePolicy,
+    getAllUsersForContact,
+    getAllSourceForContact
 } = contactSlice.actions;
 export default contactSlice.reducer;

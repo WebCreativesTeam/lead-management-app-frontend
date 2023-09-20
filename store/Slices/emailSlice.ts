@@ -1,6 +1,6 @@
-import { IEmailTemplate, EmailsInitialStateProps } from '@/utils/Types';
-import { fetchUserPermissionArray } from '@/utils/contant';
-import { createSlice } from '@reduxjs/toolkit';
+import { IEmailTemplate, EmailsInitialStateProps, UserDataType } from '@/utils/Types';
+import { fetchUserInfo } from '@/utils/contant';
+import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 
 const initialState: EmailsInitialStateProps = {
     data: [] as IEmailTemplate[],
@@ -20,9 +20,9 @@ const emailTemplateSlice = createSlice({
     initialState,
     name: 'email template',
     extraReducers(builder) {
-        builder.addCase(fetchUserPermissionArray.fulfilled, (state, action) => {
+        builder.addCase(fetchUserInfo.fulfilled, (state, action: PayloadAction<UserDataType>) => {
             if (action.payload) {
-                state.userPolicyArr = action.payload;
+                state.userPolicyArr = action.payload.permissions;
             }
         });
     },

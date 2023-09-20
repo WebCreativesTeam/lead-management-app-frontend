@@ -9,18 +9,28 @@ import { countryData, namePrefix } from '@/utils/Raw Data';
 import { useFormik } from 'formik';
 import { contactSchema } from '@/utils/schemas';
 import { ApiClient } from '@/utils/http';
-import { SelectOptionsType } from '@/utils/Types';
+import { SelectOptionsType, SourceDataType, UserDataType } from '@/utils/Types';
 import { showToastAlert } from '@/utils/contant';
 import Loader from '../__Shared/Loader';
 
 const ContactEditModal = () => {
-    const { editModal, isBtnDisabled, singleData, isFetching } = useSelector((state: IRootState) => state.contacts);
+    const { editModal, isBtnDisabled, singleData, isFetching, usersList, sourceList } = useSelector((state: IRootState) => state.contacts);
     const [defaultState, setDefaultState] = useState<SelectOptionsType>({} as SelectOptionsType);
-    const [defaultCity, setDefaultCity] = useState<SelectOptionsType>({} as SelectOptionsType);
     const [defaultCountry, setDefaultCountry] = useState<SelectOptionsType>({} as SelectOptionsType);
     const [defaultTitle, setDefaultTitle] = useState<SelectOptionsType>({} as SelectOptionsType);
+    const [defaultAssignTo, setDefaultAssignTo] = useState<SelectOptionsType>({} as SelectOptionsType);
+    const [defaultSource, setDefaultSource] = useState<SelectOptionsType>({} as SelectOptionsType);
 
     const dispatch = useDispatch();
+
+    const assignToUsersDropdown: SelectOptionsType[] = usersList?.map((item: UserDataType) => {
+        return { value: item.id, label: `${item.firstName} ${item.lastName}` };
+    });
+
+    const sourceDropdown: SelectOptionsType[] = sourceList?.map((item: SourceDataType) => {
+        return { value: item.id, label: item.name };
+    });
+
     useEffect(() => {
         const { email, comment, name, phoneNumber, position, assignedTo, facebookProfile, twitterProfile, industry, location, source, title, website } = singleData;
         setFieldValue('email', email);
@@ -28,10 +38,8 @@ const ContactEditModal = () => {
         setFieldValue('name', name);
         setFieldValue('phoneNumber', phoneNumber);
         setFieldValue('position', position);
-        setFieldValue('assignedTo', `${assignedTo?.firstName} ${assignedTo?.lastName}`);
         setFieldValue('facebookProfile', facebookProfile);
         setFieldValue('twitterProfile', twitterProfile);
-        setFieldValue('source', source?.name);
         setFieldValue('industry', industry);
         setFieldValue('address', location?.address);
         setFieldValue('website', website);
@@ -43,14 +51,21 @@ const ContactEditModal = () => {
         const findState: any = countryData.find((item: SelectOptionsType) => item.value === location?.state);
         setDefaultState(findState);
 
-        const findCity: any = countryData.find((item: SelectOptionsType) => item.value === location?.city);
-        setDefaultCity(findCity);
-
         const findCountry: any = countryData.find((item: SelectOptionsType) => item.value === location?.country);
         setDefaultCountry(findCountry);
 
         const findNamePrefix: any = namePrefix.find((item: SelectOptionsType) => item.value === title);
         setDefaultTitle(findNamePrefix);
+
+        const findAssignTo: SelectOptionsType | undefined = assignToUsersDropdown.find((item: SelectOptionsType) => item?.value === assignedTo?.id);
+        if (findAssignTo) {
+            setDefaultAssignTo(findAssignTo);
+        }
+
+        const findSource: SelectOptionsType | undefined = sourceDropdown.find((item: SelectOptionsType) => item?.value === source?.id);
+        if (findSource) {
+            setDefaultSource(findSource);
+        }
     }, [singleData]);
 
     const initialValues = {
@@ -123,6 +138,7 @@ const ContactEditModal = () => {
         dispatch(setEditModal({ open: false }));
         resetForm();
     };
+
     return (
         <Modal
             open={editModal}
@@ -195,21 +211,12 @@ const ContactEditModal = () => {
                         </div>
                         <div className="flex flex-col gap-4 sm:flex-row">
                             <div className="flex-1">
-                                <label htmlFor="createAssignedTo">Assign To</label>
-                                <input
-                                    onChange={handleChange}
-                                    onBlur={handleBlur}
-                                    value={values.assignedTo}
-                                    id="createAssignedTo"
-                                    name="assignedTo"
-                                    type="text"
-                                    placeholder="Assign To"
-                                    className="form-input"
-                                />
+                                <label htmlFor="state">Assign To</label>
+                                <Select placeholder="Assign To" options={assignToUsersDropdown} defaultValue={defaultAssignTo} onChange={(data: any) => setFieldValue('assignedTo', data.value)} />
                             </div>
                             <div className="flex-1">
-                                <label htmlFor="createSource">Source</label>
-                                <input onChange={handleChange} onBlur={handleBlur} value={values.source} id="createSource" name="source" type="text" placeholder="Source" className="form-input" />
+                                <label htmlFor="state">Source</label>
+                                <Select placeholder="Select Source" defaultValue={defaultSource} options={sourceDropdown} onChange={(data: any) => setFieldValue('source', data.value)} />
                             </div>
                         </div>
                         <div className="flex flex-col gap-4 sm:flex-row">
@@ -279,8 +286,8 @@ const ContactEditModal = () => {
                                 <Select placeholder="select state" defaultValue={defaultState} options={countryData} onChange={(data: any) => setFieldValue('state', data.value)} />
                             </div>
                             <div className="flex-1">
-                                <label htmlFor="state">City</label>
-                                <Select placeholder="select city" defaultValue={defaultCity} options={countryData} onChange={(data: any) => setFieldValue('city', data.value)} />
+                                <label htmlFor="city">City</label>
+                                <input onChange={handleChange} onBlur={handleBlur} value={values.city} id="city" name="city" type="text" placeholder="Enter City Name" className="form-input" />
                             </div>
                         </div>
                         <div>

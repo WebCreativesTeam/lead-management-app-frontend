@@ -9,9 +9,9 @@ import PageHeadingSection from '@/components/__Shared/PageHeadingSection/index.'
 import ConfirmationModal from '@/components/__Shared/ConfirmationModal';
 import { useDispatch, useSelector } from 'react-redux';
 import { setPageTitle } from '@/store/themeConfigSlice';
-import { ContactDataType, GetMethodResponseType } from '@/utils/Types';
+import { ContactDataType, GetMethodResponseType, SourceDataType, UserDataType } from '@/utils/Types';
 import { ApiClient } from '@/utils/http';
-import { getAllContacts, setEditModal, setDeleteModal, setCreateModal, setViewModal, setFetching, setDisableBtn } from '@/store/Slices/contactSlice';
+import { getAllContacts, setEditModal, setDeleteModal, setCreateModal, setViewModal, setFetching, setDisableBtn, getAllUsersForContact, getAllSourceForContact } from '@/store/Slices/contactSlice';
 import ContactViewModal from '@/components/Contact/ContactViewModal';
 import { IRootState } from '@/store';
 import ContactCreateModal from '@/components/Contact/ContactCreateModal';
@@ -66,6 +66,8 @@ const Contacts = () => {
     //get all contact after page render
     useEffect(() => {
         getContactList();
+        getAllSourceList();
+        getAllUsersList();
     }, [isFetching]);
 
     useEffect(() => {
@@ -87,6 +89,30 @@ const Contacts = () => {
         }
         dispatch(getAllContacts(contacts));
         setLoading(false);
+    };
+
+    //get all user's list
+    const getAllUsersList = async () => {
+        setLoading(true);
+        const usersList: GetMethodResponseType = await new ApiClient().get('user');
+        const users: UserDataType[] = usersList?.data;
+        if (typeof users === 'undefined') {
+            dispatch(getAllUsersForContact([] as UserDataType[]));
+            return;
+        }
+        dispatch(getAllUsersForContact(users));
+    };
+
+    //get all Source list
+    const getAllSourceList = async () => {
+        setLoading(true);
+        const sourceList: GetMethodResponseType = await new ApiClient().get('source');
+        const source: SourceDataType[] = sourceList?.data;
+        if (typeof source === 'undefined') {
+            dispatch(getAllSourceForContact([] as SourceDataType[]));
+            return;
+        }
+        dispatch(getAllSourceForContact(source));
     };
 
     //deleting contact

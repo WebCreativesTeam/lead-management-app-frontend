@@ -244,6 +244,8 @@ export interface InitialStateProps {
 export interface ContactInitialStateProps extends InitialStateProps {
     data: ContactDataType[];
     singleData: ContactDataType;
+    usersList: UserDataType[];
+    sourceList: SourceDataType[];
 }
 //manage task slice initial props
 export interface ManageTaskInitialStateProps extends InitialStateProps {

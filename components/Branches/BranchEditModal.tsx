@@ -16,7 +16,6 @@ import Loader from '../__Shared/Loader';
 const BranchEditModal = () => {
     const { editModal, isBtnDisabled, singleData, isFetching } = useSelector((state: IRootState) => state.branch);
     const [defaultState, setDefaultState] = useState<SelectOptionsType>({} as SelectOptionsType);
-    const [defaultCity, setDefaultCity] = useState<SelectOptionsType>({} as SelectOptionsType);
     const [defaultCountry, setDefaultCountry] = useState<SelectOptionsType>({} as SelectOptionsType);
 
     const dispatch = useDispatch();
@@ -29,9 +28,6 @@ const BranchEditModal = () => {
 
         const findState: any = countryData.find((item: SelectOptionsType) => item.value === singleData?.state);
         setDefaultState(findState);
-
-        const findCity: any = countryData.find((item: SelectOptionsType) => item.value === singleData?.city);
-        setDefaultCity(findCity);
 
         const findCountry: any = countryData.find((item: SelectOptionsType) => item.value === singleData.country);
         setDefaultCountry(findCountry);
@@ -93,20 +89,7 @@ const BranchEditModal = () => {
                             <label htmlFor="createBranch">Branch Name</label>
                             <input onChange={handleChange} onBlur={handleBlur} value={values.name} id="createBranch" name="name" type="text" placeholder="Branch Name" className="form-input" />
                         </div>
-                        <div>
-                            <label htmlFor="createAddress">Address</label>
-                            <input
-                                onChange={handleChange}
-                                onBlur={handleBlur}
-                                value={values.address}
-                                id="createAddress"
-                                name="address"
-                                type="text"
-                                placeholder="Branch Address"
-                                className="form-input"
-                            />
-                        </div>
-                        <section className="flex flex-col  gap-4 sm:flex-row">
+                        <div className="flex flex-col  gap-4 sm:flex-row">
                             <div className="flex-1">
                                 <label htmlFor="country">Select Country</label>
                                 <Select placeholder="select country" defaultValue={defaultCountry} options={countryData} onChange={(data: any) => setFieldValue('country', data.value)} />
@@ -115,9 +98,33 @@ const BranchEditModal = () => {
                                 <label htmlFor="state">Select State</label>
                                 <Select placeholder="select state" defaultValue={defaultState} options={countryData} onChange={(data: any) => setFieldValue('state', data.value)} />
                             </div>
+                        </div>
+                        <section className="flex flex-col  gap-4 sm:flex-row">
                             <div className="flex-1">
-                                <label htmlFor="state">Select City</label>
-                                <Select placeholder="select city" defaultValue={defaultCity} options={countryData} onChange={(data: any) => setFieldValue('city', data.value)} />
+                                <label htmlFor="updateBranchCity">City</label>
+                                <input
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    value={values.city}
+                                    id="updateBranchCity"
+                                    name="city"
+                                    type="text"
+                                    placeholder="Enter City"
+                                    className="form-input"
+                                />
+                            </div>
+                            <div className="flex-1">
+                                <label htmlFor="createAddress">Address</label>
+                                <input
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    value={values.address}
+                                    id="createAddress"
+                                    name="address"
+                                    type="text"
+                                    placeholder="Branch Address"
+                                    className="form-input"
+                                />
                             </div>
                         </section>
                     </form>

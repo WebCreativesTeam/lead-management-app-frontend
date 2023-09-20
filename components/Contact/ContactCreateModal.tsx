@@ -10,9 +10,10 @@ import { contactSchema } from '@/utils/schemas';
 import { ApiClient } from '@/utils/http';
 import { showToastAlert } from '@/utils/contant';
 import Loader from '../__Shared/Loader';
+import { SelectOptionsType, SourceDataType, UserDataType } from '@/utils/Types';
 
 const ContactCreateModal = () => {
-    const { isFetching, createModal, isBtnDisabled } = useSelector((state: IRootState) => state.contacts);
+    const { isFetching, createModal, isBtnDisabled , usersList,sourceList} = useSelector((state: IRootState) => state.contacts);
     const dispatch = useDispatch();
     const initialValues = {
         name: '',
@@ -32,7 +33,7 @@ const ContactCreateModal = () => {
         state: '',
         country: '',
     };
-    const { values, handleChange, submitForm, handleSubmit, setFieldValue, errors, handleBlur, resetForm } = useFormik({
+    const { values, handleChange, submitForm, handleSubmit, setFieldValue, handleBlur, resetForm } = useFormik({
         initialValues,
         validationSchema: contactSchema,
         validateOnChange: false,
@@ -81,7 +82,15 @@ const ContactCreateModal = () => {
         dispatch(setCreateModal(false));
         resetForm();
     };
-    console.log(errors)
+
+     const assignToUsersDropdown: SelectOptionsType[] = usersList?.map((item: UserDataType) => {
+         return { value: item.id, label: `${item.firstName} ${item.lastName}` };
+     });
+
+     const sourceDropdown: SelectOptionsType[] = sourceList?.map((item: SourceDataType) => {
+         return { value: item.id, label: item.name };
+     });
+
     return (
         <Modal
             open={createModal}
@@ -156,21 +165,12 @@ const ContactCreateModal = () => {
                         </div>
                         <div className="flex flex-col gap-4 sm:flex-row">
                             <div className="flex-1">
-                                <label htmlFor="createAssignedTo">Assign To</label>
-                                <input
-                                    onChange={handleChange}
-                                    onBlur={handleBlur}
-                                    value={values.assignedTo}
-                                    id="createAssignedTo"
-                                    name="assignedTo"
-                                    type="text"
-                                    placeholder="Assign To"
-                                    className="form-input"
-                                />
+                                <label htmlFor="state">Assign To</label>
+                                <Select placeholder="Assign To" options={assignToUsersDropdown} onChange={(data: any) => setFieldValue('assignedTo', data.value)} />
                             </div>
                             <div className="flex-1">
-                                <label htmlFor="createSource">Source</label>
-                                <input onChange={handleChange} onBlur={handleBlur} value={values.source} id="createSource" name="source" type="text" placeholder="Source" className="form-input" />
+                                <label htmlFor="state">Source</label>
+                                <Select placeholder="Select Source" options={sourceDropdown} onChange={(data: any) => setFieldValue('source', data.value)} />
                             </div>
                         </div>
                         <div className="flex flex-col gap-4 sm:flex-row">
@@ -199,7 +199,7 @@ const ContactCreateModal = () => {
                                     onChange={handleChange}
                                     onBlur={handleBlur}
                                     value={values.facebookProfile}
-                                    id="createIndustry"
+                                    id="createFacebookProfile"
                                     name="facebookProfile"
                                     type="text"
                                     placeholder="FacebookProfile"
@@ -232,7 +232,7 @@ const ContactCreateModal = () => {
                         </div>
                         <div className="flex flex-col gap-4 sm:flex-row">
                             <div className="flex-1">
-                                <label htmlFor="state">Country</label>
+                                <label htmlFor="country">Country</label>
                                 <Select placeholder="select country" options={countryData} onChange={(data: any) => setFieldValue('country', data.value)} />
                             </div>
                             <div className="flex-1">
@@ -240,8 +240,8 @@ const ContactCreateModal = () => {
                                 <Select placeholder="select state" options={countryData} onChange={(data: any) => setFieldValue('state', data.value)} />
                             </div>
                             <div className="flex-1">
-                                <label htmlFor="state">City</label>
-                                <Select placeholder="select city" options={countryData} onChange={(data: any) => setFieldValue('city', data.value)} />
+                                <label htmlFor="city">City</label>
+                                <input onChange={handleChange} onBlur={handleBlur} value={values.city} id="city" name="city" type="text" placeholder="Enter City Name" className="form-input" />
                             </div>
                         </div>
                         <div>

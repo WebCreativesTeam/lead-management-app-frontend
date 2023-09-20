@@ -1,6 +1,6 @@
-import { TaskPriorityType, TaskPriorityInitialStateProps } from '@/utils/Types';
-import { showToastAlert,fetchUserPermissionArray } from '@/utils/contant';
-import { createSlice } from '@reduxjs/toolkit';
+import { TaskPriorityType, TaskPriorityInitialStateProps, UserDataType } from '@/utils/Types';
+import { showToastAlert, fetchUserInfo } from '@/utils/contant';
+import { createSlice,PayloadAction } from '@reduxjs/toolkit';
 
 const initialState: TaskPriorityInitialStateProps = {
     data: [] as TaskPriorityType[],
@@ -16,7 +16,7 @@ const initialState: TaskPriorityInitialStateProps = {
     isAbleToCreate: false,
     isAbleToUpdate: false,
     isAbleToDelete: false,
-    isAbleToChangeDefaultPriority:false,
+    isAbleToChangeDefaultPriority: false,
     userPolicyArr: [] as string[],
 };
 
@@ -24,9 +24,9 @@ const taskPrioritySlice = createSlice({
     initialState,
     name: 'task priority',
     extraReducers(builder) {
-        builder.addCase(fetchUserPermissionArray.fulfilled, (state, action) => {
+        builder.addCase(fetchUserInfo.fulfilled, (state, action: PayloadAction<UserDataType>) => {
             if (action.payload) {
-                state.userPolicyArr = action.payload;
+                state.userPolicyArr = action.payload.permissions;
             }
         });
     },

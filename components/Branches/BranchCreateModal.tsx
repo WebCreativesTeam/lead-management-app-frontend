@@ -80,6 +80,20 @@ const BranchCreateModal = () => {
                         </div>
                         <div className="flex flex-col  gap-4 sm:flex-row">
                             <div className="flex-1">
+                                <label htmlFor="country">Select Country</label>
+                                <Select placeholder="select country" options={countryData} onChange={(data: any) => setFieldValue('country', data.value)} />
+                            </div>
+                            <div className="flex-1">
+                                <label htmlFor="state">Select State</label>
+                                <Select placeholder="select state" options={countryData} onChange={(data: any) => setFieldValue('state', data.value)} />
+                            </div>
+                        </div>
+                        <section className="flex flex-col  gap-4 sm:flex-row">
+                            <div className="flex-1">
+                                <label htmlFor="createBranchCity">City</label>
+                                <input onChange={handleChange} onBlur={handleBlur} value={values.city} id="createBranchCity" name="city" type="text" placeholder="Enter City" className="form-input" />
+                            </div>
+                            <div className="flex-1">
                                 <label htmlFor="createAddress">Address</label>
                                 <input
                                     onChange={handleChange}
@@ -91,20 +105,6 @@ const BranchCreateModal = () => {
                                     placeholder="Branch Address"
                                     className="form-input"
                                 />
-                            </div>
-                            <div className="flex-1">
-                                <label htmlFor="country">Select Country</label>
-                                <Select placeholder="select country" options={countryData} onChange={(data: any) => setFieldValue('country', data.value)} />
-                            </div>
-                        </div>
-                        <section className="flex flex-col  gap-4 sm:flex-row">
-                            <div className="flex-1">
-                                <label htmlFor="state">Select State</label>
-                                <Select placeholder="select state" options={countryData} onChange={(data: any) => setFieldValue('state', data.value)} />
-                            </div>
-                            <div className="flex-1">
-                                <label htmlFor="state">Select City</label>
-                                <Select placeholder="select city" options={countryData} onChange={(data: any) => setFieldValue('city', data.value)} />
                             </div>
                         </section>
                     </form>

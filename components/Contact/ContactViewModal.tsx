@@ -8,7 +8,7 @@ import { IRootState } from '@/store';
 const ContactViewModal = () => {
     const { viewModal, singleData } = useSelector((state: IRootState) => state.contacts);
     const dispatch = useDispatch();
-    const { location, assignedTo, comment, createdAt, email, facebookProfile, industry, name, phoneNumber, position, source, title, twitterProfile, updatedAt, website } = singleData;
+    const { location, assignedTo, comment, createdAt, email, facebookProfile, industry, name, phoneNumber, position, source, title, twitterProfile, updatedAt, website, addedBy } = singleData;
 
     const reqData: any = {
         name: title + ' ' + name,
@@ -16,8 +16,9 @@ const ContactViewModal = () => {
         phoneNumber,
         industry,
         position,
-        assignedTo,
+        ['Assigned To']: `${assignedTo?.firstName} ${assignedTo?.lastName}`,
         ['source Name']: source?.name,
+        ['Added By']: `${addedBy?.firstName} ${addedBy?.lastName}`,
         twitterProfile,
         facebookProfile,
         website,

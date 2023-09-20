@@ -11,7 +11,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { ArrowRight, Branch, Email, Global, Phone, Shield, Tasks, User } from '../../utils/icons';
 import { setBranchCreatePolicy, setBranchDeletePolicy, setBranchReadPolicy, setBranchUpdatePolicy } from '@/store/Slices/branchSlice';
-import { fetchUserPermissionArray } from '@/utils/contant';
+import { fetchUserInfo } from '@/utils/contant';
 import { setContactCreatePolicy, setContactDeletePolicy, setContactReadPolicy, setContactUpdatePolicy } from '@/store/Slices/contactSlice';
 import { setSourceCreatePolicy, setSourceDeletePolicy, setSourceReadPolicy, setSourceUpdatePolicy } from '@/store/Slices/sourceSlice';
 import { setChangeActiveStatusPermission, setChangeUsersPolicy, setUserCreatePolicy, setUserDeletePolicy, setUserReadPolicy, setUserUpdatePolicy } from '@/store/Slices/userSlice';
@@ -83,8 +83,13 @@ const Sidebar = () => {
     const userPolicyEmailTemplateArray: string[] = useSelector((state: IRootState) => state.taskStatus.userPolicyArr);
     const isAbleToReadEmailTemplates: boolean = useSelector((state: IRootState) => state.emailTemplate.isAbleToRead);
     isAbleToReadEmailTemplates;
+
+    //Manage Leads page
+    const userPolicyLeadArray: string[] = useSelector((state: IRootState) => state.lead.userPolicyArr);
+    const isAbleToReadLeads: boolean = useSelector((state: IRootState) => state.lead.isAbleToRead);
+    isAbleToReadEmailTemplates;
     useEffect(() => {
-        dispatch(fetchUserPermissionArray());
+        dispatch(fetchUserInfo());
     }, []);
 
     //access for branch page
@@ -170,7 +175,7 @@ const Sidebar = () => {
         dispatch(setLeadCreatePolicy('lead:Create::Document'));
         dispatch(setLeadUpdatePolicy('lead:Update::Document'));
         dispatch(setLeadDeletePolicy('lead:Delete::Document'));
-    }, [userPolicyTaskArray]);
+    }, [userPolicyLeadArray]);
 
     useEffect(() => {
         const selector = document.querySelector('.sidebar ul a[href="' + window.location.pathname + '"]');
@@ -270,7 +275,7 @@ const Sidebar = () => {
                             )}
 
                             {/* Leads */}
-                            {!isAbleToReadTask && !isAbleToReadTaskPriority && !isAbleToReadTaskStatus ? null : (
+                            {!isAbleToReadLeads && !isAbleToReadTaskPriority && !isAbleToReadTaskStatus ? null : (
                                 <li className="menu nav-item">
                                     <button type="button" className={`${currentMenu === 'Leads' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('Leads')}>
                                         <div className="flex items-center">
@@ -285,7 +290,7 @@ const Sidebar = () => {
 
                                     <AnimateHeight duration={300} height={currentMenu === 'Leads' ? 'auto' : 0}>
                                         <ul className="sub-menu text-gray-500">
-                                            {isAbleToReadTask && (
+                                            {isAbleToReadLeads && (
                                                 <li>
                                                     <Link href="/leads">{t('Manage Leads')}</Link>
                                                 </li>
