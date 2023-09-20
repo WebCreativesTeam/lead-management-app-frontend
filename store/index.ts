@@ -11,6 +11,7 @@ import taskPrioritySlice from './Slices/taskSlice/taskPrioritySlice';
 import emailTemplateSlice from './Slices/emailSlice';
 import manageLeadSlice from './Slices/leadSlice/manageLeadSlice';
 import userProfileSlice from './Slices/userProfileSlice';
+import leadPrioritySlice from './Slices/leadSlice/leadPrioritySlice';
 
 const rootReducer = combineReducers({
     themeConfig: themeConfigSlice,
@@ -23,6 +24,7 @@ const rootReducer = combineReducers({
     taskStatus: taskStatusSlice,
     taskPriority: taskPrioritySlice,
     lead: manageLeadSlice,
+    leadPriority:leadPrioritySlice,
     emailTemplate: emailTemplateSlice,
     userInfo: userProfileSlice,
 });

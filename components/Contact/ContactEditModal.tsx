@@ -140,9 +140,6 @@ const ContactEditModal = () => {
         dispatch(setEditModal({ open: false }));
         resetForm();
     };
-
-    console.log(values);
-
     return (
         <Modal
             open={editModal}

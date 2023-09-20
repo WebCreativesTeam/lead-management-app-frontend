@@ -34,6 +34,7 @@ import {
 import { setEmailTemplateCreatePermission, setEmailTemplateDeletePermission, setEmailTemplateReadPermission, setEmailTemplateUpdatePermission } from '@/store/Slices/emailSlice';
 import { setLeadCreatePolicy, setLeadDeletePolicy, setLeadReadPolicy, setLeadUpdatePolicy } from '@/store/Slices/leadSlice/manageLeadSlice';
 import Talegram from '@/utils/icons/Talegram';
+import { setChangeDefaultLeadPriorityPermission, setLeadPriorityCreatePolicy, setLeadPriorityDeletePolicy, setLeadPriorityReadPolicy, setLeadPriorityUpdatePolicy } from '@/store/Slices/leadSlice/leadPrioritySlice';
 
 const Sidebar = () => {
     const router = useRouter();
@@ -75,11 +76,15 @@ const Sidebar = () => {
     const userPolicyTaskPriorityArray: string[] = useSelector((state: IRootState) => state.taskPriority.userPolicyArr);
     const isAbleToReadTaskPriority: boolean = useSelector((state: IRootState) => state.taskPriority.isAbleToRead);
 
+    //Task Priority
+    const userPolicyLeadPriorityArray: string[] = useSelector((state: IRootState) => state.leadPriority.userPolicyArr);
+    const isAbleToReadLeadPriority: boolean = useSelector((state: IRootState) => state.taskPriority.isAbleToRead);
+
     //Task Status
     const userPolicyTaskStatusArray: string[] = useSelector((state: IRootState) => state.taskStatus.userPolicyArr);
     const isAbleToReadTaskStatus: boolean = useSelector((state: IRootState) => state.taskStatus.isAbleToRead);
 
-    //Task Status
+    //email template
     const userPolicyEmailTemplateArray: string[] = useSelector((state: IRootState) => state.taskStatus.userPolicyArr);
     const isAbleToReadEmailTemplates: boolean = useSelector((state: IRootState) => state.emailTemplate.isAbleToRead);
     isAbleToReadEmailTemplates;
@@ -143,6 +148,15 @@ const Sidebar = () => {
         dispatch(setTaskPriorityDeletePolicy('taskpriority:Delete::Document'));
         dispatch(setChangeDefaultTaskPriorityPermission('taskpriority:Update::DocumentDefault'));
     }, [userPolicyTaskPriorityArray]);
+
+    //access for Lead Priority page
+    useEffect(() => {
+        dispatch(setLeadPriorityReadPolicy('leadpriority:Read::Documents'));
+        dispatch(setLeadPriorityCreatePolicy('leadpriority:Create::Document'));
+        dispatch(setLeadPriorityUpdatePolicy('leadpriority:Update::Document'));
+        dispatch(setLeadPriorityDeletePolicy('leadpriority:Delete::Document'));
+        dispatch(setChangeDefaultLeadPriorityPermission('leadpriority:Update::DocumentDefault'));
+    }, [userPolicyLeadPriorityArray]);
 
     //access for Policy page
     useEffect(() => {
@@ -275,7 +289,7 @@ const Sidebar = () => {
                             )}
 
                             {/* Leads */}
-                            {!isAbleToReadLeads && !isAbleToReadTaskPriority && !isAbleToReadTaskStatus ? null : (
+                            {!isAbleToReadLeads && !isAbleToReadLeadPriority && !isAbleToReadTaskStatus ? null : (
                                 <li className="menu nav-item">
                                     <button type="button" className={`${currentMenu === 'Leads' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('Leads')}>
                                         <div className="flex items-center">
@@ -295,7 +309,7 @@ const Sidebar = () => {
                                                     <Link href="/leads">{t('Manage Leads')}</Link>
                                                 </li>
                                             )}
-                                            {isAbleToReadTaskPriority && (
+                                            {isAbleToReadLeadPriority && (
                                                 <li>
                                                     <Link href="/leads/priority">{t('Priority')}</Link>
                                                 </li>

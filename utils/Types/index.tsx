@@ -100,6 +100,14 @@ export type TaskPriorityType = {
     isDefault: boolean;
     color: string;
 };
+export type LeadPriorityType = {
+    name: string;
+    id: string;
+    createdAt: string;
+    updatedAt: string;
+    isDefault: boolean;
+    color: string;
+};
 
 export type TaskStatusType = {
     name: string;
@@ -303,6 +311,14 @@ export interface TaskStatusInitialStateProps extends InitialStateProps {
 export interface TaskPriorityInitialStateProps extends InitialStateProps {
     data: TaskPriorityType[];
     singleData: TaskPriorityType;
+    defaultPriorityModal: boolean;
+    isAbleToChangeDefaultPriority: boolean;
+}
+
+//lead priority slice initial props
+export interface LeadPriorityInitialStateProps extends InitialStateProps {
+    data: LeadPriorityType[];
+    singleData: LeadPriorityType;
     defaultPriorityModal: boolean;
     isAbleToChangeDefaultPriority: boolean;
 }

@@ -72,6 +72,11 @@ export const taskPrioritySchema = Yup.object().shape({
     name: Yup.string().required('Please enter task priority name'),
 });
 
+//lead priority schema
+export const leadPrioritySchema = Yup.object().shape({
+    name: Yup.string().required('Please enter lead priority name'),
+});
+
 //task status schema
 export const taskStatusSchema = Yup.object().shape({
     name: Yup.string().required('Please enter task Status name'),

@@ -30,7 +30,7 @@ import {
 import { ApiClient } from '@/utils/http';
 import DeleteLeadModal from '@/components/Leads/ManageLeads/DeleteLeadModal';
 import CreateLeadModal from '@/components/Leads/ManageLeads/CreateLeadModal';
-// import EditLeadModal from '@/components/Leads/ManageLeads/EditLeadModal';
+import EditLeadModal from '@/components/Leads/ManageLeads/EditLeadModal';
 import ViewLeadModal from '@/components/Leads/ManageLeads/ViewLeadModal';
 // import ChangeLeadPriorityModal from '@/components/Leads/ManageLeads/ChangeLeadPriorityModal';
 // import ChangeLeadStatusModal from '@/components/Leads/ManageLeads/ChangeLeadStatusModal';
@@ -343,13 +343,13 @@ const LeadPage = () => {
                                             <View />
                                         </button>
                                     </Tippy>
-                                    {/* {isAbleToUpdate && (
+                                    {isAbleToUpdate && (
                                         <Tippy content="Edit">
                                             <button type="button" onClick={() => dispatch(setEditModal({ id, open: true }))}>
                                                 <Edit />
                                             </button>
                                         </Tippy>
-                                    )} */}
+                                    )}
                                     {isAbleToDelete && (
                                         <Tippy content="Delete">
                                             <button type="button" onClick={() => dispatch(setDeleteModal({ id, open: true }))}>
@@ -376,7 +376,7 @@ const LeadPage = () => {
             </div>
 
             {/* edit modal */}
-            {/* <EditLeadModal /> */}
+            <EditLeadModal />
 
             {/* view modal */}
             <ViewLeadModal />

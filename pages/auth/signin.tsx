@@ -40,7 +40,7 @@ const LoginPage = () => {
                 });
                 localStorage.setItem('uid', res?.data?.id);
                 action.resetForm();
-                router.push('/tasks');
+                router.push('/');
             } catch (error: any) {
                 if (typeof error?.response?.data?.message === 'object') {
                     showToastAlert(error?.response?.data?.message.join(' , '));

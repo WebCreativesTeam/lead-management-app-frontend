@@ -76,29 +76,9 @@ const TaskEditModal = () => {
 
     const showAlert = async () => {
         if (errors.title) {
-            const toast = Swal.mixin({
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 3000,
-            });
-            toast.fire({
-                icon: 'error',
-                title: errors.title,
-                padding: '10px 20px',
-            });
+            showToastAlert(errors.title)
         } else if (errors.description) {
-            const toast = Swal.mixin({
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 3000,
-            });
-            toast.fire({
-                icon: 'error',
-                title: errors.description,
-                padding: '10px 20px',
-            });
+          showToastAlert(errors.description);
         }
     };
     return (
