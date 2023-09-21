@@ -16,12 +16,10 @@ import ContactViewModal from '@/components/Contact/ContactViewModal';
 import { IRootState } from '@/store';
 import ContactCreateModal from '@/components/Contact/ContactCreateModal';
 import ContactEditModal from '@/components/Contact/ContactEditModal';
-import { useRouter } from 'next/router';
 import Loader from '@/components/__Shared/Loader';
 
 const Contacts = () => {
     const dispatch = useDispatch();
-    const router = useRouter();
     useEffect(() => {
         dispatch(setPageTitle('Contacts'));
     });
@@ -54,14 +52,6 @@ const Contacts = () => {
         setInitialRecords(sortStatus.direction === 'desc' ? data.reverse() : data);
         setPage(1);
     }, [sortStatus]);
-
-    //router user if dont have permission to access branch page
-    useEffect(() => {
-        if (!isAbleToRead && userPolicyArr.length > 0) {
-            router.push('/');
-            return;
-        }
-    }, []);
 
     //get all contact after page render
     useEffect(() => {

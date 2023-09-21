@@ -5,18 +5,21 @@ import Select from 'react-select';
 import { useSelector, useDispatch } from 'react-redux';
 import { IRootState } from '@/store';
 import { setEditModal, setDisableBtn, setFetching } from '@/store/Slices/branchSlice';
-import { countryData, namePrefix } from '@/utils/Raw Data';
 import { useFormik } from 'formik';
 import { branchSchema } from '@/utils/schemas';
 import { ApiClient } from '@/utils/http';
-import { SelectOptionsType } from '@/utils/Types';
 import { showToastAlert } from '@/utils/contant';
 import Loader from '../__Shared/Loader';
+import countryJson from '@/utils/Raw Data/select-address.json';
+import { ICountryData, SelectOptionsType } from '@/utils/Types';
 
 const BranchEditModal = () => {
     const { editModal, isBtnDisabled, singleData, isFetching } = useSelector((state: IRootState) => state.branch);
     const [defaultState, setDefaultState] = useState<SelectOptionsType>({} as SelectOptionsType);
     const [defaultCountry, setDefaultCountry] = useState<SelectOptionsType>({} as SelectOptionsType);
+    const [countries, setCountries] = useState<SelectOptionsType[]>([] as SelectOptionsType[]);
+    const [states, setStates] = useState<SelectOptionsType[] | undefined>([] as SelectOptionsType[]);
+    const [selectedCountry, setSelectedCountry] = useState<string[]>([]);
 
     const dispatch = useDispatch();
     useEffect(() => {
@@ -26,11 +29,28 @@ const BranchEditModal = () => {
         setFieldValue('country', singleData?.country);
         setFieldValue('city', singleData?.city);
 
-        const findState: any = countryData.find((item: SelectOptionsType) => item.value === singleData?.state);
-        setDefaultState(findState);
+        const creatCountryJsonList: SelectOptionsType[] = countryJson.countries.map((data: ICountryData) => {
+            return { value: data.country, label: data.country };
+        });
 
-        const findCountry: any = countryData.find((item: SelectOptionsType) => item.value === singleData.country);
-        setDefaultCountry(findCountry);
+        const findSelectedCountryStates: ICountryData | undefined = countryJson?.countries?.find((data) => {
+            return data.country === singleData.country;
+        });
+
+        if (findSelectedCountryStates) {
+            const findStates: SelectOptionsType[] = findSelectedCountryStates.states.map((state: string) => {
+                return { value: state, label: state };
+            });
+            const findState: SelectOptionsType | undefined = findStates.find((item: SelectOptionsType) => item.value === singleData?.state);
+            if (findState) {
+                setDefaultState(findState);
+            }
+        }
+
+        const findCountry: SelectOptionsType | undefined = creatCountryJsonList.find((item: SelectOptionsType) => item.value === singleData.country);
+        if (findCountry) {
+            setDefaultCountry(findCountry);
+        }
     }, [singleData]);
 
     const { values, handleChange, submitForm, handleSubmit, setFieldValue, errors, handleBlur, resetForm } = useFormik({
@@ -66,10 +86,39 @@ const BranchEditModal = () => {
             dispatch(setFetching(false));
         },
     });
+
+    useEffect(() => {
+        const creatCountryJsonList: SelectOptionsType[] = countryJson.countries.map((data: ICountryData) => {
+            return { value: data.country, label: data.country };
+        });
+        setCountries(creatCountryJsonList);
+
+        const findCountry: SelectOptionsType | undefined = creatCountryJsonList.find((item: SelectOptionsType) => item.value === values.country);
+        if (findCountry) {
+            setDefaultCountry(findCountry);
+        }
+
+        const findSelectedCountryStates: ICountryData | undefined = countryJson?.countries?.find((data) => {
+            return data.country === values.country;
+        });
+
+        if (findSelectedCountryStates) {
+            setSelectedCountry(findSelectedCountryStates.states);
+        }
+
+        if (findSelectedCountryStates) {
+            const findStates: SelectOptionsType[] = findSelectedCountryStates.states.map((state: string) => {
+                return { value: state, label: state };
+            });
+            setStates(findStates);
+        }
+    }, [values.country]);
+
     const handleDiscard = () => {
         dispatch(setEditModal({ open: false }));
         resetForm();
     };
+
     return (
         <Modal
             open={editModal}
@@ -92,26 +141,25 @@ const BranchEditModal = () => {
                         <div className="flex flex-col  gap-4 sm:flex-row">
                             <div className="flex-1">
                                 <label htmlFor="country">Select Country</label>
-                                <Select placeholder="select country" defaultValue={defaultCountry} options={countryData} onChange={(data: any) => setFieldValue('country', data.value)} />
+                                <Select placeholder="select country" defaultValue={defaultCountry} options={countries} onChange={(data: any) => setFieldValue('country', data.value)} />
                             </div>
                             <div className="flex-1">
                                 <label htmlFor="state">Select State</label>
-                                <Select placeholder="select state" defaultValue={defaultState} options={countryData} onChange={(data: any) => setFieldValue('state', data.value)} />
+                                <Select
+                                    placeholder="select state"
+                                    value={selectedCountry.includes(defaultState.value) ? defaultState : null}
+                                    options={states}
+                                    onChange={(data: any) => {
+                                        setFieldValue('state', data.value);
+                                        setDefaultState({ value: data.value, label: data.value });
+                                    }}
+                                />
                             </div>
                         </div>
                         <section className="flex flex-col  gap-4 sm:flex-row">
                             <div className="flex-1">
                                 <label htmlFor="updateBranchCity">City</label>
-                                <input
-                                    onChange={handleChange}
-                                    onBlur={handleBlur}
-                                    value={values.city}
-                                    id="updateBranchCity"
-                                    name="city"
-                                    type="text"
-                                    placeholder="Enter City"
-                                    className="form-input"
-                                />
+                                <input onChange={handleChange} onBlur={handleBlur} value={values.city} id="updateBranchCity" name="city" type="text" placeholder="Enter City" className="form-input" />
                             </div>
                             <div className="flex-1">
                                 <label htmlFor="createAddress">Address</label>

@@ -25,7 +25,7 @@ const TaskStatusPage = () => {
     });
 
     //hooks
-    const { data, isFetching,isAbleToChangeDefaultStatus,isAbleToCreate,isAbleToDelete,isAbleToRead,isAbleToUpdate } = useSelector((state: IRootState) => state.taskStatus);
+    const { data, isFetching, isAbleToChangeDefaultStatus, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate } = useSelector((state: IRootState) => state.taskStatus);
     const [searchInputText, setSearchInputText] = useState<string>('');
     const [searchedData, setSearchedData] = useState<TaskStatusType[]>(data);
     const [loading, setLoading] = useState<boolean>(false);
@@ -90,7 +90,7 @@ const TaskStatusPage = () => {
         setSearchedData(searchTaskStatusData);
         setRecordsData(searchedData);
     };
-    return (
+    return !isAbleToRead ? null : (
         <div>
             <PageHeadingSection description="Customize task statuses. Monitor workflow. Update stages. Reflect real-time progress." heading="Manage Progress" />
             <div className="my-6 flex flex-col gap-5 sm:flex-row ">

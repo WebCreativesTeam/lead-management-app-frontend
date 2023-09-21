@@ -180,7 +180,7 @@ const LeadPage = () => {
         setRecordsData(searchLeadData);
     };
 
-    return (
+    return !isAbleToRead ? null : (
         <div>
             <PageHeadingSection description="View, create, update, and close leads. Organize by status, priority, and due date. Stay on top of work." heading="Lead Management" />
             <div className="my-6 flex gap-5 ">

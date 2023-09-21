@@ -9,8 +9,9 @@ import { countryData, namePrefix } from '@/utils/Raw Data';
 import { useFormik } from 'formik';
 import { contactSchema } from '@/utils/schemas';
 import { ApiClient } from '@/utils/http';
-import { SelectOptionsType, SourceDataType, UserDataType } from '@/utils/Types';
+import { SelectOptionsType, SourceDataType, UserDataType, ICountryData } from '@/utils/Types';
 import { showToastAlert } from '@/utils/contant';
+import countryJson from '@/utils/Raw Data/select-address.json';
 import Loader from '../__Shared/Loader';
 
 const ContactEditModal = () => {
@@ -20,6 +21,9 @@ const ContactEditModal = () => {
     const [defaultTitle, setDefaultTitle] = useState<SelectOptionsType>({} as SelectOptionsType);
     const [defaultAssignTo, setDefaultAssignTo] = useState<SelectOptionsType>({} as SelectOptionsType);
     const [defaultSource, setDefaultSource] = useState<SelectOptionsType>({} as SelectOptionsType);
+    const [countries, setCountries] = useState<SelectOptionsType[]>([] as SelectOptionsType[]);
+    const [states, setStates] = useState<SelectOptionsType[] | undefined>([] as SelectOptionsType[]);
+    const [selectedCountry, setSelectedCountry] = useState<string[]>([]);
 
     const dispatch = useDispatch();
 
@@ -50,11 +54,28 @@ const ContactEditModal = () => {
         setFieldValue('assignedTo', assignedTo?.id);
         setFieldValue('source', source?.id);
 
-        const findState: any = countryData.find((item: SelectOptionsType) => item.value === location?.state);
-        setDefaultState(findState);
+        const creatCountryJsonList: SelectOptionsType[] = countryJson.countries.map((data: ICountryData) => {
+            return { value: data.country, label: data.country };
+        });
 
-        const findCountry: any = countryData.find((item: SelectOptionsType) => item.value === location?.country);
-        setDefaultCountry(findCountry);
+        const findSelectedCountryStates: ICountryData | undefined = countryJson?.countries?.find((data) => {
+            return data.country === location?.country;
+        });
+
+        if (findSelectedCountryStates) {
+            const findStates: SelectOptionsType[] = findSelectedCountryStates.states.map((state: string) => {
+                return { value: state, label: state };
+            });
+            const findState: SelectOptionsType | undefined = findStates.find((item: SelectOptionsType) => item.value === location?.state);
+            if (findState) {
+                setDefaultState(findState);
+            }
+        }
+
+        const findCountry: SelectOptionsType | undefined = creatCountryJsonList.find((item: SelectOptionsType) => item.value === location?.country);
+        if (findCountry) {
+            setDefaultCountry(findCountry);
+        }
 
         const findNamePrefix: any = namePrefix.find((item: SelectOptionsType) => item.value === title);
         setDefaultTitle(findNamePrefix);
@@ -136,6 +157,34 @@ const ContactEditModal = () => {
             dispatch(setFetching(false));
         },
     });
+
+    useEffect(() => {
+        const creatCountryJsonList: SelectOptionsType[] = countryJson.countries.map((data: ICountryData) => {
+            return { value: data.country, label: data.country };
+        });
+        setCountries(creatCountryJsonList);
+
+        const findCountry: SelectOptionsType | undefined = creatCountryJsonList.find((item: SelectOptionsType) => item.value === values.country);
+        if (findCountry) {
+            setDefaultCountry(findCountry);
+        }
+
+        const findSelectedCountryStates: ICountryData | undefined = countryJson?.countries?.find((data) => {
+            return data.country === values.country;
+        });
+
+        if (findSelectedCountryStates) {
+            setSelectedCountry(findSelectedCountryStates.states);
+        }
+
+        if (findSelectedCountryStates) {
+            const findStates: SelectOptionsType[] = findSelectedCountryStates.states.map((state: string) => {
+                return { value: state, label: state };
+            });
+            setStates(findStates);
+        }
+    }, [values.country]);
+
     const handleDiscard = () => {
         dispatch(setEditModal({ open: false }));
         resetForm();
@@ -280,11 +329,19 @@ const ContactEditModal = () => {
                         <div className="flex flex-col gap-4 sm:flex-row">
                             <div className="flex-1">
                                 <label htmlFor="state">Country</label>
-                                <Select placeholder="select country" defaultValue={defaultCountry} options={countryData} onChange={(data: any) => setFieldValue('country', data.value)} />
+                                <Select placeholder="select country" defaultValue={defaultCountry} options={countries} onChange={(data: any) => setFieldValue('country', data.value)} />
                             </div>
                             <div className="flex-1">
                                 <label htmlFor="state">State</label>
-                                <Select placeholder="select state" defaultValue={defaultState} options={countryData} onChange={(data: any) => setFieldValue('state', data.value)} />
+                                <Select
+                                    placeholder="select state"
+                                    value={selectedCountry.includes(defaultState.value) ? defaultState : null}
+                                    options={states}
+                                    onChange={(data: any) => {
+                                        setFieldValue('state', data.value);
+                                        setDefaultState({ value: data.value, label: data.value });
+                                    }}
+                                />
                             </div>
                             <div className="flex-1">
                                 <label htmlFor="city">City</label>

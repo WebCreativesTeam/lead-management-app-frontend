@@ -373,3 +373,8 @@ export interface EmailsInitialStateProps {
 }
 
 ///-------- Redux Toolkit Types - END -------------//
+
+export interface ICountryData {
+    country: string;
+    states: string[];
+}

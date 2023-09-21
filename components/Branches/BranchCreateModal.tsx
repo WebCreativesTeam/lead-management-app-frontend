@@ -1,21 +1,24 @@
-import React, { memo } from 'react';
+import React, { memo, useEffect, useState } from 'react';
 import Modal from '../__Shared/Modal';
 import Select from 'react-select';
 import { useSelector, useDispatch } from 'react-redux';
 import { IRootState } from '@/store';
 import { setCreateModal, setDisableBtn, setFetching } from '@/store/Slices/branchSlice';
-import { countryData } from '@/utils/Raw Data';
 import { useFormik } from 'formik';
 import { branchSchema } from '@/utils/schemas';
 import { ApiClient } from '@/utils/http';
 import { showToastAlert } from '@/utils/contant';
 import Loader from '../__Shared/Loader';
+import countryJson from '@/utils/Raw Data/select-address.json';
+import { ICountryData, SelectOptionsType } from '@/utils/Types';
 
 const BranchCreateModal = () => {
     const { isFetching, createModal, isBtnDisabled } = useSelector((state: IRootState) => state.branch);
+    const [countries, setCountries] = useState<SelectOptionsType[]>([] as SelectOptionsType[]);
+    const [states, setStates] = useState<SelectOptionsType[] | undefined>([] as SelectOptionsType[]);
     const dispatch = useDispatch();
 
-    const { values, handleChange, submitForm, handleSubmit, setFieldValue, errors, handleBlur, resetForm } = useFormik({
+    const { values, handleChange, submitForm, handleSubmit, setFieldValue, handleBlur, resetForm } = useFormik({
         initialValues: {
             name: '',
             address: '',
@@ -51,12 +54,33 @@ const BranchCreateModal = () => {
             }
             dispatch(setDisableBtn(false));
             dispatch(setFetching(false));
+            setCountries([]);
+            setStates([]);
         },
     });
     const handleDiscard = () => {
         dispatch(setCreateModal(false));
         resetForm();
     };
+    useEffect(() => {
+        const creatCountryJsonList: SelectOptionsType[] = countryJson.countries.map((data: ICountryData) => {
+            return { value: data.country, label: data.country };
+        });
+        setCountries(creatCountryJsonList);
+
+        const findSelectedCountryStates: ICountryData | undefined = countryJson?.countries?.find((data) => {
+            return data.country === values.country;
+        });
+
+        if (findSelectedCountryStates) {
+            const findStates: SelectOptionsType[] = findSelectedCountryStates.states.map((state: string) => {
+                return { value: state, label: state };
+            });
+            setStates(findStates);
+        }
+    }, [values.country]);
+
+
     return (
         <Modal
             open={createModal}
@@ -81,11 +105,11 @@ const BranchCreateModal = () => {
                         <div className="flex flex-col  gap-4 sm:flex-row">
                             <div className="flex-1">
                                 <label htmlFor="country">Select Country</label>
-                                <Select placeholder="select country" options={countryData} onChange={(data: any) => setFieldValue('country', data.value)} />
+                                <Select placeholder="select country" options={countries} onChange={(data: any) => setFieldValue('country', data.value)} />
                             </div>
                             <div className="flex-1">
                                 <label htmlFor="state">Select State</label>
-                                <Select placeholder="select state" options={countryData} onChange={(data: any) => setFieldValue('state', data.value)} />
+                                <Select placeholder="select state" options={states} onChange={(data: any) => setFieldValue('state', data.value)} />
                             </div>
                         </div>
                         <section className="flex flex-col  gap-4 sm:flex-row">

@@ -53,14 +53,6 @@ const Source = () => {
         setPage(1);
     }, [sortStatus]);
 
-    // //route user if dont have permission to access source page
-    // useEffect(() => {
-    //     if (!isAbleToRead && userPolicyArr.length > 0) {
-    //         router.push('/');
-    //         return;
-    //     }
-    // }, []);
-
     //get all source after page render
     useEffect(() => {
         getSourceList();
@@ -147,18 +139,6 @@ const Source = () => {
                             sortable: true,
                             render: ({ name }) => <div>{name}</div>,
                         },
-                        // {
-                        //     accessor: 'createdAt',
-                        //     title: 'Created Date',
-                        //     sortable: true,
-                        //     render: ({ createdAt }) => <div>{new Date(createdAt).toLocaleString()}</div>,
-                        // },
-                        // {
-                        //     accessor: 'updatedAt',
-                        //     title: 'Last Updated',
-                        //     sortable: true,
-                        //     render: ({ updatedAt }) => <div>{new Date(updatedAt).toLocaleString()}</div>,
-                        // },
                         {
                             accessor: 'action',
                             title: 'Actions',

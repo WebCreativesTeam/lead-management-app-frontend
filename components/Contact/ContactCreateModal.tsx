@@ -1,20 +1,24 @@
-import React, { memo } from 'react';
+import React, { memo, useEffect, useState } from 'react';
 import Modal from '../__Shared/Modal';
 import Select from 'react-select';
 import { useSelector, useDispatch } from 'react-redux';
 import { IRootState } from '@/store';
 import { setCreateModal, setDisableBtn, setFetching } from '@/store/Slices/contactSlice';
-import { countryData, namePrefix } from '@/utils/Raw Data';
+import { namePrefix } from '@/utils/Raw Data';
 import { useFormik } from 'formik';
 import { contactSchema } from '@/utils/schemas';
 import { ApiClient } from '@/utils/http';
 import { showToastAlert } from '@/utils/contant';
 import Loader from '../__Shared/Loader';
-import { SelectOptionsType, SourceDataType, UserDataType } from '@/utils/Types';
+import { SelectOptionsType, SourceDataType, UserDataType, ICountryData } from '@/utils/Types';
+import countryJson from '@/utils/Raw Data/select-address.json';
 
 const ContactCreateModal = () => {
-    const { isFetching, createModal, isBtnDisabled , usersList,sourceList} = useSelector((state: IRootState) => state.contacts);
+    const { isFetching, createModal, isBtnDisabled, usersList, sourceList } = useSelector((state: IRootState) => state.contacts);
     const dispatch = useDispatch();
+    const [countries, setCountries] = useState<SelectOptionsType[]>([] as SelectOptionsType[]);
+    const [states, setStates] = useState<SelectOptionsType[] | undefined>([] as SelectOptionsType[]);
+
     const initialValues = {
         name: '',
         title: '',
@@ -83,13 +87,31 @@ const ContactCreateModal = () => {
         resetForm();
     };
 
-     const assignToUsersDropdown: SelectOptionsType[] = usersList?.map((item: UserDataType) => {
-         return { value: item.id, label: `${item.firstName} ${item.lastName}` };
-     });
+    useEffect(() => {
+        const creatCountryJsonList: SelectOptionsType[] = countryJson.countries.map((data: ICountryData) => {
+            return { value: data.country, label: data.country };
+        });
+        setCountries(creatCountryJsonList);
 
-     const sourceDropdown: SelectOptionsType[] = sourceList?.map((item: SourceDataType) => {
-         return { value: item.id, label: item.name };
-     });
+        const findSelectedCountryStates: ICountryData | undefined = countryJson?.countries?.find((data) => {
+            return data.country === values.country;
+        });
+
+        if (findSelectedCountryStates) {
+            const findStates: SelectOptionsType[] = findSelectedCountryStates.states.map((state: string) => {
+                return { value: state, label: state };
+            });
+            setStates(findStates);
+        }
+    }, [values.country]);
+
+    const assignToUsersDropdown: SelectOptionsType[] = usersList?.map((item: UserDataType) => {
+        return { value: item.id, label: `${item.firstName} ${item.lastName}` };
+    });
+
+    const sourceDropdown: SelectOptionsType[] = sourceList?.map((item: SourceDataType) => {
+        return { value: item.id, label: item.name };
+    });
 
     return (
         <Modal
@@ -233,11 +255,11 @@ const ContactCreateModal = () => {
                         <div className="flex flex-col gap-4 sm:flex-row">
                             <div className="flex-1">
                                 <label htmlFor="country">Country</label>
-                                <Select placeholder="select country" options={countryData} onChange={(data: any) => setFieldValue('country', data.value)} />
+                                <Select placeholder="select country" options={countries} onChange={(data: any) => setFieldValue('country', data.value)} />
                             </div>
                             <div className="flex-1">
                                 <label htmlFor="state">State</label>
-                                <Select placeholder="select state" options={countryData} onChange={(data: any) => setFieldValue('state', data.value)} />
+                                <Select placeholder="select state" options={states} onChange={(data: any) => setFieldValue('state', data.value)} />
                             </div>
                             <div className="flex-1">
                                 <label htmlFor="city">City</label>
