@@ -18,6 +18,8 @@ const ContactCreateModal = () => {
     const dispatch = useDispatch();
     const [countries, setCountries] = useState<SelectOptionsType[]>([] as SelectOptionsType[]);
     const [states, setStates] = useState<SelectOptionsType[] | undefined>([] as SelectOptionsType[]);
+    const [selectedCountry, setSelectedCountry] = useState<string[]>([]);
+    const [selectState, setSelectState] = useState<SelectOptionsType | null>(null);
 
     const initialValues = {
         name: '',
@@ -96,6 +98,9 @@ const ContactCreateModal = () => {
         const findSelectedCountryStates: ICountryData | undefined = countryJson?.countries?.find((data) => {
             return data.country === values.country;
         });
+        if (findSelectedCountryStates) {
+            setSelectedCountry(findSelectedCountryStates.states);
+        }
 
         if (findSelectedCountryStates) {
             const findStates: SelectOptionsType[] = findSelectedCountryStates.states.map((state: string) => {
@@ -259,7 +264,15 @@ const ContactCreateModal = () => {
                             </div>
                             <div className="flex-1">
                                 <label htmlFor="state">State</label>
-                                <Select placeholder="select state" options={states} onChange={(data: any) => setFieldValue('state', data.value)} />
+                                <Select
+                                    placeholder="select state"
+                                    value={selectState && selectedCountry.includes(selectState.value) ? selectState : null}
+                                    options={states}
+                                    onChange={(data: any) => {
+                                        setFieldValue('state', data.value);
+                                        setSelectState({ value: data.value, label: data.value });
+                                    }}
+                                />
                             </div>
                             <div className="flex-1">
                                 <label htmlFor="city">City</label>
