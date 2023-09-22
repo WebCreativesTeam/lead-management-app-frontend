@@ -1,7 +1,6 @@
 import * as Yup from 'yup';
 
 //authentication schemas
-
 export const signUpSchema = Yup.object().shape({
     firstName: Yup.string().required('Please enter your firstName'),
     lastName: Yup.string().required('Please enter your lastName'),
@@ -106,8 +105,25 @@ export const contactSchema = Yup.object().shape({
     country: Yup.string().required('Please select country'),
 });
 
-export const emailSchema = Yup.object().shape({
+//email template schema
+export const emailTemplateSchema = Yup.object().shape({
     name: Yup.string().required('Please Enter Template Name'),
     subject: Yup.string().required('Please Enter Template Subject'),
     message: Yup.string().required('Please Enter Message'),
+});
+
+export const emailSmtpSchema = Yup.object().shape({
+    SMTP: Yup.string().required('Enter SMTP Name'),
+    name: Yup.string().required('Enter Name'),
+    email: Yup.string().email('Please enter valid email').required('Enter Email'),
+    password: Yup.string().required('Enter SMTP password').min(8, 'Password should be atleast 8 characters'),
+    confirmPassword: Yup.string()
+        .oneOf([Yup.ref('password')], 'Password and confirm password not matched')
+        .required('Please enter confirm password'),
+});
+
+export const editEmailSmtpSchema = Yup.object().shape({
+    SMTP: Yup.string().required('Enter SMTP Name'),
+    name: Yup.string().required('Enter Name'),
+    email: Yup.string().email('Please enter valid email').required('Enter Email')
 });

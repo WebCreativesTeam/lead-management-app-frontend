@@ -8,11 +8,12 @@ import policySlice from './Slices/policySlice';
 import manageTaskSlice from './Slices/taskSlice/manageTaskSlice';
 import taskStatusSlice from './Slices/taskSlice/taskStatusSlice';
 import taskPrioritySlice from './Slices/taskSlice/taskPrioritySlice';
-import emailTemplateSlice from './Slices/emailSlice';
+import emailTemplateSlice from './Slices/emailSlice/emailTemplateSlice';
 import manageLeadSlice from './Slices/leadSlice/manageLeadSlice';
 import userProfileSlice from './Slices/userProfileSlice';
 import leadPrioritySlice from './Slices/leadSlice/leadPrioritySlice';
 import leadStatusSlice from './Slices/leadSlice/leadStatusSlice';
+import emailSmtpSlice from './Slices/emailSlice/emailSmtpSlice';
 
 const rootReducer = combineReducers({
     themeConfig: themeConfigSlice,
@@ -25,9 +26,10 @@ const rootReducer = combineReducers({
     taskStatus: taskStatusSlice,
     taskPriority: taskPrioritySlice,
     lead: manageLeadSlice,
-    leadPriority:leadPrioritySlice,
-    leadStatus:leadStatusSlice,
+    leadPriority: leadPrioritySlice,
+    leadStatus: leadStatusSlice,
     emailTemplate: emailTemplateSlice,
+    emailSmtp: emailSmtpSlice,
     userInfo: userProfileSlice,
 });
 

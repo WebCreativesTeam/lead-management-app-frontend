@@ -1,32 +1,34 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState, useDeferredValue } from 'react';
+import React, { useEffect, useState, Fragment, useDeferredValue } from 'react';
 import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
 import { sortBy } from 'lodash';
 import { Delete, Edit, Plus, View } from '@/utils/icons';
 import PageHeadingSection from '@/components/__Shared/PageHeadingSection/index.';
+import { GetMethodResponseType, IEmailSmtp } from '@/utils/Types';
 import { useDispatch, useSelector } from 'react-redux';
 import { setPageTitle } from '@/store/themeConfigSlice';
-import { GetMethodResponseType, IEmailTemplate } from '@/utils/Types';
-import { ApiClient } from '@/utils/http';
 import { IRootState } from '@/store';
-import { getAllEmailTemplates, setDeleteModal, setViewModal } from '@/store/Slices/emailSlice';
-import EmailDeleteModal from '@/components/emails/EmailDeleteModal';
-import { useRouter } from 'next/router';
-import EmailViewModal from '@/components/emails/EmailViewModal';
+import { ApiClient } from '@/utils/http';
+import { getAllEmailSmtp, setCreateModal, setEditModal, setViewModal, setDeleteModal } from '@/store/Slices/emailSlice/emailSmtpSlice';
+import DeleteEmailSmtpModal from '@/components/emails/SMTP/DeleteEmailSmtpModal';
+import CreateEmailSmtpModal from '@/components/emails/SMTP/CreateEmailSmtpModal';
+import EditEmailSmtpModal from '@/components/emails/SMTP/EditEmailSmtpModal';
+import ViewEmailSmtpModal from '@/components/emails/SMTP/ViewEmailSmtpModal';
 
-const EmailTemplates = () => {
+const EmailSmtpPage = () => {
     const dispatch = useDispatch();
     useEffect(() => {
-        dispatch(setPageTitle('Email Templates | Emails'));
+        dispatch(setPageTitle('Email SMTP'));
     });
+
     //hooks
-    const { data, isFetching, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate } = useSelector((state: IRootState) => state.emailTemplate);
+    const { data, isFetching, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate } = useSelector((state: IRootState) => state.emailSmtp);
     const [searchInputText, setSearchInputText] = useState<string>('');
-    const [searchedData, setSearchedData] = useState<IEmailTemplate[]>(data);
+    const [searchedData, setSearchedData] = useState<IEmailSmtp[]>(data);
     const [loading, setLoading] = useState<boolean>(false);
-    const router = useRouter();
+
     //datatable
     const [page, setPage] = useState(1);
     const PAGE_SIZES = [10, 20, 30, 50, 100];
@@ -49,9 +51,9 @@ const EmailTemplates = () => {
         setPage(1);
     }, [sortStatus]);
 
-    //get all emails after page render
+    //get all emailSmtp after page render
     useEffect(() => {
-        getEmailList();
+        getEmailSmtpList();
     }, [isFetching]);
 
     useEffect(() => {
@@ -61,86 +63,78 @@ const EmailTemplates = () => {
 
     //useDefferedValue hook for search query
     const searchQuery = useDeferredValue(searchInputText);
-    //get all emails list
-    const getEmailList = async () => {
+
+    //get all EmailSmtp list
+    const getEmailSmtpList = async () => {
         setLoading(true);
-        const res: GetMethodResponseType = await new ApiClient().get('email-template');
-        const emails: IEmailTemplate[] = res?.data;
-        if (typeof emails === 'undefined') {
-            dispatch(getAllEmailTemplates([] as IEmailTemplate[]));
+        const res: GetMethodResponseType = await new ApiClient().get('smtp');
+        const emailSmtp: IEmailSmtp[] = res?.data;
+        if (typeof emailSmtp === 'undefined') {
+            dispatch(getAllEmailSmtp([] as IEmailSmtp[]));
             return;
         }
-        dispatch(getAllEmailTemplates(emails));
+        dispatch(getAllEmailSmtp(emailSmtp));
         setLoading(false);
     };
 
-    //search emails
-    const handleSearchEmail = () => {
-        const searchEmailData = data?.filter((email: IEmailTemplate) => {
+    //search emailSmtp
+    const handleSearchEmailSmtp = () => {
+        const searchEmailSmtpData = data?.filter((emailSmtp: IEmailSmtp) => {
             return (
-                email.name.toLowerCase().startsWith(searchQuery.toLowerCase().trim(), 0) ||
-                email.name.toLowerCase().endsWith(searchQuery.toLowerCase().trim()) ||
-                email.name.toLowerCase().includes(searchQuery.toLowerCase().trim())
+                emailSmtp.name.toLowerCase().startsWith(searchQuery.toLowerCase().trim(), 0) ||
+                emailSmtp.name.toLowerCase().endsWith(searchQuery.toLowerCase().trim()) ||
+                emailSmtp.name.toLowerCase().includes(searchQuery.toLowerCase().trim())
             );
         });
-        setSearchedData(searchEmailData);
-        setRecordsData(searchEmailData);
+        setSearchedData(searchEmailSmtpData);
+        setRecordsData(searchEmailSmtpData);
     };
 
     return !isAbleToRead ? null : (
         <div>
-            <PageHeadingSection
-                description=" Design and save new email templates for various purposes.Modify existing email templates to match your current needs. Remove outdated or unused email templates from your collection."
-                heading="Email Templates"
-            />
+            <PageHeadingSection description="Define Emails Smtp. Arrange by urgency. Optimize by email distribution. Enhance productivity." heading="Email SMTP" />
             <div className="my-6 flex flex-col gap-5 sm:flex-row ">
                 {!isAbleToCreate ? (
                     <div className="flex-1"></div>
                 ) : (
                     <div className="flex-1">
-                        <button className="btn btn-primary h-full w-full max-w-[250px] max-sm:mx-auto" type="button" onClick={() => router.push('/email-templates/create-email-template')}>
+                        <button className="btn btn-primary h-full w-full max-w-[250px] max-sm:mx-auto" type="button" onClick={() => dispatch(setCreateModal(true))}>
                             <Plus />
-                            Create New Template
+                            Add New SMTP
                         </button>
                     </div>
                 )}
                 <div className="relative  flex-1">
-                    <input
-                        type="text"
-                        placeholder="Find Email Templates"
-                        className="form-input py-3 ltr:pr-[100px] rtl:pl-[100px]"
-                        onChange={(e) => setSearchInputText(e.target.value)}
-                        value={searchInputText}
-                    />
-                    <button type="button" className="btn btn-primary absolute top-1 shadow-none ltr:right-1 rtl:left-1" onClick={handleSearchEmail}>
+                    <input type="text" placeholder="Find SMTP" className="form-input py-3 ltr:pr-[100px] rtl:pl-[100px]" onChange={(e) => setSearchInputText(e.target.value)} value={searchQuery} />
+                    <button type="button" className="btn btn-primary absolute top-1 shadow-none ltr:right-1 rtl:left-1" onClick={handleSearchEmailSmtp}>
                         Search
                     </button>
                 </div>
             </div>
 
-            {/* Emails List table*/}
+            {/* Smtp List table*/}
             <div className="datatables panel mt-6">
                 <DataTable
                     className="table-hover whitespace-nowrap"
                     records={recordsData}
                     columns={[
                         {
+                            accessor: 'SMTP',
+                            title: 'SMTP',
+                            sortable: true,
+                            render: ({ SMTP }) => <div>{SMTP}</div>,
+                        },
+                        {
                             accessor: 'name',
-                            title: 'Template Name',
+                            title: 'Name',
                             sortable: true,
                             render: ({ name }) => <div>{name}</div>,
                         },
                         {
-                            accessor: 'subject',
-                            title: 'Subject',
+                            accessor: 'email',
+                            title: 'Email',
                             sortable: true,
-                            render: ({ subject }) => <div>{subject}</div>,
-                        },
-                        {
-                            accessor: 'message',
-                            title: 'Template Body',
-                            sortable: true,
-                            render: ({ message }) => <div dangerouslySetInnerHTML={{ __html: message.slice(0, 30) }}></div>,
+                            render: ({ email }) => <div>{email}</div>,
                         },
                         {
                             accessor: 'createdAt',
@@ -150,7 +144,7 @@ const EmailTemplates = () => {
                         },
                         {
                             accessor: 'updatedAt',
-                            title: 'Updated Date',
+                            title: 'Last Updated',
                             sortable: true,
                             render: ({ updatedAt }) => <div>{new Date(updatedAt).toLocaleString()}</div>,
                         },
@@ -167,7 +161,7 @@ const EmailTemplates = () => {
                                     </Tippy>
                                     {isAbleToUpdate && (
                                         <Tippy content="Edit">
-                                            <button type="button" onClick={() => router.push('/email-templates/edit-email-template/' + id)}>
+                                            <button type="button" onClick={() => dispatch(setEditModal({ id, open: true }))}>
                                                 <Edit />
                                             </button>
                                         </Tippy>
@@ -197,13 +191,19 @@ const EmailTemplates = () => {
                 />
             </div>
 
+            {/* edit modal */}
+            <EditEmailSmtpModal />
+
             {/* view modal */}
-            <EmailViewModal />
+            <ViewEmailSmtpModal />
 
             {/* delete modal */}
-            <EmailDeleteModal />
+            <DeleteEmailSmtpModal />
+
+            {/* create modal */}
+            <CreateEmailSmtpModal />
         </div>
     );
 };
 
-export default EmailTemplates;
+export default EmailSmtpPage;

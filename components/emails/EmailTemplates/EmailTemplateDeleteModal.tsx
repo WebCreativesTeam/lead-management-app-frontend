@@ -1,11 +1,11 @@
 import React, { memo } from 'react';
-import ConfirmationModal from '../__Shared/ConfirmationModal';
+import ConfirmationModal from '../../__Shared/ConfirmationModal';
 import { useDispatch, useSelector } from 'react-redux';
 import { IRootState } from '@/store';
-import { setDeleteModal, setDisableBtn, setFetching } from '@/store/Slices/emailSlice';
+import { setDeleteModal, setDisableBtn, setFetching } from '@/store/Slices/emailSlice/emailTemplateSlice';
 import { IEmailTemplate } from '@/utils/Types';
 import { ApiClient } from '@/utils/http';
-import Loader from '../__Shared/Loader';
+import Loader from '../../__Shared/Loader';
 
 const EmailDeleteModal = () => {
     const { isFetching, isBtnDisabled, deleteModal, singleData } = useSelector((state: IRootState) => state.emailTemplate);

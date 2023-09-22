@@ -192,6 +192,7 @@ const LeadCreateModal = () => {
                                         position: 'auto',
                                     }}
                                     id="leadEstimateDate"
+                                    placeholder="Estimate Date"
                                     name="startDate"
                                     className="form-input"
                                     onChange={(e) => setFieldValue('estimatedDate', e)}
@@ -210,6 +211,7 @@ const LeadCreateModal = () => {
                                     id="DOB"
                                     name="DOB"
                                     className="form-input"
+                                    placeholder="Date Of Birth"
                                     onChange={(e) => setFieldValue('DOB', e)}
                                     value={values.DOB}
                                 />

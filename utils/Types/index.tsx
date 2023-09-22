@@ -1,3 +1,5 @@
+import { string } from 'yup';
+
 //general types
 export type GetMethodResponseType = {
     status: string;
@@ -231,6 +233,36 @@ export interface ILeadPriority {
     updatedAt: string;
 }
 
+//Emails SMTP types
+
+enum OutLookSecurity {
+    'SSL',
+    'TLS',
+    'STARTTLS',
+    'none',
+}
+
+enum SMTPType {
+    'Gmail',
+    'Yahoo',
+    'Outlook',
+    'Hotmail',
+}
+
+export interface IEmailSmtp {
+    id: string;
+    SMTP: 'SSL' | 'TLS' | 'STARTTLS' | 'none';
+    security: 'Gmail' | 'Yahoo' | 'Outlook' | 'Hotmail';
+    global: boolean;
+    verified: boolean;
+    name: string;
+    email: string;
+    password: string;
+    confirmPassword: string;
+    createdAt: string;
+    updatedAt: string;
+}
+
 // ----------------- authentication types : start -------------------//
 
 export interface ISignInResponse {
@@ -295,6 +327,12 @@ export interface ManageLeadInitialStateProps extends InitialStateProps {
 export interface SourceInitialStateProps extends InitialStateProps {
     data: SourceDataType[];
     singleData: SourceDataType;
+}
+
+//email smtp slice initial props
+export interface EmailSmtpInitialStateProps extends InitialStateProps {
+    data: IEmailSmtp[];
+    singleData: IEmailSmtp;
 }
 
 //policy slice initial props

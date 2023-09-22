@@ -159,6 +159,7 @@ const TaskCreateModal = () => {
                                         position: 'auto',
                                     }}
                                     id="taskStartDate"
+                                    placeholder="Task Start Date"
                                     name="startDate"
                                     className="form-input"
                                     onChange={(e) => setFieldValue('startDate', e)}
@@ -175,6 +176,7 @@ const TaskCreateModal = () => {
                                         position: 'auto',
                                     }}
                                     id="taskEndDate"
+                                    placeholder="Task End Date"
                                     name="endDate"
                                     className="form-input"
                                     onChange={(e) => setFieldValue('endDate', e)}

@@ -1,35 +1,32 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState, Fragment, useDeferredValue } from 'react';
+import React, { useEffect, useState, useDeferredValue } from 'react';
 import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
 import { sortBy } from 'lodash';
 import { Delete, Edit, Plus, View } from '@/utils/icons';
 import PageHeadingSection from '@/components/__Shared/PageHeadingSection/index.';
-import { GetMethodResponseType, TaskPriorityType } from '@/utils/Types';
 import { useDispatch, useSelector } from 'react-redux';
 import { setPageTitle } from '@/store/themeConfigSlice';
-import { IRootState } from '@/store';
+import { GetMethodResponseType, IEmailTemplate } from '@/utils/Types';
 import { ApiClient } from '@/utils/http';
-import { getAllTaskPriorities, setCreateModal, setDefaultPriorityModal, setEditModal, setViewModal,setDeleteModal } from '@/store/Slices/taskSlice/taskPrioritySlice';
-import DeleteTaskPriorityModal from '@/components/Tasks/TaskPriority/DeleteTaskPriorityModal';
-import CreateTaskPriorityModal from '@/components/Tasks/TaskPriority/CreateTaskPriorityModal';
-import EditTaskPriorityModal from '@/components/Tasks/TaskPriority/EditTaskPriorityModal';
-import ChangeDefaultPriorityModal from '@/components/Tasks/TaskPriority/ChangeDefaultPriorityModal';
-import ViewTaskPriorityModal from '@/components/Tasks/TaskPriority/ViewTaskPriorityModal';
+import { IRootState } from '@/store';
+import { getAllEmailTemplates, setDeleteModal, setViewModal } from '@/store/Slices/emailSlice/emailTemplateSlice';
+import EmailDeleteModal from '@/components/emails/EmailTemplates/EmailTemplateDeleteModal';
+import { useRouter } from 'next/router';
+import EmailViewModal from '@/components/emails/EmailTemplates/EmailTemplateViewModal';
 
-const TaskPriorityPage = () => {
+const EmailTemplates = () => {
     const dispatch = useDispatch();
     useEffect(() => {
-        dispatch(setPageTitle('Tasks Priority Page'));
+        dispatch(setPageTitle('Email Templates | Emails'));
     });
-
     //hooks
-    const { data, isFetching, isAbleToChangeDefaultPriority, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate } = useSelector((state: IRootState) => state.taskPriority);
+    const { data, isFetching, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate } = useSelector((state: IRootState) => state.emailTemplate);
     const [searchInputText, setSearchInputText] = useState<string>('');
-    const [searchedData, setSearchedData] = useState<TaskPriorityType[]>(data);
+    const [searchedData, setSearchedData] = useState<IEmailTemplate[]>(data);
     const [loading, setLoading] = useState<boolean>(false);
-
+    const router = useRouter();
     //datatable
     const [page, setPage] = useState(1);
     const PAGE_SIZES = [10, 20, 30, 50, 100];
@@ -52,9 +49,9 @@ const TaskPriorityPage = () => {
         setPage(1);
     }, [sortStatus]);
 
-    //get all taskPriority after page render
+    //get all emails after page render
     useEffect(() => {
-        getTaskPriorityList();
+        getEmailList();
     }, [isFetching]);
 
     useEffect(() => {
@@ -64,62 +61,64 @@ const TaskPriorityPage = () => {
 
     //useDefferedValue hook for search query
     const searchQuery = useDeferredValue(searchInputText);
-
-    //get all TaskPriority list
-    const getTaskPriorityList = async () => {
+    //get all emails list
+    const getEmailList = async () => {
         setLoading(true);
-        const res: GetMethodResponseType = await new ApiClient().get('task-priority?sortBy=-isDefault');
-        const priority: TaskPriorityType[] = res?.data;
-        if (typeof priority === 'undefined') {
-            dispatch(getAllTaskPriorities([] as TaskPriorityType[]));
+        const res: GetMethodResponseType = await new ApiClient().get('email-template');
+        const emails: IEmailTemplate[] = res?.data;
+        if (typeof emails === 'undefined') {
+            dispatch(getAllEmailTemplates([] as IEmailTemplate[]));
             return;
         }
-        dispatch(getAllTaskPriorities(priority));
+        dispatch(getAllEmailTemplates(emails));
         setLoading(false);
     };
 
-    //search Task Priority
-    const handleSearchTaskPriority = () => {
-        const searchTaskPriorityData = data?.filter((taskPriority: TaskPriorityType) => {
+    //search emails
+    const handleSearchEmail = () => {
+        const searchEmailData = data?.filter((email: IEmailTemplate) => {
             return (
-                taskPriority.name.toLowerCase().startsWith(searchQuery.toLowerCase().trim(), 0) ||
-                taskPriority.name.toLowerCase().endsWith(searchQuery.toLowerCase().trim()) ||
-                taskPriority.name.toLowerCase().includes(searchQuery.toLowerCase().trim())
+                email.name.toLowerCase().startsWith(searchQuery.toLowerCase().trim(), 0) ||
+                email.name.toLowerCase().endsWith(searchQuery.toLowerCase().trim()) ||
+                email.name.toLowerCase().includes(searchQuery.toLowerCase().trim())
             );
         });
-        setSearchedData(searchTaskPriorityData);
-        setRecordsData(searchTaskPriorityData);
+        setSearchedData(searchEmailData);
+        setRecordsData(searchEmailData);
     };
 
     return !isAbleToRead ? null : (
         <div>
-            <PageHeadingSection description="Define task priorities. Arrange by urgency. Optimize task distribution. Enhance productivity." heading="Task Importance" />
+            <PageHeadingSection
+                description=" Design and save new email templates for various purposes.Modify existing email templates to match your current needs. Remove outdated or unused email templates from your collection."
+                heading="Email Templates"
+            />
             <div className="my-6 flex flex-col gap-5 sm:flex-row ">
                 {!isAbleToCreate ? (
                     <div className="flex-1"></div>
                 ) : (
                     <div className="flex-1">
-                        <button className="btn btn-primary h-full w-full max-w-[250px] max-sm:mx-auto" type="button" onClick={() => dispatch(setCreateModal(true))}>
+                        <button className="btn btn-primary h-full w-full max-w-[250px] max-sm:mx-auto" type="button" onClick={() => router.push('/emails/email-templates/create-email-template')}>
                             <Plus />
-                            Add New Task Priority
+                            Create New Template
                         </button>
                     </div>
                 )}
                 <div className="relative  flex-1">
                     <input
                         type="text"
-                        placeholder="Find Task Priority"
+                        placeholder="Find Email Templates"
                         className="form-input py-3 ltr:pr-[100px] rtl:pl-[100px]"
                         onChange={(e) => setSearchInputText(e.target.value)}
-                        value={searchQuery}
+                        value={searchInputText}
                     />
-                    <button type="button" className="btn btn-primary absolute top-1 shadow-none ltr:right-1 rtl:left-1" onClick={handleSearchTaskPriority}>
+                    <button type="button" className="btn btn-primary absolute top-1 shadow-none ltr:right-1 rtl:left-1" onClick={handleSearchEmail}>
                         Search
                     </button>
                 </div>
             </div>
 
-            {/* Task Priority List table*/}
+            {/* Emails List table*/}
             <div className="datatables panel mt-6">
                 <DataTable
                     className="table-hover whitespace-nowrap"
@@ -127,13 +126,21 @@ const TaskPriorityPage = () => {
                     columns={[
                         {
                             accessor: 'name',
-                            title: 'Task Priority Name',
+                            title: 'Template Name',
                             sortable: true,
-                            render: ({ name, color }) => (
-                                <span className={`mr-2 rounded px-2.5 py-0.5 text-sm font-medium dark:bg-blue-900 dark:text-blue-300`} style={{ color: color, backgroundColor: color + '20' }}>
-                                    {name}
-                                </span>
-                            ),
+                            render: ({ name }) => <div>{name}</div>,
+                        },
+                        {
+                            accessor: 'subject',
+                            title: 'Subject',
+                            sortable: true,
+                            render: ({ subject }) => <div>{subject}</div>,
+                        },
+                        {
+                            accessor: 'message',
+                            title: 'Template Body',
+                            sortable: true,
+                            render: ({ message }) => <div dangerouslySetInnerHTML={{ __html: message.slice(0, 30) }}></div>,
                         },
                         {
                             accessor: 'createdAt',
@@ -143,34 +150,9 @@ const TaskPriorityPage = () => {
                         },
                         {
                             accessor: 'updatedAt',
-                            title: 'Last Updated',
+                            title: 'Updated Date',
                             sortable: true,
                             render: ({ updatedAt }) => <div>{new Date(updatedAt).toLocaleString()}</div>,
-                        },
-                        {
-                            accessor: 'isDefault',
-                            title: 'Default Priority',
-                            sortable: true,
-                            render: ({ isDefault, id }) =>
-                                isAbleToChangeDefaultPriority ? (
-                                    <div>
-                                        <label className="relative h-6 w-12">
-                                            <input
-                                                type="checkbox"
-                                                className="custom_switch peer absolute z-10 h-full w-full cursor-pointer opacity-0"
-                                                id="custom_switch_checkbox1"
-                                                name="permission"
-                                                checked={isDefault}
-                                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => dispatch(setDefaultPriorityModal({ switchValue: e.target.checked, id, open: true }))}
-                                            />
-                                            <span className="block h-full rounded-full bg-[#ebedf2] before:absolute before:bottom-1 before:left-1 before:h-4 before:w-4 before:rounded-full before:bg-white before:transition-all before:duration-300 peer-checked:bg-primary peer-checked:before:left-7 dark:bg-dark dark:before:bg-white-dark dark:peer-checked:before:bg-white"></span>
-                                        </label>
-                                    </div>
-                                ) : isDefault ? (
-                                    <div>
-                                        <span className="mr-2 rounded bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-300">Default</span>
-                                    </div>
-                                ) : null,
                         },
                         {
                             accessor: 'action',
@@ -185,7 +167,7 @@ const TaskPriorityPage = () => {
                                     </Tippy>
                                     {isAbleToUpdate && (
                                         <Tippy content="Edit">
-                                            <button type="button" onClick={() => dispatch(setEditModal({ id, open: true }))}>
+                                            <button type="button" onClick={() => router.push('/emails/email-templates/edit-email-template/' + id)}>
                                                 <Edit />
                                             </button>
                                         </Tippy>
@@ -215,22 +197,13 @@ const TaskPriorityPage = () => {
                 />
             </div>
 
-            {/* edit modal */}
-            <EditTaskPriorityModal />
-
             {/* view modal */}
-            <ViewTaskPriorityModal />
+            <EmailViewModal />
 
             {/* delete modal */}
-            <DeleteTaskPriorityModal />
-
-            {/* create modal */}
-            <CreateTaskPriorityModal />
-
-            {/* default priority confirmationModal */}
-            <ChangeDefaultPriorityModal />
+            <EmailDeleteModal />
         </div>
     );
 };
 
-export default TaskPriorityPage;
+export default EmailTemplates;

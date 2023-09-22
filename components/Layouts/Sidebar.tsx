@@ -31,7 +31,7 @@ import {
     setTaskStatusReadPolicy,
     setTaskStatusUpdatePolicy,
 } from '@/store/Slices/taskSlice/taskStatusSlice';
-import { setEmailTemplateCreatePermission, setEmailTemplateDeletePermission, setEmailTemplateReadPermission, setEmailTemplateUpdatePermission } from '@/store/Slices/emailSlice';
+import { setEmailTemplateCreatePermission, setEmailTemplateDeletePermission, setEmailTemplateReadPermission, setEmailTemplateUpdatePermission } from '@/store/Slices/emailSlice/emailTemplateSlice';
 import { setLeadCreatePolicy, setLeadDeletePolicy, setLeadReadPolicy, setLeadUpdatePolicy } from '@/store/Slices/leadSlice/manageLeadSlice';
 import Talegram from '@/utils/icons/Talegram';
 import {
@@ -48,6 +48,7 @@ import {
     setLeadStatusReadPolicy,
     setLeadStatusUpdatePolicy,
 } from '@/store/Slices/leadSlice/leadStatusSlice';
+import { setEmailSmtpCreatePermission, setEmailSmtpDeletePermission, setEmailSmtpReadPermission, setEmailSmtpUpdatePermission } from '@/store/Slices/emailSlice/emailSmtpSlice';
 
 const Sidebar = () => {
     const router = useRouter();
@@ -104,6 +105,11 @@ const Sidebar = () => {
     //email template
     const userPolicyEmailTemplateArray: string[] = useSelector((state: IRootState) => state.taskStatus.userPolicyArr);
     const isAbleToReadEmailTemplates: boolean = useSelector((state: IRootState) => state.emailTemplate.isAbleToRead);
+    isAbleToReadEmailTemplates;
+
+    //email smtp
+    const userPolicyEmailSmtpArray: string[] = useSelector((state: IRootState) => state.emailSmtp.userPolicyArr);
+    const isAbleToReadEmailSmtp: boolean = useSelector((state: IRootState) => state.emailSmtp.isAbleToRead);
     isAbleToReadEmailTemplates;
 
     //Manage Leads page
@@ -208,6 +214,14 @@ const Sidebar = () => {
         dispatch(setEmailTemplateUpdatePermission('emailtemplate:Update::Document'));
         dispatch(setEmailTemplateDeletePermission('emailtemplate:Delete::Document'));
     }, [userPolicyEmailTemplateArray]);
+
+    // access for Email smtp page
+    useEffect(() => {
+        dispatch(setEmailSmtpReadPermission('smtp:Read::Documents'));
+        dispatch(setEmailSmtpCreatePermission('smtp:Create::Document'));
+        dispatch(setEmailSmtpUpdatePermission('smtp:Update::Document'));
+        dispatch(setEmailSmtpDeletePermission('smtp:Delete::Document'));
+    }, [userPolicyEmailSmtpArray]);
 
     //access for Manage Lead page
     useEffect(() => {
@@ -350,15 +364,38 @@ const Sidebar = () => {
                                 </li>
                             )}
 
-                            {/* email templates */}
-                            {isAbleToReadEmailTemplates && (
+                            {/* Emails */}
+                            {!isAbleToReadEmailTemplates && !isAbleToReadEmailSmtp ? null : (
                                 <li className="menu nav-item">
-                                    <Link href="/email-templates" className="group">
+                                    <button type="button" className={`${currentMenu === 'Emails' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('Emails')}>
                                         <div className="flex items-center">
                                             <Email />
-                                            <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Email Templates')}</span>
+                                            <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Emails')}</span>
                                         </div>
-                                    </Link>
+
+                                        <div className={currentMenu === 'Emails' ? 'rotate-90' : 'rtl:rotate-180'}>
+                                            <ArrowRight />
+                                        </div>
+                                    </button>
+
+                                    <AnimateHeight duration={300} height={currentMenu === 'Emails' ? 'auto' : 0}>
+                                        <ul className="sub-menu text-gray-500">
+                                            {isAbleToReadEmailTemplates && (
+                                                <li>
+                                                    <Link href="/emails/email-templates">{t('Email Templates')}</Link>
+                                                </li>
+                                            )}
+                                            {isAbleToReadEmailSmtp && (
+                                                <li>
+                                                    <Link href="/emails/SMTP">{t('SMTP')}</Link>
+                                                </li>
+                                            )}
+
+                                            <li>
+                                                <Link href="/emails/email">{t('Emails')}</Link>
+                                            </li>
+                                        </ul>
+                                    </AnimateHeight>
                                 </li>
                             )}
 

@@ -1,7 +1,7 @@
 import React, { memo } from 'react';
-import ViewModal from '../__Shared/ViewModal';
+import ViewModal from '../../__Shared/ViewModal';
 import { useDispatch, useSelector } from 'react-redux';
-import { setViewModal } from '@/store/Slices/emailSlice';
+import { setViewModal } from '@/store/Slices/emailSlice/emailTemplateSlice';
 import { IRootState } from '@/store';
 
 const EmailViewModal = () => {
