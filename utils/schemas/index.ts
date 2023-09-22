@@ -16,6 +16,15 @@ export const signInSchema = Yup.object().shape({
     password: Yup.string().required('Please enter your password').min(8, 'Password should be atleast 8 characters'),
 });
 
+export const resetPasswordSchema = Yup.object().shape({
+    newPassword: Yup.string().required('Please enter new password').min(8, 'Password should be atleast 8 characters'),
+    confirmPassword: Yup.string()
+        .oneOf([Yup.ref('newPassword')], 'Password and confirm password not matched')
+        .required('Please enter confirm password'),
+});
+
+
+
 export const policySchema = Yup.object().shape({
     name: Yup.string().required('Please enter policy name'),
     description: Yup.string().min(20, 'Description must be 20 characters').required('Please enter policy description'),

@@ -18,7 +18,7 @@ const initialValues = {
     lastName: '',
     email: '',
     password: '',
-    // confirmPassword: '',
+    confirmPassword: '',
     checkCondition: '',
 };
 
@@ -68,6 +68,8 @@ const SignUpPage = () => {
             showToastAlert(errors.email);
         } else if (errors.password) {
             showToastAlert(errors.password);
+        } else if (errors.confirmPassword) {
+            showToastAlert(errors.confirmPassword);
         }
     };
     return (
@@ -167,7 +169,7 @@ const SignUpPage = () => {
                                                 </span>
                                             </div>
                                         </div>
-                                        {/*       <div className="flex-1">
+                                        <div className="flex-1">
                                             <label htmlFor="confirm-password">Confirm Password</label>
                                             <div className="relative text-white-dark">
                                                 <input
@@ -184,7 +186,7 @@ const SignUpPage = () => {
                                                     <Lock />
                                                 </span>
                                             </div>
-                                        </div> */}
+                                        </div>
                                     </div>
                                     <div>
                                         <label className="flex cursor-pointer items-center">
@@ -195,7 +197,7 @@ const SignUpPage = () => {
                                     <button
                                         type="submit"
                                         className="btn btn-gradient !mt-6 w-full border-0 uppercase shadow-[0_10px_20px_-10px_rgba(67,97,238,0.44)]"
-                                        disabled={values.checkCondition && values.firstName && values.lastName && values.email && values.password && !disableBtn ? false : true}
+                                        disabled={values.checkCondition && values.firstName && values.lastName && values.email && values.password && values.confirmPassword && !disableBtn ? false : true}
                                         onClick={() => errors && showAlert()}
                                     >
                                         Sign Up

@@ -3,21 +3,21 @@
 import Link from 'next/link';
 import { useDispatch } from 'react-redux';
 import { useEffect, useState } from 'react';
-import { setPageTitle } from '../../store/themeConfigSlice';
+import { setPageTitle } from '../../../store/themeConfigSlice';
 import BlankLayout from '@/components/Layouts/BlankLayout';
 import { useFormik } from 'formik';
-import { signInSchema } from '@/utils/schemas';
+import { resetPasswordSchema } from '@/utils/schemas';
 import { useRouter } from 'next/router';
 import { ApiClient } from '@/utils/http';
 import { showToastAlert } from '@/utils/contant';
 import Loader from '@/components/__Shared/Loader';
-import { Email, Lock } from '@/utils/icons';
-import { ISignInResponse } from '@/utils/Types';
+import { Lock } from '@/utils/icons';
+import Swal from 'sweetalert2';
 
-const LoginPage = () => {
+const ResetNewPasswordPage = () => {
     const dispatch = useDispatch();
     useEffect(() => {
-        dispatch(setPageTitle('Signin | Authentication'));
+        dispatch(setPageTitle('Reset Password | Authentication'));
     });
     const [disableBtn, setDisableBtn] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(false);
@@ -25,29 +25,29 @@ const LoginPage = () => {
 
     const { values, handleChange, handleSubmit, errors, handleBlur } = useFormik({
         initialValues: {
-            email: '',
-            password: '',
+            newPassword: '',
+            confirmPassword: '',
         },
-        validationSchema: signInSchema,
+        validationSchema: resetPasswordSchema,
         validateOnChange: true,
         onSubmit: async (value, action) => {
             setDisableBtn(true);
             setLoading(true);
             try {
-                const res: ISignInResponse = await new ApiClient().post('/auth/sign-in', {
-                    email: value.email,
-                    password: value.password,
+                const res = await new ApiClient().post('auth/new-password', {
+                    password: value.newPassword,
+                    token: router?.query?.token,
                 });
-                localStorage.setItem('uid', res?.data?.id);
-                if (!res?.data?.isVerified) {
-                    //below is path of api endpoint
-                    const sendMail = await new ApiClient().get('auth/confirm-email');
-                    //below path is normal page route
-                    router.push('/auth/confirm-email');
-                    return;
-                }
+                  Swal.fire({
+                      icon: 'success',
+                      title: 'Password changed Successfully! Go to signin page',
+                      padding: '2em',
+                      customClass: 'sweet-alerts',
+                      didClose: () => {
+                          router.push('/auth/signin');
+                      },
+                  });
                 action.resetForm();
-                router.push('/');
             } catch (error: any) {
                 if (typeof error?.response?.data?.message === 'object') {
                     showToastAlert(error?.response?.data?.message.join(' , '));
@@ -62,10 +62,10 @@ const LoginPage = () => {
     });
 
     const showAlert = async () => {
-        if (errors.email) {
-            showToastAlert(errors?.email);
-        } else if (errors.password) {
-            showToastAlert(errors?.password);
+        if (errors.newPassword) {
+            showToastAlert(errors?.newPassword);
+        } else if (errors.confirmPassword) {
+            showToastAlert(errors?.confirmPassword);
         }
     };
 
@@ -87,75 +87,55 @@ const LoginPage = () => {
                         <div className="relative flex flex-col justify-center rounded-md bg-white/60 px-6 py-12 backdrop-blur-lg dark:bg-black/50 ">
                             <div className="mx-auto w-full max-w-[440px]">
                                 <div className="mb-10">
-                                    <h1 className="text-3xl font-extrabold uppercase !leading-snug text-primary md:text-4xl">Sign in</h1>
-                                    <p className="text-base font-bold leading-normal text-white-dark">Enter your email and password to login</p>
+                                    <h1 className="text-3xl font-extrabold uppercase !leading-snug text-primary md:text-4xl">Reset Password</h1>
+                                    <p className="text-base font-bold leading-normal text-white-dark">Please enter new password and confirm password to reset.</p>
                                 </div>
                                 <form className="space-y-5 dark:text-white" onSubmit={handleSubmit}>
-                                    <div>
-                                        <label htmlFor="Email">Email</label>
+                                    <div className="flex-1">
+                                        <label htmlFor="newPassword">New Password</label>
                                         <div className="relative text-white-dark">
                                             <input
-                                                id="Email"
-                                                type="email"
-                                                placeholder="Enter Email"
-                                                className="form-input ps-10 placeholder:text-white-dark"
-                                                name="email"
-                                                onChange={handleChange}
-                                                onBlur={handleBlur}
-                                                value={values.email}
-                                            />
-                                            <span className="absolute start-4 top-1/2 -translate-y-1/2">
-                                                <Email />
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <label htmlFor="Password">Password</label>
-                                        <div className="relative text-white-dark">
-                                            <input
-                                                id="Password"
+                                                id="newPassword"
                                                 type="password"
-                                                placeholder="Enter Password"
+                                                placeholder=" New Password"
                                                 className="form-input ps-10 placeholder:text-white-dark"
-                                                name="password"
+                                                name="newPassword"
                                                 onChange={handleChange}
                                                 onBlur={handleBlur}
-                                                value={values.password}
+                                                value={values.newPassword}
                                             />
                                             <span className="absolute start-4 top-1/2 -translate-y-1/2">
                                                 <Lock />
                                             </span>
                                         </div>
                                     </div>
-                                    <div>
-                                        <label className="flex cursor-pointer items-center">
-                                            <input type="checkbox" className="form-checkbox bg-white dark:bg-black" />
-                                            <span className="text-white-dark">Keep me logged in</span>
-                                        </label>
+                                    <div className="flex-1">
+                                        <label htmlFor="confirm-password">Confirm Password</label>
+                                        <div className="relative text-white-dark">
+                                            <input
+                                                id="confirm-password"
+                                                type="password"
+                                                placeholder="Confirm Password"
+                                                className="form-input ps-10 placeholder:text-white-dark"
+                                                name="confirmPassword"
+                                                onChange={handleChange}
+                                                onBlur={handleBlur}
+                                                value={values.confirmPassword}
+                                            />
+                                            <span className="absolute start-4 top-1/2 -translate-y-1/2">
+                                                <Lock />
+                                            </span>
+                                        </div>
                                     </div>
                                     <button
                                         type="submit"
                                         className="btn btn-gradient !mt-6 w-full border-0 uppercase shadow-[0_10px_20px_-10px_rgba(67,97,238,0.44)]"
                                         onClick={() => errors && showAlert()}
-                                        disabled={values.email && values.password && !disableBtn ? false : true}
+                                        disabled={values.newPassword && values.confirmPassword && !disableBtn ? false : true}
                                     >
-                                        Sign in
+                                        Change My Password
                                     </button>
                                 </form>
-                                <div className="mb-6"></div>
-                                <div className="text-center dark:text-white">
-                                    Don&lsquo;t have an account ?&nbsp;
-                                    <Link href="/auth/signup" className="uppercase text-primary underline transition hover:text-black dark:hover:text-white">
-                                        SIGN UP
-                                    </Link>
-                                </div>
-                                <div className="text-center">or</div>
-                                <div className="text-center dark:text-white">
-                                    Don&lsquo;t remember your password ?&nbsp;
-                                    <Link href="/auth/forget-password" className="uppercase text-primary underline transition hover:text-black dark:hover:text-white">
-                                        Forget password
-                                    </Link>
-                                </div>
                             </div>
                         </div>
                     )}
@@ -164,7 +144,7 @@ const LoginPage = () => {
         </div>
     );
 };
-LoginPage.getLayout = (page: any) => {
+ResetNewPasswordPage.getLayout = (page: any) => {
     return <BlankLayout>{page}</BlankLayout>;
 };
-export default LoginPage;
+export default ResetNewPasswordPage;

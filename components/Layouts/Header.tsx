@@ -191,10 +191,10 @@ const Header = () => {
                                         </Link>
                                     </li>
                                     <li>
-                                        <Link href="/" className="dark:hover:text-white">
+                                        <div className="flex cursor-pointer !py-3 px-4 dark:hover:text-white hover:text-blue-500" onClick={()=>router.push("/auth/reset-password")}>
                                             <LockOutlined />
                                             Reset Password
-                                        </Link>
+                                        </div>
                                     </li>
                                     <li className="border-t border-white-light dark:border-white-light/10">
                                         <div onClick={handleSignout} className="flex cursor-pointer !py-3 px-4 text-danger">

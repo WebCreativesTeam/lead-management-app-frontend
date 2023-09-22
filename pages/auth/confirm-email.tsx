@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @next/next/no-img-element */
 import { useDispatch } from 'react-redux';
 import { useEffect } from 'react';
@@ -5,13 +6,12 @@ import { setPageTitle } from '../../store/themeConfigSlice';
 import BlankLayout from '@/components/Layouts/BlankLayout';
 import Link from 'next/link';
 
-const EmailVerificationPage = () => {
+const ConfirmEmailPage = () => {
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('Email Verification | Authentication'));
-    });
-
-    return (
+    }, []);
+        return (
         <div>
             <div className="absolute inset-0">
                 <img src="/assets/images/auth/bg-gradient.png" alt="image" className="h-full w-full object-cover" />
@@ -26,9 +26,10 @@ const EmailVerificationPage = () => {
                     <div className="relative flex flex-col justify-center rounded-md bg-white/60 px-6 py-12 backdrop-blur-lg dark:bg-black/50 ">
                         <div className="mx-auto w-full max-w-[440px]">
                             <div className="mb-3">
-                                <h1 className="text-center text-3xl font-extrabold uppercase !leading-snug text-primary md:text-4xl">Sign Up successfull</h1>
+                                <h1 className="text-center text-3xl font-extrabold uppercase !leading-snug text-primary md:text-4xl">Email Verification</h1>
                                 <p className="py-6 text-justify text-base font-bold leading-normal text-white-dark">
-                                    Thank you for signing up. We&apos;ve just sent a verification email to your mail inbox. Please verify your email to access all features.
+                                    As we check, you recently signup but still you have not verify you email address. So we send you an email again to given mail address, Please verify to access all
+                                    features.
                                 </p>
                                 <Link href="/auth/signin">
                                     <button type="submit" className="btn btn-gradient !mt-6 w-full border-0 uppercase shadow-[0_10px_20px_-10px_rgba(67,97,238,0.44)]">
@@ -43,7 +44,7 @@ const EmailVerificationPage = () => {
         </div>
     );
 };
-EmailVerificationPage.getLayout = (page: any) => {
+ConfirmEmailPage.getLayout = (page: any) => {
     return <BlankLayout>{page}</BlankLayout>;
 };
-export default EmailVerificationPage;
+export default ConfirmEmailPage;
