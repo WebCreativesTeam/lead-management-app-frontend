@@ -1,5 +1,3 @@
-import { string } from 'yup';
-
 //general types
 export type GetMethodResponseType = {
     status: string;
@@ -177,7 +175,7 @@ export type BranchDataType = {
     updatedAt: string;
 };
 
-// emails page types
+// email template types
 export interface IEmailTemplate {
     name: string;
     subject: string;
@@ -185,6 +183,19 @@ export interface IEmailTemplate {
     createdAt: string;
     updatedAt: string;
     id: string;
+}
+
+// send email types
+export interface IEmailLog {
+    id: string;
+    senderName: string;
+    senderEmail: string;
+    receiverEmail: string;
+    subject: string;
+    message: string;
+    templateId: string;
+    createdAt: string;
+    updatedAt: string;
 }
 
 //lead page types
@@ -407,6 +418,17 @@ export interface EmailsInitialStateProps {
     isAbleToCreate: boolean;
     isAbleToUpdate: boolean;
     isAbleToDelete: boolean;
+    userPolicyArr: string[];
+}
+
+// email slice initial props
+export interface EmailLogInitialStateProps {
+    data: IEmailLog[];
+    singleData: IEmailLog;
+    isBtnDisabled: boolean;
+    isFetching: boolean;
+    viewModal: boolean;
+    isAbleToRead: boolean;
     userPolicyArr: string[];
 }
 

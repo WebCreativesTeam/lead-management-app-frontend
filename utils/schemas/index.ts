@@ -23,8 +23,6 @@ export const resetPasswordSchema = Yup.object().shape({
         .required('Please enter confirm password'),
 });
 
-
-
 export const policySchema = Yup.object().shape({
     name: Yup.string().required('Please enter policy name'),
     description: Yup.string().min(20, 'Description must be 20 characters').required('Please enter policy description'),
@@ -121,6 +119,15 @@ export const emailTemplateSchema = Yup.object().shape({
     message: Yup.string().required('Please Enter Message'),
 });
 
+//send email schema
+export const sendEmailSchema = Yup.object().shape({
+    senderName: Yup.string().required('Enter Sender Name'),
+    senderEmail: Yup.string().required('Enter Sender Email'),
+    receiverEmail: Yup.string().required('Enter Receiver Email'),
+    subject: Yup.string().required('Enter Subject'),
+    message: Yup.string().required('Enter Message'),
+});
+
 export const emailSmtpSchema = Yup.object().shape({
     SMTP: Yup.string().required('Enter SMTP Name'),
     name: Yup.string().required('Enter Name'),
@@ -134,5 +141,5 @@ export const emailSmtpSchema = Yup.object().shape({
 export const editEmailSmtpSchema = Yup.object().shape({
     SMTP: Yup.string().required('Enter SMTP Name'),
     name: Yup.string().required('Enter Name'),
-    email: Yup.string().email('Please enter valid email').required('Enter Email')
+    email: Yup.string().email('Please enter valid email').required('Enter Email'),
 });

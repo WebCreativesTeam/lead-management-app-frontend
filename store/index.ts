@@ -14,6 +14,7 @@ import userProfileSlice from './Slices/userProfileSlice';
 import leadPrioritySlice from './Slices/leadSlice/leadPrioritySlice';
 import leadStatusSlice from './Slices/leadSlice/leadStatusSlice';
 import emailSmtpSlice from './Slices/emailSlice/emailSmtpSlice';
+import emailLogSlice from './Slices/emailSlice/emailLogSlice';
 
 const rootReducer = combineReducers({
     themeConfig: themeConfigSlice,
@@ -30,6 +31,7 @@ const rootReducer = combineReducers({
     leadStatus: leadStatusSlice,
     emailTemplate: emailTemplateSlice,
     emailSmtp: emailSmtpSlice,
+    emailLog: emailLogSlice,
     userInfo: userProfileSlice,
 });
 
