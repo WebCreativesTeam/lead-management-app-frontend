@@ -49,16 +49,16 @@ const EmailVerificationPage = () => {
     const sendVerificationMail = async () => {
         setLoading(true);
         const sendMail: { status: 'success' } = await new ApiClient().get('auth/confirm-email');
-        if (sendMail.status === "success") {
-               Swal.fire({
-                   icon: 'success',
-                   title: 'Verification mail has been send successfully!',
-                   padding: '2em',
-                   customClass: 'sweet-alerts',
-                   didClose: () => {
-                       router.push('/auth/signin');
-                   },
-               });
+        if (sendMail.status === 'success') {
+            Swal.fire({
+                icon: 'success',
+                title: 'Verification mail has been send successfully!',
+                padding: '2em',
+                customClass: 'sweet-alerts',
+                didClose: () => {
+                    router.push('/auth/signin');
+                },
+            });
         }
         setLoading(false);
     };
