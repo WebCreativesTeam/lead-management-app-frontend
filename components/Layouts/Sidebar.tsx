@@ -291,6 +291,7 @@ const Sidebar = () => {
                         </button>
                     </div>
                     <PerfectScrollbar className="relative h-[calc(100vh-80px)]">
+                        
                         <ul className="relative space-y-0.5 p-4 py-0 font-semibold">
                             {/* tasks */}
                             {!isAbleToReadTask && !isAbleToReadTaskPriority && !isAbleToReadTaskStatus ? null : (
@@ -359,6 +360,44 @@ const Sidebar = () => {
                                                     <Link href="/leads/status">{t('Status')}</Link>
                                                 </li>
                                             )}
+                                        </ul>
+                                    </AnimateHeight>
+                                </li>
+                            )}
+
+                            {/* Reports */}
+                            {!isAbleToReadEmailTemplates && !isAbleToReadEmailSmtp ? null : (
+                                <li className="menu nav-item">
+                                    <button type="button" className={`${currentMenu === 'Reports' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('Reports')}>
+                                        <div className="flex items-center">
+                                            <Email />
+                                            <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Reports')}</span>
+                                        </div>
+
+                                        <div className={currentMenu === 'Reports' ? 'rotate-90' : 'rtl:rotate-180'}>
+                                            <ArrowRight />
+                                        </div>
+                                    </button>
+
+                                    <AnimateHeight duration={300} height={currentMenu === 'Reports' ? 'auto' : 0}>
+                                        <ul className="sub-menu text-gray-500">
+                                                <li>
+                                                    <Link href="/reports/task">{t('Task Reports')}</Link>
+                                                </li>
+
+                                                <li>
+                                                    <Link href="/reports/leads">{t('Leads Reports')}</Link>
+                                                </li>
+
+                                                <li>
+                                                    <Link href="/reports/activity">{t('Activity Reports')}</Link>
+                                                </li>
+                                                <li>
+                                                    <Link href="/reports/schedules">{t('Schedules')}</Link>
+                                                </li>
+                                                <li>
+                                                    <Link href="/reports/performance">{t('Performance Reports')}</Link>
+                                                </li>
                                         </ul>
                                     </AnimateHeight>
                                 </li>
