@@ -17,7 +17,8 @@ const EmailVerificationPage = () => {
     useEffect(() => {
         dispatch(setPageTitle('Email Verification | Authentication'));
     }, []);
-    const [loading, setLoading] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [isLinkExpired, setIsLinkExpired] = useState<boolean>(false);
 
     useEffect(() => {
         if (router.query.token && router.query.token?.length > 0) {
@@ -27,23 +28,38 @@ const EmailVerificationPage = () => {
     }, [router?.query?.token]);
 
     const sendVerificationToken = async () => {
-        setLoading(true);
         try {
             await new ApiClient().post('auth/verify-email', { token: router?.query?.token });
         } catch (error: any) {
             if (error?.response?.status === 400) {
-                router.push('/auth/signin');
+                setIsLinkExpired(true);
                 return;
             }
-
             if (typeof error?.response?.data?.message === 'object') {
                 showToastAlert(error?.response?.data?.message.join(' , '));
             } else {
                 showToastAlert(error?.response?.data?.message);
             }
             showToastAlert(error?.response?.data?.message);
+        } finally {
+            setLoading(false);
         }
+    };
 
+    const sendVerificationMail = async () => {
+        setLoading(true);
+        const sendMail: { status: 'success' } = await new ApiClient().get('auth/confirm-email');
+        if (sendMail.status === "success") {
+               Swal.fire({
+                   icon: 'success',
+                   title: 'Verification mail has been send successfully!',
+                   padding: '2em',
+                   customClass: 'sweet-alerts',
+                   didClose: () => {
+                       router.push('/auth/signin');
+                   },
+               });
+        }
         setLoading(false);
     };
 
@@ -63,7 +79,7 @@ const EmailVerificationPage = () => {
                         <div className="mx-auto w-full max-w-[440px]">
                             {loading ? (
                                 <Loader />
-                            ) : (
+                            ) : !isLinkExpired ? (
                                 <div className="mb-3">
                                     <h1 className="text-center text-3xl font-extrabold uppercase !leading-snug text-primary md:text-4xl">Verification SuccessFull</h1>
                                     <p className="py-6 text-justify text-base font-bold leading-normal text-white-dark">
@@ -74,6 +90,16 @@ const EmailVerificationPage = () => {
                                             Sign in
                                         </button>
                                     </Link>
+                                </div>
+                            ) : (
+                                <div className="mb-3">
+                                    <h1 className="text-center text-3xl font-extrabold uppercase !leading-snug text-primary md:text-4xl">Verification Link expired</h1>
+                                    <p className="py-6 text-justify text-base font-bold leading-normal text-white-dark">
+                                        The link you are try to access is already expired. To verify your account click below button to receive email verification mail again.
+                                    </p>
+                                    <button type="submit" onClick={sendVerificationMail} className="btn btn-gradient !mt-6 w-full border-0 capitalize shadow-[0_10px_20px_-10px_rgba(67,97,238,0.44)]">
+                                        Resend Verification mail
+                                    </button>
                                 </div>
                             )}
                         </div>

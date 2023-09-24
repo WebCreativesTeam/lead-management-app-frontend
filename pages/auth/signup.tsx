@@ -12,6 +12,7 @@ import { showToastAlert } from '@/utils/contant';
 import { ApiClient } from '@/utils/http';
 import { Email, Lock, UserFilled } from '@/utils/icons';
 import Loader from '@/components/__Shared/Loader';
+import { ISignInResponse } from '@/utils/Types';
 
 const initialValues = {
     firstName: '',
@@ -44,7 +45,9 @@ const SignUpPage = () => {
                     email: value.email,
                     password: value.password,
                 };
-                await new ApiClient().post('/auth/sign-up', createUserObj);
+                const res: ISignInResponse = await new ApiClient().post('/auth/sign-up', createUserObj);
+                console.log(res)
+                localStorage.setItem('uid', res?.data?.id);
                 action.resetForm();
                 router.push('/auth/email-verification');
             } catch (error: any) {
@@ -197,7 +200,9 @@ const SignUpPage = () => {
                                     <button
                                         type="submit"
                                         className="btn btn-gradient !mt-6 w-full border-0 uppercase shadow-[0_10px_20px_-10px_rgba(67,97,238,0.44)]"
-                                        disabled={values.checkCondition && values.firstName && values.lastName && values.email && values.password && values.confirmPassword && !disableBtn ? false : true}
+                                        disabled={
+                                            values.checkCondition && values.firstName && values.lastName && values.email && values.password && values.confirmPassword && !disableBtn ? false : true
+                                        }
                                         onClick={() => errors && showAlert()}
                                     >
                                         Sign Up
