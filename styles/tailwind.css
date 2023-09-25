@@ -1,6 +1,46 @@
 /* Animate css */
 @import './animate.css';
+/* tippy css */
+@import './tippy.css';
 
+/* swiper css */
+@import './swiper.css';
+
+/* Elements - Progressbar */
+@import './progressbar.css';
+
+/* Data tables css */
+@import './datatables.css';
+
+/* scrumboard */
+@import './scrumboard.css';
+
+/* calendar css */
+@import './fullcalendar.css';
+
+/* sweetalert css */
+@import './sweetalert.css';
+
+/* flatpickr css */
+@import './flatpickr.css';
+
+/* quill-editor css */
+@import './quill-editor.css';
+
+/* markdown-editor css */
+@import './markdown-editor.css';
+
+/* file upload with preview */
+@import './file-upload-preview.css';
+
+/* dragndrop*/
+@import './dragndrop.css';
+
+/* form element*/
+@import './form-elements.css';
+
+/* Select2*/
+@import './select2.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -30,8 +70,14 @@
     .navbar-floating header {
         @apply bg-[#fafafa]/90 px-6 pt-4 dark:bg-[#060818]/90;
     }
-    .navbar-floating header > div .horizontal-menu {
-        @apply rounded-b-md shadow;
+    .navbar-floating header > div > div:first-child {
+        @apply rounded-md;
+    }
+    .horizontal .navbar-floating header > div > div:first-child {
+        @apply rounded-b-none;
+    }
+    .horizontal .navbar-floating header .horizontal-menu {
+        @apply rounded-b-md;
     }
 
     /* Sidebar */
@@ -55,8 +101,8 @@
 
     .sidebar ul.sub-menu li button,
     .sidebar ul.sub-menu li a {
-        @apply flex items-center px-9 py-2.5 before:h-0.5 before:w-2 before:rounded before:bg-gray-300 hover:bg-gray-100
-      hover:text-primary hover:before:!bg-primary ltr:before:mr-2 rtl:before:ml-2 dark:before:bg-gray-500 dark:hover:bg-gray-900 dark:hover:text-primary;
+        @apply flex w-full items-center px-9 py-2.5 before:h-0.5 before:w-2 before:rounded before:bg-gray-300 hover:bg-gray-100
+hover:text-primary hover:before:!bg-primary ltr:before:mr-2 rtl:before:ml-2 dark:before:bg-gray-500 dark:hover:bg-gray-900 dark:hover:text-primary;
     }
     .sidebar ul.sub-menu li button.active,
     .sidebar ul.sub-menu li a.active {
@@ -102,7 +148,7 @@
     }
 
     .horizontal-menu .nav-link {
-        @apply flex items-center rounded-lg py-2.5 px-2 hover:bg-[#000]/[0.08] hover:text-black dark:hover:bg-[#181f32] dark:hover:text-white-dark xl:px-4;
+        @apply flex items-center rounded-lg px-2 py-2.5 hover:bg-[#000]/[0.08] hover:text-black dark:hover:bg-[#181f32] dark:hover:text-white-dark xl:px-4;
     }
 
     .horizontal-menu .nav-link.active {
@@ -279,6 +325,7 @@
     .btn-outline-dark {
         @apply border-dark text-dark shadow-none hover:bg-dark hover:text-white;
     }
+
     .btn-gradient {
         @apply bg-gradient-to-r from-[#EF1262] to-[#4361EE] text-white hover:from-[#4361EE] hover:to-[#EF1262];
     }
@@ -466,12 +513,12 @@
     }
     table thead tr,
     table tfoot tr {
-        @apply border-b-0 bg-white-light/30  dark:!bg-[#1a2941];
+        @apply border-b-0 !bg-[#f6f8fa]  dark:!bg-[#1a2941];
     }
     table thead tr th,
     table tfoot tr th,
     table tbody tr td {
-        @apply py-3 px-4 ltr:text-left rtl:text-right;
+        @apply px-4 py-3 ltr:text-left rtl:text-right;
     }
     table thead tr th,
     table tfoot tr th {
@@ -489,7 +536,7 @@
 
     table.dataTable-table tbody tr th,
     table.dataTable-table tbody tr td {
-        @apply border-b border-[#e5e7eb] py-3 px-4 ltr:text-left rtl:text-right ;
+        @apply border-b border-white-light/40 px-4 py-3 ltr:text-left rtl:text-right dark:border-[#191e3a];
     }
     table.dataTable-table tbody tr:last-child td {
         @apply border-b-0;
@@ -620,11 +667,11 @@ pre.hljs {
 }
 
 .apexcharts-canvas .apexcharts-legend-marker {
-    @apply ltr:!mr-1.5 rtl:ml-1.5 rtl:!mr-0;
+    @apply ltr:!mr-1.5 rtl:!mr-0 rtl:ml-1.5;
 }
 
 [dir='rtl'] .apexcharts-tooltip-marker {
-    @apply mr-0 ml-2.5;
+    @apply ml-2.5 mr-0;
 }
 
 /* swal2 */
@@ -633,7 +680,7 @@ pre.hljs {
 }
 
 .swal2-container .swal2-popup.swal2-toast {
-    @apply bg-dark py-2.5 px-5;
+    @apply bg-dark px-5 py-2.5;
 }
 
 .swal2-popup.swal2-toast .swal2-title,
@@ -659,8 +706,4 @@ pre.hljs {
 }
 .swal2-container .swal2-popup.swal2-toast.color-success {
     @apply bg-success;
-}
-
-.ql-editor{
-    min-height: 20rem;
 }
