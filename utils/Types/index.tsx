@@ -59,10 +59,28 @@ export type TaskDataType = {
     description: string;
     comment: string;
     isActive: boolean;
-    lead: string;
+    lead: {
+        id: string;
+        contactId: string;
+        branchId: string;
+        sourceId: string;
+        statusId: string;
+        priorityId: string;
+    };
     assignedBy: {
         firstName: string;
         lastName: string;
+        id: string;
+    };
+    assignedTo: {
+        firstName: string;
+        lastName: string;
+        id: string;
+    };
+    observer: {
+        firstName: string;
+        lastName: string;
+        id: string;
     };
     status: {
         color: string;
@@ -318,6 +336,8 @@ export interface ManageTaskInitialStateProps extends InitialStateProps {
     changeStatusModal: boolean;
     singlePriority: TaskSelectOptions;
     singleStatus: TaskSelectOptions;
+    isAbleToTransferTask: boolean;
+    transferTaskModal: boolean;
 }
 //manage lead slice initial props
 export interface ManageLeadInitialStateProps extends InitialStateProps {

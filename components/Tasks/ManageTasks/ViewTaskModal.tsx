@@ -7,13 +7,17 @@ import { IRootState } from '@/store';
 const TaskViewModal = () => {
     const { viewModal, singleData } = useSelector((state: IRootState) => state.task);
     const dispatch = useDispatch();
-    const { comment, createdAt, description, endDate, startDate, status, title, updatedAt, assignedBy } = singleData;
+    const { comment, createdAt, description, endDate, startDate, status, title, updatedAt, assignedBy, assignedTo, isActive, observer, priority } = singleData;
 
     const reqData: any = {
         title,
         description,
         comment,
+        Observer: `${observer?.firstName} ${observer?.lastName}`,
+        ['Active Status']: isActive ? 'Active' : 'Not Active',
+        Priority: priority?.name,
         ['assigned By']: `${assignedBy?.firstName} ${assignedBy?.lastName}`,
+        ['assigned To']: `${assignedTo?.firstName} ${assignedTo?.lastName}`,
         ['Task Created']: new Date(createdAt).toLocaleString(),
         ['Task Updated']: new Date(updatedAt).toLocaleString(),
         ['Task Start Date']: new Date(startDate).toLocaleString(),

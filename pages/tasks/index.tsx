@@ -5,7 +5,7 @@ import 'tippy.js/dist/tippy.css';
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
 import { sortBy } from 'lodash';
 import 'flatpickr/dist/flatpickr.css';
-import { Delete, Edit, Plus, View } from '@/utils/icons';
+import { ArrowTransfer, Delete, Edit, Plus, View } from '@/utils/icons';
 import PageHeadingSection from '@/components/__Shared/PageHeadingSection/index.';
 import { GetMethodResponseType, LeadDataType, TaskSelectOptions, UserDataType } from '@/utils/Types';
 import { TaskDataType } from '@/utils/Types';
@@ -24,6 +24,7 @@ import {
     setCreateModal,
     setDeleteModal,
     setEditModal,
+    setTransferTaskModal,
     setViewModal,
 } from '@/store/Slices/taskSlice/manageTaskSlice';
 import { ApiClient } from '@/utils/http';
@@ -33,6 +34,7 @@ import EditTaskModal from '@/components/Tasks/ManageTasks/EditTaskModal';
 import ViewTaskModal from '@/components/Tasks/ManageTasks/ViewTaskModal';
 import ChangeTaskPriorityModal from '@/components/Tasks/ManageTasks/ChangeTaskPriorityModal';
 import ChangeTaskStatusModal from '@/components/Tasks/ManageTasks/ChangeTaskStatusModal';
+import TransferTaskModal from '@/components/Tasks/ManageTasks/TransferTaskModal';
 
 const TaskPage = () => {
     const dispatch = useDispatch();
@@ -41,7 +43,7 @@ const TaskPage = () => {
     });
 
     //hooks
-    const { data, isFetching, taskPriorityList, taskStatusList, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate } = useSelector((state: IRootState) => state.task);
+    const { data, isFetching, taskPriorityList, taskStatusList, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate,isAbleToTransferTask } = useSelector((state: IRootState) => state.task);
     const [searchInputText, setSearchInputText] = useState<string>('');
     const [searchedData, setSearchedData] = useState<TaskDataType[]>(data);
     const [loading, setLoading] = useState<boolean>(false);
@@ -168,7 +170,7 @@ const TaskPage = () => {
     return !isAbleToRead ? null : (
         <div>
             <PageHeadingSection description="View, create, update, and close tasks. Organize by status, priority, and due date. Stay on top of work." heading="Task Management" />
-            <div className="my-6 flex gap-5 flex-col sm:flex-row">
+            <div className="my-6 flex flex-col gap-5 sm:flex-row">
                 <div className="flex flex-1 gap-5 ">
                     {isAbleToCreate && (
                         <button className="btn btn-primary h-full w-full max-w-[200px] max-sm:mr-auto" type="button" onClick={() => dispatch(setCreateModal(true))}>
@@ -341,6 +343,13 @@ const TaskPage = () => {
                                             </button>
                                         </Tippy>
                                     )}
+                                    {isAbleToTransferTask && (
+                                        <Tippy content="Transfer">
+                                            <button type="button" onClick={() => dispatch(setTransferTaskModal({ id, open: true }))}>
+                                                <ArrowTransfer />
+                                            </button>
+                                        </Tippy>
+                                    )}
                                     {isAbleToDelete && (
                                         <Tippy content="Delete">
                                             <button type="button" onClick={() => dispatch(setDeleteModal({ id, open: true }))}>
@@ -383,6 +392,9 @@ const TaskPage = () => {
 
             {/* create modal */}
             <CreateTaskModal />
+
+            {/* transfer task modal */}
+            <TransferTaskModal />
         </div>
     );
 };

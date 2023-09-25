@@ -15,7 +15,7 @@ import { fetchUserInfo } from '@/utils/contant';
 import { setContactCreatePolicy, setContactDeletePolicy, setContactReadPolicy, setContactUpdatePolicy } from '@/store/Slices/contactSlice';
 import { setSourceCreatePolicy, setSourceDeletePolicy, setSourceReadPolicy, setSourceUpdatePolicy } from '@/store/Slices/sourceSlice';
 import { setChangeActiveStatusPermission, setChangeUsersPolicy, setUserCreatePolicy, setUserDeletePolicy, setUserReadPolicy, setUserUpdatePolicy } from '@/store/Slices/userSlice';
-import { setTaskCreatePolicy, setTaskDeletePolicy, setTaskReadPolicy, setTaskUpdatePolicy } from '@/store/Slices/taskSlice/manageTaskSlice';
+import { setTaskCreatePolicy, setTaskDeletePolicy, setTaskReadPolicy, setTaskTransferPermission, setTaskUpdatePolicy } from '@/store/Slices/taskSlice/manageTaskSlice';
 import {
     setChangeDefaultTaskPriorityPermission,
     setTaskPriorityCreatePolicy,
@@ -152,6 +152,7 @@ const Sidebar = () => {
         dispatch(setTaskCreatePolicy('task:Create::Document'));
         dispatch(setTaskUpdatePolicy('task:Update::Document'));
         dispatch(setTaskDeletePolicy('task:Delete::Document'));
+        dispatch(setTaskTransferPermission('task:Update::DocumentTransfer'));
     }, [userPolicyTaskArray]);
 
     //access for Task Status page

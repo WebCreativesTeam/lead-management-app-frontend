@@ -23,6 +23,8 @@ const initialState: ManageTaskInitialStateProps = {
     isAbleToCreate: false,
     isAbleToUpdate: false,
     isAbleToDelete: false,
+    isAbleToTransferTask: false,
+    transferTaskModal:false,
     userPolicyArr: [] as string[],
 };
 
@@ -54,6 +56,17 @@ const manageTaskSlice = createSlice({
             const findRequestedData: TaskDataType | undefined = state.data.find((item: TaskDataType) => item.id === id);
 
             if (findRequestedData && state.editModal) {
+                state.singleData = findRequestedData;
+            } else {
+                state.singleData = {} as TaskDataType;
+            }
+        },
+        setTransferTaskModal(state, action) {
+            const { open, id } = action.payload;
+            state.transferTaskModal = open;
+            const findRequestedData: TaskDataType | undefined = state.data.find((item: TaskDataType) => item.id === id);
+
+            if (findRequestedData && state.transferTaskModal) {
                 state.singleData = findRequestedData;
             } else {
                 state.singleData = {} as TaskDataType;
@@ -138,6 +151,10 @@ const manageTaskSlice = createSlice({
             const verifyPolicy: boolean = state.userPolicyArr.includes(action.payload);
             state.isAbleToDelete = verifyPolicy;
         },
+        setTaskTransferPermission(state, action) {
+            const verifyPolicy: boolean = state.userPolicyArr.includes(action.payload);
+            state.isAbleToTransferTask = verifyPolicy;
+        },
     },
 });
 
@@ -159,5 +176,7 @@ export const {
     setTaskReadPolicy,
     setTaskUpdatePolicy,
     getAllLeadsForTask,
+    setTaskTransferPermission,
+    setTransferTaskModal
 } = manageTaskSlice.actions;
 export default manageTaskSlice.reducer;
