@@ -1,0 +1,29 @@
+.react-select-3-live-region{
+    @apply dark:!bg-inherit
+}
+
+.css-1dimb5e-singleValue{
+ @apply dark:!text-white-dark
+}
+
+.css-13cymwt-control{
+    @apply dark:!border-[#17263c] dark:!bg-[#121e32] ;
+}
+.css-t3ipsp-control{
+    @apply dark:!border-[#17263c] dark:!bg-[#121e32] ;
+}
+
+.css-d7l1ni-option{
+    background-color: inherit !important;
+}
+
+.css-1nmdiq5-menu{
+    @apply dark:!border-[#17263c] dark:!bg-[#121e32] ;
+}
+.css-1n6sfyn-MenuList div{
+    cursor: pointer;
+}
+.css-1n6sfyn-MenuList div:hover:not(.css-tr4s17-option) {
+    @apply dark:!bg-[#0e1a2c];
+
+}

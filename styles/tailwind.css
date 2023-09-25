@@ -41,6 +41,11 @@
 
 /* Select2*/
 @import './select2.css';
+
+/* react-select */
+@import './react-select.css';
+
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

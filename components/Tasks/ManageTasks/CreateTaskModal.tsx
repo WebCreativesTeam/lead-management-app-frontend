@@ -7,7 +7,6 @@ import { useFormik } from 'formik';
 import { taskSchema } from '@/utils/schemas';
 import { ApiClient } from '@/utils/http';
 import { showToastAlert } from '@/utils/contant';
-import Swal from 'sweetalert2';
 import Loader from '@/components/__Shared/Loader';
 import Select from 'react-select';
 import Flatpickr from 'react-flatpickr';

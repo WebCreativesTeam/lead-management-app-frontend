@@ -168,17 +168,17 @@ const TaskPage = () => {
     return !isAbleToRead ? null : (
         <div>
             <PageHeadingSection description="View, create, update, and close tasks. Organize by status, priority, and due date. Stay on top of work." heading="Task Management" />
-            <div className="my-6 flex gap-5 ">
+            <div className="my-6 flex gap-5 flex-col sm:flex-row">
                 <div className="flex flex-1 gap-5 ">
                     {isAbleToCreate && (
-                        <button className="btn btn-primary h-full w-full max-w-[200px] max-sm:mx-auto" type="button" onClick={() => dispatch(setCreateModal(true))}>
+                        <button className="btn btn-primary h-full w-full max-w-[200px] max-sm:mr-auto" type="button" onClick={() => dispatch(setCreateModal(true))}>
                             <Plus />
                             Add New Task
                         </button>
                     )}
                     <div className="dropdown">
                         <Dropdown
-                            placement="bottom-start"
+                            placement="auto-start"
                             btnClassName="btn btn-outline-primary h-full dropdown-toggle"
                             button={
                                 <>
