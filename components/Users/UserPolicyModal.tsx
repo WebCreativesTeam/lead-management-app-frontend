@@ -8,9 +8,10 @@ import { ApiClient } from '@/utils/http';
 import { PolicyDataType, SelectOptionsType, UserDataType } from '@/utils/Types';
 import { showToastAlert } from '@/utils/contant';
 import Select, { ActionMeta } from 'react-select';
+import Loader from '../__Shared/Loader';
 
 const UserPolicyModal = () => {
-    const { policyModal, isBtnDisabled, singleData, policies } = useSelector((state: IRootState) => state.user);
+    const { policyModal, isBtnDisabled, singleData, policies, isFetching } = useSelector((state: IRootState) => state.user);
     const [policiesData, setPoliciesData] = useState<SelectOptionsType[]>([]);
     const [defaultSelectedPolicy, setDefaultSelectedPolicy] = useState<SelectOptionsType[]>([]);
 
@@ -27,7 +28,6 @@ const UserPolicyModal = () => {
         });
         setPoliciesData(createPolicyObj);
 
-        
         const selectedPolicyIdArr: string[] = singleData?.policies?.map((item: any) => {
             return item.id;
         });
@@ -73,9 +73,13 @@ const UserPolicyModal = () => {
             disabledDiscardBtn={isBtnDisabled}
             isBtnDisabled={isBtnDisabled ? true : false}
             content={
-                <div className="text-center text-xl">
-                    <Select placeholder="Select Policy" options={policiesData} isMulti isSearchable={false} onChange={handleSelectPolicy} value={defaultSelectedPolicy} />
-                </div>
+                isFetching ? (
+                    <Loader />
+                ) : (
+                    <div className="text-center text-xl">
+                        <Select placeholder="Select Policy" options={policiesData} isMulti isSearchable={false} onChange={handleSelectPolicy} value={defaultSelectedPolicy} />
+                    </div>
+                )
             }
         />
     );

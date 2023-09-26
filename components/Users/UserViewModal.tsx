@@ -31,12 +31,12 @@ const UserViewModal = () => {
                             <span className="flex-1 text-lg font-bold"> Email</span>
                             <p className="flex-[3] break-all">{email}</p>
                         </li>
-                        <li className="flex">
+                        <li className="flex flex-col sm:flex-row">
                             <span className="flex-1 text-lg font-bold">Permissions</span>
-                            <div className="grid flex-[3] grid-cols-3 gap-x-3 gap-y-1">
+                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-3 gap-y-1">
                                 {permissions?.map((item:string, i: number) => {
                                     return (
-                                        <span key={i} className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">
+                                        <span key={i} className="rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 break-words ring-1 ring-inset ring-blue-700/10">
                                             {item}
                                         </span>
                                     );

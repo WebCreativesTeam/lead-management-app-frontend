@@ -6,9 +6,10 @@ import { Close } from '@/utils/icons';
 import { Dialog, Transition } from '@headlessui/react';
 import React, { Fragment } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import Loader from '../__Shared/Loader';
 
 const UserDeactivateModal = () => {
-    const { deactivateModal, isBtnDisabled, deactivateValue, singleData } = useSelector((state: IRootState) => state.user);
+    const { deactivateModal, isBtnDisabled, deactivateValue, singleData,isFetching } = useSelector((state: IRootState) => state.user);
     const dispatch = useDispatch();
 
     const onDeactivateUser = async () => {
@@ -48,27 +49,31 @@ const UserDeactivateModal = () => {
                                             <Close />
                                         </button>
                                     </div>
-                                    <div className="p-5">
-                                        <div className="text-center text-xl">Are you sure you want to {deactivateValue ? 'activate' : 'deactivate'} this user?</div>
-                                        <div className="mt-8 flex items-center justify-center">
-                                            <button
-                                                type="button"
-                                                className={`btn btn-outline-${deactivateValue ? 'danger' : 'success'}`}
-                                                onClick={() => dispatch(setDeactivateModal({ open: false }))}
-                                                disabled={isBtnDisabled}
-                                            >
-                                                Cancel
-                                            </button>
-                                            <button
-                                                type="button"
-                                                className={`btn ${deactivateValue ? 'btn-success' : 'btn-danger'} rtl:mr-4" ltr:ml-4`}
-                                                onClick={onDeactivateUser}
-                                                disabled={isBtnDisabled}
-                                            >
-                                                {deactivateValue ? 'Activate' : 'Deactivate'} User
-                                            </button>
+                                    {isFetching ? (
+                                        <Loader />
+                                    ) : (
+                                        <div className="p-5">
+                                            <div className="text-center text-xl">Are you sure you want to {deactivateValue ? 'activate' : 'deactivate'} this user?</div>
+                                            <div className="mt-8 flex items-center justify-center">
+                                                <button
+                                                    type="button"
+                                                    className={`btn btn-outline-${deactivateValue ? 'danger' : 'success'}`}
+                                                    onClick={() => dispatch(setDeactivateModal({ open: false }))}
+                                                    disabled={isBtnDisabled}
+                                                >
+                                                    Cancel
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    className={`btn ${deactivateValue ? 'btn-success' : 'btn-danger'} rtl:mr-4" ltr:ml-4`}
+                                                    onClick={onDeactivateUser}
+                                                    disabled={isBtnDisabled}
+                                                >
+                                                    {deactivateValue ? 'Activate' : 'Deactivate'} User
+                                                </button>
+                                            </div>
                                         </div>
-                                    </div>
+                                    )}
                                 </Dialog.Panel>
                             </Transition.Child>
                         </div>

@@ -7,11 +7,11 @@ import { setEditModal, setDisableBtn, setFetching } from '@/store/Slices/userSli
 import { useFormik } from 'formik';
 import { editUserSchema } from '@/utils/schemas';
 import { ApiClient } from '@/utils/http';
-import { UserDataType } from '@/utils/Types';
 import { showToastAlert } from '@/utils/contant';
+import Loader from '../__Shared/Loader';
 
 const UserEditModal = () => {
-    const {editModal,isBtnDisabled,singleData} = useSelector((state: IRootState) => state.user);
+    const { editModal, isBtnDisabled, singleData, isFetching } = useSelector((state: IRootState) => state.user);
 
     const dispatch = useDispatch();
     useEffect(() => {
@@ -19,7 +19,7 @@ const UserEditModal = () => {
         setFieldValue('lastName', singleData?.lastName);
     }, [singleData]);
 
-    const { values, handleChange, submitForm, handleSubmit, setFieldValue, errors, handleBlur, resetForm } = useFormik({
+    const { values, handleChange, submitForm, handleSubmit, setFieldValue, handleBlur, resetForm } = useFormik({
         initialValues: {
             firstName: '',
             lastName: '',
@@ -63,16 +63,29 @@ const UserEditModal = () => {
             disabledDiscardBtn={isBtnDisabled}
             isBtnDisabled={values.firstName && values.lastName && !isBtnDisabled ? false : true}
             content={
-                <form className="space-y-5" onSubmit={handleSubmit}>
-                    <div>
-                        <label htmlFor="firstNameEdit">First Name</label>
-                        <input onChange={handleChange} onBlur={handleBlur} value={values.firstName} id="firstNameEdit" name="firstName" type="text" placeholder="First Name" className="form-input" />
-                    </div>
-                    <div>
-                        <label htmlFor="lastNameEdit">Last Name</label>
-                        <input onChange={handleChange} onBlur={handleBlur} value={values.lastName} id="lastNameEdit" name="lastName" type="text" placeholder="Last Name" className="form-input" />
-                    </div>
-                </form>
+                isFetching ? (
+                    <Loader />
+                ) : (
+                    <form className="space-y-5" onSubmit={handleSubmit}>
+                        <div>
+                            <label htmlFor="firstNameEdit">First Name</label>
+                            <input
+                                onChange={handleChange}
+                                onBlur={handleBlur}
+                                value={values.firstName}
+                                id="firstNameEdit"
+                                name="firstName"
+                                type="text"
+                                placeholder="First Name"
+                                className="form-input"
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor="lastNameEdit">Last Name</label>
+                            <input onChange={handleChange} onBlur={handleBlur} value={values.lastName} id="lastNameEdit" name="lastName" type="text" placeholder="Last Name" className="form-input" />
+                        </div>
+                    </form>
+                )
             }
         />
     );
