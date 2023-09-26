@@ -6,7 +6,7 @@ export type GetMethodResponseType = {
 
 export type SelectOptionsType = {
     value: string;
-    label: string;
+    label: string | React.ReactNode;
 };
 
 export type Permission = {

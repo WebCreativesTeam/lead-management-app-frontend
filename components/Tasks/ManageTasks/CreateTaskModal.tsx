@@ -79,19 +79,28 @@ const TaskCreateModal = () => {
     });
 
     const taskPriorityDropdown: SelectOptionsType[] = taskPriorityList?.map((item: TaskSelectOptions) => {
-        return { value: item.id, label: item.name };
+        return {
+            value: item.id,
+            label: (
+                <>
+                    <span className={`rounded px-2.5 py-0.5 text-sm font-medium dark:bg-blue-900 dark:text-blue-300`} style={{ color: item?.color, backgroundColor: item?.color + '20' }}>
+                        {item?.name}
+                    </span>
+                </>
+            ),
+        };
     });
 
     const taskAssignToDropdown: SelectOptionsType[] = usersList?.map((item: UserDataType) => {
-        return { value: item.id, label: `${item.firstName} ${item.lastName}` };
+        return { value: item.id, label: `${item.firstName} ${item.lastName} (${item?.email})` };
     });
 
     const taskObserverDropdown: SelectOptionsType[] = usersList?.map((item: UserDataType) => {
-        return { value: item.id, label: `${item.firstName} ${item.lastName}` };
+        return { value: item.id, label: `${item.firstName} ${item.lastName} (${item?.email})` };
     });
 
     const taskLeadsDropdown: SelectOptionsType[] = ledsList?.map((item: LeadDataType) => {
-        return { value: item.id, label: item?.contact?.name };
+        return { value: item.id, label: `${item?.contact?.name} (${item?.contact?.email})` };
     });
 
     const showAlert = async () => {

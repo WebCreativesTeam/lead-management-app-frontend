@@ -270,7 +270,12 @@ const TaskPage = () => {
                                                             onClick={() => dispatch(setChangeStatusModal({ statusId: status2.id, taskId: id, open: true }))}
                                                             disabled={status2?.id === status?.id}
                                                         >
-                                                            {status2.name}
+                                                            <span
+                                                                className={`rounded px-2.5 py-0.5 text-sm font-medium dark:bg-blue-900 dark:text-blue-300`}
+                                                                style={{ color: status2?.color, backgroundColor: status2?.color + '20' }}
+                                                            >
+                                                                {status2?.name}
+                                                            </span>
                                                         </button>
                                                     </li>
                                                 );
@@ -309,7 +314,12 @@ const TaskPage = () => {
                                                             onClick={() => dispatch(setChangePriorityModal({ priorityId: priority2.id, taskId: id, open: true }))}
                                                             disabled={priority2?.id === priority?.id}
                                                         >
-                                                            {priority2.name}
+                                                            <span
+                                                                className={`rounded px-2.5 py-0.5 text-sm font-medium dark:bg-blue-900 dark:text-blue-300`}
+                                                                style={{ color: priority2?.color, backgroundColor: priority2?.color + '20' }}
+                                                            >
+                                                                {priority2?.name}
+                                                            </span>
                                                         </button>
                                                     </li>
                                                 );

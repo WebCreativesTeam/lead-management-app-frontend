@@ -11,7 +11,7 @@ import { showToastAlert } from '@/utils/contant';
 import Loader from '@/components/__Shared/Loader';
 
 const EditTaskStatusModal = () => {
-    const { isBtnDisabled, editModal, isFetching,singleData } = useSelector((state: IRootState) => state.taskStatus);
+    const { isBtnDisabled, editModal, isFetching, singleData } = useSelector((state: IRootState) => state.taskStatus);
     const [inputColor, setInputColor] = useState<string>('');
 
     const dispatch = useDispatch();
@@ -31,7 +31,7 @@ const EditTaskStatusModal = () => {
                     name: value.name,
                     color: inputColor,
                 };
-                await new ApiClient().patch('task-status/'+singleData?.id, editTaskStatusObj);
+                await new ApiClient().patch('task-status/' + singleData?.id, editTaskStatusObj);
                 dispatch(setEditModal({ open: false }));
                 action.resetForm();
             } catch (error: any) {
@@ -47,19 +47,18 @@ const EditTaskStatusModal = () => {
         },
     });
     const handleDiscard = () => {
-        dispatch(setEditModal({open:false}));
+        dispatch(setEditModal({ open: false }));
         resetForm();
     };
-     useEffect(() => {
-         setFieldValue('name', singleData?.name);
+    useEffect(() => {
+        setFieldValue('name', singleData?.name);
         setInputColor(singleData?.color);
-
-     }, [singleData]);
+    }, [singleData]);
     return (
         <Modal
             open={editModal}
             onClose={() => {
-                dispatch(setEditModal({open:false}));
+                dispatch(setEditModal({ open: false }));
             }}
             onDiscard={handleDiscard}
             size="medium"
@@ -74,20 +73,11 @@ const EditTaskStatusModal = () => {
                     <form className="space-y-5" onSubmit={handleSubmit}>
                         <div>
                             <label htmlFor="editTaskStatus">Task Status Name</label>
-                            <input
-                                onChange={handleChange}
-                                onBlur={handleBlur}
-                                value={values.name}
-                                id="editTaskStatus"
-                                name="name"
-                                type="text"
-                                placeholder="Task Status Name"
-                                className="form-input"
-                            />
+                            <input onChange={handleChange} onBlur={handleBlur} value={values.name} id="editTaskStatus" name="name" type="text" placeholder="Task Status Name" className="form-input" />
                         </div>
                         <div>
                             <label htmlFor="statusColor">Task Status Color</label>
-                            <input onBlur={(e: React.ChangeEvent<HTMLInputElement>) => setInputColor(e.target.value)} id="statusColor" name="color" type="color" />
+                            <input onBlur={(e: React.ChangeEvent<HTMLInputElement>) => setInputColor(e.target.value)} id="statusColor" name="color" type="color" defaultValue={inputColor} />
                         </div>
                     </form>
                 )

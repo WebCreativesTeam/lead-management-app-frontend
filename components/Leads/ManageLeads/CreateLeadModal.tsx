@@ -84,7 +84,16 @@ const LeadCreateModal = () => {
     });
 
     const leadPriorityDropdown: SelectOptionsType[] = leadPriorityList?.map((item: ILeadPriority) => {
-        return { value: item.id, label: item.name };
+        return {
+            value: item.id,
+            label: (
+                <>
+                    <span className={`rounded px-2.5 py-0.5 text-sm font-medium dark:bg-blue-900 dark:text-blue-300`} style={{ color: item?.color, backgroundColor: item?.color + '20' }}>
+                        {item?.name}
+                    </span>
+                </>
+            ),
+        };
     });
 
     const leadBranchDropdown: SelectOptionsType[] = leadBranchList?.map((item: BranchDataType) => {
@@ -92,7 +101,7 @@ const LeadCreateModal = () => {
     });
 
     const leadContactDropdown: SelectOptionsType[] = leadContactsList?.map((item: ContactDataType) => {
-        return { value: item.id, label: item.name };
+        return { value: item.id, label: `${item.name} (${item?.email})` };
     });
 
     const leadSourceDropdown: SelectOptionsType[] = leadSourceList?.map((item: SourceDataType) => {
@@ -114,6 +123,7 @@ const LeadCreateModal = () => {
             showToastAlert(errors.serviceInterestedIn);
         }
     };
+    
     return (
         <Modal
             open={createModal}

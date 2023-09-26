@@ -7,7 +7,7 @@ import { IRootState } from '@/store';
 const TaskViewModal = () => {
     const { viewModal, singleData } = useSelector((state: IRootState) => state.task);
     const dispatch = useDispatch();
-    const { comment, createdAt, description, endDate, startDate, status, title, updatedAt, assignedBy, assignedTo, isActive, observer, priority } = singleData;
+    const { comment, createdAt, description, endDate, startDate, status, title, updatedAt, assignedBy, assignedTo, isActive, observer, priority,lead } = singleData;
 
     const reqData: any = {
         title,
@@ -15,14 +15,27 @@ const TaskViewModal = () => {
         comment,
         Observer: `${observer?.firstName} ${observer?.lastName}`,
         ['Active Status']: isActive ? 'Active' : 'Not Active',
-        Priority: priority?.name,
+        Priority: (
+            <>
+                <span className={`rounded px-2.5 py-0.5 text-sm font-medium dark:bg-blue-900 dark:text-blue-300`} style={{ color: priority?.color, backgroundColor: priority?.color + '20' }}>
+                    {priority?.name}
+                </span>
+            </>
+        ),
         ['assigned By']: `${assignedBy?.firstName} ${assignedBy?.lastName}`,
+        // Lead: `$}`,
         ['assigned To']: `${assignedTo?.firstName} ${assignedTo?.lastName}`,
         ['Task Created']: new Date(createdAt).toLocaleString(),
         ['Task Updated']: new Date(updatedAt).toLocaleString(),
         ['Task Start Date']: new Date(startDate).toLocaleString(),
         ['Task End Date']: new Date(endDate).toLocaleString(),
-        ['Task Status']: status?.name,
+        ['Task Status']: (
+            <>
+                <span className={`rounded px-2.5 py-0.5 text-sm font-medium dark:bg-blue-900 dark:text-blue-300`} style={{ color: status?.color, backgroundColor: status?.color + '20' }}>
+                    {status?.name}
+                </span>
+            </>
+        ),
     };
 
     return (

@@ -58,7 +58,7 @@ const TranserTaskModal = () => {
     });
 
     const userDropdownList: SelectOptionsType[] = usersList?.map((item: UserDataType) => {
-        return { value: item.id, label: `${item.firstName} ${item.lastName}` };
+        return { value: item.id, label: `${item.firstName} ${item.lastName} (${item?.email})` };
     });
 
     return (

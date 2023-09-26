@@ -11,7 +11,7 @@ const LeadViewModal = () => {
 
     const reqData: any = {
         branch: branch?.name,
-        contact: contact?.name,
+        contact: `${contact?.title} ${contact?.name} (${contact?.email})`,
         source: source?.name,
         ['Estimate Budget']: estimatedBudget,
         description,
@@ -19,19 +19,31 @@ const LeadViewModal = () => {
         job,
         ['Facebook Campaign Name']: facebookCampaignName,
         ['Service Interested']: serviceInterestedIn,
-        priority: priority?.name,
+        priority: (
+            <>
+                <span className={`rounded px-2.5 py-0.5 text-sm font-medium dark:bg-blue-900 dark:text-blue-300`} style={{ color: priority?.color, backgroundColor: priority?.color + '20' }}>
+                    {priority?.name}
+                </span>
+            </>
+        ),
         ['Lead Created']: new Date(createdAt).toLocaleString(),
         ['Lead Updated']: new Date(updatedAt).toLocaleString(),
         ['Lead Estimate Date']: new Date(estimatedDate).toLocaleString(),
         DOB: new Date(DOB).toLocaleString(),
-        ['Lead Status']: status?.name,
+        ['Lead Status']: (
+            <>
+                <span className={`rounded px-2.5 py-0.5 text-sm font-medium dark:bg-blue-900 dark:text-blue-300`} style={{ color: status?.color, backgroundColor: status?.color + '20' }}>
+                    {status?.name}
+                </span>
+            </>
+        ),
     };
 
     return (
         <ViewModal
             title="View Lead Detail"
             open={viewModal}
-            size='large'
+            size="large"
             onClose={() => dispatch(setViewModal({ open: false }))}
             content={
                 <>

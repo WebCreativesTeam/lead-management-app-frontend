@@ -231,6 +231,24 @@ const LeadPage = () => {
                     records={recordsData}
                     columns={[
                         {
+                            accessor: 'contact',
+                            title: 'Name',
+                            sortable: true,
+                            render: ({ contact }) => <div>{`${contact?.title} ${contact?.name}`}</div>,
+                        },
+                        {
+                            accessor: 'contact',
+                            title: 'Email',
+                            sortable: true,
+                            render: ({ contact }) => <div>{`${contact?.email}`}</div>,
+                        },
+                        {
+                            accessor: 'source',
+                            title: 'Source',
+                            sortable: true,
+                            render: ({ source }) => <div>{source?.name}</div>,
+                        },
+                        {
                             accessor: 'createdAt',
                             title: 'Created Date',
                             sortable: true,
@@ -277,7 +295,12 @@ const LeadPage = () => {
                                                             onClick={() => dispatch(setChangeStatusModal({ statusId: status2.id, leadId: id, open: true }))}
                                                             disabled={status2?.id === status?.id}
                                                         >
-                                                            {status2.name}
+                                                            <span
+                                                                className={`rounded px-2.5 py-0.5 text-sm font-medium dark:bg-blue-900 dark:text-blue-300`}
+                                                                style={{ color: status2?.color, backgroundColor: status2?.color + '20' }}
+                                                            >
+                                                                {status2?.name}
+                                                            </span>
                                                         </button>
                                                     </li>
                                                 );
@@ -316,7 +339,12 @@ const LeadPage = () => {
                                                             onClick={() => dispatch(setChangePriorityModal({ priorityId: priority2.id, leadId: id, open: true }))}
                                                             disabled={priority2?.id === priority?.id}
                                                         >
-                                                            {priority2.name}
+                                                            <span
+                                                                className={`rounded px-2.5 py-0.5 text-sm font-medium dark:bg-blue-900 dark:text-blue-300`}
+                                                                style={{ color: priority2?.color, backgroundColor: priority2?.color + '20' }}
+                                                            >
+                                                                {priority2?.name}
+                                                            </span>
                                                         </button>
                                                     </li>
                                                 );

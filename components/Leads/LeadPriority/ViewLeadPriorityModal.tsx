@@ -18,7 +18,14 @@ const LeadPriorityViewModal = () => {
                     <ul className="flex flex-col gap-4">
                         <li className="flex flex-wrap">
                             <span className="flex-1 text-lg font-bold">Priority Name</span>
-                            <p className="flex-[2]">{singleData.name}</p>
+                            <p className="flex-[2]">
+                                <span
+                                    className={`rounded px-2.5 py-0.5 text-sm font-medium dark:bg-blue-900 dark:text-blue-300`}
+                                    style={{ color: singleData?.color, backgroundColor: singleData?.color + '20' }}
+                                >
+                                    {singleData?.name}
+                                </span>
+                            </p>
                         </li>
                         <li className="flex flex-wrap">
                             <span className="flex-1 text-lg font-bold">Lead Priority Created</span>
