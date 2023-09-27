@@ -9,7 +9,7 @@ import { showToastAlert } from '@/utils/contant';
 import Loader from '@/components/__Shared/Loader';
 import Select from 'react-select';
 import 'flatpickr/dist/flatpickr.css';
-import { SelectOptionsType, UserDataType } from '@/utils/Types';
+import { SelectOptionsType, UserListSecondaryEndpointType } from '@/utils/Types';
 
 const TranserTaskModal = () => {
     const dispatch = useDispatch();
@@ -57,7 +57,7 @@ const TranserTaskModal = () => {
         },
     });
 
-    const userDropdownList: SelectOptionsType[] = usersList?.map((item: UserDataType) => {
+    const userDropdownList: SelectOptionsType[] = usersList?.map((item: UserListSecondaryEndpointType) => {
         return { value: item.id, label: `${item.firstName} ${item.lastName} (${item?.email})` };
     });
 

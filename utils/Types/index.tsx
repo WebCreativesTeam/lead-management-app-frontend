@@ -23,7 +23,6 @@ export type PolicyDataType = {
 };
 
 //users Page
-
 export type UserDataType = {
     firstName: string;
     lastName: string;
@@ -39,6 +38,13 @@ export type UserDataType = {
         description: string;
     }[];
     token: string;
+};
+
+export type UserListSecondaryEndpointType = {
+    firstName: string;
+    lastName: string;
+    email: string;
+    id: string;
 };
 
 //source page
@@ -66,21 +72,28 @@ export type TaskDataType = {
         sourceId: string;
         statusId: string;
         priorityId: string;
+        contact: {
+            email: string;
+            name: string;
+        };
     };
     assignedBy: {
         firstName: string;
         lastName: string;
         id: string;
+        email: string;
     };
     assignedTo: {
         firstName: string;
         lastName: string;
         id: string;
+        email: string;
     };
     observer: {
         firstName: string;
         lastName: string;
         id: string;
+        email: string;
     };
     status: {
         color: string;
@@ -102,6 +115,37 @@ export type TaskSelectOptions = {
     updatedAt: string;
 };
 
+export type TaskStatusSecondaryEndpoint = {
+    name: string;
+    color: string;
+    id: string;
+};
+export type LeadStatusSecondaryEndpoint = {
+    name: string;
+    color: string;
+    id: string;
+};
+export type LeadPrioritySecondaryEndpoint = {
+    name: string;
+    color: string;
+    id: string;
+};
+export type BranchListSecondaryEndpoint = {
+    name: string;
+    id: string;
+};
+
+export type PolicyListSecondaryEndpoint = {
+    name: string;
+    id: string;
+};
+
+export type ContactListSecondaryEndpoint = {
+    name: string;
+    id: string;
+    email: string;
+};
+
 export type LeadSelectOptions = {
     name: string;
     color: string;
@@ -117,6 +161,12 @@ export type TaskPriorityType = {
     updatedAt: string;
     isDefault: boolean;
     color: string;
+};
+
+export type TaskPrioritySecondaryEndpoint = {
+    name: string;
+    color: string;
+    id: string;
 };
 export type LeadPriorityType = {
     name: string;
@@ -154,6 +204,7 @@ export interface ContactDataType {
         firstName: string;
         lastName: string;
         id: string;
+        email: string;
     };
     source: {
         name: string;
@@ -163,6 +214,7 @@ export interface ContactDataType {
         firstName: string;
         lastName: string;
         id: string;
+        email: string;
     };
     website: string;
     position: string;
@@ -245,6 +297,14 @@ export type LeadDataType = {
     branch: BranchDataType;
 };
 
+export type LeadListSecondaryEndpointType = {
+    contact: {
+        id: string;
+        name: string;
+        email: string;
+    };
+};
+
 export interface ILeadStatus {
     id: string;
     name: string;
@@ -321,21 +381,21 @@ export interface InitialStateProps {
 export interface ContactInitialStateProps extends InitialStateProps {
     data: ContactDataType[];
     singleData: ContactDataType;
-    usersList: UserDataType[];
+    usersList: UserListSecondaryEndpointType[];
     sourceList: SourceDataType[];
 }
 //manage task slice initial props
 export interface ManageTaskInitialStateProps extends InitialStateProps {
     data: TaskDataType[];
     singleData: TaskDataType;
-    taskPriorityList: TaskSelectOptions[];
-    taskStatusList: TaskSelectOptions[];
-    usersList: UserDataType[];
-    ledsList: LeadDataType[];
+    taskPriorityList: TaskPrioritySecondaryEndpoint[];
+    taskStatusList: TaskStatusSecondaryEndpoint[];
+    usersList: UserListSecondaryEndpointType[];
+    leadsList: LeadListSecondaryEndpointType[];
     changePriorityModal: boolean;
     changeStatusModal: boolean;
-    singlePriority: TaskSelectOptions;
-    singleStatus: TaskSelectOptions;
+    singlePriority: TaskPrioritySecondaryEndpoint;
+    singleStatus: TaskStatusSecondaryEndpoint;
     isAbleToTransferTask: boolean;
     transferTaskModal: boolean;
 }
@@ -343,14 +403,14 @@ export interface ManageTaskInitialStateProps extends InitialStateProps {
 export interface ManageLeadInitialStateProps extends InitialStateProps {
     data: LeadDataType[];
     singleData: LeadDataType;
-    leadPriorityList: ILeadPriority[];
-    leadStatusList: ILeadStatus[];
+    leadPriorityList: LeadPrioritySecondaryEndpoint[];
+    leadStatusList: LeadStatusSecondaryEndpoint[];
     changePriorityModal: boolean;
     changeStatusModal: boolean;
-    singlePriority: ILeadPriority;
-    singleStatus: ILeadStatus;
-    leadContactsList: ContactDataType[];
-    leadBranchList: BranchDataType[];
+    singlePriority: LeadPrioritySecondaryEndpoint;
+    singleStatus: LeadStatusSecondaryEndpoint;
+    leadContactsList: ContactListSecondaryEndpoint[];
+    leadBranchList: BranchListSecondaryEndpoint[];
     leadSourceList: SourceDataType[];
 }
 
@@ -417,7 +477,7 @@ export interface BranchInitialStateProps extends InitialStateProps {
 //user slice initial props
 export interface UserInitialStateProps extends InitialStateProps {
     data: UserDataType[];
-    policies: PolicyDataType[];
+    policies: PolicyListSecondaryEndpoint[];
     singleData: UserDataType;
     policyModal: boolean;
     deactivateModal: boolean;

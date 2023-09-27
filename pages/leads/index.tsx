@@ -7,7 +7,7 @@ import { sortBy } from 'lodash';
 import 'flatpickr/dist/flatpickr.css';
 import { Delete, Edit, Plus, View } from '@/utils/icons';
 import PageHeadingSection from '@/components/__Shared/PageHeadingSection/index.';
-import { BranchDataType, ContactDataType, GetMethodResponseType, LeadSelectOptions, SourceDataType } from '@/utils/Types';
+import { BranchListSecondaryEndpoint, ContactDataType, GetMethodResponseType, LeadPrioritySecondaryEndpoint, LeadStatusSecondaryEndpoint, SourceDataType } from '@/utils/Types';
 import { LeadDataType } from '@/utils/Types';
 import { useDispatch, useSelector } from 'react-redux';
 import { setPageTitle } from '@/store/themeConfigSlice';
@@ -107,7 +107,7 @@ const LeadPage = () => {
     //get all contacts list
     const getContactsList = async () => {
         setLoading(true);
-        const res: GetMethodResponseType = await new ApiClient().get('contact');
+        const res: GetMethodResponseType = await new ApiClient().get('contact/list');
         const contacts: ContactDataType[] = res?.data;
         if (typeof contacts === 'undefined') {
             dispatch(getAllContactsForLead([] as ContactDataType[]));
@@ -120,10 +120,10 @@ const LeadPage = () => {
     //get all branches list
     const getBranchList = async () => {
         setLoading(true);
-        const res: GetMethodResponseType = await new ApiClient().get('branch');
-        const branches: ContactDataType[] = res?.data;
+        const res: GetMethodResponseType = await new ApiClient().get('branch/list');
+        const branches: BranchListSecondaryEndpoint[] = res?.data;
         if (typeof branches === 'undefined') {
-            dispatch(getAllBranchForLead([] as BranchDataType[]));
+            dispatch(getAllBranchForLead([] as BranchListSecondaryEndpoint[]));
             return;
         }
         dispatch(getAllBranchForLead(branches));
@@ -133,23 +133,23 @@ const LeadPage = () => {
     //get all source list
     const getSourceList = async () => {
         setLoading(true);
-        const res: GetMethodResponseType = await new ApiClient().get('source');
-        const branches: ContactDataType[] = res?.data;
-        if (typeof branches === 'undefined') {
+        const res: GetMethodResponseType = await new ApiClient().get('source/list');
+        const sources: SourceDataType[] = res?.data;
+        if (typeof sources === 'undefined') {
             dispatch(getAllSourceForLead([] as SourceDataType[]));
             return;
         }
-        dispatch(getAllSourceForLead(branches));
+        dispatch(getAllSourceForLead(sources));
         setLoading(false);
     };
 
     //get all lead priority list
     const getLeadsPriority = async () => {
         setLoading(true);
-        const leadPriorityList: GetMethodResponseType = await new ApiClient().get('lead-priority');
-        const priorities: LeadSelectOptions[] = leadPriorityList?.data;
+        const leadPriorityList: GetMethodResponseType = await new ApiClient().get('lead-priority/list');
+        const priorities: LeadPrioritySecondaryEndpoint[] = leadPriorityList?.data;
         if (typeof priorities === 'undefined') {
-            dispatch(getAllLeadPriorities([] as LeadSelectOptions[]));
+            dispatch(getAllLeadPriorities([] as LeadPrioritySecondaryEndpoint[]));
             return;
         }
         dispatch(getAllLeadPriorities(priorities));
@@ -158,10 +158,10 @@ const LeadPage = () => {
     //get all lead status list
     const getLeadStatus = async () => {
         setLoading(true);
-        const leadStatusList: GetMethodResponseType = await new ApiClient().get('lead-status');
-        const status: LeadSelectOptions[] = leadStatusList?.data;
+        const leadStatusList: GetMethodResponseType = await new ApiClient().get('lead-status/list');
+        const status: LeadStatusSecondaryEndpoint[] = leadStatusList?.data;
         if (typeof status === 'undefined') {
-            dispatch(getAllLeadStatus([] as LeadSelectOptions[]));
+            dispatch(getAllLeadStatus([] as LeadStatusSecondaryEndpoint[]));
             return;
         }
         dispatch(getAllLeadStatus(status));
@@ -231,13 +231,13 @@ const LeadPage = () => {
                     records={recordsData}
                     columns={[
                         {
-                            accessor: 'contact',
+                            accessor: 'contactTitle',
                             title: 'Name',
                             sortable: true,
                             render: ({ contact }) => <div>{`${contact?.title} ${contact?.name}`}</div>,
                         },
                         {
-                            accessor: 'contact',
+                            accessor: 'contactEmail',
                             title: 'Email',
                             sortable: true,
                             render: ({ contact }) => <div>{`${contact?.email}`}</div>,
@@ -286,7 +286,7 @@ const LeadPage = () => {
                                         }
                                     >
                                         <ul className="max-h-32 !min-w-[170px] overflow-y-auto">
-                                            {leadStatusList.map((status2: LeadSelectOptions, i: number) => {
+                                            {leadStatusList.map((status2: LeadStatusSecondaryEndpoint, i: number) => {
                                                 return (
                                                     <li key={i}>
                                                         <button
@@ -330,7 +330,7 @@ const LeadPage = () => {
                                         }
                                     >
                                         <ul className="max-h-32 !min-w-[170px] overflow-y-auto">
-                                            {leadPriorityList.map((priority2: LeadSelectOptions, i: number) => {
+                                            {leadPriorityList.map((priority2: LeadPrioritySecondaryEndpoint, i: number) => {
                                                 return (
                                                     <li key={i}>
                                                         <button

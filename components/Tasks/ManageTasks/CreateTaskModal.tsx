@@ -11,11 +11,11 @@ import Loader from '@/components/__Shared/Loader';
 import Select from 'react-select';
 import Flatpickr from 'react-flatpickr';
 import 'flatpickr/dist/flatpickr.css';
-import { LeadDataType, SelectOptionsType, TaskSelectOptions, UserDataType } from '@/utils/Types';
+import { LeadListSecondaryEndpointType, SelectOptionsType, TaskPrioritySecondaryEndpoint, UserListSecondaryEndpointType } from '@/utils/Types';
 
 const TaskCreateModal = () => {
     const dispatch = useDispatch();
-    const { isFetching, createModal, isBtnDisabled, taskPriorityList, usersList, ledsList } = useSelector((state: IRootState) => state.task);
+    const { isFetching, createModal, isBtnDisabled, taskPriorityList, usersList, leadsList } = useSelector((state: IRootState) => state.task);
 
     const initialValues = {
         title: '',
@@ -78,7 +78,7 @@ const TaskCreateModal = () => {
         },
     });
 
-    const taskPriorityDropdown: SelectOptionsType[] = taskPriorityList?.map((item: TaskSelectOptions) => {
+    const taskPriorityDropdown: SelectOptionsType[] = taskPriorityList?.map((item: TaskPrioritySecondaryEndpoint) => {
         return {
             value: item.id,
             label: (
@@ -91,16 +91,11 @@ const TaskCreateModal = () => {
         };
     });
 
-    const taskAssignToDropdown: SelectOptionsType[] = usersList?.map((item: UserDataType) => {
+    const userDropdownList: SelectOptionsType[] = usersList?.map((item: UserListSecondaryEndpointType) => {
         return { value: item.id, label: `${item.firstName} ${item.lastName} (${item?.email})` };
     });
-
-    const taskObserverDropdown: SelectOptionsType[] = usersList?.map((item: UserDataType) => {
-        return { value: item.id, label: `${item.firstName} ${item.lastName} (${item?.email})` };
-    });
-
-    const taskLeadsDropdown: SelectOptionsType[] = ledsList?.map((item: LeadDataType) => {
-        return { value: item.id, label: `${item?.contact?.name} (${item?.contact?.email})` };
+    const leadDrodownList: SelectOptionsType[] = leadsList?.map((item: LeadListSecondaryEndpointType) => {
+        return { value: item?.contact?.id, label: `${item?.contact?.name} (${item?.contact?.email})` };
     });
 
     const showAlert = async () => {
@@ -153,7 +148,7 @@ const TaskCreateModal = () => {
                             </div>
                             <div className="flex-1">
                                 <label htmlFor="taskLead">Select Lead</label>
-                                <Select placeholder="Select task Lead" options={taskLeadsDropdown} id="taskLead" onChange={(e) => setFieldValue('lead', e)} />
+                                <Select placeholder="Select task Lead" options={leadDrodownList} id="taskLead" onChange={(e) => setFieldValue('lead', e)} />
                             </div>
                         </div>
                         <div className="flex flex-col gap-4 sm:flex-row">
@@ -195,11 +190,11 @@ const TaskCreateModal = () => {
                         <div className="flex flex-col gap-4 sm:flex-row">
                             <div className="flex-1">
                                 <label htmlFor="taskAssignTo">Task Assign To</label>
-                                <Select placeholder="Select task Assign To" options={taskAssignToDropdown} id="taskAssignTo" onChange={(e) => setFieldValue('assignedTo', e)} />
+                                <Select placeholder="Select task Assign To" options={userDropdownList} id="taskAssignTo" onChange={(e) => setFieldValue('assignedTo', e)} />
                             </div>
                             <div className="flex-1">
                                 <label htmlFor="taskObserver">Task Observer</label>
-                                <Select placeholder="Select task observer" options={taskObserverDropdown} id="taskObserver" onChange={(e) => setFieldValue('observer', e)} />
+                                <Select placeholder="Select task observer" options={userDropdownList} id="taskObserver" onChange={(e) => setFieldValue('observer', e)} />
                             </div>
                         </div>
                         <div className="flex flex-col gap-4 sm:flex-row">

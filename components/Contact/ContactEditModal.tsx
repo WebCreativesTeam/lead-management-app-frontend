@@ -5,11 +5,11 @@ import Select from 'react-select';
 import { useSelector, useDispatch } from 'react-redux';
 import { IRootState } from '@/store';
 import { setEditModal, setDisableBtn, setFetching } from '@/store/Slices/contactSlice';
-import { countryData, namePrefix } from '@/utils/Raw Data';
+import { namePrefix } from '@/utils/Raw Data';
 import { useFormik } from 'formik';
 import { contactSchema } from '@/utils/schemas';
 import { ApiClient } from '@/utils/http';
-import { SelectOptionsType, SourceDataType, UserDataType, ICountryData } from '@/utils/Types';
+import { SelectOptionsType, SourceDataType, ICountryData, UserListSecondaryEndpointType } from '@/utils/Types';
 import { showToastAlert } from '@/utils/contant';
 import countryJson from '@/utils/Raw Data/select-address.json';
 import Loader from '../__Shared/Loader';
@@ -27,7 +27,7 @@ const ContactEditModal = () => {
 
     const dispatch = useDispatch();
 
-    const assignToUsersDropdown: SelectOptionsType[] = usersList?.map((item: UserDataType) => {
+    const assignToUsersDropdown: SelectOptionsType[] = usersList?.map((item: UserListSecondaryEndpointType) => {
         return { value: item.id, label: `${item.firstName} ${item.lastName}` };
     });
 

@@ -13,7 +13,7 @@ import Loader from '@/components/__Shared/Loader';
 import Flatpickr from 'react-flatpickr';
 import 'flatpickr/dist/flatpickr.css';
 import Select from 'react-select';
-import { BranchDataType, SelectOptionsType, SourceDataType } from '@/utils/Types';
+import { BranchDataType, BranchListSecondaryEndpoint, SelectOptionsType, SourceDataType } from '@/utils/Types';
 
 const LeadEditModal = () => {
     const dispatch = useDispatch();
@@ -25,7 +25,7 @@ const LeadEditModal = () => {
     const leadSourceDropdown: SelectOptionsType[] = leadSourceList?.map((item: SourceDataType) => {
         return { value: item.id, label: item.name };
     });
-    const leadBranchDropdown: SelectOptionsType[] = leadBranchList?.map((item: BranchDataType) => {
+    const leadBranchDropdown: SelectOptionsType[] = leadBranchList?.map((item: BranchListSecondaryEndpoint) => {
         return { value: item.id, label: item.name };
     });
 

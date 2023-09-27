@@ -2,7 +2,6 @@ import React, { memo } from 'react';
 import ViewModal from '../__Shared/ViewModal';
 import { useDispatch, useSelector } from 'react-redux';
 import { setViewModal } from '@/store/Slices/contactSlice';
-import { ContactDataType } from '@/utils/Types';
 import { IRootState } from '@/store';
 
 const ContactViewModal = () => {
@@ -16,9 +15,9 @@ const ContactViewModal = () => {
         phoneNumber,
         industry,
         position,
-        ['Assigned To']: `${assignedTo?.firstName} ${assignedTo?.lastName}`,
+        ['Assigned To']: `${assignedTo?.firstName} ${assignedTo?.lastName} (${assignedTo?.email})`,
         ['source Name']: source?.name,
-        ['Added By']: `${addedBy?.firstName} ${addedBy?.lastName}`,
+        ['Added By']: `${addedBy?.firstName} ${addedBy?.lastName} (${addedBy?.email})`,
         twitterProfile,
         facebookProfile,
         website,

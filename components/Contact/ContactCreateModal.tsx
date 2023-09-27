@@ -10,7 +10,7 @@ import { contactSchema } from '@/utils/schemas';
 import { ApiClient } from '@/utils/http';
 import { showToastAlert } from '@/utils/contant';
 import Loader from '../__Shared/Loader';
-import { SelectOptionsType, SourceDataType, UserDataType, ICountryData } from '@/utils/Types';
+import { SelectOptionsType, SourceDataType, UserListSecondaryEndpointType, ICountryData } from '@/utils/Types';
 import countryJson from '@/utils/Raw Data/select-address.json';
 
 const ContactCreateModal = () => {
@@ -110,8 +110,8 @@ const ContactCreateModal = () => {
         }
     }, [values.country]);
 
-    const assignToUsersDropdown: SelectOptionsType[] = usersList?.map((item: UserDataType) => {
-        return { value: item.id, label: `${item.firstName} ${item.lastName}` };
+    const userListDropdown: SelectOptionsType[] = usersList?.map((item: UserListSecondaryEndpointType) => {
+        return { value: item.id, label: `${item.firstName} ${item.lastName} (${item?.email})`};
     });
 
     const sourceDropdown: SelectOptionsType[] = sourceList?.map((item: SourceDataType) => {
@@ -193,7 +193,7 @@ const ContactCreateModal = () => {
                         <div className="flex flex-col gap-4 sm:flex-row">
                             <div className="flex-1">
                                 <label htmlFor="state">Assign To</label>
-                                <Select placeholder="Assign To" options={assignToUsersDropdown} onChange={(data: any) => setFieldValue('assignedTo', data.value)} />
+                                <Select placeholder="Assign To" options={userListDropdown} onChange={(data: any) => setFieldValue('assignedTo', data.value)} />
                             </div>
                             <div className="flex-1">
                                 <label htmlFor="state">Source</label>

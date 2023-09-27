@@ -1,22 +1,22 @@
-import { LeadDataType, ManageLeadInitialStateProps, ILeadPriority, ILeadStatus, ContactDataType, BranchDataType, SourceDataType, UserDataType } from '@/utils/Types';
+import { LeadDataType, ManageLeadInitialStateProps, LeadPrioritySecondaryEndpoint, LeadStatusSecondaryEndpoint, SourceDataType, UserDataType, ContactListSecondaryEndpoint, BranchListSecondaryEndpoint } from '@/utils/Types';
 import { fetchUserInfo } from '@/utils/contant';
 import { createSlice, PayloadAction} from '@reduxjs/toolkit';
 
 const initialState: ManageLeadInitialStateProps = {
     data: [] as LeadDataType[],
     singleData: {} as LeadDataType,
-    singlePriority: {} as ILeadPriority,
-    singleStatus: {} as ILeadStatus,
+    singlePriority: {} as LeadPrioritySecondaryEndpoint,
+    singleStatus: {} as LeadStatusSecondaryEndpoint,
     createModal: false,
     editModal: false,
     deleteModal: false,
     viewModal: false,
     isBtnDisabled: false,
     isFetching: false,
-    leadPriorityList: [] as ILeadPriority[],
-    leadStatusList: [] as ILeadStatus[],
-    leadContactsList: [] as ContactDataType[],
-    leadBranchList: [] as BranchDataType[],
+    leadPriorityList: [] as LeadPrioritySecondaryEndpoint[],
+    leadStatusList: [] as LeadStatusSecondaryEndpoint[],
+    leadContactsList: [] as ContactListSecondaryEndpoint[],
+    leadBranchList: [] as BranchListSecondaryEndpoint[],
     leadSourceList: [] as SourceDataType[],
     changePriorityModal: false,
     changeStatusModal: false,
@@ -79,7 +79,7 @@ const manageLeadSlice = createSlice({
             state.changePriorityModal = open;
             const findRequestedData: LeadDataType | undefined = state.data.find((item: LeadDataType) => item.id === leadId);
 
-            const findSinglePriority: ILeadPriority | undefined = state?.leadPriorityList.find((item: ILeadPriority) => item.id === priorityId);
+            const findSinglePriority: LeadPrioritySecondaryEndpoint | undefined = state?.leadPriorityList.find((item: LeadPrioritySecondaryEndpoint) => item.id === priorityId);
 
             if (findRequestedData && state.changePriorityModal && findSinglePriority) {
                 state.singleData = findRequestedData;
@@ -93,7 +93,7 @@ const manageLeadSlice = createSlice({
             state.changeStatusModal = open;
             const findRequestedData: LeadDataType | undefined = state.data.find((item: LeadDataType) => item.id === leadId);
 
-            const findSingleStatus: ILeadStatus | undefined = state?.leadStatusList?.find((item: ILeadStatus) => item.id === statusId);
+            const findSingleStatus: LeadStatusSecondaryEndpoint | undefined = state?.leadStatusList?.find((item: LeadStatusSecondaryEndpoint) => item.id === statusId);
 
             if (findRequestedData && state.changeStatusModal && findSingleStatus) {
                 state.singleData = findRequestedData;

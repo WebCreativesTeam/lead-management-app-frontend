@@ -1,4 +1,4 @@
-import { ContactDataType, ContactInitialStateProps, SourceDataType, UserDataType } from '@/utils/Types';
+import { ContactDataType, ContactInitialStateProps, SourceDataType, UserDataType, UserListSecondaryEndpointType } from '@/utils/Types';
 import { fetchUserInfo, showToastAlert } from '@/utils/contant';
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 
@@ -16,7 +16,7 @@ const initialState: ContactInitialStateProps = {
     isAbleToRead: false,
     isAbleToUpdate: false,
     userPolicyArr: [] as string[],
-    usersList: [] as UserDataType[],
+    usersList: [] as UserListSecondaryEndpointType[],
     sourceList: [] as SourceDataType[],
 };
 

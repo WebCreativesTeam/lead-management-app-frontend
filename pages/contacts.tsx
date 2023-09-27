@@ -9,7 +9,7 @@ import PageHeadingSection from '@/components/__Shared/PageHeadingSection/index.'
 import ConfirmationModal from '@/components/__Shared/ConfirmationModal';
 import { useDispatch, useSelector } from 'react-redux';
 import { setPageTitle } from '@/store/themeConfigSlice';
-import { ContactDataType, GetMethodResponseType, SourceDataType, UserDataType } from '@/utils/Types';
+import { ContactDataType, GetMethodResponseType, SourceDataType, UserListSecondaryEndpointType } from '@/utils/Types';
 import { ApiClient } from '@/utils/http';
 import { getAllContacts, setEditModal, setDeleteModal, setCreateModal, setViewModal, setFetching, setDisableBtn, getAllUsersForContact, getAllSourceForContact } from '@/store/Slices/contactSlice';
 import ContactViewModal from '@/components/Contact/ContactViewModal';
@@ -84,10 +84,10 @@ const Contacts = () => {
     //get all user's list
     const getAllUsersList = async () => {
         setLoading(true);
-        const usersList: GetMethodResponseType = await new ApiClient().get('user');
-        const users: UserDataType[] = usersList?.data;
+        const usersList: GetMethodResponseType = await new ApiClient().get('user/list');
+        const users: UserListSecondaryEndpointType[] = usersList?.data;
         if (typeof users === 'undefined') {
-            dispatch(getAllUsersForContact([] as UserDataType[]));
+            dispatch(getAllUsersForContact([] as UserListSecondaryEndpointType[]));
             return;
         }
         dispatch(getAllUsersForContact(users));
@@ -96,7 +96,7 @@ const Contacts = () => {
     //get all Source list
     const getAllSourceList = async () => {
         setLoading(true);
-        const sourceList: GetMethodResponseType = await new ApiClient().get('source');
+        const sourceList: GetMethodResponseType = await new ApiClient().get('source/list');
         const source: SourceDataType[] = sourceList?.data;
         if (typeof source === 'undefined') {
             dispatch(getAllSourceForContact([] as SourceDataType[]));
@@ -200,19 +200,19 @@ const Contacts = () => {
                             accessor: 'city',
                             title: 'City',
                             sortable: true,
-                            render: ({ location }) => <div>{location.city}</div>,
+                            render: ({ location }) => <div>{location?.city}</div>,
                         },
                         {
                             accessor: 'state',
                             title: 'State',
                             sortable: true,
-                            render: ({ location }) => <div>{location.state}</div>,
+                            render: ({ location }) => <div>{location?.state}</div>,
                         },
                         {
                             accessor: 'country',
                             title: 'Country',
                             sortable: true,
-                            render: ({ location }) => <div>{location.country}</div>,
+                            render: ({ location }) => <div>{location?.country}</div>,
                         },
                         {
                             accessor: 'createdAt',

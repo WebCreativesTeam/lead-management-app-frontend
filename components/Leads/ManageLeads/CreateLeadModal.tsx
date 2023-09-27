@@ -11,7 +11,7 @@ import Loader from '@/components/__Shared/Loader';
 import Select from 'react-select';
 import Flatpickr from 'react-flatpickr';
 import 'flatpickr/dist/flatpickr.css';
-import { SelectOptionsType, BranchDataType, SourceDataType, ContactDataType, ILeadPriority } from '@/utils/Types';
+import { SelectOptionsType, BranchListSecondaryEndpoint, SourceDataType, ContactListSecondaryEndpoint, LeadPrioritySecondaryEndpoint } from '@/utils/Types';
 
 const LeadCreateModal = () => {
     const dispatch = useDispatch();
@@ -83,7 +83,7 @@ const LeadCreateModal = () => {
         },
     });
 
-    const leadPriorityDropdown: SelectOptionsType[] = leadPriorityList?.map((item: ILeadPriority) => {
+    const leadPriorityDropdown: SelectOptionsType[] = leadPriorityList?.map((item: LeadPrioritySecondaryEndpoint) => {
         return {
             value: item.id,
             label: (
@@ -96,11 +96,11 @@ const LeadCreateModal = () => {
         };
     });
 
-    const leadBranchDropdown: SelectOptionsType[] = leadBranchList?.map((item: BranchDataType) => {
+    const leadBranchDropdown: SelectOptionsType[] = leadBranchList?.map((item: BranchListSecondaryEndpoint) => {
         return { value: item.id, label: item.name };
     });
 
-    const leadContactDropdown: SelectOptionsType[] = leadContactsList?.map((item: ContactDataType) => {
+    const leadContactDropdown: SelectOptionsType[] = leadContactsList?.map((item: ContactListSecondaryEndpoint) => {
         return { value: item.id, label: `${item.name} (${item?.email})` };
     });
 

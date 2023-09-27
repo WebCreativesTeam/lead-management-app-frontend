@@ -4,7 +4,7 @@ import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
 import { Delete, Edit, Plus, Shield, View } from '@/utils/icons';
-import { UserDataType, PolicyDataType, GetMethodResponseType } from '@/utils/Types';
+import { UserDataType, PolicyListSecondaryEndpoint, GetMethodResponseType } from '@/utils/Types';
 import PageHeadingSection from '@/components/__Shared/PageHeadingSection/index.';
 import ConfirmationModal from '@/components/__Shared/ConfirmationModal';
 import { setPageTitle } from '@/store/themeConfigSlice';
@@ -88,10 +88,10 @@ const Users = () => {
     
     const getPolicyList = async () => {
         setLoading(true);
-        const res: GetMethodResponseType = await new ApiClient().get('policy');
-        const policies: PolicyDataType[] = res?.data;
+        const res: GetMethodResponseType = await new ApiClient().get('policy/list');
+        const policies: PolicyListSecondaryEndpoint[] = res?.data;
         if (typeof policies === 'undefined') {
-            dispatch(getAllPolicies([] as PolicyDataType[]));
+            dispatch(getAllPolicies([] as PolicyListSecondaryEndpoint[]));
             return;
         }
         dispatch(getAllPolicies(policies));

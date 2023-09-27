@@ -7,13 +7,13 @@ import { IRootState } from '@/store';
 const TaskViewModal = () => {
     const { viewModal, singleData } = useSelector((state: IRootState) => state.task);
     const dispatch = useDispatch();
-    const { comment, createdAt, description, endDate, startDate, status, title, updatedAt, assignedBy, assignedTo, isActive, observer, priority,lead } = singleData;
+    const { comment, createdAt, description, endDate, startDate, status, title, updatedAt, assignedBy, assignedTo, isActive, observer, priority, lead } = singleData;
 
     const reqData: any = {
         title,
         description,
         comment,
-        Observer: `${observer?.firstName} ${observer?.lastName}`,
+        Observer: `${observer?.firstName} ${observer?.lastName} (${observer?.email})`,
         ['Active Status']: isActive ? 'Active' : 'Not Active',
         Priority: (
             <>
@@ -22,9 +22,9 @@ const TaskViewModal = () => {
                 </span>
             </>
         ),
-        ['assigned By']: `${assignedBy?.firstName} ${assignedBy?.lastName}`,
-        // Lead: `$}`,
-        ['assigned To']: `${assignedTo?.firstName} ${assignedTo?.lastName}`,
+        ['assigned By']: `${assignedBy?.firstName} ${assignedBy?.lastName} (${assignedBy?.email})`,
+        Lead: `${lead?.contact?.name} (${lead?.contact?.email})`,
+        ['assigned To']: `${assignedTo?.firstName} ${assignedTo?.lastName} (${assignedTo?.email})`,
         ['Task Created']: new Date(createdAt).toLocaleString(),
         ['Task Updated']: new Date(updatedAt).toLocaleString(),
         ['Task Start Date']: new Date(startDate).toLocaleString(),

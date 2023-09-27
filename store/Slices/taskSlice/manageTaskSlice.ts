@@ -1,4 +1,4 @@
-import { TaskDataType, ManageTaskInitialStateProps, TaskSelectOptions, UserDataType, LeadDataType } from '@/utils/Types';
+import { TaskDataType, ManageTaskInitialStateProps, TaskSelectOptions, UserDataType, LeadDataType, UserListSecondaryEndpointType, LeadListSecondaryEndpointType, TaskPrioritySecondaryEndpoint, TaskStatusSecondaryEndpoint } from '@/utils/Types';
 import { fetchUserInfo } from '@/utils/contant';
 import { createSlice,PayloadAction } from '@reduxjs/toolkit';
 
@@ -13,10 +13,10 @@ const initialState: ManageTaskInitialStateProps = {
     viewModal: false,
     isBtnDisabled: false,
     isFetching: false,
-    taskPriorityList: [] as TaskSelectOptions[],
-    taskStatusList: [] as TaskSelectOptions[],
-    usersList: [] as UserDataType[],
-    ledsList: [] as LeadDataType[],
+    taskPriorityList: [] as TaskPrioritySecondaryEndpoint[],
+    taskStatusList: [] as TaskStatusSecondaryEndpoint[],
+    usersList: [] as UserListSecondaryEndpointType[],
+    leadsList: [] as LeadListSecondaryEndpointType[],
     changePriorityModal: false,
     changeStatusModal: false,
     isAbleToRead: false,
@@ -24,7 +24,7 @@ const initialState: ManageTaskInitialStateProps = {
     isAbleToUpdate: false,
     isAbleToDelete: false,
     isAbleToTransferTask: false,
-    transferTaskModal:false,
+    transferTaskModal: false,
     userPolicyArr: [] as string[],
 };
 
@@ -91,7 +91,7 @@ const manageTaskSlice = createSlice({
             state.changePriorityModal = open;
             const findRequestedData: TaskDataType | undefined = state.data.find((item: TaskDataType) => item.id === taskId);
 
-            const findSinglePriority: TaskSelectOptions | undefined = state?.taskPriorityList.find((item: TaskSelectOptions) => item.id === priorityId);
+            const findSinglePriority: TaskPrioritySecondaryEndpoint | undefined = state?.taskPriorityList.find((item: TaskPrioritySecondaryEndpoint) => item.id === priorityId);
 
             if (findRequestedData && state.changePriorityModal && findSinglePriority) {
                 state.singleData = findRequestedData;
@@ -105,7 +105,7 @@ const manageTaskSlice = createSlice({
             state.changeStatusModal = open;
             const findRequestedData: TaskDataType | undefined = state.data.find((item: TaskDataType) => item.id === taskId);
 
-            const findSingleStatus: TaskSelectOptions | undefined = state?.taskStatusList?.find((item: TaskSelectOptions) => item.id === statusId);
+            const findSingleStatus: TaskStatusSecondaryEndpoint | undefined = state?.taskStatusList?.find((item: TaskStatusSecondaryEndpoint) => item.id === statusId);
 
             if (findRequestedData && state.changeStatusModal && findSingleStatus) {
                 state.singleData = findRequestedData;
@@ -121,7 +121,7 @@ const manageTaskSlice = createSlice({
             state.usersList = action.payload;
         },
         getAllLeadsForTask(state, action) {
-            state.ledsList = action.payload;
+            state.leadsList = action.payload;
         },
         getAllTaskPriorities(state, action) {
             state.taskPriorityList = action.payload;

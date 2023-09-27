@@ -7,7 +7,7 @@ import { sortBy } from 'lodash';
 import 'flatpickr/dist/flatpickr.css';
 import { ArrowTransfer, Delete, Edit, Plus, View } from '@/utils/icons';
 import PageHeadingSection from '@/components/__Shared/PageHeadingSection/index.';
-import { GetMethodResponseType, LeadDataType, TaskSelectOptions, UserDataType } from '@/utils/Types';
+import { GetMethodResponseType, LeadListSecondaryEndpointType, TaskPrioritySecondaryEndpoint, TaskStatusSecondaryEndpoint, UserListSecondaryEndpointType } from '@/utils/Types';
 import { TaskDataType } from '@/utils/Types';
 import { useDispatch, useSelector } from 'react-redux';
 import { setPageTitle } from '@/store/themeConfigSlice';
@@ -43,7 +43,7 @@ const TaskPage = () => {
     });
 
     //hooks
-    const { data, isFetching, taskPriorityList, taskStatusList, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate,isAbleToTransferTask } = useSelector((state: IRootState) => state.task);
+    const { data, isFetching, taskPriorityList, taskStatusList, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate, isAbleToTransferTask } = useSelector((state: IRootState) => state.task);
     const [searchInputText, setSearchInputText] = useState<string>('');
     const [searchedData, setSearchedData] = useState<TaskDataType[]>(data);
     const [loading, setLoading] = useState<boolean>(false);
@@ -107,10 +107,10 @@ const TaskPage = () => {
     //get all users list
     const getUsersList = async () => {
         setLoading(true);
-        const res: GetMethodResponseType = await new ApiClient().get('user');
-        const users: UserDataType[] = res?.data;
+        const res: GetMethodResponseType = await new ApiClient().get('user/list');
+        const users: UserListSecondaryEndpointType[] = res?.data;
         if (typeof users === 'undefined') {
-            dispatch(getAllUsersForTask([] as UserDataType[]));
+            dispatch(getAllUsersForTask([] as UserListSecondaryEndpointType[]));
             return;
         }
         dispatch(getAllUsersForTask(users));
@@ -120,10 +120,10 @@ const TaskPage = () => {
     //get all Leads list
     const getLeadsList = async () => {
         setLoading(true);
-        const res: GetMethodResponseType = await new ApiClient().get('lead');
-        const leads: LeadDataType[] = res?.data;
+        const res: GetMethodResponseType = await new ApiClient().get('lead/list');
+        const leads: LeadListSecondaryEndpointType[] = res?.data;
         if (typeof leads === 'undefined') {
-            dispatch(getAllUsersForTask([] as LeadDataType[]));
+            dispatch(getAllLeadsForTask([] as LeadListSecondaryEndpointType[]));
             return;
         }
         dispatch(getAllLeadsForTask(leads));
@@ -133,10 +133,10 @@ const TaskPage = () => {
     //get all task priority list
     const getTasksPriority = async () => {
         setLoading(true);
-        const taskPriorityList: GetMethodResponseType = await new ApiClient().get('task-priority');
-        const priorities: TaskSelectOptions[] = taskPriorityList?.data;
+        const taskPriorityList: GetMethodResponseType = await new ApiClient().get('task-priority/list');
+        const priorities: TaskPrioritySecondaryEndpoint[] = taskPriorityList?.data;
         if (typeof priorities === 'undefined') {
-            dispatch(getAllTaskPriorities([] as TaskSelectOptions[]));
+            dispatch(getAllTaskPriorities([] as TaskPrioritySecondaryEndpoint[]));
             return;
         }
         dispatch(getAllTaskPriorities(priorities));
@@ -145,10 +145,10 @@ const TaskPage = () => {
     //get all task status list
     const getTaskStatus = async () => {
         setLoading(true);
-        const taskStatusList: GetMethodResponseType = await new ApiClient().get('task-status');
-        const status: TaskSelectOptions[] = taskStatusList?.data;
+        const taskStatusList: GetMethodResponseType = await new ApiClient().get('task-status/list');
+        const status: TaskStatusSecondaryEndpoint[] = taskStatusList?.data;
         if (typeof status === 'undefined') {
-            dispatch(getAllTaskStatus([] as TaskSelectOptions[]));
+            dispatch(getAllTaskStatus([] as TaskStatusSecondaryEndpoint[]));
             return;
         }
         dispatch(getAllTaskStatus(status));
@@ -253,15 +253,15 @@ const TaskPage = () => {
                                             <>
                                                 <span
                                                     className={`rounded px-2.5 py-0.5 text-sm font-medium dark:bg-blue-900 dark:text-blue-300`}
-                                                    style={{ color: status.color, backgroundColor: status.color + '20' }}
+                                                    style={{ color: status?.color, backgroundColor: status?.color + '20' }}
                                                 >
-                                                    {status.name}
+                                                    {status?.name}
                                                 </span>
                                             </>
                                         }
                                     >
                                         <ul className="max-h-32 !min-w-[170px] overflow-y-auto">
-                                            {taskStatusList.map((status2: TaskSelectOptions, i: number) => {
+                                            {taskStatusList.map((status2: TaskStatusSecondaryEndpoint, i: number) => {
                                                 return (
                                                     <li key={i}>
                                                         <button
@@ -297,15 +297,15 @@ const TaskPage = () => {
                                             <>
                                                 <span
                                                     className={`mr-2 rounded px-2.5 py-0.5 text-sm font-medium dark:bg-blue-900 dark:text-blue-300`}
-                                                    style={{ color: priority.color, backgroundColor: priority.color + '20' }}
+                                                    style={{ color: priority?.color, backgroundColor: priority?.color + '20' }}
                                                 >
-                                                    {priority.name}
+                                                    {priority?.name}
                                                 </span>
                                             </>
                                         }
                                     >
                                         <ul className="max-h-32 !min-w-[170px] overflow-y-auto">
-                                            {taskPriorityList.map((priority2: TaskSelectOptions, i: number) => {
+                                            {taskPriorityList.map((priority2: TaskPrioritySecondaryEndpoint, i: number) => {
                                                 return (
                                                     <li key={i}>
                                                         <button

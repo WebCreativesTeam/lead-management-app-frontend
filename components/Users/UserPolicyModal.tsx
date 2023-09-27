@@ -5,7 +5,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { IRootState } from '@/store';
 import { setDisableBtn, setFetching, setPolicyModal } from '@/store/Slices/userSlice';
 import { ApiClient } from '@/utils/http';
-import { PolicyDataType, SelectOptionsType, UserDataType } from '@/utils/Types';
+import { PolicyDataType, PolicyListSecondaryEndpoint, SelectOptionsType, UserDataType } from '@/utils/Types';
 import { showToastAlert } from '@/utils/contant';
 import Select, { ActionMeta } from 'react-select';
 import Loader from '../__Shared/Loader';
@@ -23,7 +23,7 @@ const UserPolicyModal = () => {
 
     const handlePolicy = async () => {
         setPolicyModal(true);
-        const createPolicyObj: SelectOptionsType[] = policies.map((policy: PolicyDataType) => {
+        const createPolicyObj: SelectOptionsType[] = policies.map((policy: PolicyListSecondaryEndpoint) => {
             return { value: policy.id, label: policy.name };
         });
         setPoliciesData(createPolicyObj);

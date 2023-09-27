@@ -1,10 +1,10 @@
-import { PolicyDataType, UserDataType, UserInitialStateProps } from '@/utils/Types';
+import { PolicyDataType, PolicyListSecondaryEndpoint, UserDataType, UserInitialStateProps } from '@/utils/Types';
 import { fetchUserInfo } from '@/utils/contant';
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 
 const initialState: UserInitialStateProps = {
     data: [] as UserDataType[],
-    policies: [] as PolicyDataType[],
+    policies: [] as PolicyListSecondaryEndpoint[],
     singleData: {} as UserDataType,
     createModal: false,
     editModal: false,
