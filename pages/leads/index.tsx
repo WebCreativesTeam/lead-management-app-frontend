@@ -25,6 +25,7 @@ import {
     setCreateModal,
     setDeleteModal,
     setEditModal,
+    setLeadDataLength,
     setViewModal,
 } from '@/store/Slices/leadSlice/manageLeadSlice';
 import { ApiClient } from '@/utils/http';
@@ -42,41 +43,35 @@ const LeadPage = () => {
     });
 
     //hooks
-    const { data, isFetching, leadPriorityList, leadStatusList, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate } = useSelector((state: IRootState) => state.lead);
+    const { data, isFetching, leadPriorityList, leadStatusList, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate, totalRecords } = useSelector((state: IRootState) => state.lead);
     const [searchInputText, setSearchInputText] = useState<string>('');
-    const [searchedData, setSearchedData] = useState<LeadDataType[]>(data);
     const [loading, setLoading] = useState<boolean>(false);
     const [filter, setFilter] = useState<string>('assigned-by-me');
+    const [search, setSearch] = useState<string>('');
 
     //useDefferedValue hook for search query
-    const searchQuery = useDeferredValue(searchInputText);
+    const searchQuery = useDeferredValue(search);
 
     //datatable
     const [page, setPage] = useState(1);
-    const PAGE_SIZES = [10, 20, 30, 50, 100];
+    const PAGE_SIZES = [10, 20, 30];
     const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
-    const [initialRecords, setInitialRecords] = useState(sortBy(searchedData, 'title'));
-    const [recordsData, setRecordsData] = useState(initialRecords);
+    const [recordsData, setRecordsData] = useState<LeadDataType[]>([] as LeadDataType[]);
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
         columnAccessor: 'title',
         direction: 'asc',
     });
-    useEffect(() => {
-        const from = (page - 1) * pageSize;
-        const to = from + pageSize;
-        setRecordsData([...initialRecords.slice(from, to)]);
-    }, [page, pageSize, initialRecords]);
 
     useEffect(() => {
-        const data = sortBy(initialRecords, sortStatus.columnAccessor);
-        setInitialRecords(sortStatus.direction === 'desc' ? data.reverse() : data);
+        const data = sortBy(recordsData, sortStatus.columnAccessor);
+        setRecordsData(sortStatus.direction === 'desc' ? data.reverse() : data);
         setPage(1);
     }, [sortStatus]);
 
     //get all lead after page render
     useEffect(() => {
         getLeadsList();
-    }, [isFetching, filter]);
+    }, [isFetching, pageSize, page, searchQuery]);
 
     useEffect(() => {
         getLeadsPriority();
@@ -87,14 +82,13 @@ const LeadPage = () => {
     }, []);
 
     useEffect(() => {
-        setSearchedData(data);
-        setInitialRecords(data);
+        setRecordsData(data);
     }, [data]);
 
     //get all leads list
     const getLeadsList = async () => {
         setLoading(true);
-        const res: GetMethodResponseType = await new ApiClient().get('lead');
+        const res: GetMethodResponseType = await new ApiClient().get(`lead?limit=${pageSize}&page=${page}&search=${searchQuery}`);
         const leads: LeadDataType[] | undefined = res?.data;
         if (typeof leads === 'undefined') {
             dispatch(getAllLeads([] as LeadDataType[]));
@@ -114,6 +108,7 @@ const LeadPage = () => {
             return;
         }
         dispatch(getAllContactsForLead(contacts));
+        dispatch(setLeadDataLength(res?.meta?.totalCount));
         setLoading(false);
     };
 
@@ -167,19 +162,6 @@ const LeadPage = () => {
         dispatch(getAllLeadStatus(status));
     };
 
-    //search lead
-    const handleSearchLead = () => {
-        const searchLeadData = data?.filter((lead: LeadDataType) => {
-            return (
-                lead.DOB.toLowerCase().startsWith(searchQuery.toLowerCase().trim(), 0) ||
-                lead.DOB.toLowerCase().endsWith(searchQuery.toLowerCase().trim()) ||
-                lead.DOB.toLowerCase().includes(searchQuery.toLowerCase().trim())
-            );
-        });
-        setSearchedData(searchLeadData);
-        setRecordsData(searchLeadData);
-    };
-
     return !isAbleToRead ? null : (
         <div>
             <PageHeadingSection description="View, create, update, and close leads. Organize by status, priority, and due date. Stay on top of work." heading="Lead Management" />
@@ -217,8 +199,14 @@ const LeadPage = () => {
                     </div>
                 </div>
                 <div className="relative  flex-1">
-                    <input type="text" placeholder="Find A Lead" className="form-input py-3 ltr:pr-[100px] rtl:pl-[100px]" onChange={(e) => setSearchInputText(e.target.value)} value={searchQuery} />
-                    <button type="button" className="btn btn-primary absolute top-1 shadow-none ltr:right-1 rtl:left-1" onClick={() => handleSearchLead()}>
+                    <input
+                        type="text"
+                        placeholder="Find A Lead"
+                        className="form-input py-3 ltr:pr-[100px] rtl:pl-[100px]"
+                        onChange={(e) => setSearchInputText(e.target.value)}
+                        value={searchInputText}
+                    />
+                    <button type="button" className="btn btn-primary absolute top-1 shadow-none ltr:right-1 rtl:left-1" onClick={() => setSearch(searchInputText)}>
                         Search
                     </button>
                 </div>
@@ -389,11 +377,11 @@ const LeadPage = () => {
                             ),
                         },
                     ]}
-                    totalRecords={initialRecords.length}
+                    totalRecords={totalRecords}
                     recordsPerPage={pageSize}
                     page={page}
                     onPageChange={(p) => setPage(p)}
-                    recordsPerPageOptions={PAGE_SIZES}
+                    recordsPerPageOptions={data?.length < 10 ? [10] : PAGE_SIZES}
                     onRecordsPerPageChange={setPageSize}
                     sortStatus={sortStatus}
                     onSortStatusChange={setSortStatus}

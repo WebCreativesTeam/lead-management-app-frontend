@@ -20,6 +20,7 @@ const initialState: PolicyInitialStateProps = {
     isAbleToDelete: false,
     isAbleToChangeDefaultPolicy: false,
     userPolicyArr: [] as string[],
+    totalRecords: 0
 };
 
 const policySlice = createSlice({
@@ -135,6 +136,9 @@ const policySlice = createSlice({
             const verifyPolicy: boolean = state.userPolicyArr.includes(action.payload);
             state.isAbleToChangeDefaultPolicy = verifyPolicy;
         },
+        setPolicyDataLength(state, action: PayloadAction<number>) {
+            state.totalRecords = action.payload;
+        },
     },
 });
 
@@ -154,5 +158,6 @@ export const {
     setPolicyReadPermission,
     setPolicyUpdatePermission,
     setChangeDefaultPolicyPermission,
+    setPolicyDataLength,
 } = policySlice.actions;
 export default policySlice.reducer;

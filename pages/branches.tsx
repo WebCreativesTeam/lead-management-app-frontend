@@ -10,81 +10,64 @@ import ConfirmationModal from '@/components/__Shared/ConfirmationModal';
 import { setPageTitle } from '@/store/themeConfigSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { BranchDataType, GetMethodResponseType } from '@/utils/Types';
-import { getAllBranches, setCreateModal, setDeleteModal, setDisableBtn, setEditModal, setFetching, setViewModal } from '@/store/Slices/branchSlice';
+import { getAllBranches, setBranchDataLength, setCreateModal, setDeleteModal, setDisableBtn, setEditModal, setFetching, setViewModal } from '@/store/Slices/branchSlice';
 import BranchViewModal from '@/components/Branches/BranchViewModal';
 import { IRootState } from '@/store';
 import { ApiClient } from '@/utils/http';
 import BranchCreateModal from '@/components/Branches/BranchCreateModal';
 import BranchEditModal from '@/components/Branches/BranchEditModal';
-import { useRouter } from 'next/router';
 import Loader from '@/components/__Shared/Loader';
 
 const BranchPage = () => {
     const dispatch = useDispatch();
-    const router = useRouter();
     useEffect(() => {
         dispatch(setPageTitle('Organize Offices | Branches'));
     }, []);
 
     //hooks
-    const { data, isFetching, isBtnDisabled, deleteModal, singleData, isAbleToCreate, isAbleToDelete, isAbleToUpdate, isAbleToRead, userPolicyArr } = useSelector((state: IRootState) => state.branch);
+    const { data, isFetching, isBtnDisabled, deleteModal, singleData, isAbleToCreate, isAbleToDelete, isAbleToUpdate, isAbleToRead, totalRecords } = useSelector((state: IRootState) => state.branch);
     const [searchInputText, setSearchInputText] = useState<string>('');
-    const [searchedData, setSearchedData] = useState<BranchDataType[]>(data);
     const [loading, setLoading] = useState<boolean>(false);
+    const [search, setSearch] = useState<string>('');
 
     //datatable
     const [page, setPage] = useState(1);
-    const PAGE_SIZES = [10, 20, 30, 50, 100];
+    const PAGE_SIZES = [10, 20, 30];
     const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
-    const [initialRecords, setInitialRecords] = useState(sortBy(searchedData, 'name'));
-    const [recordsData, setRecordsData] = useState(initialRecords);
+    const [recordsData, setRecordsData] = useState<BranchDataType[]>([] as BranchDataType[]);
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
         columnAccessor: 'name',
         direction: 'asc',
     });
-    useEffect(() => {
-        const from = (page - 1) * pageSize;
-        const to = from + pageSize;
-        setRecordsData([...initialRecords.slice(from, to)]);
-    }, [page, pageSize, initialRecords]);
 
     useEffect(() => {
-        const data = sortBy(initialRecords, sortStatus.columnAccessor);
-        setInitialRecords(sortStatus.direction === 'desc' ? data.reverse() : data);
+        const data = sortBy(recordsData, sortStatus.columnAccessor);
+        setRecordsData(sortStatus.direction === 'desc' ? data.reverse() : data);
         setPage(1);
     }, [sortStatus]);
-
-    //route user if dont have permission to access branch page
-    useEffect(() => {
-        if (!isAbleToRead && userPolicyArr.length > 0) {
-            router.push('/');
-            return;
-        }
-    }, []);
+    //useDefferedValue hook for search query
+    const searchQuery = useDeferredValue(search);
 
     //get all branch after page render
     useEffect(() => {
         getBranchList();
-    }, [isFetching]);
+    }, [isFetching, page, pageSize, searchQuery]);
 
     useEffect(() => {
-        setSearchedData(data);
-        setInitialRecords(data);
+        setRecordsData(data);
     }, [data]);
-
-    //useDefferedValue hook for search query
-    const searchQuery = useDeferredValue(searchInputText);
 
     //get all Branch list
     const getBranchList = async () => {
         setLoading(true);
-        const res: GetMethodResponseType = await new ApiClient().get('branch');
+        const res: GetMethodResponseType = await new ApiClient().get(`branch?limit=${pageSize}&page=${page}&search=${searchQuery}`);
         const branches: BranchDataType[] = res?.data;
         if (typeof branches === 'undefined') {
             dispatch(getAllBranches([] as BranchDataType[]));
             return;
         }
         dispatch(getAllBranches(branches));
+        dispatch(setBranchDataLength(res?.meta?.totalCount));
         setLoading(false);
     };
 
@@ -102,23 +85,10 @@ const BranchPage = () => {
         dispatch(setFetching(false));
     };
 
-    //search branch
-    const handleSearchBranch = () => {
-        const searchBranchData = data?.filter((branch: BranchDataType) => {
-            return (
-                branch.name.toLowerCase().startsWith(searchQuery.toLowerCase().trim(), 0) ||
-                branch.name.toLowerCase().endsWith(searchQuery.toLowerCase().trim()) ||
-                branch.name.toLowerCase().includes(searchQuery.toLowerCase().trim())
-            );
-        });
-        setSearchedData(searchBranchData);
-        setRecordsData(searchBranchData);
-    };
-
     return !isAbleToRead ? null : (
         <div>
             <PageHeadingSection description="List company branches. Add new locations. Update details. Remove obsolete branches." heading="Organize Offices" />
-            <div className="flex flex-col gap-5 my-6 sm:flex-row ">
+            <div className="my-6 flex flex-col gap-5 sm:flex-row ">
                 {isAbleToCreate ? (
                     <div className="flex-1">
                         <button className="btn btn-primary h-full w-full max-w-[200px] max-sm:mx-auto" type="button" onClick={() => dispatch(setCreateModal(true))}>
@@ -138,14 +108,14 @@ const BranchPage = () => {
                         onChange={(e) => setSearchInputText(e.target.value)}
                         value={searchInputText}
                     />
-                    <button type="button" className="absolute shadow-none btn btn-primary top-1 ltr:right-1 rtl:left-1" onClick={handleSearchBranch}>
+                    <button type="button" className="btn btn-primary absolute top-1 shadow-none ltr:right-1 rtl:left-1" onClick={() => setSearch(searchInputText)}>
                         Search
                     </button>
                 </div>
             </div>
 
             {/* Branch List table*/}
-            <div className="mt-6 datatables panel">
+            <div className="datatables panel mt-6">
                 <DataTable
                     className="table-hover whitespace-nowrap"
                     records={recordsData}
@@ -216,11 +186,11 @@ const BranchPage = () => {
                             ),
                         },
                     ]}
-                    totalRecords={initialRecords.length}
+                    totalRecords={totalRecords}
                     recordsPerPage={pageSize}
                     page={page}
                     onPageChange={(p) => setPage(p)}
-                    recordsPerPageOptions={PAGE_SIZES}
+                    recordsPerPageOptions={data?.length < 10 ? [10] : PAGE_SIZES}
                     onRecordsPerPageChange={setPageSize}
                     sortStatus={sortStatus}
                     onSortStatusChange={setSortStatus}

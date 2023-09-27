@@ -10,7 +10,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setPageTitle } from '@/store/themeConfigSlice';
 import { GetMethodResponseType, Permission, PolicyDataType } from '@/utils/Types';
 import { ApiClient } from '@/utils/http';
-import { getAllPermissions, getAllPolicies, setCreateModal, setDefaultPolicyModal, setDeleteModal, setEditModal, setViewModal } from '@/store/Slices/policySlice';
+import { getAllPermissions, getAllPolicies, setCreateModal, setDefaultPolicyModal, setDeleteModal, setEditModal, setPolicyDataLength, setViewModal } from '@/store/Slices/policySlice';
 import { IRootState } from '@/store';
 import PolicyCreateModal from '@/components/Policy/PolicyCreateModal';
 import PolicyEditModal from '@/components/Policy/PolicyEditModal';
@@ -25,60 +25,53 @@ const PolicyPage = () => {
     });
 
     //hooks
-    const { data, isFetching, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate, isAbleToChangeDefaultPolicy } = useSelector((state: IRootState) => state.policy);
+    const { data, isFetching, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate, isAbleToChangeDefaultPolicy, totalRecords } = useSelector((state: IRootState) => state.policy);
     const [searchInputText, setSearchInputText] = useState<string>('');
-    const [searchedData, setSearchedData] = useState<PolicyDataType[]>(data);
     const [loading, setLoading] = useState<boolean>(false);
+    const [search, setSearch] = useState<string>('');
 
     //datatable
     const [page, setPage] = useState(1);
-    const PAGE_SIZES = [10, 20, 30, 50, 100];
+    const PAGE_SIZES = [10, 20, 30];
     const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
-    const [initialRecords, setInitialRecords] = useState(sortBy(searchedData, 'name'));
-    const [recordsData, setRecordsData] = useState(initialRecords);
+    const [recordsData, setRecordsData] = useState<PolicyDataType[]>([] as PolicyDataType[]);
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
         columnAccessor: 'name',
         direction: 'asc',
     });
-    useEffect(() => {
-        const from = (page - 1) * pageSize;
-        const to = from + pageSize;
-        setRecordsData([...initialRecords.slice(from, to)]);
-    }, [page, pageSize, initialRecords]);
+    //useDefferedValue hook for search query
+    const searchQuery = useDeferredValue(search);
 
     useEffect(() => {
-        const data = sortBy(initialRecords, sortStatus.columnAccessor);
-        setInitialRecords(sortStatus.direction === 'desc' ? data.reverse() : data);
+        const data = sortBy(recordsData, sortStatus.columnAccessor);
+        setRecordsData(sortStatus.direction === 'desc' ? data.reverse() : data);
         setPage(1);
     }, [sortStatus]);
 
     //get all policy after page render
     useEffect(() => {
         getPolicyList();
-    }, [isFetching]);
+    }, [isFetching, pageSize, page, searchQuery]);
 
     useEffect(() => {
         getPermissionList();
     }, []);
 
     useEffect(() => {
-        setSearchedData(data);
-        setInitialRecords(data);
+        setRecordsData(data);
     }, [data]);
-
-    //useDefferedValue hook for search query
-    const searchQuery = useDeferredValue(searchInputText);
 
     //get all policy list
     const getPolicyList = async () => {
         setLoading(true);
-        const res: GetMethodResponseType = await new ApiClient().get('policy?sortBy=-isDefault');
+        const res: GetMethodResponseType = await new ApiClient().get(`policy?sortBy=-isDefault&limit=${pageSize}&page=${page}`);
         const policies: PolicyDataType[] = res?.data;
         if (typeof policies === 'undefined') {
             dispatch(getAllPolicies([] as PolicyDataType[]));
             return;
         }
         dispatch(getAllPolicies(policies));
+        dispatch(setPolicyDataLength(res?.meta?.totalCount));
         setLoading(false);
     };
 
@@ -93,19 +86,6 @@ const PolicyPage = () => {
         }
         dispatch(getAllPermissions(permissions));
         setLoading(false);
-    };
-
-    //search policy
-    const handleSearchPolicy = () => {
-        const searchPolicyData = data?.filter((policy: PolicyDataType) => {
-            return (
-                policy.name.toLowerCase().startsWith(searchQuery.toLowerCase().trim(), 0) ||
-                policy.name.toLowerCase().endsWith(searchQuery.toLowerCase().trim()) ||
-                policy.name.toLowerCase().includes(searchQuery.toLowerCase().trim())
-            );
-        });
-        setSearchedData(searchPolicyData);
-        setRecordsData(searchPolicyData);
     };
 
     return !isAbleToRead ? null : (
@@ -131,7 +111,7 @@ const PolicyPage = () => {
                         onChange={(e) => setSearchInputText(e.target.value)}
                         value={searchInputText}
                     />
-                    <button type="button" className="btn btn-primary absolute top-1 shadow-none ltr:right-1 rtl:left-1" onClick={handleSearchPolicy}>
+                    <button type="button" className="btn btn-primary absolute top-1 shadow-none ltr:right-1 rtl:left-1" onClick={() => setSearch(searchInputText)}>
                         Search
                     </button>
                 </div>
@@ -154,7 +134,7 @@ const PolicyPage = () => {
                             accessor: 'description',
                             title: 'Description',
                             sortable: true,
-                            render: ({ description }) => <div className='max-w-sm overflow-hidden'>{description.slice(0,55)+"..."}</div>,
+                            render: ({ description }) => <div className="max-w-sm overflow-hidden">{description.slice(0, 55) + '...'}</div>,
                         },
                         {
                             accessor: 'isDefault',
@@ -210,11 +190,11 @@ const PolicyPage = () => {
                             ),
                         },
                     ]}
-                    totalRecords={initialRecords.length}
+                    totalRecords={totalRecords}
                     recordsPerPage={pageSize}
                     page={page}
                     onPageChange={(p) => setPage(p)}
-                    recordsPerPageOptions={PAGE_SIZES}
+                    recordsPerPageOptions={data?.length < 10 ? [10] : PAGE_SIZES}
                     onRecordsPerPageChange={setPageSize}
                     sortStatus={sortStatus}
                     onSortStatusChange={setSortStatus}

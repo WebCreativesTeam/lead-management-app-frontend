@@ -10,6 +10,7 @@ const initialState: EmailLogInitialStateProps = {
     isFetching: false,
     isAbleToRead: false,
     userPolicyArr: [] as string[],
+    totalRecords: 0,
 };
 
 const emailLogSlice = createSlice({
@@ -47,8 +48,11 @@ const emailLogSlice = createSlice({
             const verifyPolicy: boolean = state.userPolicyArr.includes(action.payload);
             state.isAbleToRead = verifyPolicy;
         },
+        setEmailLogDataLength(state, action: PayloadAction<number>) {
+            state.totalRecords = action.payload;
+        },
     },
 });
 
-export const { setViewModal, getAllEmailLogs, setDisableBtn, setFetching, setEmailLogReadPolicy } = emailLogSlice.actions;
+export const { setViewModal, getAllEmailLogs, setDisableBtn, setFetching, setEmailLogReadPolicy,setEmailLogDataLength } = emailLogSlice.actions;
 export default emailLogSlice.reducer;

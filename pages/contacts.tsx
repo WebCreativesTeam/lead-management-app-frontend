@@ -11,7 +11,18 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setPageTitle } from '@/store/themeConfigSlice';
 import { ContactDataType, GetMethodResponseType, SourceDataType, UserListSecondaryEndpointType } from '@/utils/Types';
 import { ApiClient } from '@/utils/http';
-import { getAllContacts, setEditModal, setDeleteModal, setCreateModal, setViewModal, setFetching, setDisableBtn, getAllUsersForContact, getAllSourceForContact } from '@/store/Slices/contactSlice';
+import {
+    getAllContacts,
+    setEditModal,
+    setDeleteModal,
+    setCreateModal,
+    setViewModal,
+    setFetching,
+    setDisableBtn,
+    getAllUsersForContact,
+    getAllSourceForContact,
+    setContactDataLength,
+} from '@/store/Slices/contactSlice';
 import ContactViewModal from '@/components/Contact/ContactViewModal';
 import { IRootState } from '@/store';
 import ContactCreateModal from '@/components/Contact/ContactCreateModal';
@@ -24,32 +35,28 @@ const Contacts = () => {
         dispatch(setPageTitle('Contacts'));
     });
     //hooks
-    const { data, isFetching, isBtnDisabled, deleteModal, singleData, isAbleToCreate, isAbleToDelete, isAbleToUpdate, isAbleToRead, userPolicyArr } = useSelector(
-        (state: IRootState) => state.contacts
-    );
+    const { data, isFetching, isBtnDisabled, deleteModal, singleData, isAbleToCreate, isAbleToDelete, isAbleToUpdate, isAbleToRead, totalRecords } = useSelector((state: IRootState) => state.contacts);
     const [searchInputText, setSearchInputText] = useState<string>('');
-    const [searchedData, setSearchedData] = useState<ContactDataType[]>(data);
     const [loading, setLoading] = useState<boolean>(false);
 
     //datatable
     const [page, setPage] = useState(1);
-    const PAGE_SIZES = [10, 20, 30, 50, 100];
+    const PAGE_SIZES = [10, 20, 30];
     const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
-    const [initialRecords, setInitialRecords] = useState(sortBy(searchedData, 'name'));
-    const [recordsData, setRecordsData] = useState(initialRecords);
+    const [search, setSearch] = useState<string>('');
+
+    const [recordsData, setRecordsData] = useState<ContactDataType[]>([] as ContactDataType[]);
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
         columnAccessor: 'name',
         direction: 'asc',
     });
-    useEffect(() => {
-        const from = (page - 1) * pageSize;
-        const to = from + pageSize;
-        setRecordsData([...initialRecords.slice(from, to)]);
-    }, [page, pageSize, initialRecords]);
+
+    // useDefferedValue hook for search query
+    const searchQuery = useDeferredValue(search);
 
     useEffect(() => {
-        const data = sortBy(initialRecords, sortStatus.columnAccessor);
-        setInitialRecords(sortStatus.direction === 'desc' ? data.reverse() : data);
+        const data = sortBy(recordsData, sortStatus.columnAccessor);
+        setRecordsData(sortStatus.direction === 'desc' ? data.reverse() : data);
         setPage(1);
     }, [sortStatus]);
 
@@ -58,26 +65,23 @@ const Contacts = () => {
         getContactList();
         getAllSourceList();
         getAllUsersList();
-    }, [isFetching]);
+    }, [isFetching, pageSize, page, searchQuery]);
 
     useEffect(() => {
-        setSearchedData(data);
-        setInitialRecords(data);
+        setRecordsData(data);
     }, [data]);
-
-    // useDefferedValue hook for search query
-    const searchQuery = useDeferredValue(searchInputText);
 
     //get all Contact list
     const getContactList = async () => {
         setLoading(true);
-        const res: GetMethodResponseType = await new ApiClient().get('contact');
+        const res: GetMethodResponseType = await new ApiClient().get(`contact?search=${searchQuery}&limit=${pageSize}&page=${page}`);
         const contacts: ContactDataType[] = res?.data;
         if (typeof contacts === 'undefined') {
             dispatch(getAllContacts([] as ContactDataType[]));
             return;
         }
         dispatch(getAllContacts(contacts));
+        dispatch(setContactDataLength(res?.meta?.totalCount));
         setLoading(false);
     };
 
@@ -119,19 +123,6 @@ const Contacts = () => {
         dispatch(setDeleteModal({ open: false }));
     };
 
-    //search contact
-    const handleSearchContact = () => {
-        const searchContactData = data?.filter((contact: ContactDataType) => {
-            return (
-                contact.name.toLowerCase().startsWith(searchQuery.toLowerCase().trim(), 0) ||
-                contact.name.toLowerCase().endsWith(searchQuery.toLowerCase().trim()) ||
-                contact.name.toLowerCase().includes(searchQuery.toLowerCase().trim())
-            );
-        });
-        setSearchedData(searchContactData);
-        setRecordsData(searchContactData);
-    };
-
     return !isAbleToRead ? null : (
         <div>
             <PageHeadingSection description="Identify and categorize lead contacts. Update descriptions. Add or remove contact channels." heading="Track Leads" />
@@ -154,7 +145,7 @@ const Contacts = () => {
                         onChange={(e) => setSearchInputText(e.target.value)}
                         value={searchInputText}
                     />
-                    <button type="button" className="btn btn-primary absolute top-1 shadow-none ltr:right-1 rtl:left-1" onClick={handleSearchContact}>
+                    <button type="button" className="btn btn-primary absolute top-1 shadow-none ltr:right-1 rtl:left-1" onClick={() => setSearch(searchInputText)}>
                         Search
                     </button>
                 </div>
@@ -255,11 +246,11 @@ const Contacts = () => {
                             ),
                         },
                     ]}
-                    totalRecords={initialRecords?.length}
+                    totalRecords={totalRecords}
                     recordsPerPage={pageSize}
                     page={page}
                     onPageChange={(p) => setPage(p)}
-                    recordsPerPageOptions={PAGE_SIZES}
+                    recordsPerPageOptions={data?.length < 10 ? [10] : PAGE_SIZES}
                     onRecordsPerPageChange={setPageSize}
                     sortStatus={sortStatus}
                     onSortStatusChange={setSortStatus}

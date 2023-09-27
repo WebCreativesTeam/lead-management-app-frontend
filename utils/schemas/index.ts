@@ -131,7 +131,7 @@ export const sendEmailSchema = Yup.object().shape({
 export const emailSmtpSchema = Yup.object().shape({
     SMTP: Yup.string().required('Enter SMTP Name'),
     name: Yup.string().required('Enter Name'),
-    email: Yup.string().email('Please enter valid email').required('Enter Email'),
+    email: Yup.string().required('Enter Email'),
     password: Yup.string().required('Enter SMTP password').min(8, 'Password should be atleast 8 characters'),
     confirmPassword: Yup.string()
         .oneOf([Yup.ref('password')], 'Password and confirm password not matched')
@@ -141,5 +141,8 @@ export const emailSmtpSchema = Yup.object().shape({
 export const editEmailSmtpSchema = Yup.object().shape({
     SMTP: Yup.string().required('Enter SMTP Name'),
     name: Yup.string().required('Enter Name'),
-    email: Yup.string().email('Please enter valid email').required('Enter Email'),
+    password: Yup.string().required('Enter SMTP password').min(8, 'Password should be atleast 8 characters'),
+    confirmPassword: Yup.string()
+        .oneOf([Yup.ref('password')], 'Password and confirm password not matched')
+        .required('Please enter confirm password'),
 });

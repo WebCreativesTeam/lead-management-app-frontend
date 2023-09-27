@@ -20,13 +20,13 @@ const EmailSmtpUpdateModal = () => {
     const [defaultSMTP, setDefaultSMTP] = useState<SelectOptionsType>({} as SelectOptionsType);
 
     useEffect(() => {
-        const { email, SMTP, name, security } = singleData;
+        const { email, SMTP, name, security, host, port } = singleData;
         setFieldValue('email', email);
         setFieldValue('name', name);
         setFieldValue('SMTP', SMTP);
         setFieldValue('security', security);
-
-        console.log(SMTP);
+        setFieldValue('host', host);
+        setFieldValue('port', port);
 
         const findSMTP: SelectOptionsType | undefined = SMTPList.find((item: SelectOptionsType) => item.value === SMTP);
         if (findSMTP) {
@@ -44,23 +44,30 @@ const EmailSmtpUpdateModal = () => {
             name: '',
             email: '',
             security: '',
+            password: '',
+            confirmPassword: '',
+            host: '',
+            port: '',
         },
         validationSchema: editEmailSmtpSchema,
         validateOnChange: false,
         enableReinitialize: true,
         onSubmit: async (value, action) => {
             dispatch(setFetching(true));
-            const createSmtpObj = {
+            const editSmtpObj = {
                 SMTP: value.SMTP,
                 security: value.SMTP !== 'Outlook' ? 'none' : value.security,
                 global: false,
                 verified: false,
                 name: value.name,
                 email: value.email,
+                password: value.password,
+                host: value.host,
+                port: value.port,
             };
             try {
                 dispatch(setDisableBtn(true));
-                await new ApiClient().patch(`smtp/${singleData?.id}`, createSmtpObj);
+                await new ApiClient().patch(`smtp/${singleData?.id}`, editSmtpObj);
                 dispatch(setEditModal({ open: false }));
                 action.resetForm();
             } catch (error: any) {
@@ -86,6 +93,10 @@ const EmailSmtpUpdateModal = () => {
             showToastAlert(errors.name);
         } else if (errors.email) {
             showToastAlert(errors.email);
+        } else if (errors.password) {
+            showToastAlert(errors.password);
+        } else if (errors.confirmPassword) {
+            showToastAlert(errors.confirmPassword);
         }
     };
     return (
@@ -101,7 +112,7 @@ const EmailSmtpUpdateModal = () => {
                 submitForm();
             }}
             title="Update SMTP"
-            isBtnDisabled={values.SMTP && values.name && values.email && !isBtnDisabled ? false : true}
+            isBtnDisabled={values.SMTP && values.name && values.email && values.password && values.confirmPassword && !isBtnDisabled ? false : true}
             disabledDiscardBtn={isBtnDisabled}
             content={
                 isFetching ? (
@@ -111,7 +122,7 @@ const EmailSmtpUpdateModal = () => {
                         <div className="flex flex-col gap-4 sm:flex-row">
                             <div className="flex-1">
                                 <label htmlFor="state">Select SMTP</label>
-                                <Select placeholder="SMTP" options={SMTPList} defaultValue={defaultSMTP} onChange={(data: any) => setFieldValue('SMTP', data.value)} />
+                                <Select placeholder="SMTP" options={SMTPList} onChange={(data: any) => setFieldValue('SMTP', data.value)} defaultValue={defaultSMTP}/>
                             </div>
                             <div className="flex-1">
                                 <label htmlFor="name">SMTP Name</label>
@@ -120,9 +131,15 @@ const EmailSmtpUpdateModal = () => {
                         </div>
                         <div className="flex flex-col gap-4 sm:flex-row">
                             <div className="flex-1">
-                                <label htmlFor="emailSmtp">Email</label>
-                                <input onChange={handleChange} onBlur={handleBlur} value={values.email} id="emailSmtp" name="email" type="email" placeholder="Email" className="form-input" />
+                                <label htmlFor="smtpHost">Host</label>
+                                <input onChange={handleChange} onBlur={handleBlur} value={values.host} id="smtpHost" name="host" type="text" placeholder="Enter Host" className="form-input" />
                             </div>
+                            <div className="flex-1">
+                                <label htmlFor="smtpPort">Port</label>
+                                <input onChange={handleChange} onBlur={handleBlur} value={values.port} id="smtpPort" name="port" type="text" placeholder="Emter Port" className="form-input" />
+                            </div>
+                        </div>
+                        <div className="flex flex-col gap-4 sm:flex-row">
                             <div className="flex-1">
                                 <label htmlFor="state">Security</label>
                                 <Select
@@ -134,6 +151,34 @@ const EmailSmtpUpdateModal = () => {
                                     }}
                                     value={values.SMTP !== 'Outlook' ? { value: 'none', label: 'none' } : security}
                                     isDisabled={values.SMTP === 'Outlook' ? false : true}
+                                />
+                            </div>
+                        </div>
+                        <div className="flex flex-col gap-4 sm:flex-row">
+                            <div className="flex-1">
+                                <label htmlFor="passwordSmtp">Password</label>
+                                <input
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    value={values.password}
+                                    id="passwordSmtp"
+                                    name="password"
+                                    type="password"
+                                    placeholder="Password"
+                                    className="form-input"
+                                />
+                            </div>
+                            <div className="flex-1">
+                                <label htmlFor="confirmPasswordSmtp">Confirm password</label>
+                                <input
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    value={values.confirmPassword}
+                                    id="confirmPasswordSmtp"
+                                    name="confirmPassword"
+                                    type="password"
+                                    placeholder="Confirm Password"
+                                    className="form-input"
                                 />
                             </div>
                         </div>

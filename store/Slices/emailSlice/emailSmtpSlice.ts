@@ -16,6 +16,7 @@ const initialState: EmailSmtpInitialStateProps = {
     isAbleToUpdate: false,
     isAbleToDelete: false,
     userPolicyArr: [] as string[],
+    totalRecords:0
 };
 
 const emailSmtpSlice = createSlice({
@@ -90,6 +91,9 @@ const emailSmtpSlice = createSlice({
             const verifyPolicy: boolean = state.userPolicyArr.includes(action.payload);
             state.isAbleToDelete = verifyPolicy;
         },
+        setEmailSmtpDataLength(state, action: PayloadAction<number>) {
+            state.totalRecords = action.payload;
+        },
     },
 });
 
@@ -105,5 +109,6 @@ export const {
     setEmailSmtpDeletePermission,
     setEmailSmtpReadPermission,
     setEmailSmtpUpdatePermission,
+    setEmailSmtpDataLength,
 } = emailSmtpSlice.actions;
 export default emailSmtpSlice.reducer;

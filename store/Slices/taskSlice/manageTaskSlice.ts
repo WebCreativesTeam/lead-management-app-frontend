@@ -26,6 +26,7 @@ const initialState: ManageTaskInitialStateProps = {
     isAbleToTransferTask: false,
     transferTaskModal: false,
     userPolicyArr: [] as string[],
+    totalRecords: 0
 };
 
 const manageTaskSlice = createSlice({
@@ -155,6 +156,9 @@ const manageTaskSlice = createSlice({
             const verifyPolicy: boolean = state.userPolicyArr.includes(action.payload);
             state.isAbleToTransferTask = verifyPolicy;
         },
+        setTaskDataLength(state, action: PayloadAction<number>) {
+            state.totalRecords = action.payload;
+        },
     },
 });
 
@@ -177,6 +181,7 @@ export const {
     setTaskUpdatePolicy,
     getAllLeadsForTask,
     setTaskTransferPermission,
-    setTransferTaskModal
+    setTransferTaskModal,
+    setTaskDataLength
 } = manageTaskSlice.actions;
 export default manageTaskSlice.reducer;

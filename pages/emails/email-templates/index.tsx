@@ -11,7 +11,7 @@ import { setPageTitle } from '@/store/themeConfigSlice';
 import { GetMethodResponseType, IEmailTemplate } from '@/utils/Types';
 import { ApiClient } from '@/utils/http';
 import { IRootState } from '@/store';
-import { getAllEmailTemplates, setDeleteModal, setViewModal } from '@/store/Slices/emailSlice/emailTemplateSlice';
+import { getAllEmailTemplates, setDeleteModal, setEmailTemplateDataLength, setViewModal } from '@/store/Slices/emailSlice/emailTemplateSlice';
 import EmailDeleteModal from '@/components/emails/EmailTemplates/EmailTemplateDeleteModal';
 import { useRouter } from 'next/router';
 import EmailViewModal from '@/components/emails/EmailTemplates/EmailTemplateViewModal';
@@ -22,69 +22,52 @@ const EmailTemplates = () => {
         dispatch(setPageTitle('Email Templates | Emails'));
     });
     //hooks
-    const { data, isFetching, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate } = useSelector((state: IRootState) => state.emailTemplate);
+    const { data, isFetching, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate, totalRecords } = useSelector((state: IRootState) => state.emailTemplate);
     const [searchInputText, setSearchInputText] = useState<string>('');
-    const [searchedData, setSearchedData] = useState<IEmailTemplate[]>(data);
     const [loading, setLoading] = useState<boolean>(false);
+    const [search, setSearch] = useState<string>('');
+
     const router = useRouter();
     //datatable
     const [page, setPage] = useState(1);
-    const PAGE_SIZES = [10, 20, 30, 50, 100];
+    const PAGE_SIZES = [10, 20, 30];
     const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
-    const [initialRecords, setInitialRecords] = useState(sortBy(searchedData, 'name'));
-    const [recordsData, setRecordsData] = useState(initialRecords);
+    const [recordsData, setRecordsData] = useState<IEmailTemplate[]>([] as IEmailTemplate[]);
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
         columnAccessor: 'name',
         direction: 'asc',
     });
-    useEffect(() => {
-        const from = (page - 1) * pageSize;
-        const to = from + pageSize;
-        setRecordsData([...initialRecords.slice(from, to)]);
-    }, [page, pageSize, initialRecords]);
+
+    //useDefferedValue hook for search query
+    const searchQuery = useDeferredValue(search);
 
     useEffect(() => {
-        const data = sortBy(initialRecords, sortStatus.columnAccessor);
-        setInitialRecords(sortStatus.direction === 'desc' ? data.reverse() : data);
+        const data = sortBy(recordsData, sortStatus.columnAccessor);
+        setRecordsData(sortStatus.direction === 'desc' ? data.reverse() : data);
         setPage(1);
     }, [sortStatus]);
 
     //get all emails after page render
     useEffect(() => {
         getEmailList();
-    }, [isFetching]);
+    }, [isFetching, pageSize, page, searchQuery]);
 
     useEffect(() => {
-        setSearchedData(data);
-        setInitialRecords(data);
+        setRecordsData(data);
     }, [data]);
 
-    //useDefferedValue hook for search query
-    const searchQuery = useDeferredValue(searchInputText);
     //get all emails list
     const getEmailList = async () => {
         setLoading(true);
-        const res: GetMethodResponseType = await new ApiClient().get('email-template');
+        const res: GetMethodResponseType = await new ApiClient().get(`email-template?limit=${pageSize}&page=${page}&search=${searchQuery}`);
         const emails: IEmailTemplate[] = res?.data;
         if (typeof emails === 'undefined') {
             dispatch(getAllEmailTemplates([] as IEmailTemplate[]));
             return;
         }
         dispatch(getAllEmailTemplates(emails));
+        dispatch(setEmailTemplateDataLength(res?.meta?.totalCount));
         setLoading(false);
-    };
-
-    //search emails
-    const handleSearchEmail = () => {
-        const searchEmailData = data?.filter((email: IEmailTemplate) => {
-            return (
-                email.name.toLowerCase().startsWith(searchQuery.toLowerCase().trim(), 0) ||
-                email.name.toLowerCase().endsWith(searchQuery.toLowerCase().trim()) ||
-                email.name.toLowerCase().includes(searchQuery.toLowerCase().trim())
-            );
-        });
-        setSearchedData(searchEmailData);
-        setRecordsData(searchEmailData);
     };
 
     return !isAbleToRead ? null : (
@@ -112,7 +95,7 @@ const EmailTemplates = () => {
                         onChange={(e) => setSearchInputText(e.target.value)}
                         value={searchInputText}
                     />
-                    <button type="button" className="btn btn-primary absolute top-1 shadow-none ltr:right-1 rtl:left-1" onClick={handleSearchEmail}>
+                    <button type="button" className="btn btn-primary absolute top-1 shadow-none ltr:right-1 rtl:left-1" onClick={() => setSearch(searchInputText)}>
                         Search
                     </button>
                 </div>
@@ -183,11 +166,11 @@ const EmailTemplates = () => {
                             ),
                         },
                     ]}
-                    totalRecords={initialRecords.length}
+                    totalRecords={totalRecords}
                     recordsPerPage={pageSize}
                     page={page}
                     onPageChange={(p) => setPage(p)}
-                    recordsPerPageOptions={PAGE_SIZES}
+                    recordsPerPageOptions={data?.length < 10 ? [10] : PAGE_SIZES}
                     onRecordsPerPageChange={setPageSize}
                     sortStatus={sortStatus}
                     onSortStatusChange={setSortStatus}

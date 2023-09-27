@@ -16,6 +16,7 @@ const initialState: SourceInitialStateProps = {
     isAbleToUpdate: false,
     isAbleToDelete: false,
     userPolicyArr: [] as string[],
+    totalRecords: 0,
 };
 
 const sourceSlice = createSlice({
@@ -90,6 +91,9 @@ const sourceSlice = createSlice({
             const verifyPolicy: boolean = state.userPolicyArr.includes(action.payload);
             state.isAbleToDelete = verifyPolicy;
         },
+        setSourceDataLength(state, action: PayloadAction<number>) {
+            state.totalRecords = action.payload;
+        },
     },
 });
 
@@ -105,5 +109,6 @@ export const {
     setSourceDeletePolicy,
     setSourceReadPolicy,
     setSourceUpdatePolicy,
+    setSourceDataLength,
 } = sourceSlice.actions;
 export default sourceSlice.reducer;

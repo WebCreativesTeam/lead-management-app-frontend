@@ -1,6 +1,15 @@
-import { LeadDataType, ManageLeadInitialStateProps, LeadPrioritySecondaryEndpoint, LeadStatusSecondaryEndpoint, SourceDataType, UserDataType, ContactListSecondaryEndpoint, BranchListSecondaryEndpoint } from '@/utils/Types';
+import {
+    LeadDataType,
+    ManageLeadInitialStateProps,
+    LeadPrioritySecondaryEndpoint,
+    LeadStatusSecondaryEndpoint,
+    SourceDataType,
+    UserDataType,
+    ContactListSecondaryEndpoint,
+    BranchListSecondaryEndpoint,
+} from '@/utils/Types';
 import { fetchUserInfo } from '@/utils/contant';
-import { createSlice, PayloadAction} from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 const initialState: ManageLeadInitialStateProps = {
     data: [] as LeadDataType[],
@@ -25,6 +34,7 @@ const initialState: ManageLeadInitialStateProps = {
     isAbleToUpdate: false,
     isAbleToDelete: false,
     userPolicyArr: [] as string[],
+    totalRecords: 0,
 };
 
 const manageLeadSlice = createSlice({
@@ -142,6 +152,9 @@ const manageLeadSlice = createSlice({
             const verifyPolicy: boolean = state.userPolicyArr.includes(action.payload);
             state.isAbleToDelete = verifyPolicy;
         },
+        setLeadDataLength(state, action: PayloadAction<number>) {
+            state.totalRecords = action.payload;
+        },
     },
 });
 
@@ -164,5 +177,6 @@ export const {
     getAllContactsForLead,
     getAllBranchForLead,
     getAllSourceForLead,
+    setLeadDataLength
 } = manageLeadSlice.actions;
 export default manageLeadSlice.reducer;

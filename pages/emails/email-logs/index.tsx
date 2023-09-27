@@ -11,7 +11,7 @@ import { setPageTitle } from '@/store/themeConfigSlice';
 import { GetMethodResponseType, IEmailLog } from '@/utils/Types';
 import { ApiClient } from '@/utils/http';
 import { IRootState } from '@/store';
-import { getAllEmailLogs, setViewModal } from '@/store/Slices/emailSlice/emailLogSlice';
+import { getAllEmailLogs, setEmailLogDataLength, setViewModal } from '@/store/Slices/emailSlice/emailLogSlice';
 import EmailLogViewModal from '@/components/emails/EmailLogs/EmailLogViewModal';
 
 const EmailLog = () => {
@@ -20,73 +20,52 @@ const EmailLog = () => {
     useEffect(() => {
         dispatch(setPageTitle('Email Logs | Email'));
     });
-    const { data, isFetching, isAbleToRead } = useSelector((state: IRootState) => state.emailLog);
+    const { data, isFetching, isAbleToRead, totalRecords } = useSelector((state: IRootState) => state.emailLog);
 
     //hooks
     const [searchInputText, setSearchInputText] = useState<string>('');
-    const [searchedData, setSearchedData] = useState<IEmailLog[]>(data);
     const [loading, setLoading] = useState<boolean>(false);
+    const [search, setSearch] = useState<string>('');
+
     //datatable
     const [page, setPage] = useState(1);
-    const PAGE_SIZES = [10, 20, 30, 50, 100];
+    const PAGE_SIZES = [10, 20, 30];
     const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
-    const [initialRecords, setInitialRecords] = useState(sortBy(searchedData, 'name'));
-    const [recordsData, setRecordsData] = useState(initialRecords);
+    const [recordsData, setRecordsData] = useState<IEmailLog[]>([] as IEmailLog[]);
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
         columnAccessor: 'name',
         direction: 'asc',
     });
-    useEffect(() => {
-        const from = (page - 1) * pageSize;
-        const to = from + pageSize;
-        setRecordsData([...initialRecords.slice(from, to)]);
-    }, [page, pageSize, initialRecords]);
+    //useDefferedValue hook for search query
+    const searchQuery = useDeferredValue(search);
 
     useEffect(() => {
-        const data = sortBy(initialRecords, sortStatus.columnAccessor);
-        setInitialRecords(sortStatus.direction === 'desc' ? data.reverse() : data);
+        const data = sortBy(recordsData, sortStatus.columnAccessor);
+        setRecordsData(sortStatus.direction === 'desc' ? data.reverse() : data);
         setPage(1);
     }, [sortStatus]);
 
     //get all emailLog after page render
     useEffect(() => {
         getEmailLogList();
-    }, [isFetching]);
+    }, [isFetching, pageSize, page, searchQuery]);
 
     useEffect(() => {
-        setSearchedData(data);
-        setInitialRecords(data);
+        setRecordsData(data);
     }, [data]);
 
-    //useDefferedValue hook for search query
-    const searchQuery = useDeferredValue(searchInputText);
     //get all EmailLog list
     const getEmailLogList = async () => {
         setLoading(true);
-        const res: GetMethodResponseType = await new ApiClient().get('email');
+        const res: GetMethodResponseType = await new ApiClient().get(`email?limit=${pageSize}&page=${page}&search=${searchQuery}`);
         const emailLog: IEmailLog[] = res?.data;
         if (typeof emailLog === 'undefined') {
             dispatch(getAllEmailLogs([] as IEmailLog[]));
             return;
         }
         dispatch(getAllEmailLogs(emailLog));
+        dispatch(setEmailLogDataLength(res?.meta?.totalCount));
         setLoading(false);
-    };
-
-    //search emailLog
-    const handleSearchEmailLog = () => {
-        const searchEmailLogData = data?.filter((emailLog: IEmailLog) => {
-            return (
-                emailLog.senderName.toLowerCase().startsWith(searchQuery.toLowerCase().trim(), 0) ||
-                emailLog.senderName.toLowerCase().endsWith(searchQuery.toLowerCase().trim()) ||
-                emailLog.senderName.toLowerCase().includes(searchQuery.toLowerCase().trim()) ||
-                emailLog.receiverEmail.toLowerCase().startsWith(searchQuery.toLowerCase().trim(), 0) ||
-                emailLog.receiverEmail.toLowerCase().endsWith(searchQuery.toLowerCase().trim()) ||
-                emailLog.receiverEmail.toLowerCase().includes(searchQuery.toLowerCase().trim())
-            );
-        });
-        setSearchedData(searchEmailLogData);
-        setRecordsData(searchEmailLogData);
     };
 
     return (
@@ -95,8 +74,8 @@ const EmailLog = () => {
             <div className="my-6 flex flex-col gap-5 sm:flex-row ">
                 <div className="flex-1"></div>
                 <div className="relative flex-1">
-                    <input type="text" placeholder="Find Log" className="form-input py-3 ltr:pr-[100px] rtl:pl-[100px]" onChange={(e) => setSearchInputText(e.target.value)} value={searchQuery} />
-                    <button type="button" className="btn btn-primary absolute top-1 shadow-none ltr:right-1 rtl:left-1" onClick={handleSearchEmailLog}>
+                    <input type="text" placeholder="Find Log" className="form-input py-3 ltr:pr-[100px] rtl:pl-[100px]" onChange={(e) => setSearchInputText(e.target.value)} value={searchInputText} />
+                    <button type="button" className="btn btn-primary absolute top-1 shadow-none ltr:right-1 rtl:left-1" onClick={() => setSearch(searchInputText)}>
                         Search
                     </button>
                 </div>
@@ -153,11 +132,11 @@ const EmailLog = () => {
                             ),
                         },
                     ]}
-                    totalRecords={initialRecords.length}
+                    totalRecords={totalRecords}
                     recordsPerPage={pageSize}
                     page={page}
                     onPageChange={(p) => setPage(p)}
-                    recordsPerPageOptions={PAGE_SIZES}
+                    recordsPerPageOptions={data?.length < 10 ? [10] : PAGE_SIZES}
                     onRecordsPerPageChange={setPageSize}
                     sortStatus={sortStatus}
                     onSortStatusChange={setSortStatus}

@@ -5,6 +5,7 @@ export const SMTPList: SelectOptionsType[] = [
     { value: 'Yahoo', label: 'Yahoo' },
     { value: 'Outlook', label: 'Outlook' },
     { value: 'Hotmail', label: 'Hotmail' },
+    { value: 'Others', label: 'Others' },
 ];
 
 

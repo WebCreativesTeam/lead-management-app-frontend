@@ -31,7 +31,6 @@ const UserPolicyModal = () => {
         const selectedPolicyIdArr: string[] = singleData?.policies?.map((item: any) => {
             return item.id;
         });
-        console.log(singleData);
         const preSelectedPolicy: SelectOptionsType[] = createPolicyObj.filter((item: SelectOptionsType) => {
             return selectedPolicyIdArr?.includes(item.value);
         });

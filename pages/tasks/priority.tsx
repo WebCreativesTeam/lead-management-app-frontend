@@ -11,7 +11,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setPageTitle } from '@/store/themeConfigSlice';
 import { IRootState } from '@/store';
 import { ApiClient } from '@/utils/http';
-import { getAllTaskPriorities, setCreateModal, setDefaultPriorityModal, setEditModal, setViewModal,setDeleteModal } from '@/store/Slices/taskSlice/taskPrioritySlice';
+import { getAllTaskPriorities, setCreateModal, setDefaultPriorityModal, setEditModal, setViewModal, setDeleteModal, setTaskPriorityDataLength } from '@/store/Slices/taskSlice/taskPrioritySlice';
 import DeleteTaskPriorityModal from '@/components/Tasks/TaskPriority/DeleteTaskPriorityModal';
 import CreateTaskPriorityModal from '@/components/Tasks/TaskPriority/CreateTaskPriorityModal';
 import EditTaskPriorityModal from '@/components/Tasks/TaskPriority/EditTaskPriorityModal';
@@ -25,70 +25,51 @@ const TaskPriorityPage = () => {
     });
 
     //hooks
-    const { data, isFetching, isAbleToChangeDefaultPriority, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate } = useSelector((state: IRootState) => state.taskPriority);
+    const { data, isFetching, isAbleToChangeDefaultPriority, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate, totalRecords } = useSelector((state: IRootState) => state.taskPriority);
     const [searchInputText, setSearchInputText] = useState<string>('');
-    const [searchedData, setSearchedData] = useState<TaskPriorityType[]>(data);
     const [loading, setLoading] = useState<boolean>(false);
+    const [search, setSearch] = useState<string>('');
 
     //datatable
     const [page, setPage] = useState(1);
-    const PAGE_SIZES = [10, 20, 30, 50, 100];
+    const PAGE_SIZES = [10, 20, 30];
     const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
-    const [initialRecords, setInitialRecords] = useState(sortBy(searchedData, 'name'));
-    const [recordsData, setRecordsData] = useState(initialRecords);
+    const [recordsData, setRecordsData] = useState<TaskPriorityType[]>([] as TaskPriorityType[]);
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
         columnAccessor: 'name',
         direction: 'asc',
     });
-    useEffect(() => {
-        const from = (page - 1) * pageSize;
-        const to = from + pageSize;
-        setRecordsData([...initialRecords.slice(from, to)]);
-    }, [page, pageSize, initialRecords]);
+
+    //useDefferedValue hook for search query
+    const searchQuery = useDeferredValue(search);
 
     useEffect(() => {
-        const data = sortBy(initialRecords, sortStatus.columnAccessor);
-        setInitialRecords(sortStatus.direction === 'desc' ? data.reverse() : data);
+        const data = sortBy(recordsData, sortStatus.columnAccessor);
+        setRecordsData(sortStatus.direction === 'desc' ? data.reverse() : data);
         setPage(1);
     }, [sortStatus]);
 
     //get all taskPriority after page render
     useEffect(() => {
         getTaskPriorityList();
-    }, [isFetching]);
+    }, [isFetching, pageSize, page, searchQuery]);
 
     useEffect(() => {
-        setSearchedData(data);
-        setInitialRecords(data);
+        setRecordsData(data);
     }, [data]);
-
-    //useDefferedValue hook for search query
-    const searchQuery = useDeferredValue(searchInputText);
 
     //get all TaskPriority list
     const getTaskPriorityList = async () => {
         setLoading(true);
-        const res: GetMethodResponseType = await new ApiClient().get('task-priority?sortBy=-isDefault');
+        const res: GetMethodResponseType = await new ApiClient().get(`task-priority?limit=${pageSize}&page=${page}&search=${searchQuery}&sortBy=-isDefault`);
         const priority: TaskPriorityType[] = res?.data;
         if (typeof priority === 'undefined') {
             dispatch(getAllTaskPriorities([] as TaskPriorityType[]));
             return;
         }
         dispatch(getAllTaskPriorities(priority));
+        dispatch(setTaskPriorityDataLength(res?.meta?.totalCount));
         setLoading(false);
-    };
-
-    //search Task Priority
-    const handleSearchTaskPriority = () => {
-        const searchTaskPriorityData = data?.filter((taskPriority: TaskPriorityType) => {
-            return (
-                taskPriority.name.toLowerCase().startsWith(searchQuery.toLowerCase().trim(), 0) ||
-                taskPriority.name.toLowerCase().endsWith(searchQuery.toLowerCase().trim()) ||
-                taskPriority.name.toLowerCase().includes(searchQuery.toLowerCase().trim())
-            );
-        });
-        setSearchedData(searchTaskPriorityData);
-        setRecordsData(searchTaskPriorityData);
     };
 
     return !isAbleToRead ? null : (
@@ -111,9 +92,9 @@ const TaskPriorityPage = () => {
                         placeholder="Find Task Priority"
                         className="form-input py-3 ltr:pr-[100px] rtl:pl-[100px]"
                         onChange={(e) => setSearchInputText(e.target.value)}
-                        value={searchQuery}
+                        value={searchInputText}
                     />
-                    <button type="button" className="btn btn-primary absolute top-1 shadow-none ltr:right-1 rtl:left-1" onClick={handleSearchTaskPriority}>
+                    <button type="button" className="btn btn-primary absolute top-1 shadow-none ltr:right-1 rtl:left-1" onClick={() => setSearch(searchInputText)}>
                         Search
                     </button>
                 </div>
@@ -201,11 +182,11 @@ const TaskPriorityPage = () => {
                             ),
                         },
                     ]}
-                    totalRecords={initialRecords.length}
+                    totalRecords={totalRecords}
                     recordsPerPage={pageSize}
                     page={page}
                     onPageChange={(p) => setPage(p)}
-                    recordsPerPageOptions={PAGE_SIZES}
+                    recordsPerPageOptions={data?.length < 10 ? [10] : PAGE_SIZES}
                     onRecordsPerPageChange={setPageSize}
                     sortStatus={sortStatus}
                     onSortStatusChange={setSortStatus}

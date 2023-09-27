@@ -18,6 +18,7 @@ const initialState: LeadStatusInitialStateProps = {
     isAbleToDelete: false,
     isAbleToChangeDefaultStatus: false,
     userPolicyArr: [] as string[],
+    totalRecords: 0,
 };
 
 const leadStatusSlice = createSlice({
@@ -114,6 +115,9 @@ const leadStatusSlice = createSlice({
             const verifyPolicy: boolean = state.userPolicyArr.includes(action.payload);
             state.isAbleToChangeDefaultStatus = verifyPolicy;
         },
+        setLeadStatusDataLength(state, action: PayloadAction<number>) {
+            state.totalRecords = action.payload;
+        },
     },
 });
 
@@ -131,5 +135,6 @@ export const {
     setLeadStatusReadPolicy,
     setLeadStatusUpdatePolicy,
     setChangeDefaultLeadStatusPermission,
+    setLeadStatusDataLength
 } = leadStatusSlice.actions;
 export default leadStatusSlice.reducer;

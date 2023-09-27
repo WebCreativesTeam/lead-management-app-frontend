@@ -21,6 +21,8 @@ const EmailSmtpCreateModal = () => {
         initialValues: {
             SMTP: '',
             name: '',
+            host: '',
+            port: '',
             email: '',
             security: '',
             password: '',
@@ -34,11 +36,11 @@ const EmailSmtpCreateModal = () => {
             const createSmtpObj = {
                 SMTP: value.SMTP,
                 security: value.SMTP !== 'Outlook' ? 'none' : value.security,
-                global: false,
-                verified: false,
                 name: value.name,
                 email: value.email,
                 password: value.password,
+                host: value.host,
+                port: value.port,
             };
             try {
                 dispatch(setDisableBtn(true));
@@ -79,6 +81,7 @@ const EmailSmtpCreateModal = () => {
             open={createModal}
             onClose={() => {
                 dispatch(setCreateModal(false));
+                resetForm();
             }}
             onDiscard={handleDiscard}
             size="large"
@@ -102,6 +105,16 @@ const EmailSmtpCreateModal = () => {
                             <div className="flex-1">
                                 <label htmlFor="name">SMTP Name</label>
                                 <input onChange={handleChange} onBlur={handleBlur} value={values.name} id="name" name="name" type="text" placeholder="SMTP Name" className="form-input" />
+                            </div>
+                        </div>
+                        <div className="flex flex-col gap-4 sm:flex-row">
+                            <div className="flex-1">
+                                <label htmlFor="smtpHost">Host</label>
+                                <input onChange={handleChange} onBlur={handleBlur} value={values.host} id="smtpHost" name="host" type="text" placeholder="Enter Host" className="form-input" />
+                            </div>
+                            <div className="flex-1">
+                                <label htmlFor="smtpPort">Port</label>
+                                <input onChange={handleChange} onBlur={handleBlur} value={values.port} id="smtpPort" name="port" type="text" placeholder="Emter Port" className="form-input" />
                             </div>
                         </div>
                         <div className="flex flex-col gap-4 sm:flex-row">

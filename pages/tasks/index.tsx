@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState, Fragment, useDeferredValue } from 'react';
+import React, { useEffect, useState, Fragment, useDeferredValue, useLayoutEffect } from 'react';
 import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
@@ -24,6 +24,7 @@ import {
     setCreateModal,
     setDeleteModal,
     setEditModal,
+    setTaskDataLength,
     setTransferTaskModal,
     setViewModal,
 } from '@/store/Slices/taskSlice/manageTaskSlice';
@@ -40,44 +41,40 @@ const TaskPage = () => {
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('Manage Tasks'));
-    });
+    }, []);
 
     //hooks
-    const { data, isFetching, taskPriorityList, taskStatusList, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate, isAbleToTransferTask } = useSelector((state: IRootState) => state.task);
+    const { data, isFetching, taskPriorityList, taskStatusList, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate, isAbleToTransferTask, totalRecords } = useSelector(
+        (state: IRootState) => state.task
+    );
     const [searchInputText, setSearchInputText] = useState<string>('');
-    const [searchedData, setSearchedData] = useState<TaskDataType[]>(data);
     const [loading, setLoading] = useState<boolean>(false);
-    const [filter, setFilter] = useState<string>('assigned-by-me');
+    const [filter, setFilter] = useState<string>('');
+    const [search, setSearch] = useState<string>('');
 
     //useDefferedValue hook for search query
-    const searchQuery = useDeferredValue(searchInputText);
+    const searchQuery = useDeferredValue(search);
 
     //datatable
     const [page, setPage] = useState(1);
-    const PAGE_SIZES = [10, 20, 30, 50, 100];
+    const PAGE_SIZES = [10, 20, 30];
     const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
-    const [initialRecords, setInitialRecords] = useState(sortBy(searchedData, 'title'));
-    const [recordsData, setRecordsData] = useState(initialRecords);
+    const [recordsData, setRecordsData] = useState<TaskDataType[]>([] as TaskDataType[]);
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
         columnAccessor: 'title',
         direction: 'asc',
     });
-    useEffect(() => {
-        const from = (page - 1) * pageSize;
-        const to = from + pageSize;
-        setRecordsData([...initialRecords.slice(from, to)]);
-    }, [page, pageSize, initialRecords]);
 
     useEffect(() => {
-        const data = sortBy(initialRecords, sortStatus.columnAccessor);
-        setInitialRecords(sortStatus.direction === 'desc' ? data.reverse() : data);
+        const data = sortBy(recordsData, sortStatus.columnAccessor);
+        setRecordsData(sortStatus.direction === 'desc' ? data.reverse() : data);
         setPage(1);
     }, [sortStatus]);
 
     //get all task after page render
     useEffect(() => {
         getTasksList();
-    }, [isFetching, filter]);
+    }, [isFetching, pageSize, page, searchQuery]);
 
     useEffect(() => {
         getTasksPriority();
@@ -87,20 +84,20 @@ const TaskPage = () => {
     }, []);
 
     useEffect(() => {
-        setSearchedData(data);
-        setInitialRecords(data);
+        setRecordsData(data);
     }, [data]);
 
     //get all tasks list
     const getTasksList = async () => {
         setLoading(true);
-        const res: GetMethodResponseType = await new ApiClient().get('task');
+        const res: GetMethodResponseType = await new ApiClient().get(`task?limit=${pageSize}&page=${page}&search=${searchQuery}`);
         const tasks: TaskDataType[] | undefined = res?.data;
         if (typeof tasks === 'undefined') {
             dispatch(getAllTasks([] as TaskDataType[]));
             return;
         }
         dispatch(getAllTasks(tasks));
+        dispatch(setTaskDataLength(res?.meta?.totalCount));
         setLoading(false);
     };
 
@@ -154,19 +151,6 @@ const TaskPage = () => {
         dispatch(getAllTaskStatus(status));
     };
 
-    //search task
-    const handleSearchTask = () => {
-        const searchTaskData = data?.filter((task: TaskDataType) => {
-            return (
-                task.title.toLowerCase().startsWith(searchQuery.toLowerCase().trim(), 0) ||
-                task.title.toLowerCase().endsWith(searchQuery.toLowerCase().trim()) ||
-                task.title.toLowerCase().includes(searchQuery.toLowerCase().trim())
-            );
-        });
-        setSearchedData(searchTaskData);
-        setRecordsData(searchTaskData);
-    };
-
     return !isAbleToRead ? null : (
         <div>
             <PageHeadingSection description="View, create, update, and close tasks. Organize by status, priority, and due date. Stay on top of work." heading="Task Management" />
@@ -190,12 +174,12 @@ const TaskPage = () => {
                         >
                             <ul className="!min-w-[170px]">
                                 <li>
-                                    <button type="button" onClick={() => setFilter('assigned-by-me')}>
+                                    <button type="button" onClick={() => setFilter(`assignedById=${null}`)}>
                                         Assigned by Me
                                     </button>
                                 </li>
                                 <li>
-                                    <button type="button" onClick={() => setFilter('assigned-to-me')}>
+                                    <button type="button" onClick={() => setFilter(`assignedToId=${null}`)}>
                                         Assigned to Me
                                     </button>
                                 </li>
@@ -204,8 +188,14 @@ const TaskPage = () => {
                     </div>
                 </div>
                 <div className="relative  flex-1">
-                    <input type="text" placeholder="Find A Task" className="form-input py-3 ltr:pr-[100px] rtl:pl-[100px]" onChange={(e) => setSearchInputText(e.target.value)} value={searchQuery} />
-                    <button type="button" className="btn btn-primary absolute top-1 shadow-none ltr:right-1 rtl:left-1" onClick={() => handleSearchTask()}>
+                    <input
+                        type="text"
+                        placeholder="Find A Task"
+                        className="form-input py-3 ltr:pr-[100px] rtl:pl-[100px]"
+                        onChange={(e) => setSearchInputText(e.target.value)}
+                        value={searchInputText}
+                    />
+                    <button type="button" className="btn btn-primary absolute top-1 shadow-none ltr:right-1 rtl:left-1" onClick={() => setSearch(searchInputText)}>
                         Search
                     </button>
                 </div>
@@ -371,11 +361,11 @@ const TaskPage = () => {
                             ),
                         },
                     ]}
-                    totalRecords={initialRecords.length}
+                    totalRecords={totalRecords}
                     recordsPerPage={pageSize}
                     page={page}
                     onPageChange={(p) => setPage(p)}
-                    recordsPerPageOptions={PAGE_SIZES}
+                    recordsPerPageOptions={data?.length < 10 ? [10] : PAGE_SIZES}
                     onRecordsPerPageChange={setPageSize}
                     sortStatus={sortStatus}
                     onSortStatusChange={setSortStatus}

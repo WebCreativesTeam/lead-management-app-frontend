@@ -18,6 +18,7 @@ const initialState: TaskPriorityInitialStateProps = {
     isAbleToDelete: false,
     isAbleToChangeDefaultPriority: false,
     userPolicyArr: [] as string[],
+    totalRecords:0
 };
 
 const taskPrioritySlice = createSlice({
@@ -114,6 +115,9 @@ const taskPrioritySlice = createSlice({
             const verifyPolicy: boolean = state.userPolicyArr.includes(action.payload);
             state.isAbleToChangeDefaultPriority = verifyPolicy;
         },
+        setTaskPriorityDataLength(state, action: PayloadAction<number>) {
+            state.totalRecords = action.payload;
+        },
     },
 });
 
@@ -131,5 +135,6 @@ export const {
     setTaskPriorityReadPolicy,
     setTaskPriorityUpdatePolicy,
     setChangeDefaultTaskPriorityPermission,
+    setTaskPriorityDataLength
 } = taskPrioritySlice.actions;
 export default taskPrioritySlice.reducer;

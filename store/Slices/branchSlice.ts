@@ -16,6 +16,7 @@ const initialState: BranchInitialStateProps = {
     isAbleToUpdate: false,
     isAbleToDelete: false,
     userPolicyArr: [] as string[],
+    totalRecords:0
 };
 
 const branchSlice = createSlice({
@@ -90,6 +91,9 @@ const branchSlice = createSlice({
             const verifyPolicy: boolean = state.userPolicyArr.includes(action.payload);
             state.isAbleToDelete = verifyPolicy;
         },
+        setBranchDataLength(state, action: PayloadAction<number>) {
+            state.totalRecords = action.payload;
+        },
     },
 });
 
@@ -105,5 +109,6 @@ export const {
     setBranchDeletePolicy,
     setBranchReadPolicy,
     setBranchUpdatePolicy,
+    setBranchDataLength
 } = branchSlice.actions;
 export default branchSlice.reducer;

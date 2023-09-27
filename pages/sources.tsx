@@ -12,7 +12,7 @@ import { setPageTitle } from '@/store/themeConfigSlice';
 import { GetMethodResponseType, SourceDataType } from '@/utils/Types';
 import { ApiClient } from '@/utils/http';
 import { IRootState } from '@/store';
-import { getAllSources, setCreateModal, setDeleteModal, setDisableBtn, setEditModal, setFetching, setViewModal } from '@/store/Slices/sourceSlice';
+import { getAllSources, setCreateModal, setDeleteModal, setDisableBtn, setEditModal, setFetching, setSourceDataLength, setViewModal } from '@/store/Slices/sourceSlice';
 import SourceViewModal from '@/components/Sources/SourceViewModal';
 import SourceCreateModal from '@/components/Sources/SourceCreateModal';
 import SourceEditModal from '@/components/Sources/SourceEditModal';
@@ -21,60 +21,54 @@ import Loader from '@/components/__Shared/Loader';
 
 const Source = () => {
     const dispatch = useDispatch();
-    const router = useRouter();
     useEffect(() => {
         dispatch(setPageTitle('Track Leads | Sources'));
     });
-    const { data, isFetching, isBtnDisabled, deleteModal, singleData, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate } = useSelector((state: IRootState) => state.source);
+    const { data, isFetching, isBtnDisabled, deleteModal, singleData, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate, totalRecords } = useSelector((state: IRootState) => state.source);
 
     //hooks
     const [searchInputText, setSearchInputText] = useState<string>('');
-    const [searchedData, setSearchedData] = useState<SourceDataType[]>(data);
     const [loading, setLoading] = useState<boolean>(false);
+    const [search, setSearch] = useState<string>('');
+
     //datatable
     const [page, setPage] = useState(1);
-    const PAGE_SIZES = [10, 20, 30, 50, 100];
+    const PAGE_SIZES = [10, 20, 30];
     const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
-    const [initialRecords, setInitialRecords] = useState(sortBy(searchedData, 'name'));
-    const [recordsData, setRecordsData] = useState(initialRecords);
+    const [recordsData, setRecordsData] = useState<SourceDataType[]>([] as SourceDataType[]);
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
         columnAccessor: 'name',
         direction: 'asc',
     });
-    useEffect(() => {
-        const from = (page - 1) * pageSize;
-        const to = from + pageSize;
-        setRecordsData([...initialRecords.slice(from, to)]);
-    }, [page, pageSize, initialRecords]);
+    //useDefferedValue hook for search query
+    const searchQuery = useDeferredValue(search);
 
     useEffect(() => {
-        const data = sortBy(initialRecords, sortStatus.columnAccessor);
-        setInitialRecords(sortStatus.direction === 'desc' ? data.reverse() : data);
+        const data = sortBy(recordsData, sortStatus.columnAccessor);
+        setRecordsData(sortStatus.direction === 'desc' ? data.reverse() : data);
         setPage(1);
     }, [sortStatus]);
 
     //get all source after page render
     useEffect(() => {
         getSourceList();
-    }, [isFetching]);
+    }, [isFetching, pageSize, page, searchQuery]);
 
     useEffect(() => {
-        setSearchedData(data);
-        setInitialRecords(data);
+        setRecordsData(data);
     }, [data]);
 
-    //useDefferedValue hook for search query
-    const searchQuery = useDeferredValue(searchInputText);
     //get all Source list
     const getSourceList = async () => {
         setLoading(true);
-        const res: GetMethodResponseType = await new ApiClient().get('source');
+        const res: GetMethodResponseType = await new ApiClient().get(`source?limit=${pageSize}&page=${page}`);
         const source: SourceDataType[] = res?.data;
         if (typeof source === 'undefined') {
             dispatch(getAllSources([] as SourceDataType[]));
             return;
         }
         dispatch(getAllSources(source));
+        dispatch(setSourceDataLength(res?.meta?.totalCount));
         setLoading(false);
     };
 
@@ -92,19 +86,6 @@ const Source = () => {
         dispatch(setDeleteModal({ open: false }));
     };
 
-    //search source
-    const handleSearchSource = () => {
-        const searchSourceData = data?.filter((source: SourceDataType) => {
-            return (
-                source.name.toLowerCase().startsWith(searchQuery.toLowerCase().trim(), 0) ||
-                source.name.toLowerCase().endsWith(searchQuery.toLowerCase().trim()) ||
-                source.name.toLowerCase().includes(searchQuery.toLowerCase().trim())
-            );
-        });
-        setSearchedData(searchSourceData);
-        setRecordsData(searchSourceData);
-    };
-
     return !isAbleToRead ? null : (
         <div>
             <PageHeadingSection description="Identify and categorize lead sources. Update descriptions. Add or remove source channels." heading="Track Leads" />
@@ -120,8 +101,14 @@ const Source = () => {
                     </div>
                 )}
                 <div className="relative  flex-1">
-                    <input type="text" placeholder="Find A Source" className="form-input py-3 ltr:pr-[100px] rtl:pl-[100px]" onChange={(e) => setSearchInputText(e.target.value)} value={searchQuery} />
-                    <button type="button" className="btn btn-primary absolute top-1 shadow-none ltr:right-1 rtl:left-1" onClick={handleSearchSource}>
+                    <input
+                        type="text"
+                        placeholder="Find A Source"
+                        className="form-input py-3 ltr:pr-[100px] rtl:pl-[100px]"
+                        onChange={(e) => setSearchInputText(e.target.value)}
+                        value={searchInputText}
+                    />
+                    <button type="button" className="btn btn-primary absolute top-1 shadow-none ltr:right-1 rtl:left-1" onClick={() => setSearch(searchInputText)}>
                         Search
                     </button>
                 </div>
@@ -168,11 +155,11 @@ const Source = () => {
                             ),
                         },
                     ]}
-                    totalRecords={initialRecords.length}
+                    totalRecords={totalRecords}
                     recordsPerPage={pageSize}
                     page={page}
                     onPageChange={(p) => setPage(p)}
-                    recordsPerPageOptions={PAGE_SIZES}
+                    recordsPerPageOptions={data?.length < 10 ? [10] : PAGE_SIZES}
                     onRecordsPerPageChange={setPageSize}
                     sortStatus={sortStatus}
                     onSortStatusChange={setSortStatus}

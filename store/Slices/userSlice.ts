@@ -1,4 +1,4 @@
-import { PolicyDataType, PolicyListSecondaryEndpoint, UserDataType, UserInitialStateProps } from '@/utils/Types';
+import { PolicyListSecondaryEndpoint, UserDataType, UserInitialStateProps } from '@/utils/Types';
 import { fetchUserInfo } from '@/utils/contant';
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 
@@ -22,6 +22,7 @@ const initialState: UserInitialStateProps = {
     isAbleToUpdatePolicy: false,
     isAbleToChangeActiveStatus: false,
     userPolicyArr: [] as string[],
+    totalRecords: 0,
 };
 
 const userSlice = createSlice({
@@ -131,6 +132,9 @@ const userSlice = createSlice({
             const verifyPolicy: boolean = state.userPolicyArr.includes(action.payload);
             state.isAbleToChangeActiveStatus = verifyPolicy;
         },
+        setUserDataLength(state, action: PayloadAction<number>) {
+            state.totalRecords = action.payload;
+        },
     },
 });
 
@@ -151,5 +155,6 @@ export const {
     setUserUpdatePolicy,
     setChangeUsersPolicy,
     setChangeActiveStatusPermission,
+    setUserDataLength,
 } = userSlice.actions;
 export default userSlice.reducer;

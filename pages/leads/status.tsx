@@ -10,7 +10,7 @@ import { GetMethodResponseType, LeadStatusType } from '@/utils/Types';
 import { useDispatch, useSelector } from 'react-redux';
 import { setPageTitle } from '@/store/themeConfigSlice';
 import { ApiClient } from '@/utils/http';
-import { getAllLeadStatus, setCreateModal, setDefaultStatusModal, setDeleteModal, setEditModal, setViewModal } from '@/store/Slices/leadSlice/leadStatusSlice';
+import { getAllLeadStatus, setCreateModal, setDefaultStatusModal, setDeleteModal, setEditModal, setLeadStatusDataLength, setViewModal } from '@/store/Slices/leadSlice/leadStatusSlice';
 import { IRootState } from '@/store';
 import DeleteLeadStatusModal from '@/components/Leads/LeadStatus/DeleteLeadStatusModal';
 import CreateLeadStatusModal from '@/components/Leads/LeadStatus/CreateLeadStatusModal';
@@ -25,71 +25,53 @@ const LeadStatusPage = () => {
     });
 
     //hooks
-    const { data, isFetching, isAbleToChangeDefaultStatus, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate } = useSelector((state: IRootState) => state.leadStatus);
+    const { data, isFetching, isAbleToChangeDefaultStatus, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate, totalRecords } = useSelector((state: IRootState) => state.leadStatus);
     const [searchInputText, setSearchInputText] = useState<string>('');
-    const [searchedData, setSearchedData] = useState<LeadStatusType[]>(data);
     const [loading, setLoading] = useState<boolean>(false);
+    const [search, setSearch] = useState<string>('');
 
     //datatable
     const [page, setPage] = useState(1);
-    const PAGE_SIZES = [10, 20, 30, 50, 100];
+    const PAGE_SIZES = [10, 20, 30];
     const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
-    const [initialRecords, setInitialRecords] = useState(sortBy(searchedData, 'name'));
-    const [recordsData, setRecordsData] = useState(initialRecords);
+    const [recordsData, setRecordsData] = useState<LeadStatusType[]>([] as LeadStatusType[]);
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
         columnAccessor: 'name',
         direction: 'asc',
     });
-    useEffect(() => {
-        const from = (page - 1) * pageSize;
-        const to = from + pageSize;
-        setRecordsData([...initialRecords.slice(from, to)]);
-    }, [page, pageSize, initialRecords]);
+
+    //useDefferedValue hook for search query
+    const searchQuery = useDeferredValue(search);
 
     useEffect(() => {
-        const data = sortBy(initialRecords, sortStatus.columnAccessor);
-        setInitialRecords(sortStatus.direction === 'desc' ? data.reverse() : data);
+        const data = sortBy(recordsData, sortStatus.columnAccessor);
+        setRecordsData(sortStatus.direction === 'desc' ? data.reverse() : data);
         setPage(1);
     }, [sortStatus]);
 
     //get all leadStatus after page render
     useEffect(() => {
         getLeadStatusList();
-    }, [isFetching]);
+    }, [isFetching, pageSize, page, searchQuery]);
 
     useEffect(() => {
-        setSearchedData(data);
-        setInitialRecords(data);
+        setRecordsData(data);
     }, [data]);
-
-    //useDefferedValue hook for search query
-    const searchQuery = useDeferredValue(searchInputText);
 
     //get all LeadStatus list
     const getLeadStatusList = async () => {
         setLoading(true);
-        const res: GetMethodResponseType = await new ApiClient().get('lead-status?sortBy=-isDefault');
+        const res: GetMethodResponseType = await new ApiClient().get(`lead-status?limit=${pageSize}&page=${page}&search=${searchQuery}&sortBy=-isDefault`);
         const status: LeadStatusType[] = res?.data;
         if (typeof status === 'undefined') {
             dispatch(getAllLeadStatus([] as LeadStatusType[]));
             return;
         }
         dispatch(getAllLeadStatus(status));
+        dispatch(setLeadStatusDataLength(res?.meta?.totalCount));
         setLoading(false);
     };
 
-    //search leadStatus
-    const handleSearchLeadStatus = () => {
-        const searchLeadStatusData = data?.filter((leadStatus: LeadStatusType) => {
-            return (
-                leadStatus.name.toLowerCase().startsWith(searchQuery.toLowerCase().trim(), 0) ||
-                leadStatus.name.toLowerCase().endsWith(searchQuery.toLowerCase().trim()) ||
-                leadStatus.name.toLowerCase().includes(searchQuery.toLowerCase().trim())
-            );
-        });
-        setSearchedData(searchLeadStatusData);
-        setRecordsData(searchedData);
-    };
     return !isAbleToRead ? null : (
         <div>
             <PageHeadingSection description="Customize lead statuses. Monitor workflow. Update stages. Reflect real-time progress." heading="Manage Progress" />
@@ -110,9 +92,9 @@ const LeadStatusPage = () => {
                         placeholder="Find Lead Status"
                         className="form-input py-3 ltr:pr-[100px] rtl:pl-[100px]"
                         onChange={(e) => setSearchInputText(e.target.value)}
-                        value={searchQuery}
+                        value={searchInputText}
                     />
-                    <button type="button" className="btn btn-primary absolute top-1 shadow-none ltr:right-1 rtl:left-1" onClick={handleSearchLeadStatus}>
+                    <button type="button" className="btn btn-primary absolute top-1 shadow-none ltr:right-1 rtl:left-1" onClick={() => setSearch(searchInputText)}>
                         Search
                     </button>
                 </div>
@@ -200,11 +182,11 @@ const LeadStatusPage = () => {
                             ),
                         },
                     ]}
-                    totalRecords={initialRecords.length}
+                    totalRecords={totalRecords}
                     recordsPerPage={pageSize}
                     page={page}
                     onPageChange={(p) => setPage(p)}
-                    recordsPerPageOptions={PAGE_SIZES}
+                    recordsPerPageOptions={data?.length < 10 ? [10] : PAGE_SIZES}
                     onRecordsPerPageChange={setPageSize}
                     sortStatus={sortStatus}
                     onSortStatusChange={setSortStatus}

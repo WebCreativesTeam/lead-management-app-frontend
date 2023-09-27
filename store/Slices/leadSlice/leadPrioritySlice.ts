@@ -18,6 +18,7 @@ const initialState: LeadPriorityInitialStateProps = {
     isAbleToDelete: false,
     isAbleToChangeDefaultPriority: false,
     userPolicyArr: [] as string[],
+    totalRecords: 0,
 };
 
 const leadPrioritySlice = createSlice({
@@ -114,6 +115,9 @@ const leadPrioritySlice = createSlice({
             const verifyPolicy: boolean = state.userPolicyArr.includes(action.payload);
             state.isAbleToChangeDefaultPriority = verifyPolicy;
         },
+        setLeadPriorityDataLength(state, action: PayloadAction<number>) {
+            state.totalRecords = action.payload;
+        },
     },
 });
 
@@ -131,5 +135,6 @@ export const {
     setLeadPriorityReadPolicy,
     setLeadPriorityUpdatePolicy,
     setChangeDefaultLeadPriorityPermission,
+    setLeadPriorityDataLength
 } = leadPrioritySlice.actions;
 export default leadPrioritySlice.reducer;

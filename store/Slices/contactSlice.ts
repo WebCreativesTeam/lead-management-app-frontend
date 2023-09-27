@@ -18,6 +18,7 @@ const initialState: ContactInitialStateProps = {
     userPolicyArr: [] as string[],
     usersList: [] as UserListSecondaryEndpointType[],
     sourceList: [] as SourceDataType[],
+    totalRecords:0
 };
 
 const contactSlice = createSlice({
@@ -98,6 +99,9 @@ const contactSlice = createSlice({
             const verifyPolicy: boolean = state.userPolicyArr.includes(action.payload);
             state.isAbleToDelete = verifyPolicy;
         },
+        setContactDataLength(state, action: PayloadAction<number>) {
+            state.totalRecords = action.payload;
+        },
     },
 });
 
@@ -114,6 +118,8 @@ export const {
     setContactReadPolicy,
     setContactUpdatePolicy,
     getAllUsersForContact,
-    getAllSourceForContact
+    getAllSourceForContact,
+    setContactDataLength
+
 } = contactSlice.actions;
 export default contactSlice.reducer;

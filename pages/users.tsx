@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState, Fragment, useDeferredValue, ChangeEvent } from 'react';
+import React, { useEffect, useState, useDeferredValue } from 'react';
 import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
@@ -10,7 +10,19 @@ import ConfirmationModal from '@/components/__Shared/ConfirmationModal';
 import { setPageTitle } from '@/store/themeConfigSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { ApiClient } from '@/utils/http';
-import { getAllPolicies, getAllUsers, setCreateModal, setDeactivateModal, setDeleteModal, setDisableBtn, setEditModal, setFetching, setPolicyModal, setViewModal } from '@/store/Slices/userSlice';
+import {
+    getAllPolicies,
+    getAllUsers,
+    setCreateModal,
+    setDeactivateModal,
+    setDeleteModal,
+    setDisableBtn,
+    setEditModal,
+    setFetching,
+    setPolicyModal,
+    setUserDataLength,
+    setViewModal,
+} from '@/store/Slices/userSlice';
 import { IRootState } from '@/store';
 import UserCreateModal from '@/components/Users/UserCreateModal';
 import UserViewModal from '@/components/Users/UserViewModal';
@@ -26,66 +38,58 @@ const Users = () => {
         dispatch(setPageTitle('Manage Users'));
     });
     //hooks
-    const { data, isFetching, isBtnDisabled, deleteModal, singleData, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate, isAbleToUpdatePolicy, isAbleToChangeActiveStatus } = useSelector(
-        (state: IRootState) => state.user
-    );
-
+    const { data, isFetching, isBtnDisabled, deleteModal, singleData, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate, isAbleToUpdatePolicy, isAbleToChangeActiveStatus, totalRecords } =
+        useSelector((state: IRootState) => state.user);
     const [searchInputText, setSearchInputText] = useState<string>('');
     const [searchedData, setSearchedData] = useState<UserDataType[]>(data);
     const [loading, setLoading] = useState<boolean>(false);
+    const [search, setSearch] = useState<string>('');
 
     //datatable
     const [page, setPage] = useState(1);
-    const PAGE_SIZES = [10, 20, 30, 50, 100];
+    const PAGE_SIZES = [10, 20, 30];
     const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
-    const [initialRecords, setInitialRecords] = useState(sortBy(searchedData, 'name'));
-    const [recordsData, setRecordsData] = useState(initialRecords);
+    const [recordsData, setRecordsData] = useState([] as UserDataType[]);
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
         columnAccessor: 'firstName',
         direction: 'asc',
     });
-    useEffect(() => {
-        const from = (page - 1) * pageSize;
-        const to = from + pageSize;
-        setRecordsData([...initialRecords.slice(from, to)]);
-    }, [page, pageSize, initialRecords]);
+    //useDefferedValue hook for search query
+    const searchQuery = useDeferredValue(search);
 
     useEffect(() => {
-        const data = sortBy(initialRecords, sortStatus.columnAccessor);
-        setInitialRecords(sortStatus.direction === 'desc' ? data.reverse() : data);
+        const data = sortBy(recordsData, sortStatus.columnAccessor);
+        setRecordsData(sortStatus.direction === 'desc' ? data.reverse() : data);
         setPage(1);
     }, [sortStatus]);
 
     //get all user after page render
     useEffect(() => {
         getUsersList();
-    }, [isFetching]);
+    }, [isFetching, pageSize, page, searchQuery]);
 
     useEffect(() => {
         getPolicyList();
     }, []);
 
     useEffect(() => {
-        setSearchedData(data);
-        setInitialRecords(data);
+        setRecordsData(data);
     }, [data]);
-
-    //useDefferedValue hook for search query
-    const searchQuery = useDeferredValue(searchInputText);
 
     //get all users list
     const getUsersList = async () => {
         setLoading(true);
-        const res: GetMethodResponseType = await new ApiClient().get('user');
+        const res: GetMethodResponseType = await new ApiClient().get(`user?limit=${pageSize}&page=${page}&search=${searchQuery}`);
         const users: UserDataType[] = res?.data;
         if (typeof users === 'undefined') {
             dispatch(getAllUsers([] as UserDataType[]));
             return;
         }
         dispatch(getAllUsers(users));
+        dispatch(setUserDataLength(res?.meta?.totalCount));
         setLoading(false);
     };
-    
+
     const getPolicyList = async () => {
         setLoading(true);
         const res: GetMethodResponseType = await new ApiClient().get('policy/list');
@@ -112,25 +116,6 @@ const Users = () => {
         dispatch(setDeleteModal({ open: false }));
     };
 
-    //search user
-    const handleSearchUser = () => {
-        const searchUserData = data?.filter((user: UserDataType) => {
-            return (
-                user.firstName.toLowerCase().startsWith(searchQuery.toLowerCase().trim(), 0) ||
-                user.firstName.toLowerCase().endsWith(searchQuery.toLowerCase().trim()) ||
-                user.lastName.toLowerCase().startsWith(searchQuery.toLowerCase().trim(), 0) ||
-                user.lastName.toLowerCase().endsWith(searchQuery.toLowerCase().trim()) ||
-                user.email.toLowerCase().startsWith(searchQuery.toLowerCase().trim(), 0) ||
-                user.email.toLowerCase().endsWith(searchQuery.toLowerCase().trim()) ||
-                user.firstName.toLowerCase().includes(searchQuery.toLowerCase().trim()) ||
-                user.lastName.toLowerCase().includes(searchQuery.toLowerCase().trim()) ||
-                user.email.toLowerCase().includes(searchQuery.toLowerCase().trim())
-            );
-        });
-        setSearchedData(searchUserData);
-        setRecordsData(searchUserData);
-    };
-
     return !isAbleToRead ? null : (
         <div>
             <PageHeadingSection description="Add, edit, or remove users. Assign roles. Track activity. Personalize user experience." heading="Manage Users" />
@@ -153,7 +138,7 @@ const Users = () => {
                         onChange={(e) => setSearchInputText(e.target.value)}
                         value={searchInputText}
                     />
-                    <button type="button" className="btn btn-primary absolute top-1 shadow-none ltr:right-1 rtl:left-1" onClick={handleSearchUser}>
+                    <button type="button" className="btn btn-primary absolute top-1 shadow-none ltr:right-1 rtl:left-1" onClick={() => setSearch(searchInputText)}>
                         Search
                     </button>
                 </div>
@@ -262,11 +247,11 @@ const Users = () => {
                             ),
                         },
                     ]}
-                    totalRecords={initialRecords.length}
+                    totalRecords={totalRecords}
                     recordsPerPage={pageSize}
                     page={page}
                     onPageChange={(p) => setPage(p)}
-                    recordsPerPageOptions={PAGE_SIZES}
+                    recordsPerPageOptions={data?.length < 10 ? [10] : PAGE_SIZES}
                     onRecordsPerPageChange={setPageSize}
                     sortStatus={sortStatus}
                     onSortStatusChange={setSortStatus}

@@ -10,7 +10,7 @@ import { GetMethodResponseType, TaskStatusType } from '@/utils/Types';
 import { useDispatch, useSelector } from 'react-redux';
 import { setPageTitle } from '@/store/themeConfigSlice';
 import { ApiClient } from '@/utils/http';
-import { getAllTaskStatus, setCreateModal, setDefaultStatusModal, setDeleteModal, setEditModal, setViewModal } from '@/store/Slices/taskSlice/taskStatusSlice';
+import { getAllTaskStatus, setCreateModal, setDefaultStatusModal, setDeleteModal, setEditModal, setTaskStatusDataLength, setViewModal } from '@/store/Slices/taskSlice/taskStatusSlice';
 import { IRootState } from '@/store';
 import DeleteTaskStatusModal from '@/components/Tasks/TaskStatus/DeleteTaskStatusModal';
 import CreateTaskStatusModal from '@/components/Tasks/TaskStatus/CreateTaskStatusModal';
@@ -25,70 +25,51 @@ const TaskStatusPage = () => {
     });
 
     //hooks
-    const { data, isFetching, isAbleToChangeDefaultStatus, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate } = useSelector((state: IRootState) => state.taskStatus);
+    const { data, isFetching, isAbleToChangeDefaultStatus, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate, totalRecords } = useSelector((state: IRootState) => state.taskStatus);
     const [searchInputText, setSearchInputText] = useState<string>('');
-    const [searchedData, setSearchedData] = useState<TaskStatusType[]>(data);
     const [loading, setLoading] = useState<boolean>(false);
+    const [search, setSearch] = useState<string>('');
 
     //datatable
     const [page, setPage] = useState(1);
-    const PAGE_SIZES = [10, 20, 30, 50, 100];
+    const PAGE_SIZES = [10, 20, 30];
     const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
-    const [initialRecords, setInitialRecords] = useState(sortBy(searchedData, 'name'));
-    const [recordsData, setRecordsData] = useState(initialRecords);
+    const [recordsData, setRecordsData] = useState<TaskStatusType[]>([] as TaskStatusType[]);
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
         columnAccessor: 'name',
         direction: 'asc',
     });
-    useEffect(() => {
-        const from = (page - 1) * pageSize;
-        const to = from + pageSize;
-        setRecordsData([...initialRecords.slice(from, to)]);
-    }, [page, pageSize, initialRecords]);
+
+    //useDefferedValue hook for search query
+    const searchQuery = useDeferredValue(search);
 
     useEffect(() => {
-        const data = sortBy(initialRecords, sortStatus.columnAccessor);
-        setInitialRecords(sortStatus.direction === 'desc' ? data.reverse() : data);
+        const data = sortBy(recordsData, sortStatus.columnAccessor);
+        setRecordsData(sortStatus.direction === 'desc' ? data.reverse() : data);
         setPage(1);
     }, [sortStatus]);
 
     //get all taskStatus after page render
     useEffect(() => {
         getTaskStatusList();
-    }, [isFetching]);
+    }, [isFetching, pageSize, page, searchQuery]);
 
     useEffect(() => {
-        setSearchedData(data);
-        setInitialRecords(data);
+        setRecordsData(data);
     }, [data]);
-
-    //useDefferedValue hook for search query
-    const searchQuery = useDeferredValue(searchInputText);
 
     //get all TaskStatus list
     const getTaskStatusList = async () => {
         setLoading(true);
-        const res: GetMethodResponseType = await new ApiClient().get('task-status?sortBy=-isDefault');
+        const res: GetMethodResponseType = await new ApiClient().get(`task-status?limit=${pageSize}&page=${page}&search=${searchQuery}&sortBy=-isDefault`);
         const status: TaskStatusType[] = res?.data;
         if (typeof status === 'undefined') {
             dispatch(getAllTaskStatus([] as TaskStatusType[]));
             return;
         }
         dispatch(getAllTaskStatus(status));
+        dispatch(setTaskStatusDataLength(res?.meta?.totalCount));
         setLoading(false);
-    };
-
-    //search taskStatus
-    const handleSearchTaskStatus = () => {
-        const searchTaskStatusData = data?.filter((taskStatus: TaskStatusType) => {
-            return (
-                taskStatus.name.toLowerCase().startsWith(searchQuery.toLowerCase().trim(), 0) ||
-                taskStatus.name.toLowerCase().endsWith(searchQuery.toLowerCase().trim()) ||
-                taskStatus.name.toLowerCase().includes(searchQuery.toLowerCase().trim())
-            );
-        });
-        setSearchedData(searchTaskStatusData);
-        setRecordsData(searchedData);
     };
     return !isAbleToRead ? null : (
         <div>
@@ -110,9 +91,9 @@ const TaskStatusPage = () => {
                         placeholder="Find Task Status"
                         className="form-input py-3 ltr:pr-[100px] rtl:pl-[100px]"
                         onChange={(e) => setSearchInputText(e.target.value)}
-                        value={searchQuery}
+                        value={searchInputText}
                     />
-                    <button type="button" className="btn btn-primary absolute top-1 shadow-none ltr:right-1 rtl:left-1" onClick={handleSearchTaskStatus}>
+                    <button type="button" className="btn btn-primary absolute top-1 shadow-none ltr:right-1 rtl:left-1" onClick={() => setSearch(searchInputText)}>
                         Search
                     </button>
                 </div>
@@ -200,11 +181,11 @@ const TaskStatusPage = () => {
                             ),
                         },
                     ]}
-                    totalRecords={initialRecords.length}
+                    totalRecords={totalRecords}
                     recordsPerPage={pageSize}
                     page={page}
                     onPageChange={(p) => setPage(p)}
-                    recordsPerPageOptions={PAGE_SIZES}
+                    recordsPerPageOptions={data?.length < 10 ? [10] : PAGE_SIZES}
                     onRecordsPerPageChange={setPageSize}
                     sortStatus={sortStatus}
                     onSortStatusChange={setSortStatus}

@@ -11,7 +11,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setPageTitle } from '@/store/themeConfigSlice';
 import { IRootState } from '@/store';
 import { ApiClient } from '@/utils/http';
-import { getAllLeadPriorities, setCreateModal, setDefaultPriorityModal, setEditModal, setViewModal } from '@/store/Slices/leadSlice/leadPrioritySlice';
+import { getAllLeadPriorities, setCreateModal, setDefaultPriorityModal, setEditModal, setLeadPriorityDataLength, setViewModal } from '@/store/Slices/leadSlice/leadPrioritySlice';
 import { setDeleteModal } from '@/store/Slices/leadSlice/leadPrioritySlice';
 import DeleteLeadPriorityModal from '@/components/Leads/LeadPriority/DeleteLeadPriorityModal';
 import CreateLeadPriorityModal from '@/components/Leads/LeadPriority/CreateLeadPriorityModal';
@@ -26,70 +26,51 @@ const LeadPriorityPage = () => {
     });
 
     //hooks
-    const { data, isFetching, isAbleToChangeDefaultPriority, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate } = useSelector((state: IRootState) => state.leadPriority);
+    const { data, isFetching, isAbleToChangeDefaultPriority, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate, totalRecords } = useSelector((state: IRootState) => state.leadPriority);
     const [searchInputText, setSearchInputText] = useState<string>('');
-    const [searchedData, setSearchedData] = useState<LeadPriorityType[]>(data);
     const [loading, setLoading] = useState<boolean>(false);
+    const [search, setSearch] = useState<string>('');
 
     //datatable
     const [page, setPage] = useState(1);
-    const PAGE_SIZES = [10, 20, 30, 50, 100];
+    const PAGE_SIZES = [10, 20, 30];
     const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
-    const [initialRecords, setInitialRecords] = useState(sortBy(searchedData, 'name'));
-    const [recordsData, setRecordsData] = useState(initialRecords);
+    const [recordsData, setRecordsData] = useState<LeadPriorityType[]>([] as LeadPriorityType[]);
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
         columnAccessor: 'name',
         direction: 'asc',
     });
-    useEffect(() => {
-        const from = (page - 1) * pageSize;
-        const to = from + pageSize;
-        setRecordsData([...initialRecords.slice(from, to)]);
-    }, [page, pageSize, initialRecords]);
+
+    //useDefferedValue hook for search query
+    const searchQuery = useDeferredValue(search);
 
     useEffect(() => {
-        const data = sortBy(initialRecords, sortStatus.columnAccessor);
-        setInitialRecords(sortStatus.direction === 'desc' ? data.reverse() : data);
+        const data = sortBy(recordsData, sortStatus.columnAccessor);
+        setRecordsData(sortStatus.direction === 'desc' ? data.reverse() : data);
         setPage(1);
     }, [sortStatus]);
 
     //get all leadPriority after page render
     useEffect(() => {
         getLeadPriorityList();
-    }, [isFetching]);
+    }, [isFetching, pageSize, page, searchQuery]);
 
     useEffect(() => {
-        setSearchedData(data);
-        setInitialRecords(data);
+        setRecordsData(data);
     }, [data]);
-
-    //useDefferedValue hook for search query
-    const searchQuery = useDeferredValue(searchInputText);
 
     //get all LeadPriority list
     const getLeadPriorityList = async () => {
         setLoading(true);
-        const res: GetMethodResponseType = await new ApiClient().get('lead-priority?sortBy=-isDefault');
+        const res: GetMethodResponseType = await new ApiClient().get(`lead-priority?limit=${pageSize}&page=${page}&search=${searchQuery}&sortBy=-isDefault`);
         const priority: LeadPriorityType[] = res?.data;
         if (typeof priority === 'undefined') {
             dispatch(getAllLeadPriorities([] as LeadPriorityType[]));
             return;
         }
         dispatch(getAllLeadPriorities(priority));
+        dispatch(setLeadPriorityDataLength(res?.meta?.totalCount));
         setLoading(false);
-    };
-
-    //search Lead Priority
-    const handleSearchLeadPriority = () => {
-        const searchLeadPriorityData = data?.filter((leadPriority: LeadPriorityType) => {
-            return (
-                leadPriority.name.toLowerCase().startsWith(searchQuery.toLowerCase().trim(), 0) ||
-                leadPriority.name.toLowerCase().endsWith(searchQuery.toLowerCase().trim()) ||
-                leadPriority.name.toLowerCase().includes(searchQuery.toLowerCase().trim())
-            );
-        });
-        setSearchedData(searchLeadPriorityData);
-        setRecordsData(searchLeadPriorityData);
     };
 
     return !isAbleToRead ? null : (
@@ -112,9 +93,9 @@ const LeadPriorityPage = () => {
                         placeholder="Find Lead Priority"
                         className="form-input py-3 ltr:pr-[100px] rtl:pl-[100px]"
                         onChange={(e) => setSearchInputText(e.target.value)}
-                        value={searchQuery}
+                        value={searchInputText}
                     />
-                    <button type="button" className="btn btn-primary absolute top-1 shadow-none ltr:right-1 rtl:left-1" onClick={handleSearchLeadPriority}>
+                    <button type="button" className="btn btn-primary absolute top-1 shadow-none ltr:right-1 rtl:left-1" onClick={() => setSearch(searchInputText)}>
                         Search
                     </button>
                 </div>
@@ -202,11 +183,11 @@ const LeadPriorityPage = () => {
                             ),
                         },
                     ]}
-                    totalRecords={initialRecords.length}
+                    totalRecords={totalRecords}
                     recordsPerPage={pageSize}
                     page={page}
                     onPageChange={(p) => setPage(p)}
-                    recordsPerPageOptions={PAGE_SIZES}
+                    recordsPerPageOptions={data?.length < 10 ? [10] : PAGE_SIZES}
                     onRecordsPerPageChange={setPageSize}
                     sortStatus={sortStatus}
                     onSortStatusChange={setSortStatus}

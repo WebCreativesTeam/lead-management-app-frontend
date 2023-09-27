@@ -1,8 +1,8 @@
-import { IEmailTemplate, EmailsInitialStateProps, UserDataType } from '@/utils/Types';
+import { IEmailTemplate, EmailTemplateInitialStateProps, UserDataType } from '@/utils/Types';
 import { fetchUserInfo } from '@/utils/contant';
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 
-const initialState: EmailsInitialStateProps = {
+const initialState: EmailTemplateInitialStateProps = {
     data: [] as IEmailTemplate[],
     singleData: {} as IEmailTemplate,
     deleteModal: false,
@@ -14,6 +14,7 @@ const initialState: EmailsInitialStateProps = {
     isAbleToRead: false,
     isAbleToUpdate: false,
     userPolicyArr: [] as string[],
+    totalRecords: 0,
 };
 
 const emailTemplateSlice = createSlice({
@@ -74,6 +75,9 @@ const emailTemplateSlice = createSlice({
             const verifyPolicy: boolean = state.userPolicyArr.includes(action.payload);
             state.isAbleToDelete = verifyPolicy;
         },
+        setEmailTemplateDataLength(state, action: PayloadAction<number>) {
+            state.totalRecords = action.payload;
+        },
     },
 });
 
@@ -87,5 +91,6 @@ export const {
     setEmailTemplateDeletePermission,
     setEmailTemplateReadPermission,
     setEmailTemplateUpdatePermission,
+    setEmailTemplateDataLength
 } = emailTemplateSlice.actions;
 export default emailTemplateSlice.reducer;

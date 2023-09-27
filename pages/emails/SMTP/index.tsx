@@ -11,7 +11,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setPageTitle } from '@/store/themeConfigSlice';
 import { IRootState } from '@/store';
 import { ApiClient } from '@/utils/http';
-import { getAllEmailSmtp, setCreateModal, setEditModal, setViewModal, setDeleteModal } from '@/store/Slices/emailSlice/emailSmtpSlice';
+import { getAllEmailSmtp, setCreateModal, setEditModal, setViewModal, setDeleteModal, setEmailSmtpDataLength } from '@/store/Slices/emailSlice/emailSmtpSlice';
 import DeleteEmailSmtpModal from '@/components/emails/SMTP/DeleteEmailSmtpModal';
 import CreateEmailSmtpModal from '@/components/emails/SMTP/CreateEmailSmtpModal';
 import EditEmailSmtpModal from '@/components/emails/SMTP/EditEmailSmtpModal';
@@ -24,70 +24,51 @@ const EmailSmtpPage = () => {
     });
 
     //hooks
-    const { data, isFetching, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate } = useSelector((state: IRootState) => state.emailSmtp);
+    const { data, isFetching, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate, totalRecords } = useSelector((state: IRootState) => state.emailSmtp);
     const [searchInputText, setSearchInputText] = useState<string>('');
-    const [searchedData, setSearchedData] = useState<IEmailSmtp[]>(data);
     const [loading, setLoading] = useState<boolean>(false);
+    const [search, setSearch] = useState<string>('');
 
     //datatable
     const [page, setPage] = useState(1);
-    const PAGE_SIZES = [10, 20, 30, 50, 100];
+    const PAGE_SIZES = [10, 20, 30];
     const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
-    const [initialRecords, setInitialRecords] = useState(sortBy(searchedData, 'name'));
-    const [recordsData, setRecordsData] = useState(initialRecords);
+    const [recordsData, setRecordsData] = useState<IEmailSmtp[]>([] as IEmailSmtp[]);
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
         columnAccessor: 'name',
         direction: 'asc',
     });
-    useEffect(() => {
-        const from = (page - 1) * pageSize;
-        const to = from + pageSize;
-        setRecordsData([...initialRecords.slice(from, to)]);
-    }, [page, pageSize, initialRecords]);
+
+    //useDefferedValue hook for search query
+    const searchQuery = useDeferredValue(search);
 
     useEffect(() => {
-        const data = sortBy(initialRecords, sortStatus.columnAccessor);
-        setInitialRecords(sortStatus.direction === 'desc' ? data.reverse() : data);
+        const data = sortBy(recordsData, sortStatus.columnAccessor);
+        setRecordsData(sortStatus.direction === 'desc' ? data.reverse() : data);
         setPage(1);
     }, [sortStatus]);
 
     //get all emailSmtp after page render
     useEffect(() => {
         getEmailSmtpList();
-    }, [isFetching]);
+    }, [isFetching, pageSize, page, searchQuery]);
 
     useEffect(() => {
-        setSearchedData(data);
-        setInitialRecords(data);
+        setRecordsData(data);
     }, [data]);
-
-    //useDefferedValue hook for search query
-    const searchQuery = useDeferredValue(searchInputText);
 
     //get all EmailSmtp list
     const getEmailSmtpList = async () => {
         setLoading(true);
-        const res: GetMethodResponseType = await new ApiClient().get('smtp');
+        const res: GetMethodResponseType = await new ApiClient().get(`smtp?limit=${pageSize}&page=${page}&search=${searchQuery}`);
         const emailSmtp: IEmailSmtp[] = res?.data;
         if (typeof emailSmtp === 'undefined') {
             dispatch(getAllEmailSmtp([] as IEmailSmtp[]));
             return;
         }
         dispatch(getAllEmailSmtp(emailSmtp));
+        dispatch(setEmailSmtpDataLength(res?.meta?.totalCount));
         setLoading(false);
-    };
-
-    //search emailSmtp
-    const handleSearchEmailSmtp = () => {
-        const searchEmailSmtpData = data?.filter((emailSmtp: IEmailSmtp) => {
-            return (
-                emailSmtp.name.toLowerCase().startsWith(searchQuery.toLowerCase().trim(), 0) ||
-                emailSmtp.name.toLowerCase().endsWith(searchQuery.toLowerCase().trim()) ||
-                emailSmtp.name.toLowerCase().includes(searchQuery.toLowerCase().trim())
-            );
-        });
-        setSearchedData(searchEmailSmtpData);
-        setRecordsData(searchEmailSmtpData);
     };
 
     return !isAbleToRead ? null : (
@@ -105,8 +86,8 @@ const EmailSmtpPage = () => {
                     </div>
                 )}
                 <div className="relative  flex-1">
-                    <input type="text" placeholder="Find SMTP" className="form-input py-3 ltr:pr-[100px] rtl:pl-[100px]" onChange={(e) => setSearchInputText(e.target.value)} value={searchQuery} />
-                    <button type="button" className="btn btn-primary absolute top-1 shadow-none ltr:right-1 rtl:left-1" onClick={handleSearchEmailSmtp}>
+                    <input type="text" placeholder="Find SMTP" className="form-input py-3 ltr:pr-[100px] rtl:pl-[100px]" onChange={(e) => setSearchInputText(e.target.value)} value={searchInputText} />
+                    <button type="button" className="btn btn-primary absolute top-1 shadow-none ltr:right-1 rtl:left-1" onClick={() => setSearch(searchInputText)}>
                         Search
                     </button>
                 </div>
@@ -177,11 +158,11 @@ const EmailSmtpPage = () => {
                             ),
                         },
                     ]}
-                    totalRecords={initialRecords.length}
+                    totalRecords={totalRecords}
                     recordsPerPage={pageSize}
                     page={page}
                     onPageChange={(p) => setPage(p)}
-                    recordsPerPageOptions={PAGE_SIZES}
+                    recordsPerPageOptions={data?.length < 10 ? [10] : PAGE_SIZES}
                     onRecordsPerPageChange={setPageSize}
                     sortStatus={sortStatus}
                     onSortStatusChange={setSortStatus}

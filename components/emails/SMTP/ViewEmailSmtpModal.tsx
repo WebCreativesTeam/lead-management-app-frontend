@@ -8,15 +8,15 @@ const EmailSmtpViewModal = () => {
     const { viewModal, singleData } = useSelector((state: IRootState) => state.emailSmtp);
     const dispatch = useDispatch();
 
-    const { createdAt, SMTP, email, global, name, security, updatedAt, verified } = singleData;
+    const { createdAt, SMTP, email, name, security, updatedAt ,port,host} = singleData;
 
     const reqData: any = {
         SMTP,
         Email: email,
         Name: name,
         Security: security,
-        Global: global ? 'Yes' : 'No',
-        Verified: verified ? 'Verified' : 'Unverified',
+        Port :port,
+        Host :host,
         ['Lead Created']: new Date(createdAt).toLocaleString(),
         ['Lead Updated']: new Date(updatedAt).toLocaleString(),
     };

@@ -2,6 +2,12 @@
 export type GetMethodResponseType = {
     status: string;
     data: any[];
+    meta: {
+        currentPage: number;
+        perPage: number;
+        totalCount: number;
+        totalPages: number;
+    };
 };
 
 export type SelectOptionsType = {
@@ -323,31 +329,15 @@ export interface ILeadPriority {
 }
 
 //Emails SMTP types
-
-enum OutLookSecurity {
-    'SSL',
-    'TLS',
-    'STARTTLS',
-    'none',
-}
-
-enum SMTPType {
-    'Gmail',
-    'Yahoo',
-    'Outlook',
-    'Hotmail',
-}
-
 export interface IEmailSmtp {
     id: string;
     SMTP: 'SSL' | 'TLS' | 'STARTTLS' | 'none';
+    host: string;
+    port: string;
     security: 'Gmail' | 'Yahoo' | 'Outlook' | 'Hotmail';
-    global: boolean;
-    verified: boolean;
     name: string;
     email: string;
     password: string;
-    confirmPassword: string;
     createdAt: string;
     updatedAt: string;
 }
@@ -375,6 +365,7 @@ export interface InitialStateProps {
     isAbleToUpdate: boolean;
     isAbleToDelete: boolean;
     userPolicyArr: string[];
+    totalRecords: number;
 }
 
 //contact slice initial props
@@ -484,10 +475,11 @@ export interface UserInitialStateProps extends InitialStateProps {
     deactivateValue: boolean;
     isAbleToUpdatePolicy: boolean;
     isAbleToChangeActiveStatus: boolean;
+    totalRecords: number;
 }
 
 // email slice initial props
-export interface EmailsInitialStateProps {
+export interface EmailTemplateInitialStateProps {
     data: IEmailTemplate[];
     singleData: IEmailTemplate;
     deleteModal: boolean;
@@ -499,6 +491,7 @@ export interface EmailsInitialStateProps {
     isAbleToUpdate: boolean;
     isAbleToDelete: boolean;
     userPolicyArr: string[];
+    totalRecords: number;
 }
 
 // email slice initial props
@@ -510,6 +503,7 @@ export interface EmailLogInitialStateProps {
     viewModal: boolean;
     isAbleToRead: boolean;
     userPolicyArr: string[];
+    totalRecords: number;
 }
 
 ///-------- Redux Toolkit Types - END -------------//
