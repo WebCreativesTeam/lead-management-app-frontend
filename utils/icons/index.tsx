@@ -19,3 +19,4 @@ export * from './SignOut';
 export * from './Talegram';
 export * from './LockOutlined';
 export * from './ArrowTransfer';
+export * from './Sms';

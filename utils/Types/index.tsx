@@ -274,8 +274,16 @@ export interface IEmailLog {
     updatedAt: string;
 }
 
-//lead page types
+//sms template types
+export interface ISmsTemplate {
+    id: string;
+    name: string;
+    message: string;
+    createdAt: string;
+    updatedAt: string;
+}
 
+//lead page types
 export type LeadDataType = {
     id: string;
     createdAt: string;
@@ -433,6 +441,12 @@ export interface TaskStatusInitialStateProps extends InitialStateProps {
     singleData: TaskStatusType;
     defaultStatusModal: boolean;
     isAbleToChangeDefaultStatus: boolean;
+}
+
+//task status slice initial props
+export interface SmsTemplateInitialStateProps extends InitialStateProps {
+    data: ISmsTemplate[];
+    singleData: ISmsTemplate;
 }
 
 //task status slice initial props

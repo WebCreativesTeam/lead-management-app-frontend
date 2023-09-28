@@ -49,6 +49,8 @@ import {
     setLeadStatusUpdatePolicy,
 } from '@/store/Slices/leadSlice/leadStatusSlice';
 import { setEmailSmtpCreatePermission, setEmailSmtpDeletePermission, setEmailSmtpReadPermission, setEmailSmtpUpdatePermission } from '@/store/Slices/emailSlice/emailSmtpSlice';
+import Sms from '@/utils/icons/Sms';
+import { setSmsTemplateCreatePermission, setSmsTemplateDeletePermission, setSmsTemplateReadPermission, setSmsTemplateUpdatePermission } from '@/store/Slices/smsTemplateSlice';
 
 const Sidebar = () => {
     const router = useRouter();
@@ -105,20 +107,30 @@ const Sidebar = () => {
     //email template
     const userPolicyEmailTemplateArray: string[] = useSelector((state: IRootState) => state.taskStatus.userPolicyArr);
     const isAbleToReadEmailTemplates: boolean = useSelector((state: IRootState) => state.emailTemplate.isAbleToRead);
-    isAbleToReadEmailTemplates;
 
     //email smtp
     const userPolicyEmailSmtpArray: string[] = useSelector((state: IRootState) => state.emailSmtp.userPolicyArr);
     const isAbleToReadEmailSmtp: boolean = useSelector((state: IRootState) => state.emailSmtp.isAbleToRead);
-    isAbleToReadEmailTemplates;
 
     //Manage Leads page
     const userPolicyLeadArray: string[] = useSelector((state: IRootState) => state.lead.userPolicyArr);
     const isAbleToReadLeads: boolean = useSelector((state: IRootState) => state.lead.isAbleToRead);
-    isAbleToReadEmailTemplates;
+
+    //Manage sms template page
+    const userPolicySmsTemplateArray: string[] = useSelector((state: IRootState) => state.smsTemplate.userPolicyArr);
+    const isAbleToReadSmsTemplate: boolean = useSelector((state: IRootState) => state.smsTemplate?.isAbleToRead);
+
     useEffect(() => {
         dispatch(fetchUserInfo());
     }, []);
+
+    //access for sms template page
+    useEffect(() => {
+        dispatch(setSmsTemplateReadPermission('smstemplate:Read::Documents'));
+        dispatch(setSmsTemplateCreatePermission('smstemplate:Create::Document'));
+        dispatch(setSmsTemplateUpdatePermission('smstemplate:Update::Document'));
+        dispatch(setSmsTemplateDeletePermission('smstemplate:Delete::Document'));
+    }, [userPolicySmsTemplateArray]);
 
     //access for branch page
     useEffect(() => {
@@ -400,6 +412,18 @@ const Sidebar = () => {
                                             </li>
                                         </ul>
                                     </AnimateHeight>
+                                </li>
+                            )}
+
+                            {/* sms template */}
+                            {isAbleToReadSmsTemplate && (
+                                <li className="menu nav-item">
+                                    <Link href="/sms/sms-template" className="group">
+                                        <div className="flex items-center">
+                                            <Sms />
+                                            <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('SMS Template')}</span>
+                                        </div>
+                                    </Link>
                                 </li>
                             )}
 

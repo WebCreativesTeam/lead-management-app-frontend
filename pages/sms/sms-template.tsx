@@ -6,27 +6,25 @@ import { DataTable, DataTableSortStatus } from 'mantine-datatable';
 import { sortBy } from 'lodash';
 import { Delete, Edit, Plus, View } from '@/utils/icons';
 import PageHeadingSection from '@/components/__Shared/PageHeadingSection/index.';
-import ConfirmationModal from '@/components/__Shared/ConfirmationModal';
+import { GetMethodResponseType, ISmsTemplate } from '@/utils/Types';
 import { useDispatch, useSelector } from 'react-redux';
 import { setPageTitle } from '@/store/themeConfigSlice';
-import { GetMethodResponseType, SourceDataType } from '@/utils/Types';
-import { ApiClient } from '@/utils/http';
 import { IRootState } from '@/store';
-import { getAllSources, setCreateModal, setDeleteModal, setDisableBtn, setEditModal, setFetching, setSourceDataLength, setViewModal } from '@/store/Slices/sourceSlice';
-import SourceViewModal from '@/components/Sources/SourceViewModal';
-import SourceCreateModal from '@/components/Sources/SourceCreateModal';
-import SourceEditModal from '@/components/Sources/SourceEditModal';
-import { useRouter } from 'next/router';
-import Loader from '@/components/__Shared/Loader';
+import { ApiClient } from '@/utils/http';
+import { getAllSmsTemplates, setCreateModal, setEditModal, setViewModal, setDeleteModal, setSmsTemplateDataLength } from '@/store/Slices/smsTemplateSlice';
+import DeleteSmsTemplateModal from '@/components/Sms/SmsTemplate/DeleteSmsTemplateModal';
+import CreateSmsTemplateModal from '@/components/Sms/SmsTemplate/CreateSmsTemplateModal';
+import EditSmsTemplateModal from '@/components/Sms/SmsTemplate/EditSmsTemplateModal';
+import ViewSmsTemplateModal from '@/components/Sms/SmsTemplate/ViewSmsTemplateModal';
 
-const Source = () => {
+const SmsTemplatePage = () => {
     const dispatch = useDispatch();
     useEffect(() => {
-        dispatch(setPageTitle('Track Leads | Sources'));
+        dispatch(setPageTitle('Sms Template Page'));
     });
-    const { data, isFetching, isBtnDisabled, deleteModal, singleData, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate, totalRecords } = useSelector((state: IRootState) => state.source);
 
     //hooks
+    const { data, isFetching, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate, totalRecords } = useSelector((state: IRootState) => state.smsTemplate);
     const [searchInputText, setSearchInputText] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(false);
     const [search, setSearch] = useState<string>('');
@@ -35,11 +33,12 @@ const Source = () => {
     const [page, setPage] = useState(1);
     const PAGE_SIZES = [10, 20, 30];
     const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
-    const [recordsData, setRecordsData] = useState<SourceDataType[]>([] as SourceDataType[]);
+    const [recordsData, setRecordsData] = useState<ISmsTemplate[]>([] as ISmsTemplate[]);
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
         columnAccessor: 'name',
         direction: 'asc',
     });
+
     //useDefferedValue hook for search query
     const searchQuery = useDeferredValue(search);
 
@@ -49,61 +48,47 @@ const Source = () => {
         setPage(1);
     }, [sortStatus]);
 
-    //get all source after page render
+    //get all smsTemplate after page render
     useEffect(() => {
-        getSourceList();
+        getSmsTemplateList();
     }, [isFetching, pageSize, page, searchQuery]);
 
     useEffect(() => {
         setRecordsData(data);
     }, [data]);
 
-    //get all Source list
-    const getSourceList = async () => {
+    //get all SmsTemplate list
+    const getSmsTemplateList = async () => {
         setLoading(true);
-        const res: GetMethodResponseType = await new ApiClient().get(`source?limit=${pageSize}&page=${page}&search=${searchQuery}`);
-        const source: SourceDataType[] = res?.data;
-        if (typeof source === 'undefined') {
-            dispatch(getAllSources([] as SourceDataType[]));
+        const res: GetMethodResponseType = await new ApiClient().get(`sms-template?limit=${pageSize}&page=${page}&search=${searchQuery}`);
+        const priority: ISmsTemplate[] = res?.data;
+        if (typeof priority === 'undefined') {
+            dispatch(getAllSmsTemplates([] as ISmsTemplate[]));
             return;
         }
-        dispatch(getAllSources(source));
-        dispatch(setSourceDataLength(res?.meta?.totalCount));
+        dispatch(getAllSmsTemplates(priority));
+        dispatch(setSmsTemplateDataLength(res?.meta?.totalCount));
         setLoading(false);
-    };
-
-    //deleting source
-    const onDeleteSource = async () => {
-        dispatch(setFetching(true));
-        dispatch(setDisableBtn(true));
-        const deleteSource: SourceDataType = await new ApiClient().delete('source/' + singleData.id);
-        dispatch(setFetching(false));
-        if (deleteSource === null) {
-            dispatch(setDisableBtn(false));
-            return;
-        }
-        dispatch(setDisableBtn(false));
-        dispatch(setDeleteModal({ open: false }));
     };
 
     return !isAbleToRead ? null : (
         <div>
-            <PageHeadingSection description="Identify and categorize lead sources. Update descriptions. Add or remove source channels." heading="Track Leads" />
+            <PageHeadingSection description="Create Sms templates. Arrange by urgency. Enhance productivity." heading="Manage SMS" />
             <div className="my-6 flex flex-col gap-5 sm:flex-row ">
                 {!isAbleToCreate ? (
                     <div className="flex-1"></div>
                 ) : (
                     <div className="flex-1">
-                        <button className="btn btn-primary h-full w-full max-w-[200px] max-sm:mx-auto" type="button" onClick={() => dispatch(setCreateModal(true))}>
+                        <button className="btn btn-primary h-full w-full max-w-[250px] max-sm:mx-auto" type="button" onClick={() => dispatch(setCreateModal(true))}>
                             <Plus />
-                            Add New Source
+                            Create New Template
                         </button>
                     </div>
                 )}
                 <div className="relative  flex-1">
                     <input
                         type="text"
-                        placeholder="Find A Source"
+                        placeholder="Find Template"
                         className="form-input py-3 ltr:pr-[100px] rtl:pl-[100px]"
                         onChange={(e) => setSearchInputText(e.target.value)}
                         value={searchInputText}
@@ -114,7 +99,7 @@ const Source = () => {
                 </div>
             </div>
 
-            {/* source List table*/}
+            {/* sms template List table*/}
             <div className="datatables panel mt-6">
                 <DataTable
                     className="table-hover whitespace-nowrap"
@@ -122,9 +107,21 @@ const Source = () => {
                     columns={[
                         {
                             accessor: 'name',
-                            title: 'Source Name',
+                            title: 'Sms Template Name',
                             sortable: true,
-                            render: ({ name }) => <div>{name}</div>,
+                            render: ({ name }) => <span>{name}</span>,
+                        },
+                        {
+                            accessor: 'createdAt',
+                            title: 'Created Date',
+                            sortable: true,
+                            render: ({ createdAt }) => <div>{new Date(createdAt).toLocaleString()}</div>,
+                        },
+                        {
+                            accessor: 'updatedAt',
+                            title: 'Last Updated',
+                            sortable: true,
+                            render: ({ updatedAt }) => <div>{new Date(updatedAt).toLocaleString()}</div>,
                         },
                         {
                             accessor: 'action',
@@ -170,27 +167,18 @@ const Source = () => {
             </div>
 
             {/* edit modal */}
-            <SourceEditModal />
+            <EditSmsTemplateModal />
 
             {/* view modal */}
-            <SourceViewModal />
+            <ViewSmsTemplateModal />
 
             {/* delete modal */}
-            <ConfirmationModal
-                open={deleteModal}
-                onClose={() => dispatch(setDeleteModal({ open: false }))}
-                onDiscard={() => dispatch(setDeleteModal({ open: false }))}
-                description={isFetching ? <Loader /> : <>Are you sure you want to delete this Source? It will also remove form database.</>}
-                title="Delete Source"
-                isBtnDisabled={isBtnDisabled}
-                onSubmit={onDeleteSource}
-                btnSubmitText="Delete"
-            />
+            <DeleteSmsTemplateModal />
 
             {/* create modal */}
-            <SourceCreateModal />
+            <CreateSmsTemplateModal />
         </div>
     );
 };
 
-export default Source;
+export default SmsTemplatePage;

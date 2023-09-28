@@ -119,6 +119,12 @@ export const emailTemplateSchema = Yup.object().shape({
     message: Yup.string().required('Please Enter Message'),
 });
 
+//sms template schema
+export const smsTemplateSchema = Yup.object().shape({
+    name: Yup.string().required('Please Enter Template Name'),
+    message: Yup.string().required('Please Enter Message'),
+});
+
 //send email schema
 export const sendEmailSchema = Yup.object().shape({
     senderName: Yup.string().required('Enter Sender Name'),
@@ -146,3 +152,5 @@ export const editEmailSmtpSchema = Yup.object().shape({
         .oneOf([Yup.ref('password')], 'Password and confirm password not matched')
         .required('Please enter confirm password'),
 });
+
+

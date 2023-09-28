@@ -64,7 +64,7 @@ const PolicyPage = () => {
     //get all policy list
     const getPolicyList = async () => {
         setLoading(true);
-        const res: GetMethodResponseType = await new ApiClient().get(`policy?sortBy=-isDefault&limit=${pageSize}&page=${page}`);
+        const res: GetMethodResponseType = await new ApiClient().get(`policy?sortBy=-isDefault&limit=${pageSize}&page=${page}&search=${searchQuery}`);
         const policies: PolicyDataType[] = res?.data;
         if (typeof policies === 'undefined') {
             dispatch(getAllPolicies([] as PolicyDataType[]));
