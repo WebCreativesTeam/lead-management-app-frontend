@@ -14,7 +14,7 @@ import 'react-perfect-scrollbar/dist/css/styles.css';
 import '../styles/tailwind.css';
 import { NextPage } from 'next';
 import { useRouter } from 'next/router';
-import Loader from '@/components/__Shared/Loader';
+import FullScreenLoader from '@/components/__Shared/FullScreenLoader';
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
     getLayout?: (page: ReactElement) => ReactNode;
@@ -45,7 +45,7 @@ const App = ({ Component, pageProps }: AppPropsWithLayout) => {
     };
 
     return loader ? (
-        <Loader />
+        <FullScreenLoader />
     ) : (
         <Provider store={store}>
             <Head>
