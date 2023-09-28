@@ -46,7 +46,7 @@ const SignUpPage = () => {
                     password: value.password,
                 };
                 const res: ISignInResponse = await new ApiClient().post('/auth/sign-up', createUserObj);
-                console.log(res)
+                console.log(res);
                 localStorage.setItem('uid', res?.data?.id);
                 action.resetForm();
                 router.push('/auth/email-verification');
@@ -147,6 +147,7 @@ const SignUpPage = () => {
                                                 onChange={handleChange}
                                                 onBlur={handleBlur}
                                                 value={values.email}
+                                                autoComplete="username"
                                             />
                                             <span className="absolute start-4 top-1/2 -translate-y-1/2">
                                                 <Email />
@@ -166,6 +167,7 @@ const SignUpPage = () => {
                                                     onChange={handleChange}
                                                     onBlur={handleBlur}
                                                     value={values.password}
+                                                    autoComplete="new-password"
                                                 />
                                                 <span className="absolute start-4 top-1/2 -translate-y-1/2">
                                                     <Lock />
@@ -184,6 +186,7 @@ const SignUpPage = () => {
                                                     onChange={handleChange}
                                                     onBlur={handleBlur}
                                                     value={values.confirmPassword}
+                                                    autoComplete="new-password"
                                                 />
                                                 <span className="absolute start-4 top-1/2 -translate-y-1/2">
                                                     <Lock />

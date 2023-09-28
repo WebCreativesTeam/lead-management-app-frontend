@@ -26,11 +26,36 @@ type AppPropsWithLayout = AppProps & {
 
 const App = ({ Component, pageProps }: AppPropsWithLayout) => {
     const getLayout = Component.getLayout ?? ((page) => <DefaultLayout>{page}</DefaultLayout>);
+
     const [loader, setLoader] = useState<boolean>(true);
     const router = useRouter();
+    const availablePaths = [
+        '/',
+        '/tasks',
+        '/tasks/priority',
+        '/tasks/status',
+        '/auth/signin',
+        '/leads',
+        '/leads/priority',
+        '/leads/status',
+        '/emails/email-templates',
+        '/emails/SMTP',
+        '/emails/create-email',
+        '/emails/email-logs',
+        '/users',
+        '/branches',
+        '/policies',
+        '/sources',
+        '/contacts',
+    ];
 
     useEffect(() => {
-        checkUser();
+        const isPathNeedLogin: boolean = availablePaths.includes(router.pathname);
+        if (isPathNeedLogin) {
+            checkUser();
+        } else {
+            setLoader(false);
+        }
     }, []);
 
     const checkUser = async () => {

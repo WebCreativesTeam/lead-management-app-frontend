@@ -103,6 +103,7 @@ const LoginPage = () => {
                                                 onChange={handleChange}
                                                 onBlur={handleBlur}
                                                 value={values.email}
+                                                autoComplete="username"
                                             />
                                             <span className="absolute start-4 top-1/2 -translate-y-1/2">
                                                 <Email />
@@ -121,6 +122,7 @@ const LoginPage = () => {
                                                 onChange={handleChange}
                                                 onBlur={handleBlur}
                                                 value={values.password}
+                                                autoComplete="current-password"
                                             />
                                             <span className="absolute start-4 top-1/2 -translate-y-1/2">
                                                 <Lock />
