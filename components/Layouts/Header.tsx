@@ -63,7 +63,6 @@ const Header = () => {
     const handleSignout = async () => {
         try {
             const singout = await new ApiClient().get('auth/sign-out');
-            console.log(singout);
             localStorage.clear();
             router.push('/auth/signin');
         } catch (error) {

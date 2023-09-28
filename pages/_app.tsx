@@ -1,5 +1,5 @@
 import type { AppProps } from 'next/app';
-import { ReactElement, ReactNode } from 'react';
+import { ReactElement, ReactNode, useEffect, useState } from 'react';
 import DefaultLayout from '../components/Layouts/DefaultLayout';
 import { Provider } from 'react-redux';
 import { store } from '@/store';
@@ -13,6 +13,8 @@ import 'react-perfect-scrollbar/dist/css/styles.css';
 
 import '../styles/tailwind.css';
 import { NextPage } from 'next';
+import { useRouter } from 'next/router';
+import Loader from '@/components/__Shared/Loader';
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
     getLayout?: (page: ReactElement) => ReactNode;
@@ -24,8 +26,27 @@ type AppPropsWithLayout = AppProps & {
 
 const App = ({ Component, pageProps }: AppPropsWithLayout) => {
     const getLayout = Component.getLayout ?? ((page) => <DefaultLayout>{page}</DefaultLayout>);
+    const [loader, setLoader] = useState<boolean>(true);
+    const router = useRouter();
 
-    return (
+    useEffect(() => {
+        checkUser();
+    }, []);
+
+    const checkUser = async () => {
+        const uid: string | null = localStorage?.getItem('uid');
+        if (uid === null) {
+            const x = await router.push('/auth/signin');
+            setLoader(false);
+            return;
+        } else {
+            setLoader(false);
+        }
+    };
+
+    return loader ? (
+        <Loader />
+    ) : (
         <Provider store={store}>
             <Head>
                 <title>VRISTO - Multipurpose Tailwind Dashboard Template</title>
