@@ -17,3 +17,9 @@ export const SMTPSecurityList: SelectOptionsType[] = [
 ];
 
 
+export const variablesEmailTemplate = [
+    { value: '{Contact_Name}', label: '{Contact_Name}' },
+    { value: '{Contact_Mobile}', label: '{Contact_Mobile}' },
+    { value: '{Lead_Status}', label: '{Lead_Status}' },
+];
+
