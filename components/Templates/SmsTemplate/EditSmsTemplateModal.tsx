@@ -1,19 +1,24 @@
-import React, { memo } from 'react';
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, { memo, useEffect } from 'react';
 import Modal from '@/components/__Shared/Modal';
 import { useSelector, useDispatch } from 'react-redux';
 import { IRootState } from '@/store';
-import { setCreateModal, setDisableBtn, setFetching } from '@/store/Slices/smsTemplateSlice';
+import { setEditModal, setDisableBtn, setFetching } from '@/store/Slices/templateSlice/smsTemplateSlice';
 import { useFormik } from 'formik';
 import { smsTemplateSchema } from '@/utils/schemas';
 import { ApiClient } from '@/utils/http';
 import { showToastAlert } from '@/utils/contant';
 import Loader from '@/components/__Shared/Loader';
-
-const CreateSmsTemplateModal = () => {
-    const { createModal, isBtnDisabled, isFetching } = useSelector((state: IRootState) => state.smsTemplate);
+const SmsTemplateEditModal = () => {
+    const { editModal, singleData, isBtnDisabled, isFetching } = useSelector((state: IRootState) => state.smsTemplate);
 
     const dispatch = useDispatch();
-    const { values, handleChange, submitForm, handleSubmit, handleBlur, resetForm } = useFormik({
+    useEffect(() => {
+        setFieldValue('name', singleData?.name);
+        setFieldValue('message', singleData?.message);
+    }, [singleData]);
+
+    const { values, handleChange, submitForm, handleSubmit, setFieldValue, errors, handleBlur, resetForm } = useFormik({
         initialValues: {
             name: '',
             message: '',
@@ -25,14 +30,17 @@ const CreateSmsTemplateModal = () => {
             dispatch(setFetching(true));
             try {
                 dispatch(setDisableBtn(true));
-                await new ApiClient().post('sms-template', { name: value.name, message: value.message });
-                dispatch(setCreateModal(false));
+                await new ApiClient().patch('sms-template/' + singleData.id, { name: value.name, message: value.message });
+
                 action.resetForm();
+                dispatch(setEditModal({ open: false }));
             } catch (error: any) {
                 if (typeof error?.response?.data?.message === 'object') {
                     showToastAlert(error?.response?.data?.message.join(' , '));
-                } else {
+                } else if (error?.response?.data?.message) {
                     showToastAlert(error?.response?.data?.message);
+                } else if (error?.response?.data) {
+                    showToastAlert(error?.response?.data);
                 }
                 showToastAlert(error?.response?.data?.message);
             }
@@ -40,20 +48,20 @@ const CreateSmsTemplateModal = () => {
             dispatch(setFetching(false));
         },
     });
+    const handleDiscard = () => {
+        dispatch(setEditModal({ open: false }));
+        resetForm();
+    };
     return (
         <Modal
-            open={createModal}
-            onClose={() => {
-                dispatch(setCreateModal(false));
-            }}
-            onDiscard={() => {
-                dispatch(setCreateModal(false));
-                resetForm();
-            }}
+            open={editModal}
+            onClose={() => dispatch(setEditModal({ open: false }))}
+            size="medium"
+            onDiscard={handleDiscard}
+            title="Edit Template"
             onSubmit={() => submitForm()}
-            title="Create Sms Template"
-            isBtnDisabled={values.name && values.message && !isBtnDisabled ? false : true}
             disabledDiscardBtn={isBtnDisabled}
+            isBtnDisabled={values.name && values.message && !isBtnDisabled ? false : true}
             content={
                 isFetching ? (
                     <Loader />
@@ -83,4 +91,4 @@ const CreateSmsTemplateModal = () => {
     );
 };
 
-export default memo(CreateSmsTemplateModal);
+export default memo(SmsTemplateEditModal);

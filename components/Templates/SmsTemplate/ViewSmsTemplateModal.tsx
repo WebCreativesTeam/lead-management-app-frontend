@@ -1,7 +1,7 @@
 import React, { memo } from 'react';
 import ViewModal from '@/components/__Shared/ViewModal';
 import { useDispatch, useSelector } from 'react-redux';
-import { setViewModal } from '@/store/Slices/smsTemplateSlice';
+import { setViewModal } from '@/store/Slices/templateSlice/smsTemplateSlice';
 import { IRootState } from '@/store';
 
 const SmsTemplateViewModal = () => {
@@ -11,8 +11,8 @@ const SmsTemplateViewModal = () => {
     return (
         <ViewModal
             title="View Sms Template Detail"
-        open={viewModal}
-        size='large'
+            open={viewModal}
+            size="large"
             onClose={() => dispatch(setViewModal({ open: false }))}
             content={
                 <>

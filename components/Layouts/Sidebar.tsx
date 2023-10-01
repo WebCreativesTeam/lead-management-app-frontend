@@ -9,7 +9,7 @@ import AnimateHeight from 'react-animate-height';
 import { AppDispatch, IRootState } from '../../store';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { ArrowRight, Branch, Email, Global, Phone, Shield, Tasks, User } from '../../utils/icons';
+import { ArrowRight, Branch, Email, Global, Phone, Shield, Tasks, User, File } from '../../utils/icons';
 import { setBranchCreatePolicy, setBranchDeletePolicy, setBranchReadPolicy, setBranchUpdatePolicy } from '@/store/Slices/branchSlice';
 import { fetchUserInfo } from '@/utils/contant';
 import { setContactCreatePolicy, setContactDeletePolicy, setContactReadPolicy, setContactUpdatePolicy } from '@/store/Slices/contactSlice';
@@ -50,7 +50,7 @@ import {
 } from '@/store/Slices/leadSlice/leadStatusSlice';
 import { setEmailSmtpCreatePermission, setEmailSmtpDeletePermission, setEmailSmtpReadPermission, setEmailSmtpUpdatePermission } from '@/store/Slices/emailSlice/emailSmtpSlice';
 import Sms from '@/utils/icons/Sms';
-import { setSmsTemplateCreatePermission, setSmsTemplateDeletePermission, setSmsTemplateReadPermission, setSmsTemplateUpdatePermission } from '@/store/Slices/smsTemplateSlice';
+import { setSmsTemplateCreatePermission, setSmsTemplateDeletePermission, setSmsTemplateReadPermission, setSmsTemplateUpdatePermission } from '@/store/Slices/templateSlice/smsTemplateSlice';
 
 const Sidebar = () => {
     const router = useRouter();
@@ -372,6 +372,9 @@ const Sidebar = () => {
                                                     <Link href="/leads/status">{t('Status')}</Link>
                                                 </li>
                                             )}
+                                            <li>
+                                                <Link href="/leads/rules">{t('Rules')}</Link>
+                                            </li>
                                         </ul>
                                     </AnimateHeight>
                                 </li>
@@ -415,15 +418,32 @@ const Sidebar = () => {
                                 </li>
                             )}
 
-                            {/* sms template */}
-                            {isAbleToReadSmsTemplate && (
+                            {/* Templates */}
+                            {!isAbleToReadEmailTemplates && !isAbleToReadEmailSmtp ? null : (
                                 <li className="menu nav-item">
-                                    <Link href="/sms/sms-template" className="group">
+                                    <button type="button" className={`${currentMenu === 'Templates' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('Templates')}>
                                         <div className="flex items-center">
-                                            <Sms />
-                                            <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('SMS Template')}</span>
+                                            <File />
+                                            <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Templates')}</span>
                                         </div>
-                                    </Link>
+
+                                        <div className={currentMenu === 'Templates' ? 'rotate-90' : 'rtl:rotate-180'}>
+                                            <ArrowRight />
+                                        </div>
+                                    </button>
+
+                                    <AnimateHeight duration={300} height={currentMenu === 'Templates' ? 'auto' : 0}>
+                                        <ul className="sub-menu text-gray-500">
+                                            {isAbleToReadSmsTemplate && (
+                                                <li>
+                                                    <Link href="/templates/sms-template">{t('SMS')}</Link>
+                                                </li>
+                                            )}
+                                            {/* <li>
+                                                <Link href="/templates/whatsapp-template">{t('WhatsApp')}</Link>
+                                            </li> */}
+                                        </ul>
+                                    </AnimateHeight>
                                 </li>
                             )}
 

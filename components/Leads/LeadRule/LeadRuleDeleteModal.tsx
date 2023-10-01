@@ -2,19 +2,19 @@ import React, { memo } from 'react';
 import ConfirmationModal from '@/components/__Shared/ConfirmationModal';
 import { useDispatch, useSelector } from 'react-redux';
 import { IRootState } from '@/store';
-import { setDeleteModal, setDisableBtn, setFetching } from '@/store/Slices/smsTemplateSlice';
-import { ISmsTemplate } from '@/utils/Types';
+import { setDeleteModal, setDisableBtn, setFetching } from '@/store/Slices/leadSlice/leadRuleSlice';
+import { ILeadRules } from '@/utils/Types';
 import { ApiClient } from '@/utils/http';
 import Loader from '@/components/__Shared/Loader';
 
-const SmsTemplateDeleteModal = () => {
-    const { isFetching, isBtnDisabled, deleteModal, singleData } = useSelector((state: IRootState) => state.smsTemplate);
+const LeadRuleDeleteModal = () => {
+    const { isFetching, isBtnDisabled, deleteModal, singleData } = useSelector((state: IRootState) => state.leadRule);
     const dispatch = useDispatch();
-    const onDeleteSmsTemplate = async () => {
+    const onDeleteLeadRule = async () => {
         dispatch(setFetching(true));
         dispatch(setDisableBtn(true));
-        const deleteSmsTemplate: ISmsTemplate = await new ApiClient().delete('sms-template/' + singleData.id);
-        if (deleteSmsTemplate === null) {
+        const deleteLeadRule: ILeadRules = await new ApiClient().delete('lead-rule/' + singleData.id);
+        if (deleteLeadRule === null) {
             dispatch(setDisableBtn(false));
             return;
         }
@@ -28,13 +28,13 @@ const SmsTemplateDeleteModal = () => {
             open={deleteModal}
             onClose={() => dispatch(setDeleteModal({ open: false }))}
             onDiscard={() => dispatch(setDeleteModal({ open: false }))}
-            description={isFetching ? <Loader /> : <>Are you sure you want to delete this Sms Template? It will also remove form database.</>}
-            title="Delete Sms Template"
+            description={isFetching ? <Loader /> : <>Are you sure you want to delete this rule? It will also remove form database.</>}
+            title="Delete Lead Rule"
             isBtnDisabled={isBtnDisabled}
-            onSubmit={onDeleteSmsTemplate}
+            onSubmit={onDeleteLeadRule}
             btnSubmitText="Delete"
         />
     );
 };
 
-export default memo(SmsTemplateDeleteModal);
+export default memo(LeadRuleDeleteModal);

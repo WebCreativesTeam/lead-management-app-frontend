@@ -2,65 +2,65 @@ import * as Yup from 'yup';
 
 //authentication schemas
 export const signUpSchema = Yup.object().shape({
-    firstName: Yup.string().required('Please enter your firstName'),
-    lastName: Yup.string().required('Please enter your lastName'),
-    email: Yup.string().email().required('Please enter your email'),
-    password: Yup.string().required('Please enter your password').min(8, 'Password should be atleast 8 characters'),
+    firstName: Yup.string().required('Enter your firstName'),
+    lastName: Yup.string().required('Enter your lastName'),
+    email: Yup.string().email().required('Enter your email'),
+    password: Yup.string().required('Enter your password').min(8, 'Password should be atleast 8 characters'),
     confirmPassword: Yup.string()
         .oneOf([Yup.ref('password')], 'Password and confirm password not matched')
-        .required('Please enter confirm password'),
+        .required('Enter confirm password'),
 });
 
 export const signInSchema = Yup.object().shape({
-    email: Yup.string().email().required('Please enter your email'),
-    password: Yup.string().required('Please enter your password').min(8, 'Password should be atleast 8 characters'),
+    email: Yup.string().email().required('Enter your email'),
+    password: Yup.string().required('Enter your password').min(8, 'Password should be atleast 8 characters'),
 });
 
 export const resetPasswordSchema = Yup.object().shape({
-    newPassword: Yup.string().required('Please enter new password').min(8, 'Password should be atleast 8 characters'),
+    newPassword: Yup.string().required('Enter new password').min(8, 'Password should be atleast 8 characters'),
     confirmPassword: Yup.string()
         .oneOf([Yup.ref('newPassword')], 'Password and confirm password not matched')
-        .required('Please enter confirm password'),
+        .required('Enter confirm password'),
 });
 
 export const policySchema = Yup.object().shape({
-    name: Yup.string().required('Please enter policy name'),
-    description: Yup.string().min(20, 'Description must be 20 characters').required('Please enter policy description'),
+    name: Yup.string().required('Enter policy name'),
+    description: Yup.string().min(20, 'Description must be 20 characters').required('Enter policy description'),
 });
 
 //Create User Schema
 export const createUserSchema = Yup.object().shape({
-    firstName: Yup.string().required('Please enter your firstName'),
-    lastName: Yup.string().required('Please enter your lastName'),
-    email: Yup.string().email().required('Please enter your email'),
-    password: Yup.string().required('Please enter your password').min(8, 'Password should be atleast 8 characters'),
+    firstName: Yup.string().required('Enter your firstName'),
+    lastName: Yup.string().required('Enter your lastName'),
+    email: Yup.string().email().required('Enter your email'),
+    password: Yup.string().required('Enter your password').min(8, 'Password should be atleast 8 characters'),
     passwordConfirm: Yup.string()
         .oneOf([Yup.ref('password')], 'Password and confirm password not matched')
-        .required('Please enter confirm password'),
+        .required('Enter confirm password'),
 });
 
 //Edit User Schema
 export const editUserSchema = Yup.object().shape({
-    firstName: Yup.string().required('Please enter your firstName'),
-    lastName: Yup.string().required('Please enter your lastName'),
+    firstName: Yup.string().required('Enter your firstName'),
+    lastName: Yup.string().required('Enter your lastName'),
 });
 
 //branch schema
 
 export const branchSchema = Yup.object().shape({
-    name: Yup.string().required('Please enter Branch Name'),
-    address: Yup.string().required('Please enter Branch Address'),
+    name: Yup.string().required('Enter Branch Name'),
+    address: Yup.string().required('Enter Branch Address'),
 });
 
 //source schema
 export const sourceSchema = Yup.object().shape({
-    name: Yup.string().required('Please enter Source Name'),
+    name: Yup.string().required('Enter Source Name'),
 });
 
 //task Schema
 
 export const taskSchema = Yup.object().shape({
-    title: Yup.string().required('Please enter title'),
+    title: Yup.string().required('Enter title'),
 });
 
 //task Schema
@@ -74,55 +74,66 @@ export const leadSchema = Yup.object().shape({
 });
 
 //task priority schema
+export const leadRuleSchema = Yup.object().shape({
+    name: Yup.string().required('Enter Rule name'),
+});
+
+//task priority schema
 export const taskPrioritySchema = Yup.object().shape({
-    name: Yup.string().required('Please enter task priority name'),
+    name: Yup.string().required('Enter task priority name'),
 });
 
 //lead priority schema
 export const leadPrioritySchema = Yup.object().shape({
-    name: Yup.string().required('Please enter lead priority name'),
+    name: Yup.string().required('Enter lead priority name'),
 });
 
 //task status schema
 export const taskStatusSchema = Yup.object().shape({
-    name: Yup.string().required('Please enter task Status name'),
+    name: Yup.string().required('Enter task Status name'),
 });
 
 //lead status schema
 export const leadStatusSchema = Yup.object().shape({
-    name: Yup.string().required('Please enter lead Status name'),
+    name: Yup.string().required('Enter lead Status name'),
 });
 
 export const contactSchema = Yup.object().shape({
-    title: Yup.string().required('Please select title'),
-    name: Yup.string().required('Please enter name'),
-    phoneNumber: Yup.string().required('Please enter Phone number'),
-    email: Yup.string().email('Please enter valid email').required('Please enter email'),
-    assignedTo: Yup.string().required('Please select assign to option'),
-    source: Yup.string().required('Please select source'),
-    website: Yup.string().required('Please enter website'),
-    position: Yup.string().required('Please enter position'),
-    industry: Yup.string().required('Please enter industry'),
-    facebookProfile: Yup.string().required('Please enter facebookProfile link'),
-    twitterProfile: Yup.string().required('Please enter twitterProfile link'),
-    comment: Yup.string().required('Please enter comment'),
-    address: Yup.string().required('Please enter address'),
-    city: Yup.string().required('Please select city'),
-    state: Yup.string().required('Please select state'),
-    country: Yup.string().required('Please select country'),
+    title: Yup.string().required('select title'),
+    name: Yup.string().required('Enter name'),
+    phoneNumber: Yup.string().required('Enter Phone number'),
+    email: Yup.string().email('Enter valid email').required('Enter email'),
+    assignedTo: Yup.string().required('select assign to option'),
+    source: Yup.string().required('select source'),
+    website: Yup.string().required('Enter website'),
+    position: Yup.string().required('Enter position'),
+    industry: Yup.string().required('Enter industry'),
+    facebookProfile: Yup.string().required('Enter facebookProfile link'),
+    twitterProfile: Yup.string().required('Enter twitterProfile link'),
+    comment: Yup.string().required('Enter comment'),
+    address: Yup.string().required('Enter address'),
+    city: Yup.string().required('select city'),
+    state: Yup.string().required('select state'),
+    country: Yup.string().required('select country'),
 });
 
 //email template schema
 export const emailTemplateSchema = Yup.object().shape({
-    name: Yup.string().required('Please Enter Template Name'),
-    subject: Yup.string().required('Please Enter Template Subject'),
-    message: Yup.string().required('Please Enter Message'),
+    name: Yup.string().required('Enter Template Name'),
+    subject: Yup.string().required('Enter Template Subject'),
+    message: Yup.string().required('Enter Message'),
 });
 
 //sms template schema
 export const smsTemplateSchema = Yup.object().shape({
-    name: Yup.string().required('Please Enter Template Name'),
-    message: Yup.string().required('Please Enter Message'),
+    name: Yup.string().required('Enter Template Name'),
+    message: Yup.string().required('Enter Message'),
+});
+
+//whatsapp template schema
+export const whatsappTemplateSchema = Yup.object().shape({
+    name: Yup.string().required('Enter Template Name'),
+    message: Yup.string().required('Enter Message'),
 });
 
 //send email schema
@@ -141,7 +152,7 @@ export const emailSmtpSchema = Yup.object().shape({
     password: Yup.string().required('Enter SMTP password').min(8, 'Password should be atleast 8 characters'),
     confirmPassword: Yup.string()
         .oneOf([Yup.ref('password')], 'Password and confirm password not matched')
-        .required('Please enter confirm password'),
+        .required('Enter confirm password'),
 });
 
 export const editEmailSmtpSchema = Yup.object().shape({
@@ -150,7 +161,5 @@ export const editEmailSmtpSchema = Yup.object().shape({
     password: Yup.string().required('Enter SMTP password').min(8, 'Password should be atleast 8 characters'),
     confirmPassword: Yup.string()
         .oneOf([Yup.ref('password')], 'Password and confirm password not matched')
-        .required('Please enter confirm password'),
+        .required('Enter confirm password'),
 });
-
-

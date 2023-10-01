@@ -17,6 +17,7 @@ import PolicyEditModal from '@/components/Policy/PolicyEditModal';
 import ChangeDefaultPolicyModal from '@/components/Policy/ChangeDefaultPolicyModal';
 import PolicyDeleteModal from '@/components/Policy/PolicyDeleteModal';
 import PolicyViewModal from '@/components/Policy/PolicyViewModal';
+import ToggleSwitch from '@/components/__Shared/ToggleSwitch';
 
 const PolicyPage = () => {
     const dispatch = useDispatch();
@@ -152,7 +153,7 @@ const PolicyPage = () => {
                                                 checked={isDefault}
                                                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => dispatch(setDefaultPolicyModal({ id, open: true, switchValue: e.target.checked }))}
                                             />
-                                            <span className="block h-full rounded-full bg-[#ebedf2] before:absolute before:bottom-1 before:left-1 before:h-4 before:w-4 before:rounded-full before:bg-white before:transition-all before:duration-300 peer-checked:bg-primary peer-checked:before:left-7 dark:bg-dark dark:before:bg-white-dark dark:peer-checked:before:bg-white"></span>
+                                            <ToggleSwitch />
                                         </label>
                                     </div>
                                 ) : isDefault ? (

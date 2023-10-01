@@ -18,6 +18,7 @@ import CreateLeadPriorityModal from '@/components/Leads/LeadPriority/CreateLeadP
 import EditLeadPriorityModal from '@/components/Leads/LeadPriority/EditLeadPriorityModal';
 import ChangeDefaultPriorityModal from '@/components/Leads/LeadPriority/ChangeDefaultPriorityModal';
 import ViewLeadPriorityModal from '@/components/Leads/LeadPriority/ViewLeadPriorityModal';
+import ToggleSwitch from '@/components/__Shared/ToggleSwitch';
 
 const LeadPriorityPage = () => {
     const dispatch = useDispatch();
@@ -145,7 +146,7 @@ const LeadPriorityPage = () => {
                                                 checked={isDefault}
                                                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => dispatch(setDefaultPriorityModal({ switchValue: e.target.checked, id, open: true }))}
                                             />
-                                            <span className="block h-full rounded-full bg-[#ebedf2] before:absolute before:bottom-1 before:left-1 before:h-4 before:w-4 before:rounded-full before:bg-white before:transition-all before:duration-300 peer-checked:bg-primary peer-checked:before:left-7 dark:bg-dark dark:before:bg-white-dark dark:peer-checked:before:bg-white"></span>
+                                            <ToggleSwitch />
                                         </label>
                                     </div>
                                 ) : isDefault ? (

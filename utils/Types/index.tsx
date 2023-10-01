@@ -283,6 +283,9 @@ export interface ISmsTemplate {
     updatedAt: string;
 }
 
+//whatsapp template types
+export interface IWhatsappTemplate extends ISmsTemplate {}
+
 //lead page types
 export type LeadDataType = {
     id: string;
@@ -350,6 +353,16 @@ export interface IEmailSmtp {
     updatedAt: string;
 }
 
+//lead Rule types
+export interface ILeadRules {
+    id: string;
+    name: string;
+    isEdited: boolean;
+    isAdded: boolean;
+    source: SourceDataType;
+    
+}
+
 // ----------------- authentication types : start -------------------//
 
 export interface ISignInResponse {
@@ -381,6 +394,13 @@ export interface ContactInitialStateProps extends InitialStateProps {
     data: ContactDataType[];
     singleData: ContactDataType;
     usersList: UserListSecondaryEndpointType[];
+    sourceList: SourceDataType[];
+}
+
+//lead rules slice initial props
+export interface LeadRuleInitialStateProps extends InitialStateProps {
+    data: ILeadRules[];
+    singleData: ILeadRules;
     sourceList: SourceDataType[];
 }
 //manage task slice initial props
@@ -443,10 +463,15 @@ export interface TaskStatusInitialStateProps extends InitialStateProps {
     isAbleToChangeDefaultStatus: boolean;
 }
 
-//task status slice initial props
+//sms template slice initial props
 export interface SmsTemplateInitialStateProps extends InitialStateProps {
     data: ISmsTemplate[];
     singleData: ISmsTemplate;
+}
+//whatsapp template slice initial props
+export interface WhatsappTemplateInitialStateProps extends InitialStateProps {
+    data: IWhatsappTemplate[];
+    singleData: IWhatsappTemplate;
 }
 
 //task status slice initial props

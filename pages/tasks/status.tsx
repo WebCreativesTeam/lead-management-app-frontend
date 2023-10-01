@@ -17,6 +17,7 @@ import CreateTaskStatusModal from '@/components/Tasks/TaskStatus/CreateTaskStatu
 import EditTaskStatusModal from '@/components/Tasks/TaskStatus/EditTaskStatusModal';
 import ChangeDefaultStatusModal from '@/components/Tasks/TaskStatus/ChangeDefaultStatusModal';
 import ViewTaskStatusModal from '@/components/Tasks/TaskStatus/ViewTaskStatusModal';
+import ToggleSwitch from '@/components/__Shared/ToggleSwitch';
 
 const TaskStatusPage = () => {
     const dispatch = useDispatch();
@@ -143,7 +144,7 @@ const TaskStatusPage = () => {
                                                 checked={isDefault}
                                                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => dispatch(setDefaultStatusModal({ switchValue: e.target.checked, id, open: true }))}
                                             />
-                                            <span className="block h-full rounded-full bg-[#ebedf2] before:absolute before:bottom-1 before:left-1 before:h-4 before:w-4 before:rounded-full before:bg-white before:transition-all before:duration-300 peer-checked:bg-primary peer-checked:before:left-7 dark:bg-dark dark:before:bg-white-dark dark:peer-checked:before:bg-white"></span>
+                                            <ToggleSwitch />
                                         </label>
                                     </div>
                                 ) : isDefault ? (

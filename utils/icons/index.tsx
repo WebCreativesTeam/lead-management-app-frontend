@@ -20,3 +20,4 @@ export * from './Talegram';
 export * from './LockOutlined';
 export * from './ArrowTransfer';
 export * from './Sms';
+export * from './File';

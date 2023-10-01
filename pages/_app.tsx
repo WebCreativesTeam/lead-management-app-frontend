@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import type { AppProps } from 'next/app';
 import { ReactElement, ReactNode, useEffect, useState } from 'react';
 import DefaultLayout from '../components/Layouts/DefaultLayout';
@@ -57,6 +58,11 @@ const App = ({ Component, pageProps }: AppPropsWithLayout) => {
             setLoader(false);
         }
     }, []);
+
+    // useEffect(() => {
+    //     const isUserOnline = window?.navigator?.onLine;
+    //     setIsOnline(isUserOnline);
+    // }, [isOnline]);
 
     const checkUser = async () => {
         const uid: string | null = localStorage?.getItem('uid');

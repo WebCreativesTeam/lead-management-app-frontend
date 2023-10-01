@@ -11,11 +11,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setPageTitle } from '@/store/themeConfigSlice';
 import { IRootState } from '@/store';
 import { ApiClient } from '@/utils/http';
-import { getAllSmsTemplates, setCreateModal, setEditModal, setViewModal, setDeleteModal, setSmsTemplateDataLength } from '@/store/Slices/smsTemplateSlice';
-import DeleteSmsTemplateModal from '@/components/Sms/SmsTemplate/DeleteSmsTemplateModal';
-import CreateSmsTemplateModal from '@/components/Sms/SmsTemplate/CreateSmsTemplateModal';
-import EditSmsTemplateModal from '@/components/Sms/SmsTemplate/EditSmsTemplateModal';
-import ViewSmsTemplateModal from '@/components/Sms/SmsTemplate/ViewSmsTemplateModal';
+import { getAllSmsTemplates, setCreateModal, setEditModal, setViewModal, setDeleteModal, setSmsTemplateDataLength } from '@/store/Slices/templateSlice/smsTemplateSlice';
+import DeleteSmsTemplateModal from '@/components/Templates/SmsTemplate/DeleteSmsTemplateModal';
+import CreateSmsTemplateModal from '@/components/Templates/SmsTemplate/CreateSmsTemplateModal';
+import EditSmsTemplateModal from '@/components/Templates/SmsTemplate/EditSmsTemplateModal';
+import ViewSmsTemplateModal from '@/components/Templates/SmsTemplate/ViewSmsTemplateModal';
 
 const SmsTemplatePage = () => {
     const dispatch = useDispatch();

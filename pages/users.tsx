@@ -6,23 +6,10 @@ import { DataTable, DataTableSortStatus } from 'mantine-datatable';
 import { Delete, Edit, Plus, Shield, View } from '@/utils/icons';
 import { UserDataType, PolicyListSecondaryEndpoint, GetMethodResponseType } from '@/utils/Types';
 import PageHeadingSection from '@/components/__Shared/PageHeadingSection/index.';
-import ConfirmationModal from '@/components/__Shared/ConfirmationModal';
 import { setPageTitle } from '@/store/themeConfigSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { ApiClient } from '@/utils/http';
-import {
-    getAllPolicies,
-    getAllUsers,
-    setCreateModal,
-    setDeactivateModal,
-    setDeleteModal,
-    setDisableBtn,
-    setEditModal,
-    setFetching,
-    setPolicyModal,
-    setUserDataLength,
-    setViewModal,
-} from '@/store/Slices/userSlice';
+import { getAllPolicies, getAllUsers, setCreateModal, setDeactivateModal, setDeleteModal, setEditModal, setPolicyModal, setUserDataLength, setViewModal } from '@/store/Slices/userSlice';
 import { IRootState } from '@/store';
 import UserCreateModal from '@/components/Users/UserCreateModal';
 import UserViewModal from '@/components/Users/UserViewModal';
@@ -30,7 +17,8 @@ import UserEditModal from '@/components/Users/UserEditModal';
 import UserPolicyModal from '@/components/Users/UserPolicyModal';
 import UserDeactivateModal from '@/components/Users/UserDeactivateModal';
 import { sortBy } from 'lodash';
-import Loader from '@/components/__Shared/Loader';
+import UserDeleteModal from '@/components/Users/UserDeleteModal';
+import ToggleSwitch from '@/components/__Shared/ToggleSwitch';
 
 const Users = () => {
     const dispatch = useDispatch();
@@ -38,10 +26,10 @@ const Users = () => {
         dispatch(setPageTitle('Manage Users'));
     });
     //hooks
-    const { data, isFetching, isBtnDisabled, deleteModal, singleData, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate, isAbleToUpdatePolicy, isAbleToChangeActiveStatus, totalRecords } =
-        useSelector((state: IRootState) => state.user);
+    const { data, isFetching, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate, isAbleToUpdatePolicy, isAbleToChangeActiveStatus, totalRecords } = useSelector(
+        (state: IRootState) => state.user
+    );
     const [searchInputText, setSearchInputText] = useState<string>('');
-    const [searchedData, setSearchedData] = useState<UserDataType[]>(data);
     const [loading, setLoading] = useState<boolean>(false);
     const [search, setSearch] = useState<string>('');
 
@@ -100,20 +88,6 @@ const Users = () => {
         }
         dispatch(getAllPolicies(policies));
         setLoading(false);
-    };
-
-    //deleting User
-    const onDeleteUser = async () => {
-        dispatch(setFetching(true));
-        dispatch(setDisableBtn(true));
-        const deleteUser = await new ApiClient().delete('user/' + singleData.id);
-        dispatch(setFetching(false));
-        if (deleteUser === null) {
-            dispatch(setDisableBtn(false));
-            return;
-        }
-        dispatch(setDisableBtn(false));
-        dispatch(setDeleteModal({ open: false }));
     };
 
     return !isAbleToRead ? null : (
@@ -184,7 +158,7 @@ const Users = () => {
                                                 checked={isActive}
                                                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => dispatch(setDeactivateModal({ open: true, id, value: e.target.checked }))}
                                             />
-                                            <span className="block h-full rounded-full bg-[#ebedf2] before:absolute before:bottom-1 before:left-1 before:h-4 before:w-4 before:rounded-full before:bg-white before:transition-all before:duration-300 peer-checked:bg-primary peer-checked:before:left-7 dark:bg-dark dark:before:bg-white-dark dark:peer-checked:before:bg-white"></span>
+                                            <ToggleSwitch />
                                         </label>
                                     </div>
                                 ) : (
@@ -268,16 +242,7 @@ const Users = () => {
             <UserViewModal />
 
             {/* delete modal */}
-            <ConfirmationModal
-                open={deleteModal}
-                onClose={() => dispatch(setDeleteModal({ open: false }))}
-                onDiscard={() => dispatch(setDeleteModal({ open: false }))}
-                description={isFetching ? <Loader /> : <>Are you sure you want to delete this User? It will also remove form database. And, It will not revert!</>}
-                title="Delete User"
-                isBtnDisabled={isBtnDisabled}
-                onSubmit={onDeleteUser}
-                btnSubmitText="Delete"
-            />
+            <UserDeleteModal />
 
             {/* Deactivate modal */}
             <UserDeactivateModal />
