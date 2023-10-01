@@ -17,14 +17,13 @@ const LeadRuleEditModal = () => {
 
     const dispatch = useDispatch();
 
-    const [leadRuleDropdown, setLeadRuleDropdown] = useState<SelectOptionsType[]>([] as SelectOptionsType[]);
-
-    useEffect(() => {
-        const leadRuleOptions: SelectOptionsType[] = sourceList?.map((item: SourceDataType) => {
-            return { value: item.id, label: item.name };
-        });
-        setLeadRuleDropdown(leadRuleOptions);
-    }, [sourceList]);
+      const [sourceDropdown, setSourceDropdown] = useState<SelectOptionsType[]>([] as SelectOptionsType[]);
+   useEffect(() => {
+       const sourceOptions: SelectOptionsType[] = sourceList?.map((item: SourceDataType) => {
+           return { value: item.id, label: item.name };
+       });
+       setSourceDropdown(sourceOptions);
+   }, [sourceList]);
 
     useEffect(() => {
         formik.setFieldValue('name', singleData?.name);
@@ -130,8 +129,8 @@ const LeadRuleEditModal = () => {
                                     </div>
                                 </section>
                                 <div className="flex-1">
-                                    <label htmlFor="state">Lead Rule</label>
-                                    <Select placeholder="Select Lead Rule" options={leadRuleDropdown} onChange={(data: any) => formik.setFieldValue('leadRule', data.value)} />
+                                    <label htmlFor="state">Source</label>
+                                    <Select placeholder="Select Source" options={sourceDropdown} onChange={(data: any) => formik.setFieldValue('source', data.value)} />
                                 </div>
                             </div>
                             <FieldArray
@@ -178,15 +177,15 @@ const LeadRuleEditModal = () => {
                                                                 <div className="flex-1">
                                                                     <Select
                                                                         placeholder="Select Email Template"
-                                                                        options={leadRuleDropdown}
-                                                                        onChange={(data: any) => formik.setFieldValue('leadRule', data.value)}
+                                                                        options={sourceDropdown}
+                                                                        onChange={(data: any) => formik.setFieldValue('source', data.value)}
                                                                     />
                                                                 </div>
                                                                 <div className="flex-1">
                                                                     <Select
                                                                         placeholder="Select Smtp Account"
-                                                                        options={leadRuleDropdown}
-                                                                        onChange={(data: any) => formik.setFieldValue('leadRule', data.value)}
+                                                                        options={sourceDropdown}
+                                                                        onChange={(data: any) => formik.setFieldValue('source', data.value)}
                                                                     />
                                                                 </div>
                                                             </div>
@@ -210,15 +209,15 @@ const LeadRuleEditModal = () => {
                                                                 <div className="flex-1 ">
                                                                     <Select
                                                                         placeholder="Select SMS Template"
-                                                                        options={leadRuleDropdown}
-                                                                        onChange={(data: any) => formik.setFieldValue('leadRule', data.value)}
+                                                                        options={sourceDropdown}
+                                                                        onChange={(data: any) => formik.setFieldValue('source', data.value)}
                                                                     />
                                                                 </div>
                                                                 <div className="flex-1">
                                                                     <Select
                                                                         placeholder="Select Sms API Type"
-                                                                        options={leadRuleDropdown}
-                                                                        onChange={(data: any) => formik.setFieldValue('leadRule', data.value)}
+                                                                        options={sourceDropdown}
+                                                                        onChange={(data: any) => formik.setFieldValue('source', data.value)}
                                                                     />
                                                                 </div>
                                                             </div>
@@ -242,15 +241,15 @@ const LeadRuleEditModal = () => {
                                                                 <div className="flex-1">
                                                                     <Select
                                                                         placeholder="Select Whatsapp Template"
-                                                                        options={leadRuleDropdown}
-                                                                        onChange={(data: any) => formik.setFieldValue('leadRule', data.value)}
+                                                                        options={sourceDropdown}
+                                                                        onChange={(data: any) => formik.setFieldValue('source', data.value)}
                                                                     />
                                                                 </div>
                                                                 <div className="flex-1">
                                                                     <Select
                                                                         placeholder="Select Whatsapp API Type"
-                                                                        options={leadRuleDropdown}
-                                                                        onChange={(data: any) => formik.setFieldValue('leadRule', data.value)}
+                                                                        options={sourceDropdown}
+                                                                        onChange={(data: any) => formik.setFieldValue('source', data.value)}
                                                                     />
                                                                 </div>
                                                             </div>
