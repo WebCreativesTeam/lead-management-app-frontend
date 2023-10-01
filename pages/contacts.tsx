@@ -17,8 +17,6 @@ import {
     setDeleteModal,
     setCreateModal,
     setViewModal,
-    setFetching,
-    setDisableBtn,
     getAllUsersForContact,
     getAllSourceForContact,
     setContactDataLength,
@@ -27,7 +25,7 @@ import ContactViewModal from '@/components/Contact/ContactViewModal';
 import { IRootState } from '@/store';
 import ContactCreateModal from '@/components/Contact/ContactCreateModal';
 import ContactEditModal from '@/components/Contact/ContactEditModal';
-import Loader from '@/components/__Shared/Loader';
+import ContactDeleteModal from '@/components/Contact/ContactDeleteModal';
 
 const Contacts = () => {
     const dispatch = useDispatch();
@@ -107,20 +105,6 @@ const Contacts = () => {
             return;
         }
         dispatch(getAllSourceForContact(source));
-    };
-
-    //deleting contact
-    const onDeleteContact = async () => {
-        dispatch(setFetching(true));
-        dispatch(setDisableBtn(true));
-        const deleteContact: ContactDataType = await new ApiClient().delete('contact/' + singleData.id);
-        if (deleteContact === null) {
-            dispatch(setDisableBtn(false));
-            return;
-        }
-        dispatch(setDisableBtn(false));
-        dispatch(setFetching(false));
-        dispatch(setDeleteModal({ open: false }));
     };
 
     return !isAbleToRead ? null : (
@@ -267,16 +251,7 @@ const Contacts = () => {
             <ContactViewModal />
 
             {/* delete modal */}
-            <ConfirmationModal
-                open={deleteModal}
-                onClose={() => dispatch(setDeleteModal({ open: false }))}
-                onDiscard={() => dispatch(setDeleteModal({ open: false }))}
-                description={isFetching ? <Loader /> : <>Are you sure you want to delete this Contact? It will also remove form database.</>}
-                title="Delete Contact"
-                isBtnDisabled={isBtnDisabled}
-                onSubmit={onDeleteContact}
-                btnSubmitText="Delete"
-            />
+            <ContactDeleteModal />
 
             {/* create modal */}
             <ContactCreateModal />

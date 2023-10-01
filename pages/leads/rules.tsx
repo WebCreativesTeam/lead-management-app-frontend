@@ -80,7 +80,6 @@ const LeadRules = () => {
         setLoading(true);
         const sourceList: GetMethodResponseType = await new ApiClient().get('source/list');
         const source: SourceDataType[] = sourceList?.data;
-        console.log(sourceList);
         if (typeof source === 'undefined') {
             dispatch(getAllSourceForLeadRule([] as SourceDataType[]));
             return;
