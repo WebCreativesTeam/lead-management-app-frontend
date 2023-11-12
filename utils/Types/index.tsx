@@ -360,7 +360,6 @@ export interface ILeadRules {
     isEdited: boolean;
     isAdded: boolean;
     source: SourceDataType;
-    
 }
 
 // ----------------- authentication types : start -------------------//
@@ -431,6 +430,7 @@ export interface ManageLeadInitialStateProps extends InitialStateProps {
     leadContactsList: ContactListSecondaryEndpoint[];
     leadBranchList: BranchListSecondaryEndpoint[];
     leadSourceList: SourceDataType[];
+    leadUserList: UserListSecondaryEndpointType[];
 }
 
 //source slice initial props

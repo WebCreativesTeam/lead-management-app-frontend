@@ -7,7 +7,15 @@ import { sortBy } from 'lodash';
 import 'flatpickr/dist/flatpickr.css';
 import { Delete, Edit, Plus, View } from '@/utils/icons';
 import PageHeadingSection from '@/components/__Shared/PageHeadingSection/index.';
-import { BranchListSecondaryEndpoint, ContactDataType, GetMethodResponseType, LeadPrioritySecondaryEndpoint, LeadStatusSecondaryEndpoint, SourceDataType } from '@/utils/Types';
+import {
+    BranchListSecondaryEndpoint,
+    ContactDataType,
+    GetMethodResponseType,
+    LeadPrioritySecondaryEndpoint,
+    LeadStatusSecondaryEndpoint,
+    SourceDataType,
+    UserListSecondaryEndpointType,
+} from '@/utils/Types';
 import { LeadDataType } from '@/utils/Types';
 import { useDispatch, useSelector } from 'react-redux';
 import { setPageTitle } from '@/store/themeConfigSlice';
@@ -20,6 +28,7 @@ import {
     getAllLeadStatus,
     getAllLeads,
     getAllSourceForLead,
+    getAllUsersForLeads,
     setChangePriorityModal,
     setChangeStatusModal,
     setCreateModal,
@@ -79,6 +88,7 @@ const LeadPage = () => {
         getContactsList();
         getBranchList();
         getSourceList();
+        getAllUsersList();
     }, []);
 
     useEffect(() => {
@@ -162,6 +172,18 @@ const LeadPage = () => {
         dispatch(getAllLeadStatus(status));
     };
 
+    //get all user's list
+    const getAllUsersList = async () => {
+        setLoading(true);
+        const usersList: GetMethodResponseType = await new ApiClient().get('user/list');
+        const users: UserListSecondaryEndpointType[] = usersList?.data;
+        if (typeof users === 'undefined') {
+            dispatch(getAllUsersForLeads([] as UserListSecondaryEndpointType[]));
+            return;
+        }
+        dispatch(getAllUsersForLeads(users));
+    };
+
     return !isAbleToRead ? null : (
         <div>
             <PageHeadingSection description="View, create, update, and close leads. Organize by status, priority, and due date. Stay on top of work." heading="Lead Management" />
@@ -211,7 +233,17 @@ const LeadPage = () => {
                     </button>
                 </div>
             </div>
-
+            <div className="flex justify-end gap-4">
+                <div>
+                    <button className="btn btn-outline-primary dropdown-toggle h-full">Bulk Import</button>
+                </div>
+                <div>
+                    <button className="btn btn-outline-primary dropdown-toggle h-full">Bulk Delete</button>
+                </div>
+                <div>
+                    <button className="btn btn-outline-primary dropdown-toggle h-full">Bulk Export</button>
+                </div>
+            </div>
             {/* Leads List table*/}
             <div className="datatables panel mt-6">
                 <DataTable

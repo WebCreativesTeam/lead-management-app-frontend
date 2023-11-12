@@ -21,3 +21,6 @@ export * from './LockOutlined';
 export * from './ArrowTransfer';
 export * from './Sms';
 export * from './File';
+export * from './Home';
+export * from './Note';
+export * from './Setting';
