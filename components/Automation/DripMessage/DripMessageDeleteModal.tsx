@@ -2,19 +2,19 @@ import React, { memo } from 'react';
 import ConfirmationModal from '@/components/__Shared/ConfirmationModal';
 import { useDispatch, useSelector } from 'react-redux';
 import { IRootState } from '@/store';
-import { setDeleteModal, setDisableBtn, setFetching } from '@/store/Slices/automationSlice/scheduleMessageSlice';
-import { IScheduleMessage } from '@/utils/Types';
+import { setDeleteModal, setDisableBtn, setFetching } from '@/store/Slices/automationSlice/dripMessageSlice';
+import { IDripMessage } from '@/utils/Types';
 import { ApiClient } from '@/utils/http';
 import Loader from '@/components/__Shared/Loader';
 
-const ScheduleMessageDeleteModal = () => {
-    const { isFetching, isBtnDisabled, deleteModal, singleData } = useSelector((state: IRootState) => state.scheduleMessage);
+const DripMessageDeleteModal = () => {
+    const { isFetching, isBtnDisabled, deleteModal, singleData } = useSelector((state: IRootState) => state.dripMessage);
     const dispatch = useDispatch();
-    const onDeleteScheduleMessage = async () => {
+    const onDeleteDripMessage = async () => {
         dispatch(setFetching(true));
         dispatch(setDisableBtn(true));
-        const deleteScheduleMessage: IScheduleMessage = await new ApiClient().delete('scheduleMessage/' + singleData.id);
-        if (deleteScheduleMessage === null) {
+        const deleteDripMessage: IDripMessage = await new ApiClient().delete('dripMessage/' + singleData.id);
+        if (deleteDripMessage === null) {
             dispatch(setDisableBtn(false));
             return;
         }
@@ -28,13 +28,13 @@ const ScheduleMessageDeleteModal = () => {
             open={deleteModal}
             onClose={() => dispatch(setDeleteModal({ open: false }))}
             onDiscard={() => dispatch(setDeleteModal({ open: false }))}
-            description={isFetching ? <Loader /> : <>Are you sure you want to delete Scheduled Message?</>}
-            title="Delete Schedule Message"
+            description={isFetching ? <Loader /> : <>Are you sure you want to delete Dripd Message?</>}
+            title="Delete Drip Message"
             isBtnDisabled={isBtnDisabled}
-            onSubmit={onDeleteScheduleMessage}
+            onSubmit={onDeleteDripMessage}
             btnSubmitText="Delete"
         />
     );
 };
 
-export default memo(ScheduleMessageDeleteModal);
+export default memo(DripMessageDeleteModal);

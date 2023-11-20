@@ -1,16 +1,16 @@
 import React, { memo } from 'react';
 import ViewModal from '../../__Shared/ViewModal';
 import { useDispatch, useSelector } from 'react-redux';
-import { setViewModal } from '@/store/Slices/automationSlice/scheduleMessageSlice';
+import { setViewModal } from '@/store/Slices/automationSlice/occasionMessageSlice';
 import { IRootState } from '@/store';
 
-const ScheduleMessageViewModal = () => {
-    const { viewModal, singleData } = useSelector((state: IRootState) => state.scheduleMessage);
+const OccasionMessageViewModal = () => {
+    const { viewModal, singleData } = useSelector((state: IRootState) => state.occasionMessage);
     const dispatch = useDispatch();
     const { leadStatus, platform, product, schedule, scheduleName, source, status, template } = singleData;
 
     const reqData: any = {
-        ['Schedule Name']: scheduleName,
+        ['Occasion Name']: scheduleName,
         source,
         product,
         ['schedule time']: schedule,
@@ -22,7 +22,7 @@ const ScheduleMessageViewModal = () => {
 
     return (
         <ViewModal
-            title="View Schedule Message Detail"
+            title="View Occasion Message Detail"
             open={viewModal}
             onClose={() => dispatch(setViewModal({ open: false }))}
             content={
@@ -43,4 +43,4 @@ const ScheduleMessageViewModal = () => {
     );
 };
 
-export default memo(ScheduleMessageViewModal);
+export default memo(OccasionMessageViewModal);

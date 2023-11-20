@@ -8,10 +8,19 @@ import { Delete, Edit, Plus, View } from '@/utils/icons';
 import PageHeadingSection from '@/components/__Shared/PageHeadingSection/index.';
 import { useDispatch, useSelector } from 'react-redux';
 import { setPageTitle } from '@/store/themeConfigSlice';
-import { GetMethodResponseType, IScheduleMessage } from '@/utils/Types';
+import { GetMethodResponseType, IScheduleMessage, LeadStatusSecondaryEndpoint, SourceDataType } from '@/utils/Types';
 import { ApiClient } from '@/utils/http';
 import { IRootState } from '@/store';
-import { getAllScheduleMessages, setCreateModal, setDeleteModal, setEditModal, setScheduleMessageDataLength, setViewModal } from '@/store/Slices/scheduleMessageSlice';
+import {
+    getAllLeadStatusForScheduleMessage,
+    getAllScheduleMessages,
+    getAllSourceForScheduleMessage,
+    setCreateModal,
+    setDeleteModal,
+    setEditModal,
+    setScheduleMessageDataLength,
+    setViewModal,
+} from '@/store/Slices/automationSlice/scheduleMessageSlice';
 import ScheduleMessageViewModal from '@/components/Automation/ScheduleMessage/ScheduleMessageViewModal';
 import ScheduleMessageCreateModal from '@/components/Automation/ScheduleMessage/ScheduleMessageCreateModal';
 import ScheduleMessageEditModal from '@/components/Automation/ScheduleMessage/ScheduleMessageEditModal';
@@ -58,6 +67,11 @@ const ScheduleMessage = () => {
         setRecordsData(data);
     }, [data]);
 
+    useEffect(() => {
+        getAllSourceList();
+        getLeadStatus();
+    }, []);
+
     //get all ScheduleMessage list
     const getScheduleMessageList = async () => {
         setLoading(true);
@@ -70,6 +84,28 @@ const ScheduleMessage = () => {
         dispatch(getAllScheduleMessages(scheduleMessagesRawData));
         dispatch(setScheduleMessageDataLength(scheduleMessagesRawData.length));
         setLoading(false);
+    };
+
+    //get all Source list
+    const getAllSourceList = async () => {
+        const sourceList: GetMethodResponseType = await new ApiClient().get('source/list');
+        const source: SourceDataType[] = sourceList?.data;
+        if (typeof source === 'undefined') {
+            dispatch(getAllSourceForScheduleMessage([] as SourceDataType[]));
+            return;
+        }
+        dispatch(getAllSourceForScheduleMessage(source));
+    };
+
+    //get all lead status list
+    const getLeadStatus = async () => {
+        const leadStatusList: GetMethodResponseType = await new ApiClient().get('lead-status/list');
+        const status: LeadStatusSecondaryEndpoint[] = leadStatusList?.data;
+        if (typeof status === 'undefined') {
+            dispatch(getAllLeadStatusForScheduleMessage([] as LeadStatusSecondaryEndpoint[]));
+            return;
+        }
+        dispatch(getAllLeadStatusForScheduleMessage(status));
     };
 
     return (
@@ -143,8 +179,8 @@ const ScheduleMessage = () => {
                             render: ({ schedule }) => <div>{schedule}</div>,
                         },
                         {
-                            accessor: 'schedule',
-                            title: 'Schedule',
+                            accessor: 'platform',
+                            title: 'Platform',
                             sortable: true,
                             render: ({ platform }) => <div>{platform.join(' , ')}</div>,
                         },
@@ -177,10 +213,10 @@ const ScheduleMessage = () => {
                             ),
                         },
                         {
-                            accessor: 'schedule',
-                            title: 'Schedule',
+                            accessor: 'Status',
+                            title: 'Status',
                             sortable: true,
-                            render: ({ platform }) => (
+                            render: ({ status }) => (
                                 <div>
                                     <label className="relative h-6 w-12">
                                         <input
@@ -188,6 +224,7 @@ const ScheduleMessage = () => {
                                             className="custom_switch peer absolute z-10 h-full w-full cursor-pointer opacity-0"
                                             id="custom_switch_checkbox1"
                                             name="permission"
+                                            defaultChecked={status}
                                             // checked={isDefault}
                                             // onChange={(e: React.ChangeEvent<HTMLInputElement>) => dispatch(setDefaultPolicyModal({ id, open: true, switchValue: e.target.checked }))}
                                         />

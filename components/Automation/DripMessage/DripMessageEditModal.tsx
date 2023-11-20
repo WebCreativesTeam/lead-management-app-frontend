@@ -4,10 +4,10 @@ import Modal from '@/components/__Shared/Modal';
 import Select from 'react-select';
 import { useSelector, useDispatch } from 'react-redux';
 import { IRootState } from '@/store';
-import { setEditModal, setDisableBtn, setFetching } from '@/store/Slices/automationSlice/scheduleMessageSlice';
+import { setEditModal, setDisableBtn, setFetching } from '@/store/Slices/automationSlice/dripMessageSlice';
 import { dummyTemplateListRawData, platformListRawData } from '@/utils/Raw Data';
 import { useFormik } from 'formik';
-import { scheduleMessageSchema } from '@/utils/schemas';
+import { dripMessageSchema } from '@/utils/schemas';
 import { ApiClient } from '@/utils/http';
 import { SelectOptionsType, SourceDataType, ICountryData, UserListSecondaryEndpointType } from '@/utils/Types';
 import { showToastAlert } from '@/utils/contant';
@@ -15,8 +15,8 @@ import Loader from '@/components/__Shared/Loader';
 import Flatpickr from 'react-flatpickr';
 import 'flatpickr/dist/flatpickr.css';
 
-const ScheduleMessageEditModal = () => {
-    const { editModal, isBtnDisabled, singleData, isFetching, sourceList } = useSelector((state: IRootState) => state.scheduleMessage);
+const DripMessageEditModal = () => {
+    const { editModal, isBtnDisabled, singleData, isFetching, sourceList } = useSelector((state: IRootState) => state.dripMessage);
 
     const dispatch = useDispatch();
 
@@ -36,18 +36,18 @@ const ScheduleMessageEditModal = () => {
     };
     const { values, handleChange, submitForm, handleSubmit, setFieldValue, errors, handleBlur, resetForm } = useFormik({
         initialValues,
-        validationSchema: scheduleMessageSchema,
+        validationSchema: dripMessageSchema,
         validateOnChange: false,
         enableReinitialize: true,
         onSubmit: async (value, action) => {
             dispatch(setFetching(true));
             try {
-                const editScheduleMessageObj = {
+                const editDripMessageObj = {
                     scheduleDateAndTime: '',
                     name: '',
                 };
                 dispatch(setDisableBtn(true));
-                await new ApiClient().patch('ScheduleMessage/' + singleData.id, editScheduleMessageObj);
+                await new ApiClient().patch('DripMessage/' + singleData.id, editDripMessageObj);
 
                 action.resetForm();
                 dispatch(setEditModal({ open: false }));
@@ -76,7 +76,7 @@ const ScheduleMessageEditModal = () => {
             onClose={() => dispatch(setEditModal({ open: false }))}
             size="large"
             onDiscard={handleDiscard}
-            title="Edit Scheduled Message"
+            title="Edit Dripd Message"
             onSubmit={() => submitForm()}
             disabledDiscardBtn={isBtnDisabled}
             isBtnDisabled={values.name && values.scheduleDateAndTime && !isBtnDisabled ? false : true}
@@ -87,20 +87,20 @@ const ScheduleMessageEditModal = () => {
                     <form className="space-y-5" onSubmit={handleSubmit}>
                         <div className="flex flex-col gap-4 sm:flex-row">
                             <div className="flex-1">
-                                <label htmlFor="createScheduleName">Schedule Name</label>
+                                <label htmlFor="createDripName">Drip Name</label>
                                 <input
                                     onChange={handleChange}
                                     onBlur={handleBlur}
                                     value={values.name}
-                                    id="createScheduleName"
+                                    id="createDripName"
                                     name="name"
                                     type="text"
-                                    placeholder="Schedule Name"
+                                    placeholder="Drip Name"
                                     className="form-input"
                                 />
                             </div>
                             <div className="flex-1">
-                                <label>Schedule Date & Time</label>
+                                <label>Drip Date & Time</label>
                                 <Flatpickr
                                     data-enable-time
                                     options={{
@@ -109,7 +109,7 @@ const ScheduleMessageEditModal = () => {
                                         position: 'auto',
                                     }}
                                     id="scheduleDateAndTime"
-                                    placeholder="Schedule Date & Time"
+                                    placeholder="Drip Date & Time"
                                     name="scheduleDateAndTime"
                                     className="form-input"
                                     onChange={(e) => setFieldValue('scheduleDateAndTime', e)}
@@ -149,4 +149,4 @@ const ScheduleMessageEditModal = () => {
     );
 };
 
-export default memo(ScheduleMessageEditModal);
+export default memo(DripMessageEditModal);

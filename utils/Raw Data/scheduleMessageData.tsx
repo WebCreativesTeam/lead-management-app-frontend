@@ -1,4 +1,4 @@
-import { IScheduleMessage } from '../Types';
+import { IScheduleMessage, SelectOptionsType } from '../Types';
 
 export const scheduleMessagesRawData: IScheduleMessage[] = [
     {
@@ -23,4 +23,16 @@ export const scheduleMessagesRawData: IScheduleMessage[] = [
         platform: ['SMS', 'Email'],
         status: true,
     },
+];
+
+export const platformListRawData: SelectOptionsType[] = [
+    { value: 'whatsapp', label: 'WhatsApp' },
+    { value: 'email', label: 'Email' },
+    { value: 'sms', label: 'SMS' },
+];
+
+export const dummyTemplateListRawData: SelectOptionsType[] = [
+    { value: 'template 1', label: 'template 1' },
+    { value: 'template 2', label: 'template 2' },
+    { value: 'template 3', label: 'template 3' },
 ];

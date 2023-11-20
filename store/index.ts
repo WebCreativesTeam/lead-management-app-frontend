@@ -18,7 +18,9 @@ import emailLogSlice from './Slices/emailSlice/emailLogSlice';
 import smsTemplateSlice from './Slices/templateSlice/smsTemplateSlice';
 import leadRuleSlice from './Slices/leadSlice/leadRuleSlice';
 import whatsappTemplateSlice from './Slices/templateSlice/whatsappTemplateSlice';
-import scheduleMessageSlice from './Slices/scheduleMessageSlice';
+import scheduleMessageSlice from './Slices/automationSlice/scheduleMessageSlice';
+import occasionMessageSlice from './Slices/automationSlice/occasionMessageSlice';
+import dripMessageSlice from './Slices/automationSlice/dripMessageSlice';
 
 const rootReducer = combineReducers({
     themeConfig: themeConfigSlice,
@@ -41,6 +43,8 @@ const rootReducer = combineReducers({
     smsTemplate: smsTemplateSlice,
     whatsappTemplate: whatsappTemplateSlice,
     scheduleMessage: scheduleMessageSlice,
+    occasionMessage: occasionMessageSlice,
+    dripMessage: dripMessageSlice,
 });
 
 export const store = configureStore({

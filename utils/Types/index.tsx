@@ -373,6 +373,28 @@ export interface IScheduleMessage {
     platform: string[];
     status: boolean;
 }
+export interface IDripMessage {
+    id: string;
+    scheduleName: string;
+    leadStatus: string;
+    source: string;
+    product: string;
+    template: string;
+    schedule: string;
+    platform: string[];
+    status: boolean;
+}
+export interface IOccasionMessage {
+    id: string;
+    scheduleName: string;
+    leadStatus: string;
+    source: string;
+    product: string;
+    template: string;
+    schedule: string;
+    platform: string[];
+    status: boolean;
+}
 
 // ----------------- authentication types : start -------------------//
 
@@ -455,6 +477,24 @@ export interface SourceInitialStateProps extends InitialStateProps {
 export interface ScheduleMessageInitialStateProps extends InitialStateProps {
     data: IScheduleMessage[];
     singleData: IScheduleMessage;
+    sourceList: SourceDataType[];
+    leadStatusList: LeadStatusSecondaryEndpoint[];
+}
+
+//schedule message slice intial props
+export interface OccasionMessageInitialStateProps extends InitialStateProps {
+    data: IOccasionMessage[];
+    singleData: IOccasionMessage;
+    sourceList: SourceDataType[];
+    leadStatusList: LeadStatusSecondaryEndpoint[];
+}
+
+//schedule message slice intial props
+export interface DripMessageInitialStateProps extends InitialStateProps {
+    data: IDripMessage[];
+    singleData: IDripMessage;
+    sourceList: SourceDataType[];
+    leadStatusList: LeadStatusSecondaryEndpoint[];
 }
 
 //email smtp slice initial props

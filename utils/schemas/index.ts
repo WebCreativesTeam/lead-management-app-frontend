@@ -21,6 +21,16 @@ export const scheduleMessageSchema = Yup.object().shape({
     name: Yup.string().email().required('Enter Schedule Message Name'),
 });
 
+//drip message
+export const dripMessageSchema = Yup.object().shape({
+    name: Yup.string().email().required('Enter Schedule Message Name'),
+});
+
+//occasion message
+export const occasionMessageSchema = Yup.object().shape({
+    name: Yup.string().email().required('Enter Schedule Message Name'),
+});
+
 export const resetPasswordSchema = Yup.object().shape({
     newPassword: Yup.string().required('Enter new password').min(8, 'Password should be atleast 8 characters'),
     confirmPassword: Yup.string()

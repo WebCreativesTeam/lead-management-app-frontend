@@ -1,10 +1,13 @@
-import { IScheduleMessage, ScheduleMessageInitialStateProps, UserDataType } from '@/utils/Types';
+import { LeadStatusSecondaryEndpoint } from '../../../utils/Types/index';
+import { IDripMessage, DripMessageInitialStateProps, SourceDataType, UserDataType, ILeadStatus } from '@/utils/Types';
 import { fetchUserInfo } from '@/utils/contant';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-const initialState: ScheduleMessageInitialStateProps = {
-    data: [] as IScheduleMessage[],
-    singleData: {} as IScheduleMessage,
+const initialState: DripMessageInitialStateProps = {
+    data: [] as IDripMessage[],
+    sourceList: [] as SourceDataType[],
+    leadStatusList: [] as LeadStatusSecondaryEndpoint[],
+    singleData: {} as IDripMessage,
     createModal: false,
     editModal: false,
     deleteModal: false,
@@ -19,9 +22,9 @@ const initialState: ScheduleMessageInitialStateProps = {
     totalRecords: 0,
 };
 
-const scheduleMessageSlice = createSlice({
+const dripMessageSlice = createSlice({
     initialState,
-    name: 'scheduleMessage',
+    name: 'dripMessage',
     extraReducers(builder) {
         builder.addCase(fetchUserInfo.fulfilled, (state, action: PayloadAction<UserDataType>) => {
             if (action.payload) {
@@ -33,23 +36,23 @@ const scheduleMessageSlice = createSlice({
         setViewModal(state, action) {
             const { open, id } = action.payload;
             state.viewModal = open;
-            const findRequestedData: IScheduleMessage | undefined = state.data.find((item: IScheduleMessage) => item.id === id);
+            const findRequestedData: IDripMessage | undefined = state.data.find((item: IDripMessage) => item.id === id);
 
             if (findRequestedData && state.viewModal) {
                 state.singleData = findRequestedData;
             } else {
-                state.singleData = {} as IScheduleMessage;
+                state.singleData = {} as IDripMessage;
             }
         },
         setEditModal(state, action) {
             const { open, id } = action.payload;
             state.editModal = open;
-            const findRequestedData: IScheduleMessage | undefined = state.data.find((item: IScheduleMessage) => item.id === id);
+            const findRequestedData: IDripMessage | undefined = state.data.find((item: IDripMessage) => item.id === id);
 
             if (findRequestedData && state.editModal) {
                 state.singleData = findRequestedData;
             } else {
-                state.singleData = {} as IScheduleMessage;
+                state.singleData = {} as IDripMessage;
             }
         },
         setCreateModal(state, action) {
@@ -58,40 +61,47 @@ const scheduleMessageSlice = createSlice({
         setDeleteModal(state, action) {
             const { open, id } = action.payload;
             state.deleteModal = open;
-            const findRequestedData: IScheduleMessage | undefined = state.data.find((item: IScheduleMessage) => item.id === id);
+            const findRequestedData: IDripMessage | undefined = state.data.find((item: IDripMessage) => item.id === id);
 
             if (findRequestedData && state.deleteModal) {
                 state.singleData = findRequestedData;
             } else {
-                state.singleData = {} as IScheduleMessage;
+                state.singleData = {} as IDripMessage;
             }
         },
-        getAllScheduleMessages(state, action) {
+        getAllDripMessages(state, action: PayloadAction<IDripMessage[]>) {
             state.data = action.payload;
         },
+        getAllLeadStatusForDripMessage(state, action: PayloadAction<LeadStatusSecondaryEndpoint[]>) {
+            state.leadStatusList = action.payload;
+        },
+        getAllSourceForDripMessage(state, action: PayloadAction<SourceDataType[]>) {
+            state.sourceList = action.payload;
+        },
+
         setDisableBtn(state, action) {
             state.isBtnDisabled = action.payload;
         },
         setFetching(state, action) {
             state.isFetching = action.payload;
         },
-        setScheduleMessageReadPermission(state, action) {
+        setDripMessageReadPermission(state, action: PayloadAction<string>) {
             const verifyPermission: boolean = state.userPolicyArr.includes(action.payload);
             state.isAbleToRead = verifyPermission;
         },
-        setScheduleMessageCreatePermission(state, action) {
+        setDripMessageCreatePermission(state, action) {
             const verifyPermission: boolean = state.userPolicyArr.includes(action.payload);
             state.isAbleToCreate = verifyPermission;
         },
-        setScheduleMessageUpdatePermission(state, action) {
+        setDripMessageUpdatePermission(state, action) {
             const verifyPermission: boolean = state.userPolicyArr.includes(action.payload);
             state.isAbleToUpdate = verifyPermission;
         },
-        setScheduleMessageDeletePermission(state, action) {
+        setDripMessageDeletePermission(state, action) {
             const verifyPermission: boolean = state.userPolicyArr.includes(action.payload);
             state.isAbleToDelete = verifyPermission;
         },
-        setScheduleMessageDataLength(state, action: PayloadAction<number>) {
+        setDripMessageDataLength(state, action: PayloadAction<number>) {
             state.totalRecords = action.payload;
         },
     },
@@ -102,13 +112,15 @@ export const {
     setDeleteModal,
     setEditModal,
     setViewModal,
-    getAllScheduleMessages,
+    getAllDripMessages,
     setDisableBtn,
     setFetching,
-    setScheduleMessageCreatePermission,
-    setScheduleMessageDeletePermission,
-    setScheduleMessageReadPermission,
-    setScheduleMessageUpdatePermission,
-    setScheduleMessageDataLength,
-} = scheduleMessageSlice.actions;
-export default scheduleMessageSlice.reducer;
+    setDripMessageCreatePermission,
+    setDripMessageDeletePermission,
+    setDripMessageReadPermission,
+    setDripMessageUpdatePermission,
+    setDripMessageDataLength,
+    getAllLeadStatusForDripMessage,
+    getAllSourceForDripMessage,
+} = dripMessageSlice.actions;
+export default dripMessageSlice.reducer;
