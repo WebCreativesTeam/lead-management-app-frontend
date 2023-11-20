@@ -1,6 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import { useFormik } from 'formik';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { emailTemplateSchema } from '@/utils/schemas';
 import { IRootState } from '@/store';
@@ -11,22 +10,23 @@ import { showToastAlert } from '@/utils/contant';
 import dynamic from 'next/dynamic';
 import 'react-quill/dist/quill.snow.css';
 import Loader from '@/components/__Shared/Loader';
-import { IEmailTemplate } from '@/utils/Types';
 const ReactQuill = dynamic(import('react-quill'), { ssr: false });
+import Select from 'react-select';
+import { variablesEmailTemplate } from '@/utils/Raw Data';
 
-const UpdateEmailTemplate = () => {
+const CreateEmailTemplate = () => {
     const dispatch = useDispatch();
     const router = useRouter();
     const { isBtnDisabled } = useSelector((state: IRootState) => state.emailTemplate);
     const [htmlTextLength, sethtmlTextLength] = useState<number>(0);
     const [loading, setLoading] = useState<boolean>(false);
-    const [email, setEmail] = useState<IEmailTemplate>({} as IEmailTemplate);
 
-    const { values, handleChange, handleSubmit, handleBlur, setFieldValue } = useFormik({
+    const { values, handleChange, handleSubmit, handleBlur, resetForm, setFieldValue } = useFormik({
         initialValues: {
             name: '',
             subject: '',
             message: '',
+            variable: '',
         },
         validationSchema: emailTemplateSchema,
         validateOnChange: true,
@@ -41,8 +41,8 @@ const UpdateEmailTemplate = () => {
                     subject: value.subject,
                     message: value.message,
                 };
-                await new ApiClient().patch('email-template/' + router?.query?.id, emailTemplateObj);
-                router.push('/email/email-templates');
+                await new ApiClient().post('email-template', emailTemplateObj);
+                await router.push('/templates/email-template');
                 action.resetForm();
             } catch (error: any) {
                 if (typeof error?.response?.data?.message === 'object') {
@@ -57,44 +57,24 @@ const UpdateEmailTemplate = () => {
             setLoading(false);
         },
     });
-    const getEmailTemplate = async () => {
-        setLoading(true);
-        if (router.query.id) {
-            const res: { status: string; data: IEmailTemplate } = await new ApiClient().get('email-template/' + router.query.id);
-            const email: IEmailTemplate = res?.data;
-            setEmail(email);
-            setLoading(false);
-        }
-    };
-    useEffect(() => {
-        getEmailTemplate();
-    }, [router.query.id]);
-
-    useEffect(() => {
-        setFieldValue('name', email?.name);
-        setFieldValue('subject', email?.subject);
-        setFieldValue('message', email?.message);
-    }, [email]);
-
-    console.log('render');
 
     return loading ? (
         <Loader />
     ) : (
         <>
-            <div className="panel text-center text-xl font-bold sm:mx-auto sm:max-w-4xl"> Edit Email Template</div>
+            <div className="panel text-center text-xl font-bold sm:mx-auto sm:max-w-4xl"> Create Email Template</div>
             <form className="panel my-5 flex flex-col gap-y-6 sm:mx-auto sm:max-w-4xl" onSubmit={handleSubmit}>
                 <div>
-                    <label htmlFor="editTemplateName">Template Name</label>
-                    <input onChange={handleChange} onBlur={handleBlur} value={values?.name} id="editTemplateName" name="name" type="text" placeholder="Template Name" className="form-input" />
+                    <label htmlFor="createTemplateName">Template Name</label>
+                    <input onChange={handleChange} onBlur={handleBlur} value={values.name} id="createTemplateName" name="name" type="text" placeholder="Template Name" className="form-input" />
                 </div>
                 <div>
-                    <label htmlFor="editTemplateSubject">Template Subject</label>
+                    <label htmlFor="createTemplateSubject">Template Subject</label>
                     <textarea
                         onChange={handleChange}
                         onBlur={handleBlur}
-                        value={values?.subject}
-                        id="editTemplateSubject"
+                        value={values.subject}
+                        id="createTemplateSubject"
                         name="subject"
                         placeholder="Template Subject"
                         className="form-textarea"
@@ -102,34 +82,43 @@ const UpdateEmailTemplate = () => {
                     ></textarea>
                 </div>
                 <div>
-                    <label htmlFor="editAttachments">Upload Attachments</label>
+                    <label htmlFor="createAttachments">Upload Attachments</label>
                     <input
-                        id="editAttachments"
+                        id="createAttachments"
                         type="file"
                         className="rtl:file-ml-5 form-input cursor-pointer p-0 file:border-0 file:bg-primary/90 file:px-4 file:py-2 file:font-semibold file:text-white file:hover:bg-primary ltr:file:mr-5"
                     />
                 </div>
+                <Select
+                    placeholder="Select variable"
+                    options={variablesEmailTemplate}
+                    onChange={(data: any) => {
+                        setFieldValue('variable', data.value);
+                        setFieldValue('message', values.message + data.value);
+                    }}
+                />
                 <div>
-                    <label htmlFor="editMessage">Template Message</label>
+                    <label htmlFor="createMessage">Template Message</label>
                     <ReactQuill
                         theme="snow"
-                        id="editMessage"
-                        value={values?.message}
+                        id="createMessage"
+                        value={values.message}
                         onChange={(e, delta, source, editor) => {
                             setFieldValue('message', e);
                             sethtmlTextLength(editor.getLength());
                         }}
                     />
                 </div>
+
                 <div className="mb-4 mt-8 flex items-center justify-center gap-4">
-                    <button type="button" className="btn btn-outline-danger" onClick={() => router.push('/emails')} disabled={isBtnDisabled}>
+                    <button type="button" className="btn btn-outline-danger" onClick={() => router.push('/templates/email-template')} disabled={isBtnDisabled}>
                         Discard
                     </button>
                     <input
                         type="submit"
-                        value={'Edit Template'}
+                        value={'Create Template'}
                         className="btn btn-primary  cursor-pointer"
-                        disabled={values?.name && values?.subject && (htmlTextLength > 1 || values?.message?.length > 11) && !isBtnDisabled ? false : true}
+                        disabled={values.name && values.subject && htmlTextLength > 1 && !isBtnDisabled ? false : true}
                     />
                 </div>
             </form>
@@ -137,4 +126,4 @@ const UpdateEmailTemplate = () => {
     );
 };
 
-export default UpdateEmailTemplate;
+export default CreateEmailTemplate;

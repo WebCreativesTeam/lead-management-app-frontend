@@ -362,6 +362,18 @@ export interface ILeadRules {
     source: SourceDataType;
 }
 
+export interface IScheduleMessage {
+    id: string;
+    scheduleName: string;
+    leadStatus: string;
+    source: string;
+    product: string;
+    template: string;
+    schedule: string;
+    platform: string[];
+    status: boolean;
+}
+
 // ----------------- authentication types : start -------------------//
 
 export interface ISignInResponse {
@@ -437,6 +449,12 @@ export interface ManageLeadInitialStateProps extends InitialStateProps {
 export interface SourceInitialStateProps extends InitialStateProps {
     data: SourceDataType[];
     singleData: SourceDataType;
+}
+
+//schedule message slice intial props
+export interface ScheduleMessageInitialStateProps extends InitialStateProps {
+    data: IScheduleMessage[];
+    singleData: IScheduleMessage;
 }
 
 //email smtp slice initial props

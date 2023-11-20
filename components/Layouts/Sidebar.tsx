@@ -1,17 +1,19 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @next/next/no-img-element */
+
+//* lib Imports
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import Link from 'next/link';
-import { toggleSidebar } from '../../store/themeConfigSlice';
 import AnimateHeight from 'react-animate-height';
-import { AppDispatch, IRootState } from '../../store';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { ArrowRight, Branch, Email, Global, Phone, Shield, Tasks, User, File } from '../../utils/icons';
+
+//* redux-toolkit imports
+import { toggleSidebar } from '../../store/themeConfigSlice';
+import { AppDispatch, IRootState } from '../../store';
 import { setBranchCreatePolicy, setBranchDeletePolicy, setBranchReadPolicy, setBranchUpdatePolicy } from '@/store/Slices/branchSlice';
-import { fetchUserInfo } from '@/utils/contant';
 import { setContactCreatePolicy, setContactDeletePolicy, setContactReadPolicy, setContactUpdatePolicy } from '@/store/Slices/contactSlice';
 import { setSourceCreatePolicy, setSourceDeletePolicy, setSourceReadPolicy, setSourceUpdatePolicy } from '@/store/Slices/sourceSlice';
 import { setChangeActiveStatusPermission, setChangeUsersPolicy, setUserCreatePolicy, setUserDeletePolicy, setUserReadPolicy, setUserUpdatePolicy } from '@/store/Slices/userSlice';
@@ -33,7 +35,6 @@ import {
 } from '@/store/Slices/taskSlice/taskStatusSlice';
 import { setEmailTemplateCreatePermission, setEmailTemplateDeletePermission, setEmailTemplateReadPermission, setEmailTemplateUpdatePermission } from '@/store/Slices/emailSlice/emailTemplateSlice';
 import { setLeadCreatePolicy, setLeadDeletePolicy, setLeadReadPolicy, setLeadUpdatePolicy } from '@/store/Slices/leadSlice/manageLeadSlice';
-import Talegram from '@/utils/icons/Talegram';
 import {
     setChangeDefaultLeadPriorityPermission,
     setLeadPriorityCreatePolicy,
@@ -49,13 +50,21 @@ import {
     setLeadStatusUpdatePolicy,
 } from '@/store/Slices/leadSlice/leadStatusSlice';
 import { setEmailSmtpCreatePermission, setEmailSmtpDeletePermission, setEmailSmtpReadPermission, setEmailSmtpUpdatePermission } from '@/store/Slices/emailSlice/emailSmtpSlice';
-import Sms from '@/utils/icons/Sms';
 import { setSmsTemplateCreatePermission, setSmsTemplateDeletePermission, setSmsTemplateReadPermission, setSmsTemplateUpdatePermission } from '@/store/Slices/templateSlice/smsTemplateSlice';
+
+//other imports
+import { ArrowRight, Branch, Email, Global, Phone, Shield, Tasks, User, File, Talegram, Setting, Automation, DropdownDoubleLayer } from '../../utils/icons';
+import { fetchUserInfo } from '@/utils/contant';
 
 const Sidebar = () => {
     const router = useRouter();
     const dispatch = useDispatch<AppDispatch>();
     const [currentMenu, setCurrentMenu] = useState<string>('');
+    const [leadSettingSubMenu, setLeadSettingSubMenu] = useState<boolean>(false);
+    const [taskSettingSubMenu, setTaskSettingSubMenu] = useState<boolean>(false);
+    const [userSettingSubMenu, setUserSettingSubMenu] = useState<boolean>(false);
+    const [logsSubMenu, setLogsSubMenu] = useState<boolean>(false);
+    const [campaignIntegrationSubMenu, setCampaignIntegrationSubMenu] = useState<boolean>(false);
     const themeConfig = useSelector((state: IRootState) => state.themeConfig);
     const semidark = useSelector((state: IRootState) => state.themeConfig.semidark);
     const toggleMenu = (value: string) => {
@@ -305,41 +314,15 @@ const Sidebar = () => {
                     </div>
                     <PerfectScrollbar className="relative h-[calc(100vh-80px)]">
                         <ul className="relative space-y-0.5 p-4 py-0 font-semibold">
-                            {/* tasks */}
-                            {!isAbleToReadTask && !isAbleToReadTaskPriority && !isAbleToReadTaskStatus ? null : (
-                                <li className="menu nav-item">
-                                    <button type="button" className={`${currentMenu === 'Tasks' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('Tasks')}>
-                                        <div className="flex items-center">
-                                            <Tasks />
-                                            <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Tasks')}</span>
-                                        </div>
-
-                                        <div className={currentMenu === 'Tasks' ? 'rotate-90' : 'rtl:rotate-180'}>
-                                            <ArrowRight />
-                                        </div>
-                                    </button>
-
-                                    <AnimateHeight duration={300} height={currentMenu === 'Tasks' ? 'auto' : 0}>
-                                        <ul className="sub-menu text-gray-500">
-                                            {isAbleToReadTask && (
-                                                <li>
-                                                    <Link href="/tasks">{t('Manage Tasks')}</Link>
-                                                </li>
-                                            )}
-                                            {isAbleToReadTaskPriority && (
-                                                <li>
-                                                    <Link href="/tasks/priority">{t('Priority')}</Link>
-                                                </li>
-                                            )}
-                                            {isAbleToReadTaskStatus && (
-                                                <li>
-                                                    <Link href="/tasks/status">{t('Status')}</Link>
-                                                </li>
-                                            )}
-                                        </ul>
-                                    </AnimateHeight>
-                                </li>
-                            )}
+                            {/* dashboard */}
+                            <li className="menu nav-item">
+                                <Link href="/dashboard" className="group">
+                                    <div className="flex items-center">
+                                        <User />
+                                        <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Dashboard')}</span>
+                                    </div>
+                                </Link>
+                            </li>
 
                             {/* Leads */}
                             {!isAbleToReadLeads && !isAbleToReadLeadPriority && !isAbleToReadLeadStatus ? null : (
@@ -362,16 +345,7 @@ const Sidebar = () => {
                                                     <Link href="/leads">{t('Manage Leads')}</Link>
                                                 </li>
                                             )}
-                                            {isAbleToReadLeadPriority && (
-                                                <li>
-                                                    <Link href="/leads/priority">{t('Priority')}</Link>
-                                                </li>
-                                            )}
-                                            {isAbleToReadLeadStatus && (
-                                                <li>
-                                                    <Link href="/leads/status">{t('Status')}</Link>
-                                                </li>
-                                            )}
+
                                             <li>
                                                 <Link href="/leads/rules">{t('Rules')}</Link>
                                             </li>
@@ -380,41 +354,78 @@ const Sidebar = () => {
                                 </li>
                             )}
 
-                            {/* Emails */}
-                            {!isAbleToReadEmailTemplates && !isAbleToReadEmailSmtp ? null : (
+                            {/* IVR */}
+                            <li className="menu nav-item">
+                                <Link href="/ivr" className="group">
+                                    <div className="flex items-center">
+                                        <User />
+                                        <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('IVR')}</span>
+                                    </div>
+                                </Link>
+                            </li>
+
+                            {/* Automation */}
+                            <li className="menu nav-item">
+                                <button type="button" className={`${currentMenu === 'Automation' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('Automation')}>
+                                    <div className="flex items-center">
+                                        <Automation />
+                                        <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Automation')}</span>
+                                    </div>
+
+                                    <div className={currentMenu === 'Automation' ? 'rotate-90' : 'rtl:rotate-180'}>
+                                        <ArrowRight />
+                                    </div>
+                                </button>
+
+                                <AnimateHeight duration={300} height={currentMenu === 'Automation' ? 'auto' : 0}>
+                                    <ul className="sub-menu text-gray-500">
+                                        <li>
+                                            <Link href="/automation/schedule-message">{t('Schedule Message')}</Link>
+                                        </li>
+                                        <li>
+                                            <Link href="/automation/occasion-message">{t('Occasion Message')}</Link>
+                                        </li>
+
+                                        <li>
+                                            <Link href="/automation/drip-message">{t('Drip Message')}</Link>
+                                        </li>
+                                    </ul>
+                                </AnimateHeight>
+                            </li>
+
+                            {/* task */}
+                            {isAbleToReadContact && (
                                 <li className="menu nav-item">
-                                    <button type="button" className={`${currentMenu === 'Emails' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('Emails')}>
+                                    <Link href="/task" className="group">
                                         <div className="flex items-center">
-                                            <Email />
-                                            <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Emails')}</span>
+                                            <Tasks />
+                                            <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Task')}</span>
                                         </div>
+                                    </Link>
+                                </li>
+                            )}
 
-                                        <div className={currentMenu === 'Emails' ? 'rotate-90' : 'rtl:rotate-180'}>
-                                            <ArrowRight />
+                            {/* contacts */}
+                            {isAbleToReadContact && (
+                                <li className="menu nav-item">
+                                    <Link href="/contacts" className="group">
+                                        <div className="flex items-center">
+                                            <Phone />
+                                            <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Contacts')}</span>
                                         </div>
-                                    </button>
+                                    </Link>
+                                </li>
+                            )}
 
-                                    <AnimateHeight duration={300} height={currentMenu === 'Emails' ? 'auto' : 0}>
-                                        <ul className="sub-menu text-gray-500">
-                                            {isAbleToReadEmailTemplates && (
-                                                <li>
-                                                    <Link href="/emails/email-templates">{t('Email Templates')}</Link>
-                                                </li>
-                                            )}
-                                            {isAbleToReadEmailSmtp && (
-                                                <li>
-                                                    <Link href="/emails/SMTP">{t('SMTP')}</Link>
-                                                </li>
-                                            )}
-
-                                            <li>
-                                                <Link href="/emails/create-email">{t('Create Email')}</Link>
-                                            </li>
-                                            <li>
-                                                <Link href="/emails/email-logs">{t('Email Logs')}</Link>
-                                            </li>
-                                        </ul>
-                                    </AnimateHeight>
+                            {/* Report */}
+                            {isAbleToReadContact && (
+                                <li className="menu nav-item">
+                                    <Link href="/report" className="group">
+                                        <div className="flex items-center">
+                                            <Phone />
+                                            <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Report')}</span>
+                                        </div>
+                                    </Link>
                                 </li>
                             )}
 
@@ -439,70 +450,222 @@ const Sidebar = () => {
                                                     <Link href="/templates/sms-template">{t('SMS')}</Link>
                                                 </li>
                                             )}
-                                            {/* <li>
+                                            {isAbleToReadEmailTemplates && (
+                                                <li>
+                                                    <Link href="/templates/email-template">{t('Email')}</Link>
+                                                </li>
+                                            )}
+
+                                            <li>
                                                 <Link href="/templates/whatsapp-template">{t('WhatsApp')}</Link>
-                                            </li> */}
+                                            </li>
                                         </ul>
                                     </AnimateHeight>
                                 </li>
                             )}
 
-                            {/* Users */}
-                            {isAbleToReadUsers && (
-                                <li className="menu nav-item">
-                                    <Link href="/users" className="group">
-                                        <div className="flex items-center">
-                                            <User />
-                                            <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Users')}</span>
-                                        </div>
-                                    </Link>
-                                </li>
-                            )}
+                            {/* //? Settings */}
+                            <li className="menu nav-item">
+                                <button type="button" className={`${currentMenu === 'Setting' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('Setting')}>
+                                    <div className="flex items-center">
+                                        <Setting />
+                                        <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Setting')}</span>
+                                    </div>
 
-                            {/* Branches */}
-                            {isAbleToReadBranch && (
-                                <li className="menu nav-item">
-                                    <Link href="/branches" className="group">
-                                        <div className="flex items-center">
-                                            <Branch />
-                                            <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Branches')}</span>
-                                        </div>
-                                    </Link>
-                                </li>
-                            )}
-                            {/* policies */}
-                            {isAbleToReadPolicy && (
-                                <li className="menu nav-item">
-                                    <Link href="/policies" className="group">
-                                        <div className="flex items-center">
-                                            <Shield />
-                                            <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Policies')}</span>
-                                        </div>
-                                    </Link>
-                                </li>
-                            )}
+                                    <div className={currentMenu === 'Setting' ? 'rotate-90' : 'rtl:rotate-180'}>
+                                        <ArrowRight />
+                                    </div>
+                                </button>
 
-                            {/* sources */}
-                            {isAbleToReadSource && (
-                                <li className="menu nav-item">
-                                    <Link href="/sources" className="group">
-                                        <div className="flex items-center">
-                                            <Global />
-                                            <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Sources')}</span>
-                                        </div>
-                                    </Link>
-                                </li>
-                            )}
+                                <AnimateHeight duration={300} height={currentMenu === 'Setting' ? 'auto' : 0}>
+                                    <ul className="sub-menu text-gray-500">
+                                        {/* campaign integration dropdown */}
+                                        <li className="menu nav-item">
+                                            <button
+                                                type="button"
+                                                className={`${
+                                                    campaignIntegrationSubMenu ? 'open' : ''
+                                                } w-full break-words before:h-[5px] before:w-[5px] before:rounded before:bg-gray-300 hover:bg-gray-100 ltr:before:mr-2 rtl:before:ml-2 dark:text-[#888ea8] dark:hover:bg-gray-900`}
+                                                onClick={() => setCampaignIntegrationSubMenu(!campaignIntegrationSubMenu)}
+                                            >
+                                                {t('Campaign Integration')}
+                                                <div className={`${campaignIntegrationSubMenu ? '!rotate-90' : ''} ltr:ml-auto rtl:mr-auto rtl:rotate-180`}>
+                                                    <ArrowRight />
+                                                </div>
+                                            </button>
+                                            <AnimateHeight duration={300} height={campaignIntegrationSubMenu ? 'auto' : 0}>
+                                                <ul className="sub-menu text-gray-500">
+                                                    <li>
+                                                        <Link href="/setting/campaign-integration/email">{t('SMS')}</Link>
+                                                    </li>
+                                                    {isAbleToReadEmailSmtp && (
+                                                        <li>
+                                                            <Link href="/setting/campaign-integration/email">{t('Email')}</Link>
+                                                        </li>
+                                                    )}
+                                                    <li>
+                                                        <Link href="/setting/campaign-integration/email">{t('Whatsapp')}</Link>
+                                                    </li>
+                                                </ul>
+                                            </AnimateHeight>
+                                        </li>
 
-                            {/* contacts */}
-                            {isAbleToReadContact && (
+                                        <li>
+                                            <Link href="/setting/email-logs">{t('Lead Integration')}</Link>
+                                        </li>
+
+                                        {/* User setting dropdown */}
+                                        <li className="menu nav-item">
+                                            <button
+                                                type="button"
+                                                className={`${
+                                                    userSettingSubMenu ? 'open' : ''
+                                                } w-full before:h-[5px] before:w-[5px] before:rounded before:bg-gray-300 hover:bg-gray-100 ltr:before:mr-2 rtl:before:ml-2 dark:text-[#888ea8] dark:hover:bg-gray-900`}
+                                                onClick={() => setUserSettingSubMenu(!userSettingSubMenu)}
+                                            >
+                                                {t('User Setting')}
+                                                <div className={`${userSettingSubMenu ? '!rotate-90' : ''} ltr:ml-auto rtl:mr-auto rtl:rotate-180`}>
+                                                    <ArrowRight />
+                                                </div>
+                                            </button>
+                                            <AnimateHeight duration={300} height={userSettingSubMenu ? 'auto' : 0}>
+                                                <ul className="sub-menu text-gray-500">
+                                                    {isAbleToReadUsers && (
+                                                        <li>
+                                                            <Link href="/setting/user-setting/user-information">{t('User Information')}</Link>
+                                                        </li>
+                                                    )}
+                                                    {isAbleToReadPolicy && (
+                                                        <li>
+                                                            <Link href="/setting/user-setting/user-policy">{t('User Policy')}</Link>
+                                                        </li>
+                                                    )}
+                                                </ul>
+                                            </AnimateHeight>
+                                        </li>
+
+                                        {isAbleToReadBranch && (
+                                            <li>
+                                                <Link href="/setting/branch-setting">{t('Branch Setting')}</Link>
+                                            </li>
+                                        )}
+
+                                        {/* lead setting dropdown */}
+                                        <li className="menu nav-item">
+                                            <button
+                                                type="button"
+                                                className={`${
+                                                    leadSettingSubMenu ? 'open' : ''
+                                                } w-full before:h-[5px] before:w-[5px] before:rounded before:bg-gray-300 hover:bg-gray-100 ltr:before:mr-2 rtl:before:ml-2 dark:text-[#888ea8] dark:hover:bg-gray-900`}
+                                                onClick={() => setLeadSettingSubMenu(!leadSettingSubMenu)}
+                                            >
+                                                {t('Lead Setting')}
+                                                <div className={`${leadSettingSubMenu ? '!rotate-90' : ''} ltr:ml-auto rtl:mr-auto rtl:rotate-180`}>
+                                                    <ArrowRight />
+                                                </div>
+                                            </button>
+                                            <AnimateHeight duration={300} height={leadSettingSubMenu ? 'auto' : 0}>
+                                                <ul className="sub-menu text-gray-500">
+                                                    {isAbleToReadSource && (
+                                                        <li>
+                                                            <Link href="/setting/lead-setting/source-setting">{t('Source Setting')}</Link>
+                                                        </li>
+                                                    )}
+                                                    {isAbleToReadLeadStatus && (
+                                                        <li>
+                                                            <Link href="/setting/lead-setting/status">{t('Status')}</Link>
+                                                        </li>
+                                                    )}
+                                                    {isAbleToReadLeadPriority && (
+                                                        <li>
+                                                            <Link href="/setting/lead-setting/priority">{t('Priority')}</Link>
+                                                        </li>
+                                                    )}
+                                                </ul>
+                                            </AnimateHeight>
+                                        </li>
+
+                                        {/* task setting dropdown */}
+                                        <li className="menu nav-item">
+                                            <button
+                                                type="button"
+                                                className={`${
+                                                    taskSettingSubMenu ? 'open' : ''
+                                                } w-full before:h-[5px] before:w-[5px] before:rounded before:bg-gray-300 hover:bg-gray-100 ltr:before:mr-2 rtl:before:ml-2 dark:text-[#888ea8] dark:hover:bg-gray-900`}
+                                                onClick={() => setTaskSettingSubMenu(!taskSettingSubMenu)}
+                                            >
+                                                {t('Task Setting')}
+                                                <div className={`${taskSettingSubMenu ? '!rotate-90' : ''} ltr:ml-auto rtl:mr-auto rtl:rotate-180`}>
+                                                    <ArrowRight />
+                                                </div>
+                                            </button>
+                                            <AnimateHeight duration={300} height={taskSettingSubMenu ? 'auto' : 0}>
+                                                <ul className="sub-menu text-gray-500">
+                                                    {isAbleToReadTaskStatus && (
+                                                        <li>
+                                                            <Link href="/setting/task-setting/status">{t('Status')}</Link>
+                                                        </li>
+                                                    )}
+                                                    {isAbleToReadTaskPriority && (
+                                                        <li>
+                                                            <Link href="/setting/task-setting/priority">{t('Priority')}</Link>
+                                                        </li>
+                                                    )}
+                                                </ul>
+                                            </AnimateHeight>
+                                        </li>
+
+                                        <li>
+                                            <Link href="/setting/email-logs">{t('Lead Assigning')}</Link>
+                                        </li>
+
+                                        {/* Logs dropdown */}
+                                        <li className="menu nav-item">
+                                            <button
+                                                type="button"
+                                                className={`${
+                                                    logsSubMenu ? 'open' : ''
+                                                } w-full before:h-[5px] before:w-[5px] before:rounded before:bg-gray-300 hover:bg-gray-100 ltr:before:mr-2 rtl:before:ml-2 dark:text-[#888ea8] dark:hover:bg-gray-900`}
+                                                onClick={() => setLogsSubMenu(!logsSubMenu)}
+                                            >
+                                                {t('Logs')}
+                                                <div className={`${logsSubMenu ? '!rotate-90' : ''} ltr:ml-auto rtl:mr-auto rtl:rotate-180`}>
+                                                    <ArrowRight />
+                                                </div>
+                                            </button>
+                                            <AnimateHeight duration={300} height={logsSubMenu ? 'auto' : 0}>
+                                                <ul className="sub-menu text-gray-500">
+                                                    <li>
+                                                        <Link href="/setting/logs/email">{t('Email')}</Link>
+                                                    </li>
+                                                </ul>
+                                            </AnimateHeight>
+                                        </li>
+                                    </ul>
+                                </AnimateHeight>
+                            </li>
+
+                            {/* Emails */}
+                            {!isAbleToReadEmailSmtp ? null : (
                                 <li className="menu nav-item">
-                                    <Link href="/contacts" className="group">
+                                    <button type="button" className={`${currentMenu === 'Emails' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('Emails')}>
                                         <div className="flex items-center">
-                                            <Phone />
-                                            <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Contacts')}</span>
+                                            <Email />
+                                            <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Emails')}</span>
                                         </div>
-                                    </Link>
+
+                                        <div className={currentMenu === 'Emails' ? 'rotate-90' : 'rtl:rotate-180'}>
+                                            <ArrowRight />
+                                        </div>
+                                    </button>
+
+                                    <AnimateHeight duration={300} height={currentMenu === 'Emails' ? 'auto' : 0}>
+                                        <ul className="sub-menu text-gray-500">
+                                            <li>
+                                                <Link href="/emails/create-email">{t('Create Email')}</Link>
+                                            </li>
+                                        </ul>
+                                    </AnimateHeight>
                                 </li>
                             )}
                         </ul>

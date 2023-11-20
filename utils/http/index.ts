@@ -47,8 +47,8 @@ export class ApiClient implements IApiClient {
                 showToastAlert(error?.response?.data?.error);
             } else if (typeof error?.response?.data?.message === 'string') {
                 showToastAlert(error?.response?.data?.message);
-            } else if (typeof error?.message === "string") {
-                showToastAlert(error?.message)
+            } else if (typeof error?.message === 'string') {
+                showToastAlert(error?.message);
             }
             console.log(error);
             return null as TResponse;

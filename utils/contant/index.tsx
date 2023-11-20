@@ -1,6 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import Swal from 'sweetalert2';
-import { Permission, UserDataType } from '../Types';
+import { UserDataType } from '../Types';
 import { ApiClient } from '../http';
 
 export function showToastAlert(errMsg: string) {

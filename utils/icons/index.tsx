@@ -24,3 +24,5 @@ export * from './File';
 export * from './Home';
 export * from './Note';
 export * from './Setting';
+export * from './Automation';
+export * from './DropdownDoubleLayer';

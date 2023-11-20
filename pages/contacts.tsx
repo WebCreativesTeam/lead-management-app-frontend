@@ -1,12 +1,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState, Fragment, useDeferredValue } from 'react';
+import React, { useEffect, useState, useDeferredValue } from 'react';
 import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
 import { sortBy } from 'lodash';
 import { Delete, Edit, Plus, View } from '@/utils/icons';
 import PageHeadingSection from '@/components/__Shared/PageHeadingSection/index.';
-import ConfirmationModal from '@/components/__Shared/ConfirmationModal';
 import { useDispatch, useSelector } from 'react-redux';
 import { setPageTitle } from '@/store/themeConfigSlice';
 import { ContactDataType, GetMethodResponseType, SourceDataType, UserListSecondaryEndpointType } from '@/utils/Types';
@@ -33,7 +32,7 @@ const Contacts = () => {
         dispatch(setPageTitle('Contacts'));
     });
     //hooks
-    const { data, isFetching, isBtnDisabled, deleteModal, singleData, isAbleToCreate, isAbleToDelete, isAbleToUpdate, isAbleToRead, totalRecords } = useSelector((state: IRootState) => state.contacts);
+    const { data, isFetching, isAbleToCreate, isAbleToDelete, isAbleToUpdate, isAbleToRead, totalRecords } = useSelector((state: IRootState) => state.contacts);
     const [searchInputText, setSearchInputText] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(false);
 

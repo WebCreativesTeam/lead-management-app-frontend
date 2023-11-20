@@ -26,7 +26,7 @@
         }
     },
     "include": [
-        "next-env.d.ts",
+        "environment.d.ts",
         "**/*.ts",
         "**/*.tsx",
         "pages/apps/todolist.tsx"

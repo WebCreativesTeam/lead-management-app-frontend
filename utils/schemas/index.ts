@@ -16,6 +16,11 @@ export const signInSchema = Yup.object().shape({
     password: Yup.string().required('Enter your password').min(8, 'Password should be atleast 8 characters'),
 });
 
+//schedule message
+export const scheduleMessageSchema = Yup.object().shape({
+    name: Yup.string().email().required('Enter Schedule Message Name'),
+});
+
 export const resetPasswordSchema = Yup.object().shape({
     newPassword: Yup.string().required('Enter new password').min(8, 'Password should be atleast 8 characters'),
     confirmPassword: Yup.string()

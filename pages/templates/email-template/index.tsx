@@ -81,7 +81,7 @@ const EmailTemplates = () => {
                     <div className="flex-1"></div>
                 ) : (
                     <div className="flex-1">
-                        <button className="btn btn-primary h-full w-full max-w-[250px] max-sm:mx-auto" type="button" onClick={() => router.push('/emails/email-templates/create-email-template')}>
+                        <button className="btn btn-primary h-full w-full max-w-[250px] max-sm:mx-auto" type="button" onClick={() => router.push('/templates/email-template/create-email-template')}>
                             <Plus />
                             Create New Template
                         </button>
@@ -150,7 +150,7 @@ const EmailTemplates = () => {
                                     </Tippy>
                                     {isAbleToUpdate && (
                                         <Tippy content="Edit">
-                                            <button type="button" onClick={() => router.push('/emails/email-templates/edit-email-template/' + id)}>
+                                            <button type="button" onClick={() => router.push('/templates/email-template/edit-email-template/' + id)}>
                                                 <Edit />
                                             </button>
                                         </Tippy>
