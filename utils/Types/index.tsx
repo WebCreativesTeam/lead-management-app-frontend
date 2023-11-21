@@ -362,6 +362,7 @@ export interface ILeadRules {
     source: SourceDataType;
 }
 
+//schedule message page
 export interface IScheduleMessage {
     id: string;
     scheduleName: string;
@@ -373,6 +374,8 @@ export interface IScheduleMessage {
     platform: string[];
     status: boolean;
 }
+
+//drip message page
 export interface IDripMessage {
     id: string;
     scheduleName: string;
@@ -384,6 +387,8 @@ export interface IDripMessage {
     platform: string[];
     status: boolean;
 }
+
+//occasion message page typs
 export interface IOccasionMessage {
     id: string;
     scheduleName: string;
@@ -394,6 +399,20 @@ export interface IOccasionMessage {
     schedule: string;
     platform: string[];
     status: boolean;
+}
+
+// dashboard page types
+export interface IFollowup {
+    name: string;
+    phoneNumber: string;
+    source: SourceDataType;
+    product: string;
+    status: LeadStatusSecondaryEndpoint;
+    priority: LeadPrioritySecondaryEndpoint;
+    createdAt: string;
+    updatedAt: string;
+    nextFollowup: string;
+    id: string;
 }
 
 // ----------------- authentication types : start -------------------//
@@ -481,7 +500,7 @@ export interface ScheduleMessageInitialStateProps extends InitialStateProps {
     leadStatusList: LeadStatusSecondaryEndpoint[];
 }
 
-//schedule message slice intial props
+//occasion message slice intial props
 export interface OccasionMessageInitialStateProps extends InitialStateProps {
     data: IOccasionMessage[];
     singleData: IOccasionMessage;
@@ -489,10 +508,20 @@ export interface OccasionMessageInitialStateProps extends InitialStateProps {
     leadStatusList: LeadStatusSecondaryEndpoint[];
 }
 
-//schedule message slice intial props
+//drip message slice intial props
 export interface DripMessageInitialStateProps extends InitialStateProps {
     data: IDripMessage[];
     singleData: IDripMessage;
+    sourceList: SourceDataType[];
+    leadStatusList: LeadStatusSecondaryEndpoint[];
+}
+
+//dashboard slice intial props
+export interface DashboardInitialStateProps extends InitialStateProps {
+    todayFollowUps: IFollowup[];
+    tomorrowFollowUps: IFollowup[];
+    pendingFollowUps: IFollowup[];
+    singleData: IFollowup;
     sourceList: SourceDataType[];
     leadStatusList: LeadStatusSecondaryEndpoint[];
 }

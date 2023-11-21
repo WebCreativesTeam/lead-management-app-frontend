@@ -316,7 +316,7 @@ const Sidebar = () => {
                         <ul className="relative space-y-0.5 p-4 py-0 font-semibold">
                             {/* dashboard */}
                             <li className="menu nav-item">
-                                <Link href="/dashboard" className="group">
+                                <Link href="/" className="group">
                                     <div className="flex items-center">
                                         <User />
                                         <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Dashboard')}</span>
