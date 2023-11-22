@@ -26,3 +26,4 @@ export * from './Note';
 export * from './Setting';
 export * from './Automation';
 export * from './DropdownDoubleLayer';
+export * from './EyeIcon';

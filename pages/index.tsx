@@ -24,6 +24,7 @@ import ScheduleMessageEditModal from '@/components/Automation/ScheduleMessage/Sc
 import ScheduleMessageDeleteModal from '@/components/Automation/ScheduleMessage/ScheduleMessageDeleteModal';
 import { followUpDropdownList, followupData } from '@/utils/Raw Data';
 import { getAllPendingFollowups, getAllTodayFollowups, getAllTomorrowFollowups } from '@/store/Slices/dashbordSlice';
+import FollowUpCard from '@/components/Dashboard/FollowUpCard';
 
 const Dashboard = () => {
     const dispatch = useDispatch();
@@ -133,6 +134,13 @@ const Dashboard = () => {
 
     return (
         <div>
+            <div className="mb-6 grid grid-cols-1 gap-6 text-white sm:grid-cols-2 xl:grid-cols-3">
+                <FollowUpCard title="Today Followups" followUpPercentage="-2.35%" followups={74137} lastWeekFollowUps={84709} color="cyan" />
+                <FollowUpCard title="Tomorrow Followups" followUpPercentage="-2.35%" followups={74137} lastWeekFollowUps={84709} color="violet" />
+                <FollowUpCard title="Pending Followups" followUpPercentage="+ 1.35%" followups={38085} lastWeekFollowUps={37894} color="blue" />
+                <FollowUpCard title="Total Leads" followUpPercentage="+ 1.35%" followups={38085} lastWeekFollowUps={37894} color="fuchsia" />
+                <FollowUpCard title="Total Fresh Leads" followUpPercentage="+ 1.35%" followups={38085} lastWeekFollowUps={37894} color="blue" />
+            </div>
             <div className="datatables panel mt-6">
                 <div className="z-10 my-6 flex flex-col items-center gap-5 sm:flex-row">
                     <div className="flex-1">
