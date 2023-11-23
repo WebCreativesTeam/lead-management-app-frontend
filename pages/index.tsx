@@ -135,11 +135,11 @@ const Dashboard = () => {
     return (
         <div>
             <div className="mb-6 grid grid-cols-1 gap-6 text-white sm:grid-cols-2 xl:grid-cols-3">
-                <FollowUpCard title="Today Followups" followUpPercentage="-2.35%" followups={74137} lastWeekFollowUps={84709} color="cyan" />
-                <FollowUpCard title="Tomorrow Followups" followUpPercentage="-2.35%" followups={74137} lastWeekFollowUps={84709} color="violet" />
-                <FollowUpCard title="Pending Followups" followUpPercentage="+ 1.35%" followups={38085} lastWeekFollowUps={37894} color="blue" />
-                <FollowUpCard title="Total Leads" followUpPercentage="+ 1.35%" followups={38085} lastWeekFollowUps={37894} color="fuchsia" />
-                <FollowUpCard title="Total Fresh Leads" followUpPercentage="+ 1.35%" followups={38085} lastWeekFollowUps={37894} color="blue" />
+                <FollowUpCard title="Today Followups" followUpPercentage="-2.35%" followups={74137} lastWeekFollowUps={84709} color="#06b6d4" />
+                <FollowUpCard title="Tomorrow Followups" followUpPercentage="-2.35%" followups={74137} lastWeekFollowUps={84709} color="#8b5cf6" />
+                <FollowUpCard title="Pending Followups" followUpPercentage="+ 1.35%" followups={38085} lastWeekFollowUps={37894} color="#3b82f6" />
+                <FollowUpCard title="Total Leads" followUpPercentage="+ 1.35%" followups={38085} lastWeekFollowUps={37894} color="#d946ef" />
+                <FollowUpCard title="Total Fresh Leads" followUpPercentage="+ 1.35%" followups={38085} lastWeekFollowUps={37894} color="#3b82f6" />
             </div>
             <div className="datatables panel mt-6">
                 <div className="z-10 my-6 flex flex-col items-center gap-5 sm:flex-row">
