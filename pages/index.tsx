@@ -4,7 +4,7 @@ import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
 import { sortBy } from 'lodash';
-import { Delete, Edit, View } from '@/utils/icons';
+import { ChatIcon, Delete, Edit, Email, View, Sms } from '@/utils/icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { setPageTitle } from '@/store/themeConfigSlice';
 import { GetMethodResponseType, IFollowup, LeadStatusSecondaryEndpoint, SourceDataType } from '@/utils/Types';
@@ -218,20 +218,20 @@ const Dashboard = () => {
                                 <div className="flex justify-center gap-2  p-3 text-center ">
                                     <Tippy content="WhatsApp">
                                         <button type="button" onClick={() => dispatch(setViewModal({ id, open: true }))}>
-                                            <View />
+                                            <Sms />
                                         </button>
                                     </Tippy>
                                     {/* {isAbleToUpdate && ( */}
                                     <Tippy content="SMS">
                                         <button type="button" onClick={() => dispatch(setEditModal({ id, open: true }))}>
-                                            <Edit />
+                                            <ChatIcon />
                                         </button>
                                     </Tippy>
                                     {/* )} */}
                                     {/* {isAbleToDelete && ( */}
                                     <Tippy content="Email">
                                         <button type="button" onClick={() => dispatch(setDeleteModal({ id, open: true }))}>
-                                            <Delete />
+                                            <Email />
                                         </button>
                                     </Tippy>
                                     {/* )} */}

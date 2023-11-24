@@ -49,14 +49,28 @@ const LeadPage = () => {
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('Manage Leads'));
-    });
+    }, []);
+
+    const cols: { accessor: string; title: string }[] = [
+        { accessor: 'contactTitle', title: 'Name' },
+        { accessor: 'contactEmail', title: 'Email' },
+        { accessor: 'source', title: 'Source' },
+        { accessor: 'createdAt', title: 'Created Date' },
+        { accessor: 'updatedAt', title: 'Last Updated' },
+        { accessor: 'startDate', title: 'Start Date' },
+        { accessor: 'status', title: 'Lead Status' },
+        { accessor: 'priority', title: 'Priority' },
+        { accessor: 'endDate', title: 'End Date' },
+    ];
 
     //hooks
     const { data, isFetching, leadPriorityList, leadStatusList, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate, totalRecords } = useSelector((state: IRootState) => state.lead);
+    const isRtl = useSelector((state: IRootState) => state.themeConfig.rtlClass) === 'rtl' ? true : false;
     const [searchInputText, setSearchInputText] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(false);
     const [filter, setFilter] = useState<string>('assigned-by-me');
     const [search, setSearch] = useState<string>('');
+    const [hideCols, setHideCols] = useState<string[]>(['contactTitle']);
 
     //useDefferedValue hook for search query
     const searchQuery = useDeferredValue(search);
@@ -184,6 +198,14 @@ const LeadPage = () => {
         dispatch(getAllUsersForLeads(users));
     };
 
+    const showHideColumns = (col: string) => {
+        if (hideCols.includes(col)) {
+            setHideCols((col: any) => hideCols.filter((d: any) => d !== col));
+        } else {
+            setHideCols([...hideCols, col]);
+        }
+    };
+
     return !isAbleToRead ? null : (
         <div>
             <PageHeadingSection description="View, create, update, and close leads. Organize by status, priority, and due date. Stay on top of work." heading="Lead Management" />
@@ -234,6 +256,50 @@ const LeadPage = () => {
                 </div>
             </div>
             <div className="flex justify-end gap-4">
+                <div className="dropdown">
+                    <Dropdown
+                        placement={`${isRtl ? 'bottom-end' : 'bottom-start'}`}
+                        btnClassName="!flex items-center border font-semibold border-white-light dark:border-[#253b5c] rounded-md px-4 py-2 text-sm dark:bg-[#1b2e4b] dark:text-white-dark"
+                        button={
+                            <>
+                                <span className="ltr:mr-1 rtl:ml-1">Columns</span>
+                                <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M19 9L12 15L5 9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                                </svg>
+                            </>
+                        }
+                    >
+                        <ul className="!min-w-[170px]">
+                            {cols.map((col, i) => {
+                                return (
+                                    <li
+                                        key={i}
+                                        className="flex flex-col"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                        }}
+                                    >
+                                        <div className="flex items-center px-4 py-1">
+                                            <label className="mb-0 cursor-pointer">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={!hideCols.includes(col.accessor)}
+                                                    className="form-checkbox"
+                                                    defaultValue={col.accessor}
+                                                    onChange={(event: any) => {
+                                                        setHideCols(event.target.value);
+                                                        showHideColumns(col.accessor);
+                                                    }}
+                                                />
+                                                <span className="ltr:ml-2 rtl:mr-2">{col.title}</span>
+                                            </label>
+                                        </div>
+                                    </li>
+                                );
+                            })}
+                        </ul>
+                    </Dropdown>
+                </div>
                 <div>
                     <button className="btn btn-outline-primary dropdown-toggle h-full">Bulk Import</button>
                 </div>
@@ -255,36 +321,42 @@ const LeadPage = () => {
                             title: 'Name',
                             sortable: true,
                             render: ({ contact }) => <div>{`${contact?.title} ${contact?.name}`}</div>,
+                            hidden: hideCols.includes('contactTitle'),
                         },
                         {
                             accessor: 'contactEmail',
                             title: 'Email',
                             sortable: true,
                             render: ({ contact }) => <div>{`${contact?.email}`}</div>,
+                            hidden: hideCols.includes('contactEmail'),
                         },
                         {
                             accessor: 'source',
                             title: 'Source',
                             sortable: true,
                             render: ({ source }) => <div>{source?.name}</div>,
+                            hidden: hideCols.includes('source'),
                         },
                         {
                             accessor: 'createdAt',
                             title: 'Created Date',
                             sortable: true,
                             render: ({ createdAt }) => <div>{new Date(createdAt).toLocaleString()}</div>,
+                            hidden: hideCols.includes('createdAt'),
                         },
                         {
                             accessor: 'updatedAt',
                             title: 'Last Updated',
                             sortable: true,
                             render: ({ updatedAt }) => <div>{new Date(updatedAt).toLocaleString()}</div>,
+                            hidden: hideCols.includes('updatedAt'),
                         },
                         {
                             accessor: 'startDate',
                             title: 'Start Date',
                             sortable: true,
                             render: ({ createdAt }) => <div>{new Date(createdAt).toLocaleString()}</div>,
+                            hidden: hideCols.includes('startDate'),
                         },
                         {
                             accessor: 'status',
@@ -329,6 +401,7 @@ const LeadPage = () => {
                                     </Dropdown>
                                 </div>
                             ),
+                            hidden: hideCols.includes('status'),
                         },
                         {
                             accessor: 'priority',
@@ -373,12 +446,14 @@ const LeadPage = () => {
                                     </Dropdown>
                                 </div>
                             ),
+                            hidden: hideCols.includes('priority'),
                         },
                         {
                             accessor: 'endDate',
                             title: 'End Date',
                             sortable: true,
                             render: ({ updatedAt }) => <div>{new Date(updatedAt).toLocaleString()}</div>,
+                            hidden: hideCols.includes('endDate'),
                         },
                         {
                             accessor: 'action',
