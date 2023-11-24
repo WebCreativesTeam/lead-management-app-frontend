@@ -10,21 +10,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setPageTitle } from '@/store/themeConfigSlice';
 import { ContactDataType, GetMethodResponseType, SourceDataType, UserListSecondaryEndpointType } from '@/utils/Types';
 import { ApiClient } from '@/utils/http';
-import {
-    getAllContacts,
-    setEditModal,
-    setDeleteModal,
-    setCreateModal,
-    setViewModal,
-    getAllUsersForContact,
-    getAllSourceForContact,
-    setContactDataLength,
-} from '@/store/Slices/contactSlice';
+import { getAllContacts, setEditModal, setDeleteModal, setCreateModal, setViewModal, getAllUsersForContact, getAllSourceForContact, setContactDataLength } from '@/store/Slices/contactSlice';
 import ContactViewModal from '@/components/Contact/ContactViewModal';
 import { IRootState } from '@/store';
 import ContactCreateModal from '@/components/Contact/ContactCreateModal';
 import ContactEditModal from '@/components/Contact/ContactEditModal';
 import ContactDeleteModal from '@/components/Contact/ContactDeleteModal';
+import Dropdown from '@/components/Dropdown';
 
 const Contacts = () => {
     const dispatch = useDispatch();
@@ -33,6 +25,7 @@ const Contacts = () => {
     });
     //hooks
     const { data, isFetching, isAbleToCreate, isAbleToDelete, isAbleToUpdate, isAbleToRead, totalRecords } = useSelector((state: IRootState) => state.contacts);
+    const isRtl = useSelector((state: IRootState) => state.themeConfig.rtlClass) === 'rtl' ? true : false;
     const [searchInputText, setSearchInputText] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(false);
 
@@ -41,6 +34,7 @@ const Contacts = () => {
     const PAGE_SIZES = [10, 20, 30];
     const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
     const [search, setSearch] = useState<string>('');
+    const [hideCols, setHideCols] = useState<string[]>(['contactTitle']);
 
     const [recordsData, setRecordsData] = useState<ContactDataType[]>([] as ContactDataType[]);
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
@@ -50,6 +44,19 @@ const Contacts = () => {
 
     // useDefferedValue hook for search query
     const searchQuery = useDeferredValue(search);
+
+    const cols: { accessor: string; title: string }[] = [
+        { accessor: 'name', title: 'Name' },
+        { accessor: 'phoneNumber', title: 'Phone No' },
+        { accessor: 'email', title: 'Email' },
+        { accessor: 'position', title: 'Position' },
+        { accessor: 'industry', title: 'Industry' },
+        { accessor: 'city', title: 'City' },
+        { accessor: 'state', title: 'State' },
+        { accessor: 'country', title: 'Country' },
+        { accessor: 'createdAt', title: 'Created Date' },
+        { accessor: 'updatedAt', title: 'Last Updated' },
+    ];
 
     useEffect(() => {
         const data = sortBy(recordsData, sortStatus.columnAccessor);
@@ -106,6 +113,14 @@ const Contacts = () => {
         dispatch(getAllSourceForContact(source));
     };
 
+    const showHideColumns = (col: string) => {
+        if (hideCols.includes(col)) {
+            setHideCols((col: any) => hideCols.filter((d: any) => d !== col));
+        } else {
+            setHideCols([...hideCols, col]);
+        }
+    };
+
     return !isAbleToRead ? null : (
         <div>
             <PageHeadingSection description="Identify and categorize lead contacts. Update descriptions. Add or remove contact channels." heading="Track Leads" />
@@ -133,6 +148,52 @@ const Contacts = () => {
                     </button>
                 </div>
             </div>
+            <div className="flex justify-start gap-4">
+                <div className="dropdown">
+                    <Dropdown
+                        placement={`${isRtl ? 'bottom-end' : 'bottom-start'}`}
+                        btnClassName="!flex items-center border font-semibold border-white-light dark:border-[#253b5c] rounded-md px-4 py-2 text-sm dark:bg-[#1b2e4b] dark:text-white-dark"
+                        button={
+                            <>
+                                <span className="ltr:mr-1 rtl:ml-1">Columns</span>
+                                <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M19 9L12 15L5 9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                                </svg>
+                            </>
+                        }
+                    >
+                        <ul className="!min-w-[170px]">
+                            {cols.map((col, i) => {
+                                return (
+                                    <li
+                                        key={i}
+                                        className="flex flex-col"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                        }}
+                                    >
+                                        <div className="flex items-center px-4 py-1">
+                                            <label className="mb-0 cursor-pointer">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={!hideCols.includes(col.accessor)}
+                                                    className="form-checkbox"
+                                                    defaultValue={col.accessor}
+                                                    onChange={(event: any) => {
+                                                        setHideCols(event.target.value);
+                                                        showHideColumns(col.accessor);
+                                                    }}
+                                                />
+                                                <span className="ltr:ml-2 rtl:mr-2">{col.title}</span>
+                                            </label>
+                                        </div>
+                                    </li>
+                                );
+                            })}
+                        </ul>
+                    </Dropdown>
+                </div>
+            </div>
 
             {/* contact List table*/}
             <div className="datatables panel mt-6">
@@ -145,60 +206,70 @@ const Contacts = () => {
                             title: 'Name',
                             sortable: true,
                             render: ({ name, title }) => <div>{`${title} ${name}`}</div>,
+                            hidden: hideCols.includes('name'),
                         },
                         {
                             accessor: 'phoneNumber',
                             title: 'Phone No',
                             sortable: true,
                             render: ({ phoneNumber }) => <div>{phoneNumber}</div>,
+                            hidden: hideCols.includes('phoneNumber'),
                         },
                         {
                             accessor: 'email',
                             title: 'Email',
                             sortable: true,
                             render: ({ email }) => <div>{email}</div>,
+                            hidden: hideCols.includes('email'),
                         },
                         {
                             accessor: 'position',
                             title: 'Position',
                             sortable: true,
                             render: ({ position }) => <div>{position}</div>,
+                            hidden: hideCols.includes('position'),
                         },
                         {
                             accessor: 'industry',
                             title: 'Industry',
                             sortable: true,
                             render: ({ industry }) => <div>{industry}</div>,
+                            hidden: hideCols.includes('industry'),
                         },
                         {
                             accessor: 'city',
                             title: 'City',
                             sortable: true,
                             render: ({ location }) => <div>{location?.city}</div>,
+                            hidden: hideCols.includes('city'),
                         },
                         {
                             accessor: 'state',
                             title: 'State',
                             sortable: true,
                             render: ({ location }) => <div>{location?.state}</div>,
+                            hidden: hideCols.includes('state'),
                         },
                         {
                             accessor: 'country',
                             title: 'Country',
                             sortable: true,
                             render: ({ location }) => <div>{location?.country}</div>,
+                            hidden: hideCols.includes('country'),
                         },
                         {
                             accessor: 'createdAt',
                             title: 'Created Date',
                             sortable: true,
                             render: ({ createdAt }) => <div>{new Date(createdAt).toLocaleString()}</div>,
+                            hidden: hideCols.includes('createdAt'),
                         },
                         {
                             accessor: 'updatedAt',
                             title: 'Last Updated',
                             sortable: true,
                             render: ({ updatedAt }) => <div>{new Date(updatedAt).toLocaleString()}</div>,
+                            hidden: hideCols.includes('updatedAt'),
                         },
                         {
                             accessor: 'action',
