@@ -71,7 +71,7 @@ const LeadRuleCreateModal = () => {
             }}
             size="xLarge"
             onSubmit={() => formik.submitForm()}
-            title="Create Lead  Rule"
+            title="Create Lead Rule"
             isBtnDisabled={formik.values.name && !isBtnDisabled ? false : true}
             disabledDiscardBtn={isBtnDisabled}
             content={

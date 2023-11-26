@@ -415,6 +415,13 @@ export interface IFollowup {
     id: string;
 }
 
+// Custom field data types
+
+export interface ICustomField {
+    id: string;
+    label: string;
+}
+
 // ----------------- authentication types : start -------------------//
 
 export interface ISignInResponse {
@@ -490,6 +497,12 @@ export interface ManageLeadInitialStateProps extends InitialStateProps {
 export interface SourceInitialStateProps extends InitialStateProps {
     data: SourceDataType[];
     singleData: SourceDataType;
+}
+
+//custom field slice initial props
+export interface CustomFieldInitialStateProps extends InitialStateProps {
+    data: ICustomField[];
+    singleData: ICustomField;
 }
 
 //schedule message slice intial props

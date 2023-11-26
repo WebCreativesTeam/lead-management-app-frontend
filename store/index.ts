@@ -22,6 +22,7 @@ import scheduleMessageSlice from './Slices/automationSlice/scheduleMessageSlice'
 import occasionMessageSlice from './Slices/automationSlice/occasionMessageSlice';
 import dripMessageSlice from './Slices/automationSlice/dripMessageSlice';
 import dashbordSlice from './Slices/dashbordSlice';
+import customFieldSlice from './Slices/customFieldSlice';
 
 const rootReducer = combineReducers({
     themeConfig: themeConfigSlice,
@@ -47,6 +48,7 @@ const rootReducer = combineReducers({
     occasionMessage: occasionMessageSlice,
     dripMessage: dripMessageSlice,
     dashboard: dashbordSlice,
+    customField: customFieldSlice,
 });
 
 export const store = configureStore({
