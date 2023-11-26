@@ -20,7 +20,7 @@ import { sortBy } from 'lodash';
 import UserDeleteModal from '@/components/Users/UserDeleteModal';
 import ToggleSwitch from '@/components/__Shared/ToggleSwitch';
 
-const Users = () => {
+const ManageUsers = () => {
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('Manage Users'));
@@ -256,4 +256,4 @@ const Users = () => {
     );
 };
 
-export default Users;
+export default ManageUsers;

@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState, Fragment, useDeferredValue } from 'react';
+import React, { useEffect, useState, useDeferredValue } from 'react';
 import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
@@ -45,7 +45,7 @@ import ViewLeadModal from '@/components/Leads/ManageLeads/ViewLeadModal';
 import ChangeLeadPriorityModal from '@/components/Leads/ManageLeads/ChangeLeadPriorityModal';
 import ChangeLeadStatusModal from '@/components/Leads/ManageLeads/ChangeLeadStatusModal';
 
-const LeadPage = () => {
+const ManageLeads = () => {
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('Manage Leads'));
@@ -519,4 +519,4 @@ const LeadPage = () => {
     );
 };
 
-export default LeadPage;
+export default ManageLeads;

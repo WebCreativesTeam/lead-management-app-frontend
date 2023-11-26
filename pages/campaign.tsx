@@ -28,7 +28,7 @@ import ScheduleMessageDeleteModal from '@/components/Automation/ScheduleMessage/
 import { scheduleMessagesRawData } from '@/utils/Raw Data';
 import ToggleSwitch from '@/components/__Shared/ToggleSwitch';
 
-const ScheduleMessage = () => {
+const Campaign = () => {
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('Track Leads | ScheduleMessages'));
@@ -263,4 +263,4 @@ const ScheduleMessage = () => {
     );
 };
 
-export default ScheduleMessage;
+export default Campaign;

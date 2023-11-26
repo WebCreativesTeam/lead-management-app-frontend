@@ -53,8 +53,9 @@ import { setEmailSmtpCreatePermission, setEmailSmtpDeletePermission, setEmailSmt
 import { setSmsTemplateCreatePermission, setSmsTemplateDeletePermission, setSmsTemplateReadPermission, setSmsTemplateUpdatePermission } from '@/store/Slices/templateSlice/smsTemplateSlice';
 
 //other imports
-import { ArrowRight, Branch, Email, Global, Phone, Shield, Tasks, User, File, Talegram, Setting, Automation, DropdownDoubleLayer } from '../../utils/icons';
+import { ArrowRight, Branch, Phone, Shield, Tasks, User, File, Talegram, Setting, ChatIcon } from '../../utils/icons';
 import { fetchUserInfo } from '@/utils/contant';
+import SideabarLabel from '../__Shared/SidebarLabel';
 
 const Sidebar = () => {
     const router = useRouter();
@@ -323,76 +324,7 @@ const Sidebar = () => {
                                     </div>
                                 </Link>
                             </li>
-
-                            {/* Leads */}
-                            {!isAbleToReadLeads && !isAbleToReadLeadPriority && !isAbleToReadLeadStatus ? null : (
-                                <li className="menu nav-item">
-                                    <button type="button" className={`${currentMenu === 'Leads' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('Leads')}>
-                                        <div className="flex items-center">
-                                            <Talegram />
-                                            <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Leads')}</span>
-                                        </div>
-
-                                        <div className={currentMenu === 'Leads' ? 'rotate-90' : 'rtl:rotate-180'}>
-                                            <ArrowRight />
-                                        </div>
-                                    </button>
-
-                                    <AnimateHeight duration={300} height={currentMenu === 'Leads' ? 'auto' : 0}>
-                                        <ul className="sub-menu text-gray-500">
-                                            {isAbleToReadLeads && (
-                                                <li>
-                                                    <Link href="/leads">{t('Manage Leads')}</Link>
-                                                </li>
-                                            )}
-
-                                            <li>
-                                                <Link href="/leads/rules">{t('Rules')}</Link>
-                                            </li>
-                                        </ul>
-                                    </AnimateHeight>
-                                </li>
-                            )}
-
-                            {/* IVR */}
-                            <li className="menu nav-item">
-                                <Link href="/ivr" className="group">
-                                    <div className="flex items-center">
-                                        <User />
-                                        <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('IVR')}</span>
-                                    </div>
-                                </Link>
-                            </li>
-
-                            {/* Automation */}
-                            <li className="menu nav-item">
-                                <button type="button" className={`${currentMenu === 'Automation' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('Automation')}>
-                                    <div className="flex items-center">
-                                        <Automation />
-                                        <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Automation')}</span>
-                                    </div>
-
-                                    <div className={currentMenu === 'Automation' ? 'rotate-90' : 'rtl:rotate-180'}>
-                                        <ArrowRight />
-                                    </div>
-                                </button>
-
-                                <AnimateHeight duration={300} height={currentMenu === 'Automation' ? 'auto' : 0}>
-                                    <ul className="sub-menu text-gray-500">
-                                        <li>
-                                            <Link href="/automation/schedule-message">{t('Schedule Message')}</Link>
-                                        </li>
-                                        <li>
-                                            <Link href="/automation/occasion-message">{t('Occasion Message')}</Link>
-                                        </li>
-
-                                        <li>
-                                            <Link href="/automation/drip-message">{t('Drip Message')}</Link>
-                                        </li>
-                                    </ul>
-                                </AnimateHeight>
-                            </li>
-
+                            <SideabarLabel label="Lead" />
                             {/* task */}
                             {isAbleToReadContact && (
                                 <li className="menu nav-item">
@@ -404,7 +336,26 @@ const Sidebar = () => {
                                     </Link>
                                 </li>
                             )}
-
+                            {/* manage leads */}
+                            {isAbleToReadContact && (
+                                <li className="menu nav-item">
+                                    <Link href="/manage-leads" className="group">
+                                        <div className="flex items-center">
+                                            <Talegram />
+                                            <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Manage Leads')}</span>
+                                        </div>
+                                    </Link>
+                                </li>
+                            )}
+                            {/* IVR */}
+                            <li className="menu nav-item">
+                                <Link href="/ivr" className="group">
+                                    <div className="flex items-center">
+                                        <User />
+                                        <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('IVR')}</span>
+                                    </div>
+                                </Link>
+                            </li>
                             {/* contacts */}
                             {isAbleToReadContact && (
                                 <li className="menu nav-item">
@@ -416,18 +367,64 @@ const Sidebar = () => {
                                     </Link>
                                 </li>
                             )}
-
                             {/* Report */}
-                            {isAbleToReadContact && (
-                                <li className="menu nav-item">
-                                    <Link href="/report" className="group">
-                                        <div className="flex items-center">
-                                            <Phone />
-                                            <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Report')}</span>
-                                        </div>
-                                    </Link>
-                                </li>
-                            )}
+                            <li className="menu nav-item">
+                                <Link href="/report" className="group">
+                                    <div className="flex items-center">
+                                        <Phone />
+                                        <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Report')}</span>
+                                    </div>
+                                </Link>
+                            </li>
+                            <SideabarLabel label="Automation" />
+                            {/* Lead Assigning */}
+                            <li className="menu nav-item">
+                                <Link href="/lead-assigning" className="group">
+                                    <div className="flex items-center">
+                                        <Phone />
+                                        <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Lead Assigning')}</span>
+                                    </div>
+                                </Link>
+                            </li>
+
+                            {/* Campaign */}
+                            <li className="menu nav-item">
+                                <Link href="/campaign" className="group">
+                                    <div className="flex items-center">
+                                        <Phone />
+                                        <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Campaign')}</span>
+                                    </div>
+                                </Link>
+                            </li>
+
+                            {/* Message */}
+                            <li className="menu nav-item">
+                                <button type="button" className={`${currentMenu === 'Message' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('Message')}>
+                                    <div className="flex items-center">
+                                        <ChatIcon />
+                                        <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Message')}</span>
+                                    </div>
+
+                                    <div className={currentMenu === 'Message' ? 'rotate-90' : 'rtl:rotate-180'}>
+                                        <ArrowRight />
+                                    </div>
+                                </button>
+
+                                <AnimateHeight duration={300} height={currentMenu === 'Message' ? 'auto' : 0}>
+                                    <ul className="sub-menu text-gray-500">
+                                        <li>
+                                            <Link href="/message/email">{t('Email')}</Link>
+                                        </li>
+                                        <li>
+                                            <Link href="/message/sms">{t('SMS')}</Link>
+                                        </li>
+
+                                        <li>
+                                            <Link href="/message/whatsapp">{t('WhatsApp')}</Link>
+                                        </li>
+                                    </ul>
+                                </AnimateHeight>
+                            </li>
 
                             {/* Templates */}
                             {!isAbleToReadEmailTemplates && !isAbleToReadEmailSmtp ? null : (
@@ -463,211 +460,162 @@ const Sidebar = () => {
                                     </AnimateHeight>
                                 </li>
                             )}
+                            <SideabarLabel label="System" />
 
-                            {/* //? Settings */}
+                            {/* Integrations */}
                             <li className="menu nav-item">
-                                <button type="button" className={`${currentMenu === 'Setting' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('Setting')}>
+                                <Link href="/integrations" className="group">
                                     <div className="flex items-center">
-                                        <Setting />
-                                        <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Setting')}</span>
+                                        <Phone />
+                                        <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Integrations')}</span>
+                                    </div>
+                                </Link>
+                            </li>
+
+                            {/* manage users */}
+                            <li className="menu nav-item">
+                                <Link href="/manage-users" className="group">
+                                    <div className="flex items-center">
+                                        <User />
+                                        <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Manage Users')}</span>
+                                    </div>
+                                </Link>
+                            </li>
+
+                            {/* Access policies */}
+                            <li className="menu nav-item">
+                                <Link href="/access-policies" className="group">
+                                    <div className="flex items-center">
+                                        <Shield />
+                                        <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Access Policies')}</span>
+                                    </div>
+                                </Link>
+                            </li>
+
+                            {/* Manage Products */}
+                            <li className="menu nav-item">
+                                <Link href="/manage-products" className="group">
+                                    <div className="flex items-center">
+                                        <User />
+                                        <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Manage Products')}</span>
+                                    </div>
+                                </Link>
+                            </li>
+
+                            {/* Custom Fields */}
+                            <li className="menu nav-item">
+                                <Link href="/custom-fields" className="group">
+                                    <div className="flex items-center">
+                                        <User />
+                                        <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Custom Fields')}</span>
+                                    </div>
+                                </Link>
+                            </li>
+
+                            {/* Logs */}
+                            <li className="menu nav-item">
+                                <Link href="/logs" className="group">
+                                    <div className="flex items-center">
+                                        <User />
+                                        <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Logs')}</span>
+                                    </div>
+                                </Link>
+                            </li>
+
+                            {/* settigs */}
+                            <SideabarLabel label="Settings" />
+
+                            {/* Campaign Integration */}
+                            <li className="menu nav-item">
+                                <button type="button" className={`${currentMenu === 'Campaign Integration' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('Campaign Integration')}>
+                                    <div className="flex items-center">
+                                        <ChatIcon />
+                                        <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Campaign Integration')}</span>
                                     </div>
 
-                                    <div className={currentMenu === 'Setting' ? 'rotate-90' : 'rtl:rotate-180'}>
+                                    <div className={currentMenu === 'Campaign Integration' ? 'rotate-90' : 'rtl:rotate-180'}>
                                         <ArrowRight />
                                     </div>
                                 </button>
 
-                                <AnimateHeight duration={300} height={currentMenu === 'Setting' ? 'auto' : 0}>
+                                <AnimateHeight duration={300} height={currentMenu === 'Campaign Integration' ? 'auto' : 0}>
                                     <ul className="sub-menu text-gray-500">
-                                        {/* campaign integration dropdown */}
-                                        <li className="menu nav-item">
-                                            <button
-                                                type="button"
-                                                className={`${
-                                                    campaignIntegrationSubMenu ? 'open' : ''
-                                                } w-full break-words before:h-[5px] before:w-[5px] before:rounded before:bg-gray-300 hover:bg-gray-100 ltr:before:mr-2 rtl:before:ml-2 dark:text-[#888ea8] dark:hover:bg-gray-900`}
-                                                onClick={() => setCampaignIntegrationSubMenu(!campaignIntegrationSubMenu)}
-                                            >
-                                                {t('Campaign Integration')}
-                                                <div className={`${campaignIntegrationSubMenu ? '!rotate-90' : ''} ltr:ml-auto rtl:mr-auto rtl:rotate-180`}>
-                                                    <ArrowRight />
-                                                </div>
-                                            </button>
-                                            <AnimateHeight duration={300} height={campaignIntegrationSubMenu ? 'auto' : 0}>
-                                                <ul className="sub-menu text-gray-500">
-                                                    <li>
-                                                        <Link href="/setting/campaign-integration/email">{t('SMS')}</Link>
-                                                    </li>
-                                                    {isAbleToReadEmailSmtp && (
-                                                        <li>
-                                                            <Link href="/setting/campaign-integration/email">{t('Email')}</Link>
-                                                        </li>
-                                                    )}
-                                                    <li>
-                                                        <Link href="/setting/campaign-integration/email">{t('Whatsapp')}</Link>
-                                                    </li>
-                                                </ul>
-                                            </AnimateHeight>
+                                        <li>
+                                            <Link href="/campaign-integration/email">{t('Email')}</Link>
+                                        </li>
+                                        <li>
+                                            <Link href="/campaign-integration/sms">{t('SMS')}</Link>
                                         </li>
 
                                         <li>
-                                            <Link href="/setting/email-logs">{t('Lead Integration')}</Link>
-                                        </li>
-
-                                        {/* User setting dropdown */}
-                                        <li className="menu nav-item">
-                                            <button
-                                                type="button"
-                                                className={`${
-                                                    userSettingSubMenu ? 'open' : ''
-                                                } w-full before:h-[5px] before:w-[5px] before:rounded before:bg-gray-300 hover:bg-gray-100 ltr:before:mr-2 rtl:before:ml-2 dark:text-[#888ea8] dark:hover:bg-gray-900`}
-                                                onClick={() => setUserSettingSubMenu(!userSettingSubMenu)}
-                                            >
-                                                {t('User Setting')}
-                                                <div className={`${userSettingSubMenu ? '!rotate-90' : ''} ltr:ml-auto rtl:mr-auto rtl:rotate-180`}>
-                                                    <ArrowRight />
-                                                </div>
-                                            </button>
-                                            <AnimateHeight duration={300} height={userSettingSubMenu ? 'auto' : 0}>
-                                                <ul className="sub-menu text-gray-500">
-                                                    {isAbleToReadUsers && (
-                                                        <li>
-                                                            <Link href="/setting/user-setting/user-information">{t('User Information')}</Link>
-                                                        </li>
-                                                    )}
-                                                    {isAbleToReadPolicy && (
-                                                        <li>
-                                                            <Link href="/setting/user-setting/user-policy">{t('User Policy')}</Link>
-                                                        </li>
-                                                    )}
-                                                </ul>
-                                            </AnimateHeight>
-                                        </li>
-
-                                        {isAbleToReadBranch && (
-                                            <li>
-                                                <Link href="/setting/branch-setting">{t('Branch Setting')}</Link>
-                                            </li>
-                                        )}
-
-                                        {/* lead setting dropdown */}
-                                        <li className="menu nav-item">
-                                            <button
-                                                type="button"
-                                                className={`${
-                                                    leadSettingSubMenu ? 'open' : ''
-                                                } w-full before:h-[5px] before:w-[5px] before:rounded before:bg-gray-300 hover:bg-gray-100 ltr:before:mr-2 rtl:before:ml-2 dark:text-[#888ea8] dark:hover:bg-gray-900`}
-                                                onClick={() => setLeadSettingSubMenu(!leadSettingSubMenu)}
-                                            >
-                                                {t('Lead Setting')}
-                                                <div className={`${leadSettingSubMenu ? '!rotate-90' : ''} ltr:ml-auto rtl:mr-auto rtl:rotate-180`}>
-                                                    <ArrowRight />
-                                                </div>
-                                            </button>
-                                            <AnimateHeight duration={300} height={leadSettingSubMenu ? 'auto' : 0}>
-                                                <ul className="sub-menu text-gray-500">
-                                                    {isAbleToReadSource && (
-                                                        <li>
-                                                            <Link href="/setting/lead-setting/source-setting">{t('Source Setting')}</Link>
-                                                        </li>
-                                                    )}
-                                                    {isAbleToReadLeadStatus && (
-                                                        <li>
-                                                            <Link href="/setting/lead-setting/status">{t('Status')}</Link>
-                                                        </li>
-                                                    )}
-                                                    {isAbleToReadLeadPriority && (
-                                                        <li>
-                                                            <Link href="/setting/lead-setting/priority">{t('Priority')}</Link>
-                                                        </li>
-                                                    )}
-                                                </ul>
-                                            </AnimateHeight>
-                                        </li>
-
-                                        {/* task setting dropdown */}
-                                        <li className="menu nav-item">
-                                            <button
-                                                type="button"
-                                                className={`${
-                                                    taskSettingSubMenu ? 'open' : ''
-                                                } w-full before:h-[5px] before:w-[5px] before:rounded before:bg-gray-300 hover:bg-gray-100 ltr:before:mr-2 rtl:before:ml-2 dark:text-[#888ea8] dark:hover:bg-gray-900`}
-                                                onClick={() => setTaskSettingSubMenu(!taskSettingSubMenu)}
-                                            >
-                                                {t('Task Setting')}
-                                                <div className={`${taskSettingSubMenu ? '!rotate-90' : ''} ltr:ml-auto rtl:mr-auto rtl:rotate-180`}>
-                                                    <ArrowRight />
-                                                </div>
-                                            </button>
-                                            <AnimateHeight duration={300} height={taskSettingSubMenu ? 'auto' : 0}>
-                                                <ul className="sub-menu text-gray-500">
-                                                    {isAbleToReadTaskStatus && (
-                                                        <li>
-                                                            <Link href="/setting/task-setting/status">{t('Status')}</Link>
-                                                        </li>
-                                                    )}
-                                                    {isAbleToReadTaskPriority && (
-                                                        <li>
-                                                            <Link href="/setting/task-setting/priority">{t('Priority')}</Link>
-                                                        </li>
-                                                    )}
-                                                </ul>
-                                            </AnimateHeight>
-                                        </li>
-
-                                        <li>
-                                            <Link href="/setting/email-logs">{t('Lead Assigning')}</Link>
-                                        </li>
-
-                                        {/* Logs dropdown */}
-                                        <li className="menu nav-item">
-                                            <button
-                                                type="button"
-                                                className={`${
-                                                    logsSubMenu ? 'open' : ''
-                                                } w-full before:h-[5px] before:w-[5px] before:rounded before:bg-gray-300 hover:bg-gray-100 ltr:before:mr-2 rtl:before:ml-2 dark:text-[#888ea8] dark:hover:bg-gray-900`}
-                                                onClick={() => setLogsSubMenu(!logsSubMenu)}
-                                            >
-                                                {t('Logs')}
-                                                <div className={`${logsSubMenu ? '!rotate-90' : ''} ltr:ml-auto rtl:mr-auto rtl:rotate-180`}>
-                                                    <ArrowRight />
-                                                </div>
-                                            </button>
-                                            <AnimateHeight duration={300} height={logsSubMenu ? 'auto' : 0}>
-                                                <ul className="sub-menu text-gray-500">
-                                                    <li>
-                                                        <Link href="/setting/logs/email">{t('Email')}</Link>
-                                                    </li>
-                                                </ul>
-                                            </AnimateHeight>
+                                            <Link href="/campaign-integration/whatsapp">{t('WhatsApp')}</Link>
                                         </li>
                                     </ul>
                                 </AnimateHeight>
                             </li>
 
-                            {/* Emails */}
-                            {!isAbleToReadEmailSmtp ? null : (
-                                <li className="menu nav-item">
-                                    <button type="button" className={`${currentMenu === 'Emails' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('Emails')}>
-                                        <div className="flex items-center">
-                                            <Email />
-                                            <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Emails')}</span>
-                                        </div>
+                            {/* branches */}
+                            <li className="menu nav-item">
+                                <Link href="/branches" className="group">
+                                    <div className="flex items-center">
+                                        <Branch />
+                                        <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Branches')}</span>
+                                    </div>
+                                </Link>
+                            </li>
 
-                                        <div className={currentMenu === 'Emails' ? 'rotate-90' : 'rtl:rotate-180'}>
-                                            <ArrowRight />
-                                        </div>
-                                    </button>
+                            {/* Lead Settings */}
+                            <li className="menu nav-item">
+                                <button type="button" className={`${currentMenu === 'Lead Settings' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('Lead Settings')}>
+                                    <div className="flex items-center">
+                                        <Talegram />
+                                        <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Lead Settings')}</span>
+                                    </div>
 
-                                    <AnimateHeight duration={300} height={currentMenu === 'Emails' ? 'auto' : 0}>
-                                        <ul className="sub-menu text-gray-500">
-                                            <li>
-                                                <Link href="/emails/create-email">{t('Create Email')}</Link>
-                                            </li>
-                                        </ul>
-                                    </AnimateHeight>
-                                </li>
-                            )}
+                                    <div className={currentMenu === 'Lead Settings' ? 'rotate-90' : 'rtl:rotate-180'}>
+                                        <ArrowRight />
+                                    </div>
+                                </button>
+
+                                <AnimateHeight duration={300} height={currentMenu === 'Lead Settings' ? 'auto' : 0}>
+                                    <ul className="sub-menu text-gray-500">
+                                        <li>
+                                            <Link href="/lead-settings/source">{t('Source')}</Link>
+                                        </li>
+                                        <li>
+                                            <Link href="/lead-settings/priority">{t('Priority')}</Link>
+                                        </li>
+                                        <li>
+                                            <Link href="/lead-settings/status">{t('Status')}</Link>
+                                        </li>
+                                    </ul>
+                                </AnimateHeight>
+                            </li>
+
+                            {/* Task Settings */}
+                            <li className="menu nav-item">
+                                <button type="button" className={`${currentMenu === 'Task Settings' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('Task Settings')}>
+                                    <div className="flex items-center">
+                                        <Tasks />
+                                        <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Task Settings')}</span>
+                                    </div>
+
+                                    <div className={currentMenu === 'Task Settings' ? 'rotate-90' : 'rtl:rotate-180'}>
+                                        <ArrowRight />
+                                    </div>
+                                </button>
+
+                                <AnimateHeight duration={300} height={currentMenu === 'Task Settings' ? 'auto' : 0}>
+                                    <ul className="sub-menu text-gray-500">
+                                        <li>
+                                            <Link href="/task-settings/priority">{t('Priority')}</Link>
+                                        </li>
+                                        <li>
+                                            <Link href="/task-settings/status">{t('Status')}</Link>
+                                        </li>
+                                    </ul>
+                                </AnimateHeight>
+                            </li>
                         </ul>
                     </PerfectScrollbar>
                 </div>

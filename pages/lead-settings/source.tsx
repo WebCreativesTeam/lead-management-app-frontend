@@ -6,24 +6,23 @@ import { DataTable, DataTableSortStatus } from 'mantine-datatable';
 import { sortBy } from 'lodash';
 import { Delete, Edit, Plus, View } from '@/utils/icons';
 import PageHeadingSection from '@/components/__Shared/PageHeadingSection/index.';
-import ConfirmationModal from '@/components/__Shared/ConfirmationModal';
 import { useDispatch, useSelector } from 'react-redux';
 import { setPageTitle } from '@/store/themeConfigSlice';
-import { GetMethodResponseType, ILeadRules, SourceDataType } from '@/utils/Types';
+import { GetMethodResponseType, SourceDataType } from '@/utils/Types';
 import { ApiClient } from '@/utils/http';
 import { IRootState } from '@/store';
-import { getAllLeadRules, getAllSourceForLeadRule, setCreateModal, setDeleteModal, setEditModal, setLeadRuleDataLength, setViewModal } from '@/store/Slices/leadSlice/leadRuleSlice';
-import LeadRuleViewModal from '@/components/Leads/LeadRule/LeadRuleViewModal';
-import LeadRuleCreateModal from '@/components/Leads/LeadRule/LeadRuleCreateModal';
-import LeadRuleEditModal from '@/components/Leads/LeadRule/LeadRuleEditModal';
-import LeadRuleDeleteModal from '@/components/Leads/LeadRule/LeadRuleDeleteModal';
+import { getAllSources, setCreateModal, setDeleteModal, setEditModal, setSourceDataLength, setViewModal } from '@/store/Slices/sourceSlice';
+import SourceViewModal from '@/components/Sources/SourceViewModal';
+import SourceCreateModal from '@/components/Sources/SourceCreateModal';
+import SourceEditModal from '@/components/Sources/SourceEditModal';
+import SourceDeleteModal from '@/components/Sources/SourceDeleteModal';
 
-const LeadRules = () => {
+const Source = () => {
     const dispatch = useDispatch();
     useEffect(() => {
-        dispatch(setPageTitle('Track Leads | LeadRules'));
+        dispatch(setPageTitle('Track Leads | Sources'));
     });
-    const { data, isFetching, isBtnDisabled, deleteModal, singleData, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate, totalRecords } = useSelector((state: IRootState) => state.leadRule);
+    const { data, isFetching, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate, totalRecords } = useSelector((state: IRootState) => state.source);
 
     //hooks
     const [searchInputText, setSearchInputText] = useState<string>('');
@@ -34,7 +33,7 @@ const LeadRules = () => {
     const [page, setPage] = useState(1);
     const PAGE_SIZES = [10, 20, 30];
     const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
-    const [recordsData, setRecordsData] = useState<ILeadRules[]>([] as ILeadRules[]);
+    const [recordsData, setRecordsData] = useState<SourceDataType[]>([] as SourceDataType[]);
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
         columnAccessor: 'name',
         direction: 'asc',
@@ -48,68 +47,58 @@ const LeadRules = () => {
         setPage(1);
     }, [sortStatus]);
 
-    //get all leadRule after page render
+    //get all source after page render
     useEffect(() => {
-        getLeadRuleList();
+        getSourceList();
     }, [isFetching, pageSize, page, searchQuery]);
 
     useEffect(() => {
         setRecordsData(data);
     }, [data]);
 
-    useEffect(() => {
-        getAllSourceList();
-    }, []);
-
-    //get all LeadRule list
-    const getLeadRuleList = async () => {
+    //get all Source list
+    const getSourceList = async () => {
         setLoading(true);
         const res: GetMethodResponseType = await new ApiClient().get(`source?limit=${pageSize}&page=${page}&search=${searchQuery}`);
-        const leadRule: ILeadRules[] = res?.data;
-        if (typeof leadRule === 'undefined') {
-            dispatch(getAllLeadRules([] as ILeadRules[]));
+        const source: SourceDataType[] = res?.data;
+        if (typeof source === 'undefined') {
+            dispatch(getAllSources([] as SourceDataType[]));
             return;
         }
-        dispatch(getAllLeadRules(leadRule));
-        dispatch(setLeadRuleDataLength(res?.meta?.totalCount));
+        dispatch(getAllSources(source));
+        dispatch(setSourceDataLength(res?.meta?.totalCount));
         setLoading(false);
     };
 
-    //get all Source list
-    const getAllSourceList = async () => {
-        setLoading(true);
-        const sourceList: GetMethodResponseType = await new ApiClient().get('source/list');
-        const source: SourceDataType[] = sourceList?.data;
-        if (typeof source === 'undefined') {
-            dispatch(getAllSourceForLeadRule([] as SourceDataType[]));
-            return;
-        }
-        dispatch(getAllSourceForLeadRule(source));
-    };
-
-    return (
+    return !isAbleToRead ? null : (
         <div>
-            <PageHeadingSection description="Identify and categorize lead leadRules. Update descriptions. Add or remove leadRule channels." heading="Track Leads" />
+            <PageHeadingSection description="Identify and categorize lead sources. Update descriptions. Add or remove source channels." heading="Track Leads" />
             <div className="my-6 flex flex-col gap-5 sm:flex-row ">
-                {/* {!isAbleToCreate ? (
+                {!isAbleToCreate ? (
                     <div className="flex-1"></div>
-                ) : ( */}
-                <div className="flex-1">
-                    <button className="btn btn-primary h-full w-full max-w-[200px] max-sm:mx-auto" type="button" onClick={() => dispatch(setCreateModal(true))}>
-                        <Plus />
-                        Add New Rule
-                    </button>
-                </div>
-                {/* )} */}
-                <div className="relative flex-1">
-                    <input type="text" placeholder="Find Rule" className="form-input py-3 ltr:pr-[100px] rtl:pl-[100px]" onChange={(e) => setSearchInputText(e.target.value)} value={searchInputText} />
+                ) : (
+                    <div className="flex-1">
+                        <button className="btn btn-primary h-full w-full max-w-[200px] max-sm:mx-auto" type="button" onClick={() => dispatch(setCreateModal(true))}>
+                            <Plus />
+                            Add New Source
+                        </button>
+                    </div>
+                )}
+                <div className="relative  flex-1">
+                    <input
+                        type="text"
+                        placeholder="Find A Source"
+                        className="form-input py-3 ltr:pr-[100px] rtl:pl-[100px]"
+                        onChange={(e) => setSearchInputText(e.target.value)}
+                        value={searchInputText}
+                    />
                     <button type="button" className="btn btn-primary absolute top-1 shadow-none ltr:right-1 rtl:left-1" onClick={() => setSearch(searchInputText)}>
                         Search
                     </button>
                 </div>
             </div>
 
-            {/* leadRule List table*/}
+            {/* source List table*/}
             <div className="datatables panel mt-6">
                 <DataTable
                     className="table-hover whitespace-nowrap"
@@ -117,7 +106,7 @@ const LeadRules = () => {
                     columns={[
                         {
                             accessor: 'name',
-                            title: 'LeadRule Name',
+                            title: 'Source Name',
                             sortable: true,
                             render: ({ name }) => <div>{name}</div>,
                         },
@@ -132,20 +121,20 @@ const LeadRules = () => {
                                             <View />
                                         </button>
                                     </Tippy>
-                                    {/* {isAbleToUpdate && ( */}
-                                    <Tippy content="Edit">
-                                        <button type="button" onClick={() => dispatch(setEditModal({ id, open: true }))}>
-                                            <Edit />
-                                        </button>
-                                    </Tippy>
-                                    {/* )} */}
-                                    {/* {isAbleToDelete && ( */}
-                                    <Tippy content="Delete">
-                                        <button type="button" onClick={() => dispatch(setDeleteModal({ id, open: true }))}>
-                                            <Delete />
-                                        </button>
-                                    </Tippy>
-                                    {/* )} */}
+                                    {isAbleToUpdate && (
+                                        <Tippy content="Edit">
+                                            <button type="button" onClick={() => dispatch(setEditModal({ id, open: true }))}>
+                                                <Edit />
+                                            </button>
+                                        </Tippy>
+                                    )}
+                                    {isAbleToDelete && (
+                                        <Tippy content="Delete">
+                                            <button type="button" onClick={() => dispatch(setDeleteModal({ id, open: true }))}>
+                                                <Delete />
+                                            </button>
+                                        </Tippy>
+                                    )}
                                 </div>
                             ),
                         },
@@ -165,18 +154,18 @@ const LeadRules = () => {
             </div>
 
             {/* edit modal */}
-            <LeadRuleEditModal />
+            <SourceEditModal />
 
             {/* view modal */}
-            <LeadRuleViewModal />
+            <SourceViewModal />
 
             {/* delete modal */}
-            <LeadRuleDeleteModal />
+            <SourceDeleteModal />
 
             {/* create modal */}
-            <LeadRuleCreateModal />
+            <SourceCreateModal />
         </div>
     );
 };
 
-export default LeadRules;
+export default Source;
