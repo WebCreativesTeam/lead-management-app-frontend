@@ -1,20 +1,20 @@
 import { SelectOptionsType } from '../Types';
 
 export const FieldTypesList: SelectOptionsType[] = [
-    { label: 'Number', value: 'Number' },
-    { label: 'Dropdown', value: 'Dropdown' },
-    { label: 'Date', value: 'Date' },
-    { label: 'Text', value: 'Text' },
-    { label: 'Checkbox', value: 'Checkbox' },
-    { label: 'File Upload', value: 'fileUpload' },
-    { label: 'Radio Button', value: 'radioButton' },
+    { label: 'Number', value: 'NUMBER' },
+    { label: 'Dropdown', value: 'SELECT' },
+    { label: 'Date', value: 'DATE' },
+    { label: 'Text', value: 'TEXT' },
+    { label: 'Checkbox', value: 'CHECKBOX' },
+    { label: 'File Upload', value: 'FILE' },
+    { label: 'Radio Button', value: 'RADIO' },
 ];
 
 export const OperatorsList: SelectOptionsType[] = [
-    { label: 'Equals', value: 'Equals' },
-    { label: 'Not Equals', value: 'NotEquals' },
-    { label: 'Less Than', value: 'LessThan' },
-    { label: 'Less Than Equal To', value: 'LessThanEqualTo' },
-    { label: 'Greater Than', value: 'GreaterThan' },
-    { label: 'Grater Than Equal To', value: 'GraterThanEqualTo' },
+    { label: 'Equals', value: 'eq' },
+    { label: 'Not Equals', value: 'neq' },
+    { label: 'Less Than', value: 'lt' },
+    { label: 'Less Than Equal To', value: 'lteq' },
+    { label: 'Greater Than', value: 'gt' },
+    { label: 'Grater Than Equal To', value: 'gteq' },
 ];

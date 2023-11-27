@@ -8,14 +8,15 @@ import { Delete, Edit, Plus, View } from '@/utils/icons';
 import PageHeadingSection from '@/components/__Shared/PageHeadingSection/index.';
 import { useDispatch, useSelector } from 'react-redux';
 import { setPageTitle } from '@/store/themeConfigSlice';
-import { GetMethodResponseType, ICustomField } from '@/utils/Types';
+import { GetMethodResponseType, ICustomField, IFiedlListType } from '@/utils/Types';
 import { ApiClient } from '@/utils/http';
 import { IRootState } from '@/store';
-import { getAllCustomField, setCreateModal, setDeleteModal, setEditModal, setCustomFieldDataLength, setViewModal } from '@/store/Slices/customFieldSlice';
+import { getAllCustomField, setCreateModal, setDeleteModal, setEditModal, setCustomFieldDataLength, setViewModal, getAllFieldsList } from '@/store/Slices/customFieldSlice';
 import CustomFieldViewModal from '@/components/CustomField/CustomFieldViewModal';
 import CustomFieldCreateModal from '@/components/CustomField/CustomFieldsCreateModal';
 import CustomFieldEditModal from '@/components/CustomField/CustomFieldEditModal';
 import CustomFieldDeleteModal from '@/components/CustomField/CustomFieldsDeleteModal';
+import ToggleSwitch from '@/components/__Shared/ToggleSwitch';
 
 const CustomFields = () => {
     const dispatch = useDispatch();
@@ -50,6 +51,8 @@ const CustomFields = () => {
     //get all customField after page render
     useEffect(() => {
         getCustomFieldList();
+        getFieldsList();
+
     }, [isFetching, pageSize, page, searchQuery]);
 
     useEffect(() => {
@@ -59,7 +62,7 @@ const CustomFields = () => {
     //get all CustomField list
     const getCustomFieldList = async () => {
         setLoading(true);
-        const res: GetMethodResponseType = await new ApiClient().get(`source?limit=${pageSize}&page=${page}&search=${searchQuery}`);
+        const res: GetMethodResponseType = await new ApiClient().get(`custom-field?limit=${pageSize}&page=${page}&search=${searchQuery}`);
         const customField: ICustomField[] = res?.data;
         if (typeof customField === 'undefined') {
             dispatch(getAllCustomField([] as ICustomField[]));
@@ -68,6 +71,17 @@ const CustomFields = () => {
         dispatch(getAllCustomField(customField));
         dispatch(setCustomFieldDataLength(res?.meta?.totalCount));
         setLoading(false);
+    };
+
+    //get all field list : dropdown for create modal
+    const getFieldsList = async () => {
+        const res: GetMethodResponseType = await new ApiClient().get('custom-field/list');
+        const fieldsList: IFiedlListType[] = res?.data;
+        if (typeof fieldsList === 'undefined') {
+            dispatch(getAllFieldsList([] as IFiedlListType[]));
+            return;
+        }
+        dispatch(getAllFieldsList(fieldsList));
     };
 
     return (
@@ -109,6 +123,77 @@ const CustomFields = () => {
                             title: 'Label Name',
                             sortable: true,
                             render: ({ label }) => <div>{label}</div>,
+                        },
+                        {
+                            accessor: 'fieldType',
+                            title: 'Field Type',
+                            sortable: true,
+                            render: ({ fieldType }) => <div>{fieldType}</div>,
+                        },
+                        {
+                            accessor: 'order',
+                            title: 'Order',
+                            sortable: true,
+                            render: ({ order }) => <div>{order}</div>,
+                        },
+                        {
+                            accessor: 'active',
+                            title: 'Active',
+                            sortable: true,
+                            render: ({ active }) => (
+                                // isAbleToChangeDefaultStatus ? (
+                                <div>
+                                    <label className="relative h-6 w-12">
+                                        <input
+                                            type="checkbox"
+                                            className="custom_switch peer absolute z-10 h-full w-full cursor-pointer opacity-0"
+                                            id="custom_switch_checkbox1"
+                                            name="active"
+                                            checked={active}
+                                            onChange={
+                                                (e: React.ChangeEvent<HTMLInputElement>) => null
+                                                // dispatch(setDefaultStatusModal({ switchValue: e.target.checked, id, open: true }))
+                                            }
+                                        />
+                                        <ToggleSwitch />
+                                    </label>
+                                </div>
+                            ),
+                            // ) : (
+                            //     isDefault && (
+                            //         <div>
+                            //             <span className="mr-2 rounded bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-300">Default</span>
+                            //         </div>
+                            //     )
+                            // ),
+                        },
+                        {
+                            accessor: 'required',
+                            title: 'Field Required',
+                            sortable: true,
+                            render: ({ required }) => (
+                                <div>
+                                    <span
+                                        className={`mr-2 rounded bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-${required ? 'danger' : 'blue'}-800 dark:bg-${
+                                            required ? 'danger' : 'blue'
+                                        }-900 dark:text-${required ? 'danger' : 'blue'}-300`}
+                                    >
+                                        {required ? 'Required' : 'Not Required'}
+                                    </span>
+                                </div>
+                            ),
+                        },
+                        {
+                            accessor: 'createdAt',
+                            title: 'Created Date',
+                            sortable: true,
+                            render: ({ createdAt }) => <div>{new Date(createdAt).toLocaleString()}</div>,
+                        },
+                        {
+                            accessor: 'updatedAt',
+                            title: 'Last Updated',
+                            sortable: true,
+                            render: ({ updatedAt }) => <div>{new Date(updatedAt).toLocaleString()}</div>,
                         },
                         {
                             accessor: 'action',

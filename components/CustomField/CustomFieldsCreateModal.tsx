@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import React, { memo, useEffect, useState } from 'react';
 import Modal from '../__Shared/Modal';
 import { useSelector, useDispatch } from 'react-redux';
 import { IRootState } from '@/store';
@@ -9,11 +9,20 @@ import { ApiClient } from '@/utils/http';
 import { showToastAlert } from '@/utils/contant';
 import Loader from '../__Shared/Loader';
 import Select from 'react-select';
-import { FieldTypesList } from '@/utils/Raw Data';
+import { FieldTypesList, OperatorsList } from '@/utils/Raw Data';
 import ToggleSwitch from '../__Shared/ToggleSwitch';
+import { GetMethodResponseType, ICustomField, IFiedlListType, SelectOptionsType } from '@/utils/Types';
+
+type Options = {
+    name: string;
+    value: string;
+};
 
 const CreateCustomFieldModal = () => {
-    const { createModal, isBtnDisabled, isFetching } = useSelector((state: IRootState) => state.customField);
+    const { createModal, isBtnDisabled, isFetching, fieldsList } = useSelector((state: IRootState) => state.customField);
+    const [fieldsListDropdown, setFieldsListDropdown] = useState<SelectOptionsType[]>([]);
+    const [parentFieldDropdown, setParentFieldDropdown] = useState<SelectOptionsType[]>([]);
+    const [fieldType, setFieldType] = useState<string>('');
 
     const dispatch = useDispatch();
     const formik = useFormik({
@@ -24,10 +33,15 @@ const CreateCustomFieldModal = () => {
             withCondition: false,
             options: [
                 {
-                    text: '',
+                    name: '',
                     value: '',
                 },
             ],
+            field: '',
+            parentFieldValue: '',
+            isActive: false,
+            isRequired: false,
+            operator: '',
         },
         validationSchema: customFieldSchema,
         validateOnChange: false,
@@ -35,8 +49,62 @@ const CreateCustomFieldModal = () => {
         onSubmit: async (value, action) => {
             dispatch(setFetching(true));
             try {
+                const createCustomFieldObject: any = {
+                    label: value.label,
+                    fieldType: value.fieldType,
+                    order: value.order,
+                    required: value.isRequired,
+                    active: value.isActive,
+                };
+
+                if (value.withCondition && (value.fieldType === 'SELECT' || value.fieldType === 'CHECKBOX' || value.fieldType === 'RADIO')) {
+                    createCustomFieldObject.options = value.options;
+                    createCustomFieldObject.operator = value.operator;
+                    createCustomFieldObject.parentId = value.field;
+                    createCustomFieldObject.conditional = true;
+                } else if (value.withCondition) {
+                    createCustomFieldObject.operator = value.operator;
+                    createCustomFieldObject.parentId = value.field;
+                    createCustomFieldObject.conditional = true;
+                } else if (value.fieldType === 'SELECT' || value.fieldType === 'CHECKBOX' || value.fieldType === 'RADIO') {
+                    createCustomFieldObject.options = value.options;
+                }
+
+                const withConditionObject = {
+                    label: value.label,
+                    fieldType: value.fieldType,
+                    order: value.order,
+                    required: value.isRequired,
+                    active: value.isActive,
+                    conditional: value.withCondition,
+                    parentId: value.field,
+                };
+
+                const withOptionsObject = {
+                    label: value.label,
+                    fieldType: value.fieldType,
+                    order: value.order,
+                    required: value.isRequired,
+                    active: value.isActive,
+                    options: value.options,
+                };
+
+                const allValueObject = {
+                    label: value.label,
+                    fieldType: value.fieldType,
+                    order: value.order,
+                    required: value.isRequired,
+                    active: value.isActive,
+                    options: value.options,
+                    conditional: value.withCondition,
+                    parentId: value.field,
+                    operator: value.operator,
+                };
+
+                console.log(createCustomFieldObject);
+
                 dispatch(setDisableBtn(true));
-                await new ApiClient().post('customField', { name: value.label });
+                await new ApiClient().post('custom-field', withOptionsObject);
                 dispatch(setCreateModal(false));
                 action.resetForm();
             } catch (error: any) {
@@ -51,6 +119,29 @@ const CreateCustomFieldModal = () => {
             dispatch(setFetching(false));
         },
     });
+    useEffect(() => {
+        const createFieldListDropdown: SelectOptionsType[] = fieldsList?.map(({ id, label }: IFiedlListType) => {
+            return { label, value: id };
+        });
+        setFieldsListDropdown(createFieldListDropdown);
+    }, [fieldsList]);
+
+    const getCustomFieldById = async (id: string) => {
+        const res: { status: string; data: ICustomField } = await new ApiClient().get('custom-field/' + id);
+        const customField: ICustomField = res?.data;
+        if (typeof customField === 'undefined') {
+            alert('undefined');
+            return;
+        }
+        setFieldType(customField.fieldType);
+        if (customField.fieldType === 'SELECT' || customField.fieldType === 'CHECKBOX' || customField.fieldType === 'RADIO') {
+            const parentFieldValueDropdown: SelectOptionsType[] = customField?.options?.map(({ name, value }: Options) => {
+                return { label: name, value };
+            });
+            setParentFieldDropdown(parentFieldValueDropdown);
+        }
+    };
+
     return (
         <Modal
             open={createModal}
@@ -64,7 +155,7 @@ const CreateCustomFieldModal = () => {
             size="large"
             onSubmit={() => formik.submitForm()}
             title="Create Custom Field"
-            isBtnDisabled={formik.values.label && !isBtnDisabled ? false : true}
+            isBtnDisabled={formik.values.label && formik.values.fieldType && formik.values.order && !isBtnDisabled ? false : true}
             disabledDiscardBtn={isBtnDisabled}
             content={
                 isFetching ? (
@@ -74,12 +165,12 @@ const CreateCustomFieldModal = () => {
                         <form className="space-y-5" onSubmit={formik.handleSubmit}>
                             <div className="flex flex-col  gap-4 sm:flex-row">
                                 <div className="flex-1">
-                                    <label htmlFor="createLabel">Label</label>
+                                    <label htmlFor="fieldLabel">Label</label>
                                     <input
                                         onChange={formik.handleChange}
                                         onBlur={formik.handleBlur}
                                         value={formik.values.label}
-                                        id="createLabel"
+                                        id="fieldLabel"
                                         name="label"
                                         type="text"
                                         placeholder="Enter Label"
@@ -98,59 +189,55 @@ const CreateCustomFieldModal = () => {
                                         value={formik.values.order}
                                         id="createOrder"
                                         name="order"
-                                        type="number"
+                                        type="text"
                                         placeholder="Enter Order"
                                         className="form-input"
                                     />
                                 </div>
                             </div>
-                            {(formik.values.fieldType === 'Dropdown' || formik.values.fieldType === 'Checkbox' || formik.values.fieldType === 'radioButton') && (
+                            {(formik.values.fieldType === 'SELECT' || formik.values.fieldType === 'CHECKBOX' || formik.values.fieldType === 'RADIO') && (
                                 <FieldArray
                                     name="options"
                                     render={(arrayHelpers) => (
                                         <div className="my-6">
                                             <div className="flex justify-end">
-                                                <button type="button" className="btn btn-primary rounded" onClick={() => arrayHelpers.push({ text: '', value: '' })}>
+                                                <button type="button" className="btn btn-primary rounded" onClick={() => arrayHelpers.push({ name: '', value: '' })}>
                                                     Add Options
                                                 </button>
                                             </div>
                                             {formik.values.options.map((options, index) => (
                                                 <div key={index} className="panel my-6">
-                                                    <div className="flex flex-col gap-5">
-                                                        <div className="flex flex-col   gap-4 sm:flex-row">
-                                                            <div className="flex flex-[2] flex-col gap-4 sm:flex-row">
-                                                                <div className="flex-1">
-                                                                    <label htmlFor="textForOption1">Text For Option {index + 1}</label>
-                                                                    <input
-                                                                        onChange={formik.handleChange}
-                                                                        onBlur={formik.handleBlur}
-                                                                        value={formik.values.options[index].text}
-                                                                        id="textForOption1"
-                                                                        name={`options[${index}].text`}
-                                                                        type="text"
-                                                                        placeholder={`Enter text for option ${index + 1}`}
-                                                                        className="form-input"
-                                                                    />
-                                                                </div>
-                                                                <div className="flex-1">
-                                                                    <label htmlFor="valueForOption1">Value For Option {index + 1}</label>
-                                                                    <input
-                                                                        onChange={formik.handleChange}
-                                                                        onBlur={formik.handleBlur}
-                                                                        value={formik.values.options[index].value}
-                                                                        id="valueForOption1"
-                                                                        name={`options[${index}].value`}
-                                                                        type="text"
-                                                                        placeholder={`Enter value for option ${index + 1}`}
-                                                                        className="form-input"
-                                                                    />
-                                                                </div>
-                                                                <div className="flex items-end">
-                                                                    <button type="button" className="btn btn-outline-danger" onClick={() => arrayHelpers.remove(index)}>
-                                                                        X
-                                                                    </button>
-                                                                </div>
-                                                            </div>
+                                                    <div className="flex flex-1 flex-col gap-4 sm:flex-row">
+                                                        <div className="flex-1">
+                                                            <label htmlFor={`textForOption${index + 1}`}>Text For Option {index + 1}</label>
+                                                            <input
+                                                                onChange={formik.handleChange}
+                                                                onBlur={formik.handleBlur}
+                                                                value={formik.values.options[index].name}
+                                                                id={`textForOption${index + 1}`}
+                                                                name={`options[${index}].name`}
+                                                                type="text"
+                                                                placeholder={`Enter text for option ${index + 1}`}
+                                                                className="form-input"
+                                                            />
+                                                        </div>
+                                                        <div className="flex-1">
+                                                            <label htmlFor={`valueForOption${index + 1}`}>Value For Option {index + 1}</label>
+                                                            <input
+                                                                onChange={formik.handleChange}
+                                                                onBlur={formik.handleBlur}
+                                                                value={formik.values.options[index].value}
+                                                                id={`valueForOption${index + 1}`}
+                                                                name={`options[${index}].value`}
+                                                                type="text"
+                                                                placeholder={`Enter value for option ${index + 1}`}
+                                                                className="form-input"
+                                                            />
+                                                        </div>
+                                                        <div className="flex items-end">
+                                                            <button type="button" className="btn btn-outline-danger" onClick={() => arrayHelpers.remove(index)}>
+                                                                X
+                                                            </button>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -162,7 +249,13 @@ const CreateCustomFieldModal = () => {
 
                             <div className="flex flex-col  gap-4 sm:flex-row">
                                 <label className="inline-flex flex-1">
-                                    <input type="checkbox" className="form-checkbox" defaultChecked />
+                                    <input
+                                        type="checkbox"
+                                        className="form-checkbox"
+                                        name="isRequired"
+                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => formik.setFieldValue('isRequired', e.target.checked)}
+                                        checked={formik.values.isRequired}
+                                    />
                                     <span>Required</span>
                                 </label>
 
@@ -174,7 +267,8 @@ const CreateCustomFieldModal = () => {
                                             className="custom_switch peer absolute z-10 h-full w-full cursor-pointer opacity-0"
                                             id="custom_switch_checkbox1"
                                             name="isActive"
-                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => null}
+                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => formik.setFieldValue('isActive', e.target.checked)}
+                                            checked={formik.values.isActive}
                                         />
                                         <ToggleSwitch />
                                     </label>
@@ -187,7 +281,7 @@ const CreateCustomFieldModal = () => {
                                             type="checkbox"
                                             className="custom_switch peer absolute z-10 h-full w-full cursor-pointer opacity-0"
                                             id="custom_switch_checkbox1"
-                                            name="addCondition"
+                                            name="withCondition"
                                             checked={formik.values.withCondition}
                                             onChange={(e: React.ChangeEvent<HTMLInputElement>) => formik.setFieldValue('withCondition', e.target.checked)}
                                         />
@@ -195,6 +289,44 @@ const CreateCustomFieldModal = () => {
                                     </label>
                                 </div>
                             </div>
+                            {formik.values.withCondition && (
+                                <div className="flex flex-col  gap-4 sm:flex-row">
+                                    <div className="flex-1">
+                                        <label htmlFor="Field">Field</label>
+                                        <Select
+                                            placeholder="Field"
+                                            options={fieldsListDropdown}
+                                            onChange={(data: any) => {
+                                                formik.setFieldValue('field', data.value);
+                                                getCustomFieldById(data.value);
+                                            }}
+                                        />
+                                    </div>
+
+                                    <div className="flex-1">
+                                        <label htmlFor="parentFieldValue">Parent Field Value</label>
+                                        {fieldType === 'SELECT' || fieldType === 'CHECKBOX' || fieldType === 'RADIO' ? (
+                                            <Select placeholder="Parent Field Value" options={parentFieldDropdown} onChange={(data: any) => formik.setFieldValue('parentFieldValue', data.value)} />
+                                        ) : (
+                                            <input
+                                                onChange={formik.handleChange}
+                                                onBlur={formik.handleBlur}
+                                                value={formik.values.parentFieldValue}
+                                                id="parentFieldValue"
+                                                name="parentFieldValue"
+                                                type="text"
+                                                placeholder="Enter Parent Field Value"
+                                                className="form-input"
+                                            />
+                                        )}
+                                    </div>
+
+                                    <div className="flex-1">
+                                        <label htmlFor="country">Operator</label>
+                                        <Select placeholder="Operator" options={OperatorsList} onChange={(data: any) => formik.setFieldValue('operator', data.value)} isSearchable={false} />
+                                    </div>
+                                </div>
+                            )}
                         </form>
                     </FormikProvider>
                 )

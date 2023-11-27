@@ -420,6 +420,21 @@ export interface IFollowup {
 export interface ICustomField {
     id: string;
     label: string;
+    createdAt: string;
+    updatedAt: string;
+    fieldType: string;
+    order: string;
+    required: boolean;
+    active: boolean;
+    conditional: boolean;
+    parentId: string;
+    operator: string;
+    options: { name: string; value: string }[];
+}
+
+export interface IFiedlListType{
+    label: string;
+    id: string;
 }
 
 // ----------------- authentication types : start -------------------//
@@ -503,6 +518,7 @@ export interface SourceInitialStateProps extends InitialStateProps {
 export interface CustomFieldInitialStateProps extends InitialStateProps {
     data: ICustomField[];
     singleData: ICustomField;
+    fieldsList: IFiedlListType[]
 }
 
 //schedule message slice intial props

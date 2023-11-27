@@ -13,7 +13,7 @@ const CustomFieldDeleteModal = () => {
     const onDeleteCustomField = async () => {
         dispatch(setFetching(true));
         dispatch(setDisableBtn(true));
-        const deleteCustomField: ICustomField = await new ApiClient().delete('customField/' + singleData.id);
+        const deleteCustomField: ICustomField = await new ApiClient().delete('custom-field/' + singleData.id);
         if (deleteCustomField === null) {
             dispatch(setDisableBtn(false));
             return;

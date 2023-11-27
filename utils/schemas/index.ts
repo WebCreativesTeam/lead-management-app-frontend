@@ -23,7 +23,7 @@ export const scheduleMessageSchema = Yup.object().shape({
 
 //schedule message
 export const customFieldSchema = Yup.object().shape({
-    label: Yup.string().email().required('Enter Field Label'),
+    label: Yup.string().required('Enter Field Label'),
 });
 
 //drip message

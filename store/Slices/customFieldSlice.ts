@@ -1,4 +1,4 @@
-import { ICustomField, CustomFieldInitialStateProps, UserDataType } from '@/utils/Types';
+import { ICustomField, CustomFieldInitialStateProps, UserDataType, IFiedlListType } from '@/utils/Types';
 import { fetchUserInfo } from '@/utils/contant';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
@@ -17,6 +17,7 @@ const initialState: CustomFieldInitialStateProps = {
     isAbleToDelete: false,
     userPolicyArr: [] as string[],
     totalRecords: 0,
+    fieldsList: [] as IFiedlListType[],
 };
 
 const customFieldSlice = createSlice({
@@ -69,6 +70,9 @@ const customFieldSlice = createSlice({
         getAllCustomField(state, action) {
             state.data = action.payload;
         },
+        getAllFieldsList(state, action: PayloadAction<IFiedlListType[]>) {
+            state.fieldsList = action.payload;
+        },
         setDisableBtn(state, action) {
             state.isBtnDisabled = action.payload;
         },
@@ -110,5 +114,6 @@ export const {
     setCustomFieldReadPolicy,
     setCustomFieldUpdatePolicy,
     setCustomFieldDataLength,
+    getAllFieldsList,
 } = customFieldSlice.actions;
 export default customFieldSlice.reducer;
