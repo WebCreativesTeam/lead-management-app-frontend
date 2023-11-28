@@ -70,41 +70,10 @@ const CreateCustomFieldModal = () => {
                     createCustomFieldObject.options = value.options;
                 }
 
-                const withConditionObject = {
-                    label: value.label,
-                    fieldType: value.fieldType,
-                    order: value.order,
-                    required: value.isRequired,
-                    active: value.isActive,
-                    conditional: value.withCondition,
-                    parentId: value.field,
-                };
-
-                const withOptionsObject = {
-                    label: value.label,
-                    fieldType: value.fieldType,
-                    order: value.order,
-                    required: value.isRequired,
-                    active: value.isActive,
-                    options: value.options,
-                };
-
-                const allValueObject = {
-                    label: value.label,
-                    fieldType: value.fieldType,
-                    order: value.order,
-                    required: value.isRequired,
-                    active: value.isActive,
-                    options: value.options,
-                    conditional: value.withCondition,
-                    parentId: value.field,
-                    operator: value.operator,
-                };
-
                 console.log(createCustomFieldObject);
 
                 dispatch(setDisableBtn(true));
-                await new ApiClient().post('custom-field', withOptionsObject);
+                await new ApiClient().post('custom-field', createCustomFieldObject);
                 dispatch(setCreateModal(false));
                 action.resetForm();
             } catch (error: any) {
@@ -142,6 +111,36 @@ const CreateCustomFieldModal = () => {
         }
     };
 
+    const { field, label, operator, options, order, parentFieldValue, withCondition } = formik.values;
+
+    useEffect(() => {
+        if (withCondition && (!field || !operator || !parentFieldValue)) {
+            dispatch(setDisableBtn(true));
+        } else {
+            dispatch(setDisableBtn(false));
+        }
+    }, [dispatch, field, operator, parentFieldValue, withCondition]);
+
+    useEffect(() => {
+        if (
+            (formik.values.fieldType === 'SELECT' || formik.values.fieldType === 'CHECKBOX' || formik.values.fieldType === 'RADIO') &&
+            !options[options.length - 1].name &&
+            !options[options.length - 1].value
+        ) {
+            dispatch(setDisableBtn(true));
+        } else {
+            dispatch(setDisableBtn(false));
+        }
+    }, [dispatch, formik.values.fieldType, options]);
+
+    useEffect(() => {
+        if (withCondition) {
+            formik.setFieldValue('field', '');
+            formik.setFieldValue('parentFieldValue', '');
+            formik.setFieldValue('operator', '');
+        }
+    }, [withCondition]);
+
     return (
         <Modal
             open={createModal}
@@ -155,7 +154,7 @@ const CreateCustomFieldModal = () => {
             size="large"
             onSubmit={() => formik.submitForm()}
             title="Create Custom Field"
-            isBtnDisabled={formik.values.label && formik.values.fieldType && formik.values.order && !isBtnDisabled ? false : true}
+            isBtnDisabled={label && formik.values.fieldType && order && !isBtnDisabled ? false : true}
             disabledDiscardBtn={isBtnDisabled}
             content={
                 isFetching ? (
@@ -179,7 +178,19 @@ const CreateCustomFieldModal = () => {
                                 </div>
                                 <div className="flex-1">
                                     <label htmlFor="country">Field Type</label>
-                                    <Select placeholder="Field Type" options={FieldTypesList} onChange={(data: any) => formik.setFieldValue('fieldType', data.value)} />
+                                    <Select
+                                        placeholder="Field Type"
+                                        options={FieldTypesList}
+                                        onChange={(data: any) => {
+                                            formik.setFieldValue('fieldType', data.value);
+                                            formik.setFieldValue('options', [
+                                                {
+                                                    name: '',
+                                                    value: '',
+                                                },
+                                            ]);
+                                        }}
+                                    />
                                 </div>
                                 <div className="flex-1">
                                     <label htmlFor="createOrder">Order</label>
@@ -201,7 +212,12 @@ const CreateCustomFieldModal = () => {
                                     render={(arrayHelpers) => (
                                         <div className="my-6">
                                             <div className="flex justify-end">
-                                                <button type="button" className="btn btn-primary rounded" onClick={() => arrayHelpers.push({ name: '', value: '' })}>
+                                                <button
+                                                    type="button"
+                                                    className="btn btn-primary rounded"
+                                                    onClick={() => arrayHelpers.push({ name: '', value: '' })}
+                                                    disabled={!formik.values.options[formik.values.options.length - 1].name && !formik.values.options[formik.values.options.length - 1].value}
+                                                >
                                                     Add Options
                                                 </button>
                                             </div>

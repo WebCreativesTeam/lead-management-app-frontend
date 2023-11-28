@@ -1,26 +1,50 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import React, { memo, useEffect } from 'react';
+import React, { memo, useEffect, useState } from 'react';
 import Modal from '../__Shared/Modal';
 import { useSelector, useDispatch } from 'react-redux';
 import { IRootState } from '@/store';
 import { setEditModal, setDisableBtn, setFetching } from '@/store/Slices/customFieldSlice';
-import { useFormik } from 'formik';
+import { FieldArray, FormikProvider, useFormik } from 'formik';
 import { customFieldSchema } from '@/utils/schemas';
 import { ApiClient } from '@/utils/http';
 import { showToastAlert } from '@/utils/contant';
 import Loader from '../__Shared/Loader';
+import Select from 'react-select';
+import { FieldTypesList, OperatorsList } from '@/utils/Raw Data';
+import ToggleSwitch from '../__Shared/ToggleSwitch';
+import { ICustomField, IFiedlListType, SelectOptionsType } from '@/utils/Types';
 
-const CustomFieldEditModal = () => {
-    const { editModal, singleData, isBtnDisabled, isFetching } = useSelector((state: IRootState) => state.customField);
+type Options = {
+    name: string;
+    value: string;
+};
+
+const EditCustomFieldModal = () => {
+    const { editModal, isBtnDisabled, isFetching, fieldsList, singleData } = useSelector((state: IRootState) => state.customField);
+    const [fieldsListDropdown, setFieldsListDropdown] = useState<SelectOptionsType[]>([]);
+    const [parentFieldDropdown, setParentFieldDropdown] = useState<SelectOptionsType[]>([]);
+    const [fieldType, setFieldType] = useState<string>('');
+    const [defaultFieldType, setDefaultFieldType] = useState<SelectOptionsType>({} as SelectOptionsType);
+    const [defaultField, setDefaultField] = useState<SelectOptionsType>({} as SelectOptionsType);
+    const [defaultOperator, setDefaultOperator] = useState<SelectOptionsType>({} as SelectOptionsType);
 
     const dispatch = useDispatch();
-    useEffect(() => {
-        setFieldValue('name', singleData?.label);
-    }, [singleData]);
-
-    const { values, handleChange, submitForm, handleSubmit, setFieldValue, errors, handleBlur, resetForm } = useFormik({
+    const formik = useFormik({
         initialValues: {
-            name: '',
+            label: '',
+            fieldType: '',
+            order: '',
+            withCondition: singleData.conditional,
+            options: [
+                {
+                    name: '',
+                    value: '',
+                },
+            ],
+            field: '',
+            parentFieldValue: '',
+            isActive: singleData.active,
+            isRequired: singleData.required,
+            operator: '',
         },
         validationSchema: customFieldSchema,
         validateOnChange: false,
@@ -28,18 +52,36 @@ const CustomFieldEditModal = () => {
         onSubmit: async (value, action) => {
             dispatch(setFetching(true));
             try {
-                dispatch(setDisableBtn(true));
-                await new ApiClient().patch('customField/' + singleData.id, { name: value.name });
+                const editCustomFieldObject: any = {
+                    label: value.label,
+                    fieldType: value.fieldType,
+                    order: value.order,
+                    required: value.isRequired,
+                    active: value.isActive,
+                };
 
-                action.resetForm();
+                if (value.withCondition && (value.fieldType === 'SELECT' || value.fieldType === 'CHECKBOX' || value.fieldType === 'RADIO')) {
+                    editCustomFieldObject.options = value.options;
+                    editCustomFieldObject.operator = value.operator;
+                    editCustomFieldObject.parentId = value.field;
+                    editCustomFieldObject.conditional = true;
+                } else if (value.withCondition) {
+                    editCustomFieldObject.operator = value.operator;
+                    editCustomFieldObject.parentId = value.field;
+                    editCustomFieldObject.conditional = true;
+                } else if (value.fieldType === 'SELECT' || value.fieldType === 'CHECKBOX' || value.fieldType === 'RADIO') {
+                    editCustomFieldObject.options = value.options;
+                }
+
+                dispatch(setDisableBtn(true));
+                await new ApiClient().patch('custom-field/' + singleData.id, editCustomFieldObject);
                 dispatch(setEditModal({ open: false }));
+                action.resetForm();
             } catch (error: any) {
                 if (typeof error?.response?.data?.message === 'object') {
                     showToastAlert(error?.response?.data?.message.join(' , '));
-                } else if (error?.response?.data?.message) {
+                } else {
                     showToastAlert(error?.response?.data?.message);
-                } else if (error?.response?.data) {
-                    showToastAlert(error?.response?.data);
                 }
                 showToastAlert(error?.response?.data?.message);
             }
@@ -47,34 +89,282 @@ const CustomFieldEditModal = () => {
             dispatch(setFetching(false));
         },
     });
-    const handleDiscard = () => {
-        dispatch(setEditModal({ open: false }));
-        resetForm();
+    useEffect(() => {
+        const createFieldListDropdown: SelectOptionsType[] = fieldsList?.map(({ id, label }: IFiedlListType) => {
+            return { label, value: id };
+        });
+        setFieldsListDropdown(createFieldListDropdown);
+    }, [fieldsList]);
+
+    const getCustomFieldById = async (id: string) => {
+        const res: { status: string; data: ICustomField } = await new ApiClient().get('custom-field/' + id);
+        const customField: ICustomField = res?.data;
+        if (typeof customField === 'undefined') {
+            alert('undefined');
+            return;
+        }
+        setFieldType(customField.fieldType);
+        if (customField.fieldType === 'SELECT' || customField.fieldType === 'CHECKBOX' || customField.fieldType === 'RADIO') {
+            const parentFieldValueDropdown: SelectOptionsType[] = customField?.options?.map(({ name, value }: Options) => {
+                return { label: name, value };
+            });
+            setParentFieldDropdown(parentFieldValueDropdown);
+        }
     };
+    useEffect(() => {
+        const findDefualtFieldType: SelectOptionsType | undefined = FieldTypesList.find((item: SelectOptionsType) => item.value === singleData?.fieldType);
+        if (findDefualtFieldType) {
+            setDefaultFieldType(findDefualtFieldType);
+        }
+        const findDefualtField: SelectOptionsType | undefined = fieldsListDropdown.find((item: SelectOptionsType) => item.value === singleData.parentId);
+        if (findDefualtField) {
+            setDefaultField(findDefualtField);
+        }
+        const findDefualtOperator: SelectOptionsType | undefined = OperatorsList.find((item: SelectOptionsType) => item.value === singleData.operator);
+        if (findDefualtOperator) {
+            setDefaultOperator(findDefualtOperator);
+        }
+        formik.setFieldValue('operator', defaultOperator.value);
+        formik.setFieldValue('label', singleData.label);
+        formik.setFieldValue('order', singleData.order);
+        formik.setFieldValue('fieldType', singleData.fieldType);
+        formik.setFieldValue('field', singleData.parentId);
+        formik.setFieldValue('options', singleData.options);
+    }, [defaultOperator, fieldsListDropdown, singleData]);
+
+    const { field, label, operator, options, order, parentFieldValue, withCondition } = formik.values;
+
+    useEffect(() => {
+        if (withCondition && (!field || !operator || !parentFieldValue)) {
+            dispatch(setDisableBtn(true));
+        } else {
+            dispatch(setDisableBtn(false));
+        }
+    }, [dispatch, field, operator, parentFieldValue, withCondition]);
+
+    // useEffect(() => {
+    //     if (withCondition) {
+    //         formik.setFieldValue('field', '');
+    //         formik.setFieldValue('parentFieldValue', '');
+    //         formik.setFieldValue('operator', '');
+    //     }
+    // }, [withCondition]);
+
     return (
         <Modal
             open={editModal}
-            onClose={() => dispatch(setEditModal({ open: false }))}
-            size="medium"
-            onDiscard={handleDiscard}
-            title="Edit CustomField"
-            onSubmit={() => submitForm()}
-            disabledDiscardBtn={isBtnDisabled}
-            isBtnDisabled={values.name && !isBtnDisabled ? false : true}
+            onClose={() => {
+                dispatch(setEditModal({ open: false }));
+            }}
+            onDiscard={() => {
+                dispatch(setEditModal({ open: false }));
+                formik.resetForm();
+            }}
+            size="large"
+            onSubmit={() => formik.submitForm()}
+            title="Edit Custom Fields"
+            isBtnDisabled={label && formik.values.fieldType && order && !isBtnDisabled && options[options.length - 1].name && options[options.length - 1].value ? false : true}
             content={
                 isFetching ? (
                     <Loader />
                 ) : (
-                    <form className="space-y-5" onSubmit={handleSubmit}>
-                        <div>
-                            <label htmlFor="editCustomField">CustomField Name</label>
-                            <input onChange={handleChange} onBlur={handleBlur} value={values.name} id="editCustomField" name="name" type="text" placeholder="CustomField Name" className="form-input" />
-                        </div>
-                    </form>
+                    <FormikProvider value={formik}>
+                        <form className="space-y-5" onSubmit={formik.handleSubmit}>
+                            <div className="flex flex-col  gap-4 sm:flex-row">
+                                <div className="flex-1">
+                                    <label htmlFor="fieldLabel">Label</label>
+                                    <input
+                                        onChange={formik.handleChange}
+                                        onBlur={formik.handleBlur}
+                                        value={formik.values.label}
+                                        id="fieldLabel"
+                                        name="label"
+                                        type="text"
+                                        placeholder="Enter Label"
+                                        className="form-input"
+                                    />
+                                </div>
+                                <div className="flex-1">
+                                    <label htmlFor="country">Field Type</label>
+                                    <Select
+                                        placeholder="Field Type"
+                                        options={FieldTypesList}
+                                        onChange={(data: any) => {
+                                            formik.setFieldValue('fieldType', data.value);
+                                            formik.setFieldValue('options', [
+                                                {
+                                                    name: '',
+                                                    value: '',
+                                                },
+                                            ]);
+                                        }}
+                                        defaultValue={defaultFieldType}
+                                    />
+                                </div>
+                                <div className="flex-1">
+                                    <label htmlFor="editOrder">Order</label>
+                                    <input
+                                        onChange={formik.handleChange}
+                                        onBlur={formik.handleBlur}
+                                        value={formik.values.order}
+                                        id="editOrder"
+                                        name="order"
+                                        type="text"
+                                        placeholder="Enter Order"
+                                        className="form-input"
+                                    />
+                                </div>
+                            </div>
+                            {(formik.values.fieldType === 'SELECT' || formik.values.fieldType === 'CHECKBOX' || formik.values.fieldType === 'RADIO') && (
+                                <FieldArray
+                                    name="options"
+                                    render={(arrayHelpers) => (
+                                        <div className="my-6">
+                                            <div className="flex justify-end">
+                                                <button
+                                                    type="button"
+                                                    className="btn btn-primary rounded"
+                                                    onClick={() => arrayHelpers.push({ name: '', value: '' })}
+                                                    disabled={!formik.values.options[formik.values.options.length - 1].name || !formik.values.options[formik.values.options.length - 1].value}
+                                                >
+                                                    Add Options
+                                                </button>
+                                            </div>
+                                            {formik.values.options.map((options, index) => (
+                                                <div key={index} className="panel my-6">
+                                                    <div className="flex flex-1 flex-col gap-4 sm:flex-row">
+                                                        <div className="flex-1">
+                                                            <label htmlFor={`textForOption${index + 1}`}>Text For Option {index + 1}</label>
+                                                            <input
+                                                                onChange={formik.handleChange}
+                                                                onBlur={formik.handleBlur}
+                                                                value={formik.values.options[index].name}
+                                                                id={`textForOption${index + 1}`}
+                                                                name={`options[${index}].name`}
+                                                                type="text"
+                                                                placeholder={`Enter text for option ${index + 1}`}
+                                                                className="form-input"
+                                                            />
+                                                        </div>
+                                                        <div className="flex-1">
+                                                            <label htmlFor={`valueForOption${index + 1}`}>Value For Option {index + 1}</label>
+                                                            <input
+                                                                onChange={formik.handleChange}
+                                                                onBlur={formik.handleBlur}
+                                                                value={formik.values.options[index].value}
+                                                                id={`valueForOption${index + 1}`}
+                                                                name={`options[${index}].value`}
+                                                                type="text"
+                                                                placeholder={`Enter value for option ${index + 1}`}
+                                                                className="form-input"
+                                                            />
+                                                        </div>
+                                                        <div className="flex items-end">
+                                                            <button type="button" className="btn btn-outline-danger" onClick={() => arrayHelpers.remove(index)}>
+                                                                X
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                />
+                            )}
+
+                            <div className="flex flex-col  gap-4 sm:flex-row">
+                                <label className="inline-flex flex-1">
+                                    <input
+                                        type="checkbox"
+                                        className="form-checkbox"
+                                        name="isRequired"
+                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => formik.setFieldValue('isRequired', e.target.checked)}
+                                        checked={formik.values.isRequired}
+                                    />
+                                    <span>Required</span>
+                                </label>
+
+                                <div className="flex flex-1 gap-5">
+                                    <span>Is Active</span>
+                                    <label className="relative h-6 w-12">
+                                        <input
+                                            type="checkbox"
+                                            className="custom_switch peer absolute z-10 h-full w-full cursor-pointer opacity-0"
+                                            id="custom_switch_checkbox1"
+                                            name="isActive"
+                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => formik.setFieldValue('isActive', e.target.checked)}
+                                            checked={formik.values.isActive}
+                                        />
+                                        <ToggleSwitch />
+                                    </label>
+                                </div>
+
+                                <div className="flex flex-1 gap-5">
+                                    <span>Add Condition</span>
+                                    <label className="relative h-6 w-12">
+                                        <input
+                                            type="checkbox"
+                                            className="custom_switch peer absolute z-10 h-full w-full cursor-pointer opacity-0"
+                                            id="custom_switch_checkbox1"
+                                            name="withCondition"
+                                            checked={formik.values.withCondition}
+                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => formik.setFieldValue('withCondition', e.target.checked)}
+                                        />
+                                        <ToggleSwitch />
+                                    </label>
+                                </div>
+                            </div>
+                            {formik.values.withCondition && (
+                                <div className="flex flex-col  gap-4 sm:flex-row">
+                                    <div className="flex-1">
+                                        <label htmlFor="Field">Field</label>
+                                        <Select
+                                            placeholder="Field"
+                                            options={fieldsListDropdown}
+                                            onChange={(data: any) => {
+                                                formik.setFieldValue('field', data.value);
+                                                getCustomFieldById(data.value);
+                                            }}
+                                            defaultValue={defaultField}
+                                        />
+                                    </div>
+
+                                    <div className="flex-1">
+                                        <label htmlFor="parentFieldValue">Parent Field Value</label>
+                                        {fieldType === 'SELECT' || fieldType === 'CHECKBOX' || fieldType === 'RADIO' ? (
+                                            <Select placeholder="Parent Field Value" options={parentFieldDropdown} onChange={(data: any) => formik.setFieldValue('parentFieldValue', data.value)} />
+                                        ) : (
+                                            <input
+                                                onChange={formik.handleChange}
+                                                onBlur={formik.handleBlur}
+                                                value={formik.values.parentFieldValue}
+                                                id="parentFieldValue"
+                                                name="parentFieldValue"
+                                                type="text"
+                                                placeholder="Enter Parent Field Value"
+                                                className="form-input"
+                                            />
+                                        )}
+                                    </div>
+
+                                    <div className="flex-1">
+                                        <label htmlFor="country">Operator</label>
+                                        <Select
+                                            placeholder="Operator"
+                                            options={OperatorsList}
+                                            onChange={(data: any) => formik.setFieldValue('operator', data.value)}
+                                            isSearchable={false}
+                                            defaultValue={defaultOperator}
+                                        />
+                                    </div>
+                                </div>
+                            )}
+                        </form>
+                    </FormikProvider>
                 )
             }
         />
     );
 };
 
-export default memo(CustomFieldEditModal);
+export default memo(EditCustomFieldModal);

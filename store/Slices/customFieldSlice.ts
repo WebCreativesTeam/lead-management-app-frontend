@@ -42,7 +42,7 @@ const customFieldSlice = createSlice({
                 state.singleData = {} as ICustomField;
             }
         },
-        setEditModal(state, action) {
+        setEditModal(state, action: PayloadAction<{ id?: string; open: boolean }>) {
             const { open, id } = action.payload;
             state.editModal = open;
             const findRequestedData: ICustomField | undefined = state.data.find((item: ICustomField) => item.id === id);
@@ -53,10 +53,10 @@ const customFieldSlice = createSlice({
                 state.singleData = {} as ICustomField;
             }
         },
-        setCreateModal(state, action) {
+        setCreateModal(state, action: PayloadAction<boolean>) {
             state.createModal = action.payload;
         },
-        setDeleteModal(state, action) {
+        setDeleteModal(state, action: PayloadAction<{ id?: string; open: boolean }>) {
             const { open, id } = action.payload;
             state.deleteModal = open;
             const findRequestedData: ICustomField | undefined = state.data.find((item: ICustomField) => item.id === id);
