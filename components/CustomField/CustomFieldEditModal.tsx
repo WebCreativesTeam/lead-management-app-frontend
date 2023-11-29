@@ -135,6 +135,18 @@ const EditCustomFieldModal = () => {
     const { field, label, operator, options, order, parentFieldValue, withCondition } = formik.values;
 
     useEffect(() => {
+        if (
+            (formik.values.fieldType === 'SELECT' || formik.values.fieldType === 'CHECKBOX' || formik.values.fieldType === 'RADIO') &&
+            !options[options.length - 1].name &&
+            !options[options.length - 1].value
+        ) {
+            dispatch(setDisableBtn(true));
+        } else {
+            dispatch(setDisableBtn(false));
+        }
+    }, [dispatch, formik.values.fieldType, options]);
+
+    useEffect(() => {
         if (withCondition && (!field || !operator || !parentFieldValue)) {
             dispatch(setDisableBtn(true));
         } else {
@@ -163,7 +175,7 @@ const EditCustomFieldModal = () => {
             size="large"
             onSubmit={() => formik.submitForm()}
             title="Edit Custom Fields"
-            isBtnDisabled={label && formik.values.fieldType && order && !isBtnDisabled && options[options.length - 1].name && options[options.length - 1].value ? false : true}
+            isBtnDisabled={label && formik.values.fieldType && order && !isBtnDisabled ? false : true}
             content={
                 isFetching ? (
                     <Loader />

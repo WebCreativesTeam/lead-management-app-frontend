@@ -12,13 +12,23 @@ import Loader from '@/components/__Shared/Loader';
 import Select from 'react-select';
 import Flatpickr from 'react-flatpickr';
 import 'flatpickr/dist/flatpickr.css';
-import { SelectOptionsType, BranchListSecondaryEndpoint, SourceDataType, ContactListSecondaryEndpoint, LeadPrioritySecondaryEndpoint, UserListSecondaryEndpointType } from '@/utils/Types';
+import {
+    SelectOptionsType,
+    BranchListSecondaryEndpoint,
+    SourceDataType,
+    ContactListSecondaryEndpoint,
+    LeadPrioritySecondaryEndpoint,
+    UserListSecondaryEndpointType,
+    ICustomField,
+} from '@/utils/Types';
 import { Tab } from '@headlessui/react';
 import { Home, Phone, Note, Setting } from '@/utils/icons';
 
 const LeadCreateModal = () => {
     const dispatch = useDispatch();
-    const { isFetching, createModal, isBtnDisabled, leadPriorityList, leadBranchList, leadContactsList, leadSourceList, leadUserList } = useSelector((state: IRootState) => state.lead);
+    const { isFetching, createModal, isBtnDisabled, leadPriorityList, leadBranchList, leadContactsList, leadSourceList, leadUserList, customFieldsList } = useSelector(
+        (state: IRootState) => state.lead
+    );
 
     const initialValues = {
         name: '',
@@ -48,6 +58,7 @@ const LeadCreateModal = () => {
         serviceInterestedIn: '',
         job: '',
         occupation: '',
+        id: '',
     };
     const { values, handleChange, submitForm, handleSubmit, setFieldValue, errors, handleBlur, resetForm } = useFormik({
         initialValues,
@@ -512,71 +523,14 @@ const LeadCreateModal = () => {
                                             <label htmlFor="state">Tele Caller</label>
                                             <Select placeholder="Tele Caller" options={userListDropdown} onChange={(data: any) => setFieldValue('teleCaller', data.value)} />
                                         </div>
-                                        {/* <div className="flex flex-col gap-4 sm:flex-row">
-                                            <div className="flex-1">
-                                                <label htmlFor="createLeadReference">Lead Reference</label>
-                                                <input
-                                                    onChange={handleChange}
-                                                    onBlur={handleBlur}
-                                                    value={values.reference}
-                                                    id="createLeadReference"
-                                                    name="reference"
-                                                    type="text"
-                                                    placeholder="Lead Reference"
-                                                    className="form-input"
-                                                />
-                                            </div>
-                                            <div className="flex-1">
-                                                <label htmlFor="leadestimatedBudget">Estimated Budget</label>
-                                                <input
-                                                    onChange={handleChange}
-                                                    onBlur={handleBlur}
-                                                    value={values.estimatedBudget}
-                                                    id="leadestimatedBudget"
-                                                    name="estimatedBudget"
-                                                    type="number"
-                                                    placeholder="Enter estimated Budget"
-                                                    className="form-input"
-                                                />
-                                            </div>
-                                        </div> */}
-                                        {/* <div className="flex flex-col gap-4 sm:flex-row">
-                                            <div className="flex-1">
-                                                <label htmlFor="leadFacebookCampaignName">Facebook Campaign Name</label>
-                                                <input
-                                                    onChange={handleChange}
-                                                    onBlur={handleBlur}
-                                                    value={values.facebookCampaignName}
-                                                    id="leadFacebookCampaignName"
-                                                    name="facebookCampaignName"
-                                                    type="text"
-                                                    placeholder="Facebook Campaign Name"
-                                                    className="form-input"
-                                                />
-                                            </div>
-                                            <div className="flex-1">
-                                                <label htmlFor="leadServiceInterestedIn">Service Interest</label>
-                                                <input
-                                                    onChange={handleChange}
-                                                    onBlur={handleBlur}
-                                                    value={values.serviceInterestedIn}
-                                                    id="leadServiceInterestedIn"
-                                                    name="serviceInterestedIn"
-                                                    type="text"
-                                                    placeholder="Service Interest"
-                                                    className="form-input"
-                                                />
-                                            </div>
-                                        </div> */}
                                     </form>
                                 </Tab.Panel>
                                 {/* overview form :end */}
 
                                 {/* Custom fields tab : start */}
                                 <Tab.Panel>
-                                    <section>
-                                        <form className="space-y-5" onSubmit={handleSubmit}>
-                                            <div className="flex flex-col gap-4 sm:flex-row">
+                                    <form className="space-y-5" onSubmit={handleSubmit}>
+                                        {/* <div className="flex flex-col gap-4 sm:flex-row">
                                                 <div className="flex-1">
                                                     <label htmlFor="vehicleModel">Vehicle Model</label>
                                                     <input
@@ -788,9 +742,112 @@ const LeadCreateModal = () => {
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                        </form>
-                                    </section>
+                                            </div> */}
+                                        <section className="grid gap-x-6 gap-y-4 sm:grid-cols-2">
+                                            {customFieldsList?.map((item: ICustomField, index: number) => {
+                                                return (
+                                                    <div key={index}>
+                                                        <label htmlFor={item?.id}>{item?.label}</label>
+                                                        {item?.fieldType === 'TEXT' && (
+                                                            <input
+                                                                onChange={handleChange}
+                                                                onBlur={handleBlur}
+                                                                value={values.id}
+                                                                id={item?.id}
+                                                                name={item?.id}
+                                                                type="text"
+                                                                placeholder={item?.label}
+                                                                className="form-input"
+                                                            />
+                                                        )}
+                                                        {item?.fieldType === 'NUMBER' && (
+                                                            <input
+                                                                onChange={handleChange}
+                                                                onBlur={handleBlur}
+                                                                value={values.id}
+                                                                id={item?.id}
+                                                                name={item?.id}
+                                                                type="number"
+                                                                placeholder={'Enter ' + item?.label}
+                                                                className="form-input"
+                                                            />
+                                                        )}
+                                                        {item?.fieldType === 'FILE' && (
+                                                            <input
+                                                                onChange={handleChange}
+                                                                onBlur={handleBlur}
+                                                                value={values.name}
+                                                                id={item?.id}
+                                                                name={item?.id}
+                                                                type="file"
+                                                                placeholder={'Enter ' + item?.label}
+                                                                className="form-input"
+                                                            />
+                                                        )}
+                                                        {item?.fieldType === 'SELECT' && (
+                                                            <Select
+                                                                placeholder={`Select ${item?.label}`}
+                                                                options={item?.options?.map((item) => {
+                                                                    return { label: item.name, value: item.value };
+                                                                })}
+                                                                onChange={(data: any) => setFieldValue('country', data.value)}
+                                                            />
+                                                        )}
+                                                        {item?.fieldType === 'DATE' && (
+                                                            <Flatpickr
+                                                                data-enable-time
+                                                                options={{
+                                                                    enableTime: true,
+                                                                    dateFormat: 'Y-m-d H:i',
+                                                                    position: 'auto',
+                                                                }}
+                                                                id={item?.id}
+                                                                placeholder={`Select ${item?.label}`}
+                                                                name={item?.id}
+                                                                className="form-input"
+                                                                onChange={(e) => setFieldValue(item?.id, e)}
+                                                                // value={values.startDate}
+                                                            />
+                                                        )}
+                                                        {item?.fieldType === 'RADIO' && (
+                                                            <div className="flex gap-x-5">
+                                                                {item?.options?.map((item2, index) => {
+                                                                    return (
+                                                                        <div key={index}>
+                                                                            <input type="radio" name={item?.id} className="peer form-radio" id={item?.id} value={item2?.value} />
+                                                                            <label className="inline-flex" htmlFor={item?.id}>
+                                                                                {item2?.name}
+                                                                            </label>
+                                                                        </div>
+                                                                    );
+                                                                })}
+                                                            </div>
+                                                        )}
+                                                        {item?.fieldType === 'CHECKBOX' && (
+                                                            <div className="flex gap-x-5 items-center">
+                                                                {item?.options?.map((item2, index) => {
+                                                                    return (
+                                                                        <div key={index}>
+                                                                            <input
+                                                                                type="checkbox"
+                                                                                name={item?.id + index}
+                                                                                className="form-checkbox"
+                                                                                id={item?.id + index}
+                                                                                value={item2?.value + index}
+                                                                            />
+                                                                            <label className="inline-flex" htmlFor={item?.id}>
+                                                                                {item2?.name}
+                                                                            </label>
+                                                                        </div>
+                                                                    );
+                                                                })}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                );
+                                            })}
+                                        </section>
+                                    </form>
                                 </Tab.Panel>
                                 {/* custom fields tab :end */}
 

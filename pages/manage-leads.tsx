@@ -11,6 +11,7 @@ import {
     BranchListSecondaryEndpoint,
     ContactDataType,
     GetMethodResponseType,
+    ICustomField,
     LeadPrioritySecondaryEndpoint,
     LeadStatusSecondaryEndpoint,
     SourceDataType,
@@ -24,6 +25,7 @@ import { IRootState } from '@/store';
 import {
     getAllBranchForLead,
     getAllContactsForLead,
+    getAllCustomFieldsForLeads,
     getAllLeadPriorities,
     getAllLeadStatus,
     getAllLeads,
@@ -44,6 +46,7 @@ import EditLeadModal from '@/components/Leads/ManageLeads/EditLeadModal';
 import ViewLeadModal from '@/components/Leads/ManageLeads/ViewLeadModal';
 import ChangeLeadPriorityModal from '@/components/Leads/ManageLeads/ChangeLeadPriorityModal';
 import ChangeLeadStatusModal from '@/components/Leads/ManageLeads/ChangeLeadStatusModal';
+import { getAllCustomField } from '@/store/Slices/customFieldSlice';
 
 const ManageLeads = () => {
     const dispatch = useDispatch();
@@ -103,6 +106,7 @@ const ManageLeads = () => {
         getBranchList();
         getSourceList();
         getAllUsersList();
+        getCustomFieldList();
     }, []);
 
     useEffect(() => {
@@ -204,6 +208,19 @@ const ManageLeads = () => {
         } else {
             setHideCols([...hideCols, col]);
         }
+    };
+
+    //get all CustomField list
+    const getCustomFieldList = async () => {
+        setLoading(true);
+        const res: GetMethodResponseType = await new ApiClient().get(`custom-field?limit=${pageSize}&page=${page}&search=${searchQuery}`);
+        const customField: ICustomField[] = res?.data;
+        if (typeof customField === 'undefined') {
+            dispatch(getAllCustomFieldsForLeads([] as ICustomField[]));
+            return;
+        }
+        dispatch(getAllCustomFieldsForLeads(customField));
+        setLoading(false);
     };
 
     return !isAbleToRead ? null : (

@@ -121,17 +121,6 @@ const CreateCustomFieldModal = () => {
         }
     }, [dispatch, field, operator, parentFieldValue, withCondition]);
 
-    useEffect(() => {
-        if (
-            (formik.values.fieldType === 'SELECT' || formik.values.fieldType === 'CHECKBOX' || formik.values.fieldType === 'RADIO') &&
-            !options[options.length - 1].name &&
-            !options[options.length - 1].value
-        ) {
-            dispatch(setDisableBtn(true));
-        } else {
-            dispatch(setDisableBtn(false));
-        }
-    }, [dispatch, formik.values.fieldType, options]);
 
     useEffect(() => {
         if (withCondition) {

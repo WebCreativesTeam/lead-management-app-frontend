@@ -430,9 +430,10 @@ export interface ICustomField {
     parentId: string;
     operator: string;
     options: { name: string; value: string }[];
+    parentValue: string;
 }
 
-export interface IFiedlListType{
+export interface IFiedlListType {
     label: string;
     id: string;
 }
@@ -506,6 +507,7 @@ export interface ManageLeadInitialStateProps extends InitialStateProps {
     leadBranchList: BranchListSecondaryEndpoint[];
     leadSourceList: SourceDataType[];
     leadUserList: UserListSecondaryEndpointType[];
+    customFieldsList: ICustomField[];
 }
 
 //source slice initial props
@@ -518,7 +520,7 @@ export interface SourceInitialStateProps extends InitialStateProps {
 export interface CustomFieldInitialStateProps extends InitialStateProps {
     data: ICustomField[];
     singleData: ICustomField;
-    fieldsList: IFiedlListType[]
+    fieldsList: IFiedlListType[];
 }
 
 //schedule message slice intial props

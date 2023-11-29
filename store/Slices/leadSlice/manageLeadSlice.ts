@@ -8,6 +8,7 @@ import {
     ContactListSecondaryEndpoint,
     BranchListSecondaryEndpoint,
     UserListSecondaryEndpointType,
+    ICustomField,
 } from '@/utils/Types';
 import { fetchUserInfo } from '@/utils/contant';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
@@ -29,6 +30,7 @@ const initialState: ManageLeadInitialStateProps = {
     leadBranchList: [] as BranchListSecondaryEndpoint[],
     leadSourceList: [] as SourceDataType[],
     leadUserList: [] as UserListSecondaryEndpointType[],
+    customFieldsList: [] as ICustomField[],
     changePriorityModal: false,
     changeStatusModal: false,
     isAbleToRead: false,
@@ -135,6 +137,9 @@ const manageLeadSlice = createSlice({
         getAllLeadStatus(state, action) {
             state.leadStatusList = action.payload;
         },
+        getAllCustomFieldsForLeads(state, action) {
+            state.customFieldsList = action.payload;
+        },
         setDisableBtn(state, action) {
             state.isBtnDisabled = action.payload;
         },
@@ -184,5 +189,6 @@ export const {
     getAllSourceForLead,
     setLeadDataLength,
     getAllUsersForLeads,
+    getAllCustomFieldsForLeads,
 } = manageLeadSlice.actions;
 export default manageLeadSlice.reducer;
