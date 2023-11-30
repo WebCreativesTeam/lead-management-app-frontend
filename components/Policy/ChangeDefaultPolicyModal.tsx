@@ -8,7 +8,7 @@ import { ApiClient } from '@/utils/http';
 import Loader from '../__Shared/Loader';
 
 const ChangeDefaultPolicyModal = () => {
-    const { isFetching, singleData, isBtnDisabled,defaultPolicyModal } = useSelector((state: IRootState) => state.policy);
+    const { isFetching, singleData, isBtnDisabled, defaultPolicyModal } = useSelector((state: IRootState) => state.policy);
 
     const dispatch = useDispatch();
     const onSubmitDefaultPolicy = async () => {

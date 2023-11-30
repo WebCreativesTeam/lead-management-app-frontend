@@ -9,6 +9,7 @@ const initialState: CustomFieldInitialStateProps = {
     editModal: false,
     deleteModal: false,
     viewModal: false,
+    fieldActivationModal: false,
     isBtnDisabled: false,
     isFetching: false,
     isAbleToRead: false,
@@ -67,6 +68,17 @@ const customFieldSlice = createSlice({
                 state.singleData = {} as ICustomField;
             }
         },
+        setFieldActivationModal(state, action: PayloadAction<{ open: boolean; id?: string;  }>) {
+            const { open, id } = action.payload;
+            state.fieldActivationModal = open;
+            const findRequestedData: ICustomField | undefined = state.data.find((item: ICustomField) => item.id === id);
+
+            if (findRequestedData && state.fieldActivationModal) {
+                state.singleData = findRequestedData;
+            } else {
+                state.singleData = {} as ICustomField;
+            }
+        },
         getAllCustomField(state, action) {
             state.data = action.payload;
         },
@@ -115,5 +127,6 @@ export const {
     setCustomFieldUpdatePolicy,
     setCustomFieldDataLength,
     getAllFieldsList,
+    setFieldActivationModal,
 } = customFieldSlice.actions;
 export default customFieldSlice.reducer;

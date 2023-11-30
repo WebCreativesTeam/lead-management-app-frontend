@@ -30,7 +30,7 @@
         "**/*.ts",
         "**/*.tsx",
         "pages/apps/todolist.tsx"
-    ],
+, "components/Leads/ManageLeads/yupValidationSchema.js"    ],
     "exclude": [
         "node_modules"
     ]

@@ -11,12 +11,13 @@ import { setPageTitle } from '@/store/themeConfigSlice';
 import { GetMethodResponseType, ICustomField, IFiedlListType } from '@/utils/Types';
 import { ApiClient } from '@/utils/http';
 import { IRootState } from '@/store';
-import { getAllCustomField, setCreateModal, setDeleteModal, setEditModal, setCustomFieldDataLength, setViewModal, getAllFieldsList } from '@/store/Slices/customFieldSlice';
+import { getAllCustomField, setCreateModal, setDeleteModal, setEditModal, setCustomFieldDataLength, setViewModal, getAllFieldsList, setFieldActivationModal } from '@/store/Slices/customFieldSlice';
 import CustomFieldViewModal from '@/components/CustomField/CustomFieldViewModal';
 import CustomFieldCreateModal from '@/components/CustomField/CustomFieldsCreateModal';
 import CustomFieldEditModal from '@/components/CustomField/CustomFieldEditModal';
 import CustomFieldDeleteModal from '@/components/CustomField/CustomFieldsDeleteModal';
 import ToggleSwitch from '@/components/__Shared/ToggleSwitch';
+import CustomFieldActivateModal from '@/components/CustomField/CustomFieldActivateModal';
 
 const CustomFields = () => {
     const dispatch = useDispatch();
@@ -52,7 +53,6 @@ const CustomFields = () => {
     useEffect(() => {
         getCustomFieldList();
         getFieldsList();
-
     }, [isFetching, pageSize, page, searchQuery]);
 
     useEffect(() => {
@@ -140,7 +140,7 @@ const CustomFields = () => {
                             accessor: 'active',
                             title: 'Active',
                             sortable: true,
-                            render: ({ active }) => (
+                            render: ({ active, id }) => (
                                 // isAbleToChangeDefaultStatus ? (
                                 <div>
                                     <label className="relative h-6 w-12">
@@ -150,10 +150,7 @@ const CustomFields = () => {
                                             id="custom_switch_checkbox1"
                                             name="active"
                                             checked={active}
-                                            onChange={
-                                                (e: React.ChangeEvent<HTMLInputElement>) => null
-                                                // dispatch(setDefaultStatusModal({ switchValue: e.target.checked, id, open: true }))
-                                            }
+                                            onChange={() => dispatch(setFieldActivationModal({ id, open: true }))}
                                         />
                                         <ToggleSwitch />
                                     </label>
@@ -245,6 +242,9 @@ const CustomFields = () => {
 
             {/* create modal */}
             <CustomFieldCreateModal />
+
+            {/* custom field activation modal */}
+            <CustomFieldActivateModal />
         </div>
     );
 };

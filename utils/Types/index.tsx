@@ -521,6 +521,7 @@ export interface CustomFieldInitialStateProps extends InitialStateProps {
     data: ICustomField[];
     singleData: ICustomField;
     fieldsList: IFiedlListType[];
+    fieldActivationModal: boolean;
 }
 
 //schedule message slice intial props
