@@ -7,7 +7,6 @@ import { IRootState } from '@/store';
 const CustomFieldViewModal = () => {
     const { viewModal, singleData } = useSelector((state: IRootState) => state.customField);
     const dispatch = useDispatch();
-    console.log(singleData)
     return (
         <ViewModal
             title="View Custom Field Detail"

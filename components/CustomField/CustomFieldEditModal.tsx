@@ -22,10 +22,11 @@ const EditCustomFieldModal = () => {
     const { editModal, isBtnDisabled, isFetching, fieldsList, singleData } = useSelector((state: IRootState) => state.customField);
     const [fieldsListDropdown, setFieldsListDropdown] = useState<SelectOptionsType[]>([]);
     const [parentFieldDropdown, setParentFieldDropdown] = useState<SelectOptionsType[]>([]);
-    const [fieldType, setFieldType] = useState<string>('');
     const [defaultFieldType, setDefaultFieldType] = useState<SelectOptionsType>({} as SelectOptionsType);
     const [defaultField, setDefaultField] = useState<SelectOptionsType>({} as SelectOptionsType);
     const [defaultOperator, setDefaultOperator] = useState<SelectOptionsType>({} as SelectOptionsType);
+    const [defaultParentValue, setDefaultParentValue] = useState<SelectOptionsType>({} as SelectOptionsType);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
 
     const dispatch = useDispatch();
     const formik = useFormik({
@@ -65,6 +66,7 @@ const EditCustomFieldModal = () => {
                     editCustomFieldObject.operator = value.operator;
                     editCustomFieldObject.parentId = value.field;
                     editCustomFieldObject.conditional = true;
+                    editCustomFieldObject.parentValue = value.parentValue;
                 } else if (value.withCondition) {
                     editCustomFieldObject.operator = value.operator;
                     editCustomFieldObject.parentId = value.field;
@@ -97,21 +99,28 @@ const EditCustomFieldModal = () => {
         setFieldsListDropdown(createFieldListDropdown);
     }, [fieldsList]);
 
-    const getCustomFieldById = async (id: string) => {
-        const res: { status: string; data: ICustomField } = await new ApiClient().get('custom-field/' + id);
-        const customField: ICustomField = res?.data;
-        if (typeof customField === 'undefined') {
-            alert('undefined');
-            return;
+    const getCustomFieldById = async (id: string | undefined) => {
+        setIsLoading(true);
+        if (id) {
+            const res: { status: string; data: ICustomField } = await new ApiClient().get('custom-field/' + id);
+            const customField: ICustomField = res?.data;
+            if (typeof customField === 'undefined') {
+                setIsLoading(false);
+                return;
+            }
+            if (customField.fieldType === 'SELECT' || customField.fieldType === 'CHECKBOX' || customField.fieldType === 'RADIO') {
+                const parentValueDropdown: SelectOptionsType[] = customField?.options?.map(({ name, value }: Options) => {
+                    return { label: name, value };
+                });
+                setParentFieldDropdown(parentValueDropdown);
+            }
         }
-        setFieldType(customField.fieldType);
-        if (customField.fieldType === 'SELECT' || customField.fieldType === 'CHECKBOX' || customField.fieldType === 'RADIO') {
-            const parentValueDropdown: SelectOptionsType[] = customField?.options?.map(({ name, value }: Options) => {
-                return { label: name, value };
-            });
-            setParentFieldDropdown(parentValueDropdown);
-        }
+        setIsLoading(false);
     };
+
+    useEffect(() => {
+        getCustomFieldById(singleData.parentId);
+    }, [singleData?.parentId]);
     useEffect(() => {
         const findDefualtFieldType: SelectOptionsType | undefined = FieldTypesList.find((item: SelectOptionsType) => item.value === singleData?.fieldType);
         if (findDefualtFieldType) {
@@ -125,13 +134,22 @@ const EditCustomFieldModal = () => {
         if (findDefualtOperator) {
             setDefaultOperator(findDefualtOperator);
         }
+
         formik.setFieldValue('operator', defaultOperator.value);
         formik.setFieldValue('label', singleData.label);
         formik.setFieldValue('order', singleData.order);
         formik.setFieldValue('fieldType', singleData.fieldType);
         formik.setFieldValue('field', singleData.parentId);
         formik.setFieldValue('options', singleData.options);
-    }, [defaultOperator, fieldsListDropdown, singleData]);
+        if (singleData.fieldType === 'SELECT' || singleData.fieldType === 'CHECKBOX' || singleData.fieldType === 'RADIO') {
+            const findDefualtParentValue: SelectOptionsType | undefined = parentFieldDropdown.find((item: SelectOptionsType) => item.value === singleData?.parentValue);
+            if (findDefualtParentValue) {
+                setDefaultParentValue(findDefualtParentValue);
+            }
+        } else {
+            formik.setFieldValue('parentValue', singleData.parentValue);
+        }
+    }, [defaultOperator, fieldsListDropdown, singleData, parentFieldDropdown, defaultParentValue]);
 
     const { field, label, operator, options, order, parentValue, withCondition } = formik.values;
 
@@ -155,14 +173,6 @@ const EditCustomFieldModal = () => {
         }
     }, [dispatch, field, operator, parentValue, withCondition]);
 
-    // useEffect(() => {
-    //     if (withCondition) {
-    //         formik.setFieldValue('field', '');
-    //         formik.setFieldValue('parentValue', '');
-    //         formik.setFieldValue('operator', '');
-    //     }
-    // }, [withCondition]);
-
     return (
         <Modal
             open={editModal}
@@ -178,7 +188,7 @@ const EditCustomFieldModal = () => {
             title="Edit Custom Fields"
             isBtnDisabled={label && formik.values.fieldType && order && !isBtnDisabled ? false : true}
             content={
-                isFetching ? (
+                isFetching || isLoading || !defaultParentValue.label ? (
                     <Loader />
                 ) : (
                     <FormikProvider value={formik}>
@@ -338,8 +348,13 @@ const EditCustomFieldModal = () => {
 
                                     <div className="flex-1">
                                         <label htmlFor="parentValue">Parent Field Value</label>
-                                        {fieldType === 'SELECT' || fieldType === 'CHECKBOX' || fieldType === 'RADIO' ? (
-                                            <Select placeholder="Parent Field Value" options={parentFieldDropdown} onChange={(data: any) => formik.setFieldValue('parentValue', data.value)} />
+                                        {singleData.fieldType === 'SELECT' || singleData.fieldType === 'CHECKBOX' || singleData.fieldType === 'RADIO' ? (
+                                            <Select
+                                                placeholder="Parent Field Value"
+                                                options={parentFieldDropdown}
+                                                onChange={(data: any) => formik.setFieldValue('parentValue', data.value)}
+                                                defaultValue={defaultParentValue}
+                                            />
                                         ) : (
                                             <input
                                                 onChange={formik.handleChange}

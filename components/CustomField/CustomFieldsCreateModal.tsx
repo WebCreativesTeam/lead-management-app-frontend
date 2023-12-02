@@ -62,6 +62,8 @@ const CreateCustomFieldModal = () => {
                     createCustomFieldObject.operator = value.operator;
                     createCustomFieldObject.parentId = value.field;
                     createCustomFieldObject.conditional = true;
+                    createCustomFieldObject.parentValue = value.parentValue;
+                    
                 } else if (value.withCondition) {
                     createCustomFieldObject.operator = value.operator;
                     createCustomFieldObject.parentId = value.field;
