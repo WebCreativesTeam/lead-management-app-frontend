@@ -27,6 +27,7 @@ const EditCustomFieldModal = () => {
     const [defaultOperator, setDefaultOperator] = useState<SelectOptionsType>({} as SelectOptionsType);
     const [defaultParentValue, setDefaultParentValue] = useState<SelectOptionsType>({} as SelectOptionsType);
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [parentFieldType, setParentFieldType] = useState<string>('');
 
     const dispatch = useDispatch();
     const formik = useFormik({
@@ -99,6 +100,9 @@ const EditCustomFieldModal = () => {
         setFieldsListDropdown(createFieldListDropdown);
     }, [fieldsList]);
 
+    console.log('singleData', singleData);
+    console.log('ParentFieldDropdown', parentFieldDropdown);
+
     const getCustomFieldById = async (id: string | undefined) => {
         setIsLoading(true);
         if (id) {
@@ -108,6 +112,7 @@ const EditCustomFieldModal = () => {
                 setIsLoading(false);
                 return;
             }
+            setParentFieldType(customField?.fieldType);
             if (customField.fieldType === 'SELECT' || customField.fieldType === 'CHECKBOX' || customField.fieldType === 'RADIO') {
                 const parentValueDropdown: SelectOptionsType[] = customField?.options?.map(({ name, value }: Options) => {
                     return { label: name, value };
@@ -173,6 +178,7 @@ const EditCustomFieldModal = () => {
         }
     }, [dispatch, field, operator, parentValue, withCondition]);
 
+    console.log(defaultParentValue.label);
     return (
         <Modal
             open={editModal}
@@ -188,7 +194,7 @@ const EditCustomFieldModal = () => {
             title="Edit Custom Fields"
             isBtnDisabled={label && formik.values.fieldType && order && !isBtnDisabled ? false : true}
             content={
-                isFetching || isLoading || !defaultParentValue.label ? (
+                isFetching || isLoading ? (
                     <Loader />
                 ) : (
                     <FormikProvider value={formik}>
@@ -348,7 +354,7 @@ const EditCustomFieldModal = () => {
 
                                     <div className="flex-1">
                                         <label htmlFor="parentValue">Parent Field Value</label>
-                                        {singleData.fieldType === 'SELECT' || singleData.fieldType === 'CHECKBOX' || singleData.fieldType === 'RADIO' ? (
+                                        {parentFieldType === 'SELECT' || parentFieldType === 'CHECKBOX' || parentFieldType === 'RADIO' ? (
                                             <Select
                                                 placeholder="Parent Field Value"
                                                 options={parentFieldDropdown}
