@@ -8,7 +8,7 @@ import { ApiClient } from '@/utils/http';
 import Loader from '@/components/__Shared/Loader';
 
 const CustomFieldDeleteModal = () => {
-    const { isFetching, isBtnDisabled, deleteModal, singleData } = useSelector((state: IRootState) => state.customField);
+    const { isFetching, deleteModal, singleData } = useSelector((state: IRootState) => state.customField);
     const dispatch = useDispatch();
     const onDeleteCustomField = async () => {
         dispatch(setFetching(true));
@@ -30,7 +30,7 @@ const CustomFieldDeleteModal = () => {
             onDiscard={() => dispatch(setDeleteModal({ open: false }))}
             description={isFetching ? <Loader /> : <>Are you sure you want to delete this CustomField? It will also remove form database.</>}
             title="Delete CustomField"
-            isBtnDisabled={isBtnDisabled}
+            isBtnDisabled={false}
             onSubmit={onDeleteCustomField}
             btnSubmitText="Delete"
         />

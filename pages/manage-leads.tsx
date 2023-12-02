@@ -215,6 +215,7 @@ const ManageLeads = () => {
         setLoading(true);
         const res: GetMethodResponseType = await new ApiClient().get(`custom-field?limit=${pageSize}&page=${page}&search=${searchQuery}`);
         const customField: ICustomField[] = res?.data;
+    
         if (typeof customField === 'undefined') {
             dispatch(getAllCustomFieldsForLeads([] as ICustomField[]));
             return;

@@ -2,7 +2,7 @@ import { IRootState } from '@/store';
 import { ICustomField } from '@/utils/Types';
 import { showToastAlert } from '@/utils/contant';
 import { useFormik } from 'formik';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import Select from 'react-select';
 import Flatpickr from 'react-flatpickr';
@@ -14,16 +14,16 @@ const CustomFieldsTab = () => {
     const customFieldTabSchema = getYupSchemaFromMetaData(customFieldsList, [], []);
 
     const { values, handleChange, handleSubmit, setFieldValue, handleBlur, errors } = useFormik({
-        initialValues: {},
+        initialValues: {} as any,
         validationSchema: customFieldTabSchema,
         validateOnChange: true,
-        // enableReinitialize: true,
+        enableReinitialize: false,
         onSubmit: async (value, action) => {
             // dispatch(setFetching(true));
             try {
                 // console.log(createLeadObj);
                 // await new ApiClient().post('lead', createLeadObj);
-                console.log(value);
+                // console.log(value);
                 // action.resetForm();
             } catch (error: any) {
                 if (typeof error?.response?.data?.message === 'object') {
@@ -37,63 +37,90 @@ const CustomFieldsTab = () => {
             // dispatch(setFetching(false));
         },
     });
-    console.log(values);
+
+    // Function to evaluate the condition based on the operator
+    const evaluateCondition = (value: any, item: ICustomField) => {
+        console.log('value', value);
+        console.log('item', item);
+        // console.log('operator', item?.operator);
+        // console.log('parentValue', item?.parentValue);
+
+        switch (item?.operator) {
+            case 'eq':
+                return value[item?.parentId] === item?.parentValue;
+            case 'neq':
+                return value[item?.parentId] !== item?.parentValue;
+            case 'gt':
+                return value[item?.parentId] > item?.parentValue;
+            case 'lt':
+                return value[item?.parentId] < item?.parentValue;
+            case 'gte':
+                return value[item?.parentId] >= item?.parentValue;
+            case 'lte':
+                return value[item?.parentId] <= item?.parentValue;
+            default:
+                return false;
+        }
+    };
+
     return (
         <div>
-            Errors: {JSON.stringify(errors)}
             <form onSubmit={handleSubmit}>
                 <div className="grid gap-x-6 gap-y-4 sm:grid-cols-2">
                     {customFieldsList?.map((item: ICustomField, index: number) => {
                         return (
-                            item?.active &&
-                            !item?.conditional && (
+                            // condition start
+                            ((item?.active && !item?.conditional) ||
+                                // *
+                                (item?.active && item?.conditional && evaluateCondition(values, item))) && (
+                                //
+                                // condition ends
+                                //
                                 <div key={index}>
                                     <label htmlFor={item?.id}>{item?.label}</label>
-                                    {item?.fieldType === 'TEXT' && item?.active && (
+                                    {item?.fieldType === 'TEXT' && (
                                         <input
                                             onChange={handleChange}
                                             onBlur={handleBlur}
-                                            // value={values.id}
-                                            name={`${item?.id}&${item?.label}`}
+                                            // value={values[`${item?.id}&${item?.label}`]}
+                                            name={item?.id}
                                             type="text"
                                             placeholder={item?.label}
                                             className="form-input"
                                         />
                                     )}
-                                    {item?.fieldType === 'NUMBER' && item?.active && (
+                                    {item?.fieldType === 'NUMBER' && (
                                         <input
                                             onChange={handleChange}
                                             onBlur={handleBlur}
                                             // value={values.id}
-                                            id={item?.id}
                                             name={`${item?.id}&${item?.label}`}
                                             type="number"
                                             placeholder={'Enter ' + item?.label}
                                             className="form-input"
                                         />
                                     )}
-                                    {item?.fieldType === 'FILE' && item?.active && (
+                                    {item?.fieldType === 'FILE' && (
                                         <input
                                             onChange={handleChange}
                                             onBlur={handleBlur}
                                             // value={values.id}
-                                            id={item?.id}
                                             name={`${item?.id}&${item?.label}`}
                                             type="file"
                                             placeholder={'Enter ' + item?.label}
                                             className="form-input"
                                         />
                                     )}
-                                    {item?.fieldType === 'SELECT' && item?.active && (
+                                    {item?.fieldType === 'SELECT' && (
                                         <Select
                                             placeholder={`Select ${item?.label}`}
                                             options={item?.options?.map((item) => {
                                                 return { label: item.name, value: item.value };
                                             })}
-                                            onChange={(data: any) => setFieldValue(`${item?.id}&${item?.label}`, data.value)}
+                                            onChange={(data: any) => setFieldValue(item?.id, data.value)}
                                         />
                                     )}
-                                    {item?.fieldType === 'DATE' && item?.active && (
+                                    {item?.fieldType === 'DATE' && (
                                         <Flatpickr
                                             data-enable-time
                                             options={{
@@ -101,7 +128,6 @@ const CustomFieldsTab = () => {
                                                 dateFormat: 'Y-m-d H:i',
                                                 position: 'auto',
                                             }}
-                                            id={item?.id}
                                             placeholder={`Select ${item?.label}`}
                                             name={`${item?.id}&${item?.label}`}
                                             className="form-input"
@@ -109,7 +135,7 @@ const CustomFieldsTab = () => {
                                             // value={values.startDate}
                                         />
                                     )}
-                                    {item?.fieldType === 'RADIO' && item?.active && (
+                                    {item?.fieldType === 'RADIO' && (
                                         <div className="flex gap-x-5">
                                             {item?.options?.map((item2, index) => {
                                                 return (
@@ -131,7 +157,7 @@ const CustomFieldsTab = () => {
                                             })}
                                         </div>
                                     )}
-                                    {item?.fieldType === 'CHECKBOX' && item?.active && (
+                                    {item?.fieldType === 'CHECKBOX' && (
                                         <div className="flex items-center gap-x-5">
                                             {item?.options?.map((item2, index) => {
                                                 return (
