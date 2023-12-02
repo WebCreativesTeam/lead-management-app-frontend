@@ -41,7 +41,7 @@ const EditCustomFieldModal = () => {
                 },
             ],
             field: '',
-            parentFieldValue: '',
+            parentValue: '',
             isActive: singleData.active,
             isRequired: singleData.required,
             operator: '',
@@ -69,6 +69,7 @@ const EditCustomFieldModal = () => {
                     editCustomFieldObject.operator = value.operator;
                     editCustomFieldObject.parentId = value.field;
                     editCustomFieldObject.conditional = true;
+                    editCustomFieldObject.parentValue = value.parentValue;
                 } else if (value.fieldType === 'SELECT' || value.fieldType === 'CHECKBOX' || value.fieldType === 'RADIO') {
                     editCustomFieldObject.options = value.options;
                 }
@@ -105,10 +106,10 @@ const EditCustomFieldModal = () => {
         }
         setFieldType(customField.fieldType);
         if (customField.fieldType === 'SELECT' || customField.fieldType === 'CHECKBOX' || customField.fieldType === 'RADIO') {
-            const parentFieldValueDropdown: SelectOptionsType[] = customField?.options?.map(({ name, value }: Options) => {
+            const parentValueDropdown: SelectOptionsType[] = customField?.options?.map(({ name, value }: Options) => {
                 return { label: name, value };
             });
-            setParentFieldDropdown(parentFieldValueDropdown);
+            setParentFieldDropdown(parentValueDropdown);
         }
     };
     useEffect(() => {
@@ -132,7 +133,7 @@ const EditCustomFieldModal = () => {
         formik.setFieldValue('options', singleData.options);
     }, [defaultOperator, fieldsListDropdown, singleData]);
 
-    const { field, label, operator, options, order, parentFieldValue, withCondition } = formik.values;
+    const { field, label, operator, options, order, parentValue, withCondition } = formik.values;
 
     useEffect(() => {
         if (
@@ -147,17 +148,17 @@ const EditCustomFieldModal = () => {
     }, [dispatch, formik.values.fieldType, options]);
 
     useEffect(() => {
-        if (withCondition && (!field || !operator || !parentFieldValue)) {
+        if (withCondition && (!field || !operator || !parentValue)) {
             dispatch(setDisableBtn(true));
         } else {
             dispatch(setDisableBtn(false));
         }
-    }, [dispatch, field, operator, parentFieldValue, withCondition]);
+    }, [dispatch, field, operator, parentValue, withCondition]);
 
     // useEffect(() => {
     //     if (withCondition) {
     //         formik.setFieldValue('field', '');
-    //         formik.setFieldValue('parentFieldValue', '');
+    //         formik.setFieldValue('parentValue', '');
     //         formik.setFieldValue('operator', '');
     //     }
     // }, [withCondition]);
@@ -342,16 +343,16 @@ const EditCustomFieldModal = () => {
                                     </div>
 
                                     <div className="flex-1">
-                                        <label htmlFor="parentFieldValue">Parent Field Value</label>
+                                        <label htmlFor="parentValue">Parent Field Value</label>
                                         {fieldType === 'SELECT' || fieldType === 'CHECKBOX' || fieldType === 'RADIO' ? (
-                                            <Select placeholder="Parent Field Value" options={parentFieldDropdown} onChange={(data: any) => formik.setFieldValue('parentFieldValue', data.value)} />
+                                            <Select placeholder="Parent Field Value" options={parentFieldDropdown} onChange={(data: any) => formik.setFieldValue('parentValue', data.value)} />
                                         ) : (
                                             <input
                                                 onChange={formik.handleChange}
                                                 onBlur={formik.handleBlur}
-                                                value={formik.values.parentFieldValue}
-                                                id="parentFieldValue"
-                                                name="parentFieldValue"
+                                                value={formik.values.parentValue}
+                                                id="parentValue"
+                                                name="parentValue"
                                                 type="text"
                                                 placeholder="Enter Parent Field Value"
                                                 className="form-input"
