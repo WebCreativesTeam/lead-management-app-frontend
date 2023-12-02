@@ -55,7 +55,7 @@ const EditCustomFieldModal = () => {
                 const editCustomFieldObject: any = {
                     label: value.label,
                     fieldType: value.fieldType,
-                    order: value.order,
+                    order: Math.abs(+value.order).toString(),
                     required: value.isRequired,
                     active: value.isActive,
                 };

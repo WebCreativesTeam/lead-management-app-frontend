@@ -7,6 +7,7 @@ import { IRootState } from '@/store';
 const CustomFieldViewModal = () => {
     const { viewModal, singleData } = useSelector((state: IRootState) => state.customField);
     const dispatch = useDispatch();
+    console.log(singleData)
     return (
         <ViewModal
             title="View Custom Field Detail"
@@ -42,7 +43,7 @@ const CustomFieldViewModal = () => {
                                 <p className="flex-1">{singleData?.operator}</p>
                             </li>
                         )}
-                        {singleData?.options && (
+                        {singleData?.options?.length>0 && (
                             <li className="flex flex-wrap">
                                 <span className="flex-1 text-lg font-bold">Options</span>
                                 <p className="flex-1">

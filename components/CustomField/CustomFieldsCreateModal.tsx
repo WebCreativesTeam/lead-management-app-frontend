@@ -52,7 +52,7 @@ const CreateCustomFieldModal = () => {
                 const createCustomFieldObject: any = {
                     label: value.label,
                     fieldType: value.fieldType,
-                    order: value.order,
+                    order: Math.abs(+value.order).toString(),
                     required: value.isRequired,
                     active: value.isActive,
                 };
@@ -74,7 +74,7 @@ const CreateCustomFieldModal = () => {
                 console.log(createCustomFieldObject);
 
                 dispatch(setDisableBtn(true));
-                await new ApiClient().post('custom-field', createCustomFieldObject);
+                // await new ApiClient().post('custom-field', createCustomFieldObject);
                 dispatch(setCreateModal(false));
                 action.resetForm();
             } catch (error: any) {
@@ -191,9 +191,10 @@ const CreateCustomFieldModal = () => {
                                         value={formik.values.order}
                                         id="createOrder"
                                         name="order"
-                                        type="text"
+                                        type="number"
                                         placeholder="Enter Order"
                                         className="form-input"
+                                        
                                     />
                                 </div>
                             </div>

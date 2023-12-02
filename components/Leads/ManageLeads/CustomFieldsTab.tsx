@@ -2,7 +2,7 @@ import { IRootState } from '@/store';
 import { ICustomField } from '@/utils/Types';
 import { showToastAlert } from '@/utils/contant';
 import { useFormik } from 'formik';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useSelector } from 'react-redux';
 import Select from 'react-select';
 import Flatpickr from 'react-flatpickr';
@@ -62,6 +62,8 @@ const CustomFieldsTab = () => {
         }
     };
 
+    console.log(values)
+
     return (
         <div>
             <form onSubmit={handleSubmit}>
@@ -71,17 +73,7 @@ const CustomFieldsTab = () => {
                             ((item?.active && !item?.conditional) || (item?.active && item?.conditional && evaluateCondition(values, item))) && (
                                 <div key={index}>
                                     <label htmlFor={item?.id}>{item?.label}</label>
-                                    {item?.fieldType === 'TEXT' && (
-                                        <input
-                                            onChange={handleChange}
-                                            onBlur={handleBlur}
-                                            // value={values[`${item?.id}&${item?.label}`]}
-                                            name={item?.id}
-                                            type="text"
-                                            placeholder={item?.label}
-                                            className="form-input"
-                                        />
-                                    )}
+                                    {item?.fieldType === 'TEXT' && <input onChange={handleChange} onBlur={handleBlur} name={item?.id} type="text" placeholder={item?.label} className="form-input" />}
                                     {item?.fieldType === 'NUMBER' && (
                                         <input
                                             onChange={handleChange}
@@ -97,7 +89,6 @@ const CustomFieldsTab = () => {
                                         <input
                                             onChange={handleChange}
                                             onBlur={handleBlur}
-                                            // value={values.id}
                                             name={item?.id}
                                             type="file"
                                             placeholder={'Enter ' + item?.label}
@@ -125,7 +116,6 @@ const CustomFieldsTab = () => {
                                             name={item?.id}
                                             className="form-input"
                                             onChange={(e) => setFieldValue(item?.id, e)}
-                                            // value={values.startDate}
                                         />
                                     )}
                                     {item?.fieldType === 'RADIO' && (

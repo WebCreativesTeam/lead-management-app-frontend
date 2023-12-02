@@ -8,7 +8,7 @@ import { ApiClient } from '@/utils/http';
 import Loader from '../__Shared/Loader';
 
 const ChangeDefaultCustomFieldModal = () => {
-    const { isFetching, singleData, isBtnDisabled, fieldActivationModal } = useSelector((state: IRootState) => state.customField);
+    const { isFetching, singleData, fieldActivationModal } = useSelector((state: IRootState) => state.customField);
 
     const dispatch = useDispatch();
     const onSubmitDefaultCustomField = async () => {
@@ -31,7 +31,7 @@ const ChangeDefaultCustomFieldModal = () => {
             onDiscard={() => dispatch(setFieldActivationModal({ open: false }))}
             description={isFetching ? <Loader /> : 'Are you sure you want to change  activation of custom Field?.'}
             title="Change Custom Field Activation"
-            isBtnDisabled={isBtnDisabled}
+            isBtnDisabled={isFetching}
             onSubmit={onSubmitDefaultCustomField}
         />
     );
