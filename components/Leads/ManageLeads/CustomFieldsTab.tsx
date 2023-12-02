@@ -40,10 +40,9 @@ const CustomFieldsTab = () => {
 
     // Function to evaluate the condition based on the operator
     const evaluateCondition = (value: any, item: ICustomField) => {
-        console.log('value', value);
-        console.log('item', item);
-        // console.log('operator', item?.operator);
-        // console.log('parentValue', item?.parentValue);
+        console.log('value', value[item?.parentId]);
+        console.log('parentValue', item?.parentValue);
+        console.log('operator', item?.operator);
 
         switch (item?.operator) {
             case 'eq':
@@ -69,13 +68,7 @@ const CustomFieldsTab = () => {
                 <div className="grid gap-x-6 gap-y-4 sm:grid-cols-2">
                     {customFieldsList?.map((item: ICustomField, index: number) => {
                         return (
-                            // condition start
-                            ((item?.active && !item?.conditional) ||
-                                // *
-                                (item?.active && item?.conditional && evaluateCondition(values, item))) && (
-                                //
-                                // condition ends
-                                //
+                            ((item?.active && !item?.conditional) || (item?.active && item?.conditional && evaluateCondition(values, item))) && (
                                 <div key={index}>
                                     <label htmlFor={item?.id}>{item?.label}</label>
                                     {item?.fieldType === 'TEXT' && (
@@ -94,7 +87,7 @@ const CustomFieldsTab = () => {
                                             onChange={handleChange}
                                             onBlur={handleBlur}
                                             // value={values.id}
-                                            name={`${item?.id}&${item?.label}`}
+                                            name={item?.id}
                                             type="number"
                                             placeholder={'Enter ' + item?.label}
                                             className="form-input"
@@ -105,7 +98,7 @@ const CustomFieldsTab = () => {
                                             onChange={handleChange}
                                             onBlur={handleBlur}
                                             // value={values.id}
-                                            name={`${item?.id}&${item?.label}`}
+                                            name={item?.id}
                                             type="file"
                                             placeholder={'Enter ' + item?.label}
                                             className="form-input"
@@ -129,7 +122,7 @@ const CustomFieldsTab = () => {
                                                 position: 'auto',
                                             }}
                                             placeholder={`Select ${item?.label}`}
-                                            name={`${item?.id}&${item?.label}`}
+                                            name={item?.id}
                                             className="form-input"
                                             onChange={(e) => setFieldValue(item?.id, e)}
                                             // value={values.startDate}
@@ -142,7 +135,7 @@ const CustomFieldsTab = () => {
                                                     <div key={index}>
                                                         <input
                                                             type="radio"
-                                                            name={`${item?.id}&${item?.label}`}
+                                                            name={item?.id}
                                                             className="peer form-radio"
                                                             id={item?.id}
                                                             value={item2?.value}
@@ -164,7 +157,7 @@ const CustomFieldsTab = () => {
                                                     <div key={index}>
                                                         <input
                                                             type="checkbox"
-                                                            name={`${item?.id}&${item2?.value}`}
+                                                            name={item?.id}
                                                             className="form-checkbox"
                                                             id={item?.id + index}
                                                             value={item2?.value}
