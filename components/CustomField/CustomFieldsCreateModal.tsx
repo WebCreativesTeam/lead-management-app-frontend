@@ -74,7 +74,7 @@ const CreateCustomFieldModal = () => {
                 console.log(createCustomFieldObject);
 
                 dispatch(setDisableBtn(true));
-                // await new ApiClient().post('custom-field', createCustomFieldObject);
+                await new ApiClient().post('custom-field', createCustomFieldObject);
                 dispatch(setCreateModal(false));
                 action.resetForm();
             } catch (error: any) {
@@ -174,12 +174,6 @@ const CreateCustomFieldModal = () => {
                                         options={FieldTypesList}
                                         onChange={(data: any) => {
                                             formik.setFieldValue('fieldType', data.value);
-                                            formik.setFieldValue('options', [
-                                                {
-                                                    name: '',
-                                                    value: '',
-                                                },
-                                            ]);
                                         }}
                                     />
                                 </div>
@@ -194,7 +188,6 @@ const CreateCustomFieldModal = () => {
                                         type="number"
                                         placeholder="Enter Order"
                                         className="form-input"
-                                        
                                     />
                                 </div>
                             </div>

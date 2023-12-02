@@ -62,7 +62,7 @@ const CustomFields = () => {
     //get all CustomField list
     const getCustomFieldList = async () => {
         setLoading(true);
-        const res: GetMethodResponseType = await new ApiClient().get(`custom-field?limit=${pageSize}&page=${page}&search=${searchQuery}`);
+        const res: GetMethodResponseType = await new ApiClient().get(`custom-field?sortBy=order`);
         const customField: ICustomField[] = res?.data;
         if (typeof customField === 'undefined') {
             dispatch(getAllCustomField([] as ICustomField[]));

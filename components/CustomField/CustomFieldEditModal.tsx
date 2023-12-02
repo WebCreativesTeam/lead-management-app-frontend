@@ -204,12 +204,6 @@ const EditCustomFieldModal = () => {
                                         options={FieldTypesList}
                                         onChange={(data: any) => {
                                             formik.setFieldValue('fieldType', data.value);
-                                            formik.setFieldValue('options', [
-                                                {
-                                                    name: '',
-                                                    value: '',
-                                                },
-                                            ]);
                                         }}
                                         defaultValue={defaultFieldType}
                                     />
