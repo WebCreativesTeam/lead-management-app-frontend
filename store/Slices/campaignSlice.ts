@@ -1,12 +1,12 @@
-import { LeadStatusSecondaryEndpoint } from '../../utils/Types/index';
-import { ICampaign, CampaignInitialStateProps, SourceDataType, UserDataType, ILeadStatus } from '@/utils/Types';
+import { ICampaign, CampaignInitialStateProps, SourceDataType, UserDataType, GetMethodResponseType, ICustomField, LeadStatusSecondaryEndpoint, ILeadStatus } from '@/utils/Types';
 import { fetchUserInfo } from '@/utils/contant';
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { ApiClient } from '@/utils/http';
+import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
 
 const initialState: CampaignInitialStateProps = {
     data: [] as ICampaign[],
     sourceList: [] as SourceDataType[],
-    leadStatusList: [] as LeadStatusSecondaryEndpoint[],
+    leadStatusList: [] as ILeadStatus[],
     singleData: {} as ICampaign,
     createModal: false,
     editModal: false,
@@ -20,7 +20,24 @@ const initialState: CampaignInitialStateProps = {
     isAbleToDelete: false,
     userPolicyArr: [] as string[],
     totalRecords: 0,
+    customDateFields: [] as ICustomField[],
 };
+
+// const getCustomDateFieldsList = async () => {
+//     const res: GetMethodResponseType = await new ApiClient().get('custom-field?fieldType=DATE');
+//     const customDateFields: ICustomField[] = res?.data;
+//     if (typeof customDateFields === 'undefined') {
+//         dispatch(getAllCustomDates([] as ICustomField[]));
+//         return;
+//     }
+//     dispatch(getAllCustomDates(customDateFields));
+// };
+
+export const getCustomDateFieldsList = createAsyncThunk('getCustomDates', async () => {
+    const res: GetMethodResponseType = await new ApiClient().get('custom-field?fieldType=DATE');
+    const customDateFields: ICustomField[] = res?.data;
+    return customDateFields;
+});
 
 const campaignSlice = createSlice({
     initialState,
@@ -30,6 +47,16 @@ const campaignSlice = createSlice({
             if (action.payload) {
                 state.userPolicyArr = action.payload.permissions;
             }
+        });
+        builder.addCase(getCustomDateFieldsList.fulfilled, (state, action: PayloadAction<ICustomField[]>) => {
+            state.customDateFields = action.payload;
+            state.isFetching = false;
+        });
+        builder.addCase(getCustomDateFieldsList.pending, (state) => {
+            state.isFetching = true;
+        });
+        builder.addCase(getCustomDateFieldsList.rejected, (state) => {
+            state.isFetching = false;
         });
     },
     reducers: {
@@ -72,7 +99,7 @@ const campaignSlice = createSlice({
         getAllCampaigns(state, action: PayloadAction<ICampaign[]>) {
             state.data = action.payload;
         },
-        getAllLeadStatusForCampaign(state, action: PayloadAction<LeadStatusSecondaryEndpoint[]>) {
+        getAllLeadStatusForCampaign(state, action: PayloadAction<ILeadStatus[]>) {
             state.leadStatusList = action.payload;
         },
         getAllSourceForCampaign(state, action: PayloadAction<SourceDataType[]>) {

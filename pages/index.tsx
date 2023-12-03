@@ -11,7 +11,7 @@ import { GetMethodResponseType, IFollowup, LeadStatusSecondaryEndpoint, SourceDa
 import { ApiClient } from '@/utils/http';
 import { IRootState } from '@/store';
 import Select from 'react-select';
-import { getAllLeadStatusForScheduleMessage, getAllSourceForScheduleMessage, setDeleteModal, setEditModal, setScheduleMessageDataLength, setViewModal } from '@/store/Slices/campaignSlice';
+import { getAllLeadStatusForCampaign, getAllSourceForCampaign, setDeleteModal, setEditModal, setCampaignDataLength, setViewModal } from '@/store/Slices/campaignSlice';
 import ScheduleMessageViewModal from '@/components/Campaign/CampaignViewModal';
 import ScheduleMessageEditModal from '@/components/Campaign/CampaignEditModal';
 import ScheduleMessageDeleteModal from '@/components/Campaign/CampaignDeleteModal';
@@ -71,7 +71,7 @@ const Dashboard = () => {
         //     return;
         // }
         dispatch(getAllTodayFollowups(followupData));
-        dispatch(setScheduleMessageDataLength(followupData.length));
+        dispatch(setCampaignDataLength(followupData.length));
         setLoading(false);
     };
 
@@ -85,7 +85,7 @@ const Dashboard = () => {
         //     return;
         // }
         dispatch(getAllTomorrowFollowups(followupData));
-        dispatch(setScheduleMessageDataLength(followupData.length));
+        dispatch(setCampaignDataLength(followupData.length));
         setLoading(false);
     };
 
@@ -99,7 +99,7 @@ const Dashboard = () => {
         //     return;
         // }
         dispatch(getAllPendingFollowups(followupData));
-        dispatch(setScheduleMessageDataLength(followupData.length));
+        dispatch(setCampaignDataLength(followupData.length));
         setLoading(false);
     };
 
@@ -108,10 +108,10 @@ const Dashboard = () => {
         const sourceList: GetMethodResponseType = await new ApiClient().get('source/list');
         const source: SourceDataType[] = sourceList?.data;
         if (typeof source === 'undefined') {
-            dispatch(getAllSourceForScheduleMessage([] as SourceDataType[]));
+            dispatch(getAllSourceForCampaign([] as SourceDataType[]));
             return;
         }
-        dispatch(getAllSourceForScheduleMessage(source));
+        dispatch(getAllSourceForCampaign(source));
     };
 
     //get all lead status list
@@ -119,10 +119,10 @@ const Dashboard = () => {
         const leadStatusList: GetMethodResponseType = await new ApiClient().get('lead-status/list');
         const status: LeadStatusSecondaryEndpoint[] = leadStatusList?.data;
         if (typeof status === 'undefined') {
-            dispatch(getAllLeadStatusForScheduleMessage([] as LeadStatusSecondaryEndpoint[]));
+            dispatch(getAllLeadStatusForCampaign([] as LeadStatusSecondaryEndpoint[]));
             return;
         }
-        dispatch(getAllLeadStatusForScheduleMessage(status));
+        dispatch(getAllLeadStatusForCampaign(status));
     };
 
     return (

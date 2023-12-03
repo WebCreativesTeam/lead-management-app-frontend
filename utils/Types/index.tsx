@@ -363,16 +363,29 @@ export interface ILeadRules {
 }
 
 //campaign page
+
+export enum CampaignType {
+    'SCHEDULED',
+    DRIP,
+    OCCASIONAL,
+}
+
 export interface ICampaign {
     id: string;
-    campaignName: string;
-    leadStatus: string;
-    source: string;
-    product: string;
-    template: string;
-    schedule: string;
-    platform: string[];
-    status: boolean;
+    type: 'SCHEDULED' | 'DRIP' | 'OCCASIONAL';
+    name: string;
+    sourceId: string;
+    productId: string;
+    customDateId: string;
+    statusId: string;
+    sendBefore: string;
+    sendAfter: string;
+    hour: string;
+    date: string;
+    updatedAt: string;
+    createdAt: string;
+    sendTo: string[];
+    isActive: boolean;
 }
 
 // dashboard page types
@@ -503,7 +516,8 @@ export interface CampaignInitialStateProps extends InitialStateProps {
     data: ICampaign[];
     singleData: ICampaign;
     sourceList: SourceDataType[];
-    leadStatusList: LeadStatusSecondaryEndpoint[];
+    leadStatusList: ILeadStatus[];
+    customDateFields: ICustomField[];
 }
 
 //dashboard slice intial props

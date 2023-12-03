@@ -8,7 +8,7 @@ import { Delete, Edit, Plus, View } from '@/utils/icons';
 import PageHeadingSection from '@/components/__Shared/PageHeadingSection/index.';
 import { useDispatch, useSelector } from 'react-redux';
 import { setPageTitle } from '@/store/themeConfigSlice';
-import { GetMethodResponseType, ICampaign, LeadStatusSecondaryEndpoint, SourceDataType } from '@/utils/Types';
+import { GetMethodResponseType, ICampaign, ILeadStatus, LeadStatusSecondaryEndpoint, SourceDataType } from '@/utils/Types';
 import { ApiClient } from '@/utils/http';
 import { IRootState } from '@/store';
 import { getAllLeadStatusForCampaign, getAllCampaigns, getAllSourceForCampaign, setCreateModal, setDeleteModal, setEditModal, setCampaignDataLength, setViewModal } from '@/store/Slices/campaignSlice';
@@ -16,7 +16,7 @@ import CampaignViewModal from '@/components/Campaign/CampaignViewModal';
 import CampaignCreateModal from '@/components/Campaign/CampaignCreateModal';
 import CampaignEditModal from '@/components/Campaign/CampaignEditModal';
 import CampaignDeleteModal from '@/components/Campaign/CampaignDeleteModal';
-import { scheduleMessagesRawData } from '@/utils/Raw Data';
+import { campaignRawData } from '@/utils/Raw Data';
 import ToggleSwitch from '@/components/__Shared/ToggleSwitch';
 
 const Campaign = () => {
@@ -66,14 +66,14 @@ const Campaign = () => {
     //get all Campaign list
     const getCampaignList = async () => {
         setLoading(true);
-        // const res: GetMethodResponseType = await new ApiClient().get(`schedule-message?limit=${pageSize}&page=${page}&search=${searchQuery}`);
-        // const campaign: ICampaign[] = res?.data;
-        // if (typeof campaign === 'undefined') {
-        //     dispatch(getAllCampaigns([] as ICampaign[]));
-        //     return;
-        // }
-        dispatch(getAllCampaigns(scheduleMessagesRawData));
-        dispatch(setCampaignDataLength(scheduleMessagesRawData.length));
+        const res: GetMethodResponseType = await new ApiClient().get(`campaign`);
+        const campaign: ICampaign[] = res?.data;
+        if (typeof campaign === 'undefined') {
+            dispatch(getAllCampaigns([] as ICampaign[]));
+            return;
+        }
+        dispatch(getAllCampaigns(campaign));
+        dispatch(setCampaignDataLength(campaign.length));
         setLoading(false);
     };
 
@@ -90,10 +90,10 @@ const Campaign = () => {
 
     //get all lead status list
     const getLeadStatus = async () => {
-        const leadStatusList: GetMethodResponseType = await new ApiClient().get('lead-status/list');
-        const status: LeadStatusSecondaryEndpoint[] = leadStatusList?.data;
+        const leadStatusList: GetMethodResponseType = await new ApiClient().get('lead-status');
+        const status: ILeadStatus[] = leadStatusList?.data;
         if (typeof status === 'undefined') {
-            dispatch(getAllLeadStatusForCampaign([] as LeadStatusSecondaryEndpoint[]));
+            dispatch(getAllLeadStatusForCampaign([] as ILeadStatus[]));
             return;
         }
         dispatch(getAllLeadStatusForCampaign(status));
@@ -101,7 +101,7 @@ const Campaign = () => {
 
     return (
         <div>
-            <PageHeadingSection description="Schedule message using template and for different platforms." heading="Schedule Message" />
+            <PageHeadingSection description="campaign message using template and for different platforms." heading="Campaign Message" />
             <div className="my-6 flex flex-col gap-5 sm:flex-row ">
                 {/* {!isAbleToCreate ? (
                     <div className="flex-1"></div>
@@ -109,7 +109,7 @@ const Campaign = () => {
                 <div className="flex-1">
                     <button className="btn btn-primary h-full max-w-fit max-sm:mx-auto" type="button" onClick={() => dispatch(setCreateModal(true))}>
                         <Plus />
-                        Add Scheduled Message
+                        Add Campaign
                     </button>
                 </div>
                 {/* )} */}
@@ -134,46 +134,34 @@ const Campaign = () => {
                     records={recordsData}
                     columns={[
                         {
-                            accessor: 'scheduleName',
-                            title: 'Schedule Name',
+                            accessor: 'name',
+                            title: 'Campaign Name',
                             sortable: true,
-                            render: ({ campaignName }) => <div>{campaignName}</div>,
+                            render: ({ name }) => <div>{name}</div>,
                         },
                         {
-                            accessor: 'leadStatus',
-                            title: 'Lead Status',
+                            accessor: 'type',
+                            title: 'Type',
                             sortable: true,
-                            render: ({ leadStatus }) => <div>{leadStatus}</div>,
+                            render: ({ type }) => <div>{type}</div>,
                         },
                         {
-                            accessor: 'source',
-                            title: 'Source',
+                            accessor: 'sendTo',
+                            title: 'Send To',
                             sortable: true,
-                            render: ({ source }) => <div>{source}</div>,
+                            render: ({ sendTo }) => <div>{sendTo}</div>,
                         },
                         {
-                            accessor: 'product',
-                            title: 'Product',
+                            accessor: 'createdAt',
+                            title: 'Created Date',
                             sortable: true,
-                            render: ({ product }) => <div>{product}</div>,
+                            render: ({ createdAt }) => <div>{new Date(createdAt).toLocaleString()}</div>,
                         },
                         {
-                            accessor: 'template',
-                            title: 'Template',
+                            accessor: 'updatedAt',
+                            title: 'Last Updated',
                             sortable: true,
-                            render: ({ template }) => <div>{template}</div>,
-                        },
-                        {
-                            accessor: 'schedule',
-                            title: 'Schedule',
-                            sortable: true,
-                            render: ({ schedule }) => <div>{schedule}</div>,
-                        },
-                        {
-                            accessor: 'platform',
-                            title: 'Platform',
-                            sortable: true,
-                            render: ({ platform }) => <div>{platform.join(' , ')}</div>,
+                            render: ({ updatedAt }) => <div>{new Date(updatedAt).toLocaleString()}</div>,
                         },
                         {
                             accessor: 'action',
@@ -207,7 +195,7 @@ const Campaign = () => {
                             accessor: 'Status',
                             title: 'Status',
                             sortable: true,
-                            render: ({ status }) => (
+                            render: ({ isActive }) => (
                                 <div>
                                     <label className="relative h-6 w-12">
                                         <input
@@ -215,7 +203,7 @@ const Campaign = () => {
                                             className="custom_switch peer absolute z-10 h-full w-full cursor-pointer opacity-0"
                                             id="custom_switch_checkbox1"
                                             name="permission"
-                                            defaultChecked={status}
+                                            defaultChecked={isActive}
                                             // checked={isDefault}
                                             // onChange={(e: React.ChangeEvent<HTMLInputElement>) => dispatch(setDefaultPolicyModal({ id, open: true, switchValue: e.target.checked }))}
                                         />
