@@ -1,16 +1,16 @@
 import React, { memo } from 'react';
-import ViewModal from '../../__Shared/ViewModal';
+import ViewModal from '../__Shared/ViewModal';
 import { useDispatch, useSelector } from 'react-redux';
-import { setViewModal } from '@/store/Slices/automationSlice/dripMessageSlice';
+import { setViewModal } from '@/store/Slices/campaignSlice';
 import { IRootState } from '@/store';
 
-const DripMessageViewModal = () => {
-    const { viewModal, singleData } = useSelector((state: IRootState) => state.dripMessage);
+const CampaignViewModal = () => {
+    const { viewModal, singleData } = useSelector((state: IRootState) => state.campaign);
     const dispatch = useDispatch();
-    const { leadStatus, platform, product, schedule, scheduleName, source, status, template } = singleData;
+    const { leadStatus, platform, product, schedule, campaignName, source, status, template } = singleData;
 
     const reqData: any = {
-        ['Drip Name']: scheduleName,
+        ['Campaign Name']: campaignName,
         source,
         product,
         ['schedule time']: schedule,
@@ -22,7 +22,7 @@ const DripMessageViewModal = () => {
 
     return (
         <ViewModal
-            title="View Drip Message Detail"
+            title="View Schedule Message Detail"
             open={viewModal}
             onClose={() => dispatch(setViewModal({ open: false }))}
             content={
@@ -43,4 +43,4 @@ const DripMessageViewModal = () => {
     );
 };
 
-export default memo(DripMessageViewModal);
+export default memo(CampaignViewModal);

@@ -4,10 +4,10 @@ import Modal from '@/components/__Shared/Modal';
 import Select from 'react-select';
 import { useSelector, useDispatch } from 'react-redux';
 import { IRootState } from '@/store';
-import { setEditModal, setDisableBtn, setFetching } from '@/store/Slices/automationSlice/scheduleMessageSlice';
+import { setEditModal, setDisableBtn, setFetching } from '@/store/Slices/campaignSlice';
 import { dummyTemplateListRawData, platformListRawData } from '@/utils/Raw Data';
 import { useFormik } from 'formik';
-import { scheduleMessageSchema } from '@/utils/schemas';
+import { campaignSchema } from '@/utils/schemas';
 import { ApiClient } from '@/utils/http';
 import { SelectOptionsType, SourceDataType, ICountryData, UserListSecondaryEndpointType } from '@/utils/Types';
 import { showToastAlert } from '@/utils/contant';
@@ -15,8 +15,8 @@ import Loader from '@/components/__Shared/Loader';
 import Flatpickr from 'react-flatpickr';
 import 'flatpickr/dist/flatpickr.css';
 
-const ScheduleMessageEditModal = () => {
-    const { editModal, isBtnDisabled, singleData, isFetching, sourceList } = useSelector((state: IRootState) => state.scheduleMessage);
+const CampaignEditModal = () => {
+    const { editModal, isBtnDisabled, singleData, isFetching, sourceList } = useSelector((state: IRootState) => state.campaign);
 
     const dispatch = useDispatch();
 
@@ -25,8 +25,8 @@ const ScheduleMessageEditModal = () => {
     });
 
     useEffect(() => {
-        const { scheduleName, source } = singleData;
-        setFieldValue('scheduleName', scheduleName);
+        const { campaignName, source } = singleData;
+        setFieldValue('campaignName', campaignName);
         setFieldValue('source', source);
     }, [singleData]);
 
@@ -36,18 +36,18 @@ const ScheduleMessageEditModal = () => {
     };
     const { values, handleChange, submitForm, handleSubmit, setFieldValue, errors, handleBlur, resetForm } = useFormik({
         initialValues,
-        validationSchema: scheduleMessageSchema,
+        validationSchema: campaignSchema,
         validateOnChange: false,
         enableReinitialize: true,
         onSubmit: async (value, action) => {
             dispatch(setFetching(true));
             try {
-                const editScheduleMessageObj = {
+                const editCampaignObj = {
                     scheduleDateAndTime: '',
                     name: '',
                 };
                 dispatch(setDisableBtn(true));
-                await new ApiClient().patch('ScheduleMessage/' + singleData.id, editScheduleMessageObj);
+                await new ApiClient().patch('Campaign/' + singleData.id, editCampaignObj);
 
                 action.resetForm();
                 dispatch(setEditModal({ open: false }));
@@ -149,4 +149,4 @@ const ScheduleMessageEditModal = () => {
     );
 };
 
-export default memo(ScheduleMessageEditModal);
+export default memo(CampaignEditModal);

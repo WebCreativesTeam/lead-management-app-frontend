@@ -1,63 +1,43 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import React, { memo, useEffect, useState } from 'react';
-import Modal from '@/components/__Shared/Modal';
-import Select from 'react-select';
+import React, { memo } from 'react';
+import Modal from '../__Shared/Modal';
 import { useSelector, useDispatch } from 'react-redux';
 import { IRootState } from '@/store';
-import { setEditModal, setDisableBtn, setFetching } from '@/store/Slices/automationSlice/dripMessageSlice';
-import { dummyTemplateListRawData, platformListRawData } from '@/utils/Raw Data';
+import { setCreateModal, setDisableBtn, setFetching } from '@/store/Slices/campaignSlice';
 import { useFormik } from 'formik';
-import { dripMessageSchema } from '@/utils/schemas';
+import { campaignSchema } from '@/utils/schemas';
 import { ApiClient } from '@/utils/http';
-import { SelectOptionsType, SourceDataType, ICountryData, UserListSecondaryEndpointType } from '@/utils/Types';
 import { showToastAlert } from '@/utils/contant';
-import Loader from '@/components/__Shared/Loader';
+import Loader from '../__Shared/Loader';
+import { SelectOptionsType, SourceDataType } from '@/utils/Types';
 import Flatpickr from 'react-flatpickr';
+import Select from 'react-select';
 import 'flatpickr/dist/flatpickr.css';
+import { dummyTemplateListRawData, platformListRawData } from '@/utils/Raw Data';
 
-const DripMessageEditModal = () => {
-    const { editModal, isBtnDisabled, singleData, isFetching, sourceList } = useSelector((state: IRootState) => state.dripMessage);
+const CampaignCreateModal = () => {
+    const { createModal, isBtnDisabled, isFetching, sourceList } = useSelector((state: IRootState) => state.campaign);
 
     const dispatch = useDispatch();
-
-    const sourceDropdown: SelectOptionsType[] = sourceList?.map((item: SourceDataType) => {
-        return { value: item.id, label: item.name };
-    });
-
-    useEffect(() => {
-        const { scheduleName, source } = singleData;
-        setFieldValue('scheduleName', scheduleName);
-        setFieldValue('source', source);
-    }, [singleData]);
-
-    const initialValues = {
-        scheduleDateAndTime: '',
-        name: '',
-    };
-    const { values, handleChange, submitForm, handleSubmit, setFieldValue, errors, handleBlur, resetForm } = useFormik({
-        initialValues,
-        validationSchema: dripMessageSchema,
+    const { values, handleChange, submitForm, handleSubmit, handleBlur, resetForm, setFieldValue } = useFormik({
+        initialValues: {
+            scheduleDateAndTime: '',
+            name: '',
+        },
+        validationSchema: campaignSchema,
         validateOnChange: false,
         enableReinitialize: true,
         onSubmit: async (value, action) => {
             dispatch(setFetching(true));
             try {
-                const editDripMessageObj = {
-                    scheduleDateAndTime: '',
-                    name: '',
-                };
                 dispatch(setDisableBtn(true));
-                await new ApiClient().patch('DripMessage/' + singleData.id, editDripMessageObj);
-
+                await new ApiClient().post('campaign', { name: value.name });
+                dispatch(setCreateModal(false));
                 action.resetForm();
-                dispatch(setEditModal({ open: false }));
             } catch (error: any) {
                 if (typeof error?.response?.data?.message === 'object') {
                     showToastAlert(error?.response?.data?.message.join(' , '));
-                } else if (error?.response?.data?.message) {
+                } else {
                     showToastAlert(error?.response?.data?.message);
-                } else if (error?.response?.data) {
-                    showToastAlert(error?.response?.data);
                 }
                 showToastAlert(error?.response?.data?.message);
             }
@@ -66,20 +46,25 @@ const DripMessageEditModal = () => {
         },
     });
 
-    const handleDiscard = () => {
-        dispatch(setEditModal({ open: false }));
-        resetForm();
-    };
+    const sourceDropdown: SelectOptionsType[] = sourceList?.map((item: SourceDataType) => {
+        return { value: item.id, label: item.name };
+    });
+
     return (
         <Modal
-            open={editModal}
-            onClose={() => dispatch(setEditModal({ open: false }))}
+            open={createModal}
+            onClose={() => {
+                dispatch(setCreateModal(false));
+            }}
+            onDiscard={() => {
+                dispatch(setCreateModal(false));
+                resetForm();
+            }}
             size="large"
-            onDiscard={handleDiscard}
-            title="Edit Dripd Message"
             onSubmit={() => submitForm()}
+            title="Add Schedule Message"
+            isBtnDisabled={values.name && !isBtnDisabled ? false : true}
             disabledDiscardBtn={isBtnDisabled}
-            isBtnDisabled={values.name && values.scheduleDateAndTime && !isBtnDisabled ? false : true}
             content={
                 isFetching ? (
                     <Loader />
@@ -87,20 +72,20 @@ const DripMessageEditModal = () => {
                     <form className="space-y-5" onSubmit={handleSubmit}>
                         <div className="flex flex-col gap-4 sm:flex-row">
                             <div className="flex-1">
-                                <label htmlFor="createDripName">Drip Name</label>
+                                <label htmlFor="createScheduleName">Schedule Name</label>
                                 <input
                                     onChange={handleChange}
                                     onBlur={handleBlur}
                                     value={values.name}
-                                    id="createDripName"
+                                    id="createScheduleName"
                                     name="name"
                                     type="text"
-                                    placeholder="Drip Name"
+                                    placeholder="Schedule Name"
                                     className="form-input"
                                 />
                             </div>
                             <div className="flex-1">
-                                <label>Drip Date & Time</label>
+                                <label>Schedule Date & Time</label>
                                 <Flatpickr
                                     data-enable-time
                                     options={{
@@ -109,7 +94,7 @@ const DripMessageEditModal = () => {
                                         position: 'auto',
                                     }}
                                     id="scheduleDateAndTime"
-                                    placeholder="Drip Date & Time"
+                                    placeholder="Schedule Date & Time"
                                     name="scheduleDateAndTime"
                                     className="form-input"
                                     onChange={(e) => setFieldValue('scheduleDateAndTime', e)}
@@ -149,4 +134,4 @@ const DripMessageEditModal = () => {
     );
 };
 
-export default memo(DripMessageEditModal);
+export default memo(CampaignCreateModal);

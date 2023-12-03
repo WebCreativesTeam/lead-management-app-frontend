@@ -1,13 +1,13 @@
-import { LeadStatusSecondaryEndpoint } from '../../../utils/Types/index';
-import { IDripMessage, DripMessageInitialStateProps, SourceDataType, UserDataType, ILeadStatus } from '@/utils/Types';
+import { LeadStatusSecondaryEndpoint } from '../../utils/Types/index';
+import { ICampaign, CampaignInitialStateProps, SourceDataType, UserDataType, ILeadStatus } from '@/utils/Types';
 import { fetchUserInfo } from '@/utils/contant';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-const initialState: DripMessageInitialStateProps = {
-    data: [] as IDripMessage[],
+const initialState: CampaignInitialStateProps = {
+    data: [] as ICampaign[],
     sourceList: [] as SourceDataType[],
     leadStatusList: [] as LeadStatusSecondaryEndpoint[],
-    singleData: {} as IDripMessage,
+    singleData: {} as ICampaign,
     createModal: false,
     editModal: false,
     deleteModal: false,
@@ -22,9 +22,9 @@ const initialState: DripMessageInitialStateProps = {
     totalRecords: 0,
 };
 
-const dripMessageSlice = createSlice({
+const campaignSlice = createSlice({
     initialState,
-    name: 'dripMessage',
+    name: 'campaign',
     extraReducers(builder) {
         builder.addCase(fetchUserInfo.fulfilled, (state, action: PayloadAction<UserDataType>) => {
             if (action.payload) {
@@ -36,23 +36,23 @@ const dripMessageSlice = createSlice({
         setViewModal(state, action) {
             const { open, id } = action.payload;
             state.viewModal = open;
-            const findRequestedData: IDripMessage | undefined = state.data.find((item: IDripMessage) => item.id === id);
+            const findRequestedData: ICampaign | undefined = state.data.find((item: ICampaign) => item.id === id);
 
             if (findRequestedData && state.viewModal) {
                 state.singleData = findRequestedData;
             } else {
-                state.singleData = {} as IDripMessage;
+                state.singleData = {} as ICampaign;
             }
         },
         setEditModal(state, action) {
             const { open, id } = action.payload;
             state.editModal = open;
-            const findRequestedData: IDripMessage | undefined = state.data.find((item: IDripMessage) => item.id === id);
+            const findRequestedData: ICampaign | undefined = state.data.find((item: ICampaign) => item.id === id);
 
             if (findRequestedData && state.editModal) {
                 state.singleData = findRequestedData;
             } else {
-                state.singleData = {} as IDripMessage;
+                state.singleData = {} as ICampaign;
             }
         },
         setCreateModal(state, action) {
@@ -61,21 +61,21 @@ const dripMessageSlice = createSlice({
         setDeleteModal(state, action) {
             const { open, id } = action.payload;
             state.deleteModal = open;
-            const findRequestedData: IDripMessage | undefined = state.data.find((item: IDripMessage) => item.id === id);
+            const findRequestedData: ICampaign | undefined = state.data.find((item: ICampaign) => item.id === id);
 
             if (findRequestedData && state.deleteModal) {
                 state.singleData = findRequestedData;
             } else {
-                state.singleData = {} as IDripMessage;
+                state.singleData = {} as ICampaign;
             }
         },
-        getAllDripMessages(state, action: PayloadAction<IDripMessage[]>) {
+        getAllCampaigns(state, action: PayloadAction<ICampaign[]>) {
             state.data = action.payload;
         },
-        getAllLeadStatusForDripMessage(state, action: PayloadAction<LeadStatusSecondaryEndpoint[]>) {
+        getAllLeadStatusForCampaign(state, action: PayloadAction<LeadStatusSecondaryEndpoint[]>) {
             state.leadStatusList = action.payload;
         },
-        getAllSourceForDripMessage(state, action: PayloadAction<SourceDataType[]>) {
+        getAllSourceForCampaign(state, action: PayloadAction<SourceDataType[]>) {
             state.sourceList = action.payload;
         },
 
@@ -85,23 +85,23 @@ const dripMessageSlice = createSlice({
         setFetching(state, action) {
             state.isFetching = action.payload;
         },
-        setDripMessageReadPermission(state, action: PayloadAction<string>) {
+        setCampaignReadPermission(state, action: PayloadAction<string>) {
             const verifyPermission: boolean = state.userPolicyArr.includes(action.payload);
             state.isAbleToRead = verifyPermission;
         },
-        setDripMessageCreatePermission(state, action) {
+        setCampaignCreatePermission(state, action) {
             const verifyPermission: boolean = state.userPolicyArr.includes(action.payload);
             state.isAbleToCreate = verifyPermission;
         },
-        setDripMessageUpdatePermission(state, action) {
+        setCampaignUpdatePermission(state, action) {
             const verifyPermission: boolean = state.userPolicyArr.includes(action.payload);
             state.isAbleToUpdate = verifyPermission;
         },
-        setDripMessageDeletePermission(state, action) {
+        setCampaignDeletePermission(state, action) {
             const verifyPermission: boolean = state.userPolicyArr.includes(action.payload);
             state.isAbleToDelete = verifyPermission;
         },
-        setDripMessageDataLength(state, action: PayloadAction<number>) {
+        setCampaignDataLength(state, action: PayloadAction<number>) {
             state.totalRecords = action.payload;
         },
     },
@@ -112,15 +112,15 @@ export const {
     setDeleteModal,
     setEditModal,
     setViewModal,
-    getAllDripMessages,
+    getAllCampaigns,
     setDisableBtn,
     setFetching,
-    setDripMessageCreatePermission,
-    setDripMessageDeletePermission,
-    setDripMessageReadPermission,
-    setDripMessageUpdatePermission,
-    setDripMessageDataLength,
-    getAllLeadStatusForDripMessage,
-    getAllSourceForDripMessage,
-} = dripMessageSlice.actions;
-export default dripMessageSlice.reducer;
+    setCampaignCreatePermission,
+    setCampaignDeletePermission,
+    setCampaignReadPermission,
+    setCampaignUpdatePermission,
+    setCampaignDataLength,
+    getAllLeadStatusForCampaign,
+    getAllSourceForCampaign,
+} = campaignSlice.actions;
+export default campaignSlice.reducer;

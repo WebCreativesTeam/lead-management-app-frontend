@@ -2,19 +2,19 @@ import React, { memo } from 'react';
 import ConfirmationModal from '@/components/__Shared/ConfirmationModal';
 import { useDispatch, useSelector } from 'react-redux';
 import { IRootState } from '@/store';
-import { setDeleteModal, setDisableBtn, setFetching } from '@/store/Slices/automationSlice/dripMessageSlice';
-import { IDripMessage } from '@/utils/Types';
+import { setDeleteModal, setDisableBtn, setFetching } from '@/store/Slices/campaignSlice';
+import { ICampaign } from '@/utils/Types';
 import { ApiClient } from '@/utils/http';
 import Loader from '@/components/__Shared/Loader';
 
-const DripMessageDeleteModal = () => {
-    const { isFetching, isBtnDisabled, deleteModal, singleData } = useSelector((state: IRootState) => state.dripMessage);
+const CampaignDeleteModal = () => {
+    const { isFetching, isBtnDisabled, deleteModal, singleData } = useSelector((state: IRootState) => state.campaign);
     const dispatch = useDispatch();
-    const onDeleteDripMessage = async () => {
+    const onDeleteCampaign = async () => {
         dispatch(setFetching(true));
         dispatch(setDisableBtn(true));
-        const deleteDripMessage: IDripMessage = await new ApiClient().delete('dripMessage/' + singleData.id);
-        if (deleteDripMessage === null) {
+        const deleteCampaign: ICampaign = await new ApiClient().delete('campaign/' + singleData.id);
+        if (deleteCampaign === null) {
             dispatch(setDisableBtn(false));
             return;
         }
@@ -28,13 +28,13 @@ const DripMessageDeleteModal = () => {
             open={deleteModal}
             onClose={() => dispatch(setDeleteModal({ open: false }))}
             onDiscard={() => dispatch(setDeleteModal({ open: false }))}
-            description={isFetching ? <Loader /> : <>Are you sure you want to delete Dripd Message?</>}
-            title="Delete Drip Message"
+            description={isFetching ? <Loader /> : <>Are you sure you want to delete Scheduled Message?</>}
+            title="Delete Schedule Message"
             isBtnDisabled={isBtnDisabled}
-            onSubmit={onDeleteDripMessage}
+            onSubmit={onDeleteCampaign}
             btnSubmitText="Delete"
         />
     );
 };
 
-export default memo(DripMessageDeleteModal);
+export default memo(CampaignDeleteModal);

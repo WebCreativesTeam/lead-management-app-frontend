@@ -18,11 +18,9 @@ import emailLogSlice from './Slices/emailSlice/emailLogSlice';
 import smsTemplateSlice from './Slices/templateSlice/smsTemplateSlice';
 import leadRuleSlice from './Slices/leadSlice/leadRuleSlice';
 import whatsappTemplateSlice from './Slices/templateSlice/whatsappTemplateSlice';
-import scheduleMessageSlice from './Slices/automationSlice/scheduleMessageSlice';
-import occasionMessageSlice from './Slices/automationSlice/occasionMessageSlice';
-import dripMessageSlice from './Slices/automationSlice/dripMessageSlice';
 import dashbordSlice from './Slices/dashbordSlice';
 import customFieldSlice from './Slices/customFieldSlice';
+import campaignSlice from './Slices/campaignSlice';
 
 const rootReducer = combineReducers({
     themeConfig: themeConfigSlice,
@@ -44,9 +42,7 @@ const rootReducer = combineReducers({
     userInfo: userProfileSlice,
     smsTemplate: smsTemplateSlice,
     whatsappTemplate: whatsappTemplateSlice,
-    scheduleMessage: scheduleMessageSlice,
-    occasionMessage: occasionMessageSlice,
-    dripMessage: dripMessageSlice,
+    campaign: campaignSlice,
     dashboard: dashbordSlice,
     customField: customFieldSlice,
 });

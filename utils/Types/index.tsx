@@ -362,36 +362,10 @@ export interface ILeadRules {
     source: SourceDataType;
 }
 
-//schedule message page
-export interface IScheduleMessage {
+//campaign page
+export interface ICampaign {
     id: string;
-    scheduleName: string;
-    leadStatus: string;
-    source: string;
-    product: string;
-    template: string;
-    schedule: string;
-    platform: string[];
-    status: boolean;
-}
-
-//drip message page
-export interface IDripMessage {
-    id: string;
-    scheduleName: string;
-    leadStatus: string;
-    source: string;
-    product: string;
-    template: string;
-    schedule: string;
-    platform: string[];
-    status: boolean;
-}
-
-//occasion message page typs
-export interface IOccasionMessage {
-    id: string;
-    scheduleName: string;
+    campaignName: string;
     leadStatus: string;
     source: string;
     product: string;
@@ -524,26 +498,10 @@ export interface CustomFieldInitialStateProps extends InitialStateProps {
     fieldActivationModal: boolean;
 }
 
-//schedule message slice intial props
-export interface ScheduleMessageInitialStateProps extends InitialStateProps {
-    data: IScheduleMessage[];
-    singleData: IScheduleMessage;
-    sourceList: SourceDataType[];
-    leadStatusList: LeadStatusSecondaryEndpoint[];
-}
-
-//occasion message slice intial props
-export interface OccasionMessageInitialStateProps extends InitialStateProps {
-    data: IOccasionMessage[];
-    singleData: IOccasionMessage;
-    sourceList: SourceDataType[];
-    leadStatusList: LeadStatusSecondaryEndpoint[];
-}
-
-//drip message slice intial props
-export interface DripMessageInitialStateProps extends InitialStateProps {
-    data: IDripMessage[];
-    singleData: IDripMessage;
+//campaign slice intial props
+export interface CampaignInitialStateProps extends InitialStateProps {
+    data: ICampaign[];
+    singleData: ICampaign;
     sourceList: SourceDataType[];
     leadStatusList: LeadStatusSecondaryEndpoint[];
 }

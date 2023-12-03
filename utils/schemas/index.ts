@@ -17,23 +17,13 @@ export const signInSchema = Yup.object().shape({
 });
 
 //schedule message
-export const scheduleMessageSchema = Yup.object().shape({
+export const campaignSchema = Yup.object().shape({
     name: Yup.string().email().required('Enter Schedule Message Name'),
 });
 
 //schedule message
 export const customFieldSchema = Yup.object().shape({
     label: Yup.string().required('Enter Field Label'),
-});
-
-//drip message
-export const dripMessageSchema = Yup.object().shape({
-    name: Yup.string().email().required('Enter Schedule Message Name'),
-});
-
-//occasion message
-export const occasionMessageSchema = Yup.object().shape({
-    name: Yup.string().email().required('Enter Schedule Message Name'),
 });
 
 // custom field tab schema for lead

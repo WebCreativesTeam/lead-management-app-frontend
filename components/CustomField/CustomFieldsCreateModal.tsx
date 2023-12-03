@@ -115,7 +115,7 @@ const CreateCustomFieldModal = () => {
         }
     };
 
-    const { field, label, operator, options, order, parentValue, withCondition } = formik.values;
+    const { field, label, operator, order, parentValue, withCondition } = formik.values;
 
     useEffect(() => {
         if (withCondition && (!field || !operator || !parentValue)) {

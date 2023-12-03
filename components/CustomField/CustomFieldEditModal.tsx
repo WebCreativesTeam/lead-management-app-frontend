@@ -100,9 +100,6 @@ const EditCustomFieldModal = () => {
         setFieldsListDropdown(createFieldListDropdown);
     }, [fieldsList]);
 
-    // console.log('singleData', singleData);
-    console.log('ParentFieldDropdown', parentFieldDropdown);
-
     const getCustomFieldById = async (id: string | undefined) => {
         setIsLoading(true);
         if (id) {
@@ -178,16 +175,24 @@ const EditCustomFieldModal = () => {
         }
     }, [dispatch, field, operator, parentValue, withCondition]);
 
-    console.log(defaultParentValue.label);
     return (
         <Modal
             open={editModal}
             onClose={() => {
                 dispatch(setEditModal({ open: false }));
+                formik.resetForm();
+                setDefaultParentValue({
+                    label: '',
+                    value: '',
+                });
             }}
             onDiscard={() => {
                 dispatch(setEditModal({ open: false }));
                 formik.resetForm();
+                setDefaultParentValue({
+                    label: '',
+                    value: '',
+                });
             }}
             size="large"
             onSubmit={() => formik.submitForm()}

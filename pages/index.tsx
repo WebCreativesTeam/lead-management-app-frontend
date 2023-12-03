@@ -11,17 +11,10 @@ import { GetMethodResponseType, IFollowup, LeadStatusSecondaryEndpoint, SourceDa
 import { ApiClient } from '@/utils/http';
 import { IRootState } from '@/store';
 import Select from 'react-select';
-import {
-    getAllLeadStatusForScheduleMessage,
-    getAllSourceForScheduleMessage,
-    setDeleteModal,
-    setEditModal,
-    setScheduleMessageDataLength,
-    setViewModal,
-} from '@/store/Slices/automationSlice/scheduleMessageSlice';
-import ScheduleMessageViewModal from '@/components/Automation/ScheduleMessage/ScheduleMessageViewModal';
-import ScheduleMessageEditModal from '@/components/Automation/ScheduleMessage/ScheduleMessageEditModal';
-import ScheduleMessageDeleteModal from '@/components/Automation/ScheduleMessage/ScheduleMessageDeleteModal';
+import { getAllLeadStatusForScheduleMessage, getAllSourceForScheduleMessage, setDeleteModal, setEditModal, setScheduleMessageDataLength, setViewModal } from '@/store/Slices/campaignSlice';
+import ScheduleMessageViewModal from '@/components/Campaign/CampaignViewModal';
+import ScheduleMessageEditModal from '@/components/Campaign/CampaignEditModal';
+import ScheduleMessageDeleteModal from '@/components/Campaign/CampaignDeleteModal';
 import { followUpDropdownList, followupData } from '@/utils/Raw Data';
 import { getAllPendingFollowups, getAllTodayFollowups, getAllTomorrowFollowups } from '@/store/Slices/dashbordSlice';
 import FollowUpCard from '@/components/Dashboard/FollowUpCard';

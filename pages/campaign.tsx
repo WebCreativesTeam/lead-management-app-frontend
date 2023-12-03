@@ -8,32 +8,23 @@ import { Delete, Edit, Plus, View } from '@/utils/icons';
 import PageHeadingSection from '@/components/__Shared/PageHeadingSection/index.';
 import { useDispatch, useSelector } from 'react-redux';
 import { setPageTitle } from '@/store/themeConfigSlice';
-import { GetMethodResponseType, IScheduleMessage, LeadStatusSecondaryEndpoint, SourceDataType } from '@/utils/Types';
+import { GetMethodResponseType, ICampaign, LeadStatusSecondaryEndpoint, SourceDataType } from '@/utils/Types';
 import { ApiClient } from '@/utils/http';
 import { IRootState } from '@/store';
-import {
-    getAllLeadStatusForScheduleMessage,
-    getAllScheduleMessages,
-    getAllSourceForScheduleMessage,
-    setCreateModal,
-    setDeleteModal,
-    setEditModal,
-    setScheduleMessageDataLength,
-    setViewModal,
-} from '@/store/Slices/automationSlice/scheduleMessageSlice';
-import ScheduleMessageViewModal from '@/components/Automation/ScheduleMessage/ScheduleMessageViewModal';
-import ScheduleMessageCreateModal from '@/components/Automation/ScheduleMessage/ScheduleMessageCreateModal';
-import ScheduleMessageEditModal from '@/components/Automation/ScheduleMessage/ScheduleMessageEditModal';
-import ScheduleMessageDeleteModal from '@/components/Automation/ScheduleMessage/ScheduleMessageDeleteModal';
+import { getAllLeadStatusForCampaign, getAllCampaigns, getAllSourceForCampaign, setCreateModal, setDeleteModal, setEditModal, setCampaignDataLength, setViewModal } from '@/store/Slices/campaignSlice';
+import CampaignViewModal from '@/components/Campaign/CampaignViewModal';
+import CampaignCreateModal from '@/components/Campaign/CampaignCreateModal';
+import CampaignEditModal from '@/components/Campaign/CampaignEditModal';
+import CampaignDeleteModal from '@/components/Campaign/CampaignDeleteModal';
 import { scheduleMessagesRawData } from '@/utils/Raw Data';
 import ToggleSwitch from '@/components/__Shared/ToggleSwitch';
 
 const Campaign = () => {
     const dispatch = useDispatch();
     useEffect(() => {
-        dispatch(setPageTitle('Track Leads | ScheduleMessages'));
+        dispatch(setPageTitle('Track Leads | Campaigns'));
     });
-    const { data, isFetching, isAbleToCreate, isAbleToDelete, isAbleToUpdate, totalRecords } = useSelector((state: IRootState) => state.scheduleMessage);
+    const { data, isFetching, isAbleToCreate, isAbleToDelete, isAbleToUpdate, totalRecords } = useSelector((state: IRootState) => state.campaign);
 
     //hooks
     const [searchInputText, setSearchInputText] = useState<string>('');
@@ -44,7 +35,7 @@ const Campaign = () => {
     const [page, setPage] = useState(1);
     const PAGE_SIZES = [10, 20, 30];
     const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
-    const [recordsData, setRecordsData] = useState<IScheduleMessage[]>([] as IScheduleMessage[]);
+    const [recordsData, setRecordsData] = useState<ICampaign[]>([] as ICampaign[]);
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
         columnAccessor: 'name',
         direction: 'asc',
@@ -58,9 +49,9 @@ const Campaign = () => {
         setPage(1);
     }, [sortStatus]);
 
-    //get all scheduleMessage after page render
+    //get all campaign after page render
     useEffect(() => {
-        getScheduleMessageList();
+        getCampaignList();
     }, [isFetching, pageSize, page, searchQuery]);
 
     useEffect(() => {
@@ -72,17 +63,17 @@ const Campaign = () => {
         getLeadStatus();
     }, []);
 
-    //get all ScheduleMessage list
-    const getScheduleMessageList = async () => {
+    //get all Campaign list
+    const getCampaignList = async () => {
         setLoading(true);
         // const res: GetMethodResponseType = await new ApiClient().get(`schedule-message?limit=${pageSize}&page=${page}&search=${searchQuery}`);
-        // const scheduleMessage: IScheduleMessage[] = res?.data;
-        // if (typeof scheduleMessage === 'undefined') {
-        //     dispatch(getAllScheduleMessages([] as IScheduleMessage[]));
+        // const campaign: ICampaign[] = res?.data;
+        // if (typeof campaign === 'undefined') {
+        //     dispatch(getAllCampaigns([] as ICampaign[]));
         //     return;
         // }
-        dispatch(getAllScheduleMessages(scheduleMessagesRawData));
-        dispatch(setScheduleMessageDataLength(scheduleMessagesRawData.length));
+        dispatch(getAllCampaigns(scheduleMessagesRawData));
+        dispatch(setCampaignDataLength(scheduleMessagesRawData.length));
         setLoading(false);
     };
 
@@ -91,10 +82,10 @@ const Campaign = () => {
         const sourceList: GetMethodResponseType = await new ApiClient().get('source/list');
         const source: SourceDataType[] = sourceList?.data;
         if (typeof source === 'undefined') {
-            dispatch(getAllSourceForScheduleMessage([] as SourceDataType[]));
+            dispatch(getAllSourceForCampaign([] as SourceDataType[]));
             return;
         }
-        dispatch(getAllSourceForScheduleMessage(source));
+        dispatch(getAllSourceForCampaign(source));
     };
 
     //get all lead status list
@@ -102,10 +93,10 @@ const Campaign = () => {
         const leadStatusList: GetMethodResponseType = await new ApiClient().get('lead-status/list');
         const status: LeadStatusSecondaryEndpoint[] = leadStatusList?.data;
         if (typeof status === 'undefined') {
-            dispatch(getAllLeadStatusForScheduleMessage([] as LeadStatusSecondaryEndpoint[]));
+            dispatch(getAllLeadStatusForCampaign([] as LeadStatusSecondaryEndpoint[]));
             return;
         }
-        dispatch(getAllLeadStatusForScheduleMessage(status));
+        dispatch(getAllLeadStatusForCampaign(status));
     };
 
     return (
@@ -125,7 +116,7 @@ const Campaign = () => {
                 <div className="relative  flex-1">
                     <input
                         type="text"
-                        placeholder="Find A ScheduleMessage"
+                        placeholder="Find A Campaign"
                         className="form-input py-3 ltr:pr-[100px] rtl:pl-[100px]"
                         onChange={(e) => setSearchInputText(e.target.value)}
                         value={searchInputText}
@@ -136,7 +127,7 @@ const Campaign = () => {
                 </div>
             </div>
 
-            {/* scheduleMessage List table*/}
+            {/* campaign List table*/}
             <div className="datatables panel mt-6">
                 <DataTable
                     className="table-hover whitespace-nowrap"
@@ -146,7 +137,7 @@ const Campaign = () => {
                             accessor: 'scheduleName',
                             title: 'Schedule Name',
                             sortable: true,
-                            render: ({ scheduleName }) => <div>{scheduleName}</div>,
+                            render: ({ campaignName }) => <div>{campaignName}</div>,
                         },
                         {
                             accessor: 'leadStatus',
@@ -249,16 +240,16 @@ const Campaign = () => {
             </div>
 
             {/* edit modal */}
-            <ScheduleMessageEditModal />
+            <CampaignEditModal />
 
             {/* view modal */}
-            <ScheduleMessageViewModal />
+            <CampaignViewModal />
 
             {/* delete modal */}
-            <ScheduleMessageDeleteModal />
+            <CampaignDeleteModal />
 
             {/* create modal */}
-            <ScheduleMessageCreateModal />
+            <CampaignCreateModal />
         </div>
     );
 };
