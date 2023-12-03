@@ -30,11 +30,11 @@ const CampaignCreateModal = () => {
     const formik = useFormik({
         initialValues: {
             date: '',
-            campaignName: '',
+            name: '',
             hour: '',
             sendAfter: '',
             sendBefore: '',
-            campaignType: '',
+            type: '',
             customDate: '',
             sendTo: '',
             statusId: '',
@@ -45,8 +45,8 @@ const CampaignCreateModal = () => {
                     templateId: '',
                 },
             ],
-            source: '',
-            product: '',
+            sourceId: '',
+            productId: '',
         },
         validationSchema: campaignSchema,
         validateOnChange: true,
@@ -54,18 +54,18 @@ const CampaignCreateModal = () => {
         onSubmit: async (value, action) => {
             dispatch(setFetching(true));
             const campaignCreateObj: any = {
-                name: value.campaignName,
+                name: value.name,
                 hour: value.hour,
-                type: value.campaignType,
+                type: value.type,
                 sendTo: value.sendTo,
-                sourceId: value.source,
-                productId: value.product,
+                sourceId: value.sourceId,
+                productId: value.productId,
                 instance: value.instance,
                 isActive: value.isActive,
             };
-            if (value.campaignType === 'SCHEDULED') {
+            if (value.type === 'SCHEDULED') {
                 campaignCreateObj.date = value.date;
-            } else if (value.campaignType === 'DRIP') {
+            } else if (value.type === 'DRIP') {
                 campaignCreateObj.sendAfter = value.sendAfter;
             } else {
                 campaignCreateObj.customDateId = value.customDate;
@@ -92,6 +92,12 @@ const CampaignCreateModal = () => {
             dispatch(setFetching(false));
         },
     });
+
+    useEffect(() => {
+        formik.setFieldValue('statusId', 'All');
+        formik.setFieldValue('sourceId', 'All');
+        formik.setFieldValue('productId', 'All');
+    }, []);
 
     useEffect(() => {
         const createCustomFieldDropdown: SelectOptionsType[] = customDateFields.map((item: ICustomField) => {
@@ -138,9 +144,7 @@ const CampaignCreateModal = () => {
             size="large"
             onSubmit={() => formik.submitForm()}
             title="Add Campaign"
-            isBtnDisabled={
-                formik.values.campaignName && formik.values.hour && formik.values.campaignType && formik.values.sendTo && formik.values.source && formik.values.product && !isBtnDisabled ? false : true
-            }
+            isBtnDisabled={formik.values.name && formik.values.hour && formik.values.type && formik.values.sendTo && formik.values.sourceId && formik.values.productId && !isBtnDisabled ? false : true}
             disabledDiscardBtn={isBtnDisabled}
             content={
                 isFetching ? (
@@ -155,7 +159,7 @@ const CampaignCreateModal = () => {
                                         placeholder="Select Campaign Type"
                                         options={campaignTypeList}
                                         onChange={(data: any) => {
-                                            formik.setFieldValue('campaignType', data.value);
+                                            formik.setFieldValue('type', data.value);
                                             if (data.value === 'OCCASIONAL' && customDateFields.length <= 0) {
                                                 dispatch(getCustomDateFieldsList());
                                             }
@@ -167,9 +171,9 @@ const CampaignCreateModal = () => {
                                     <input
                                         onChange={formik.handleChange}
                                         onBlur={formik.handleBlur}
-                                        value={formik.values.campaignName}
+                                        value={formik.values.name}
                                         id="createCampaignName"
-                                        name="campaignName"
+                                        name="name"
                                         type="text"
                                         placeholder="Campaign Name"
                                         className="form-input"
@@ -177,7 +181,7 @@ const CampaignCreateModal = () => {
                                 </div>
                             </div>
                             <div className="flex flex-col gap-4 sm:flex-row">
-                                {formik.values.campaignType === 'SCHEDULED' && (
+                                {formik.values.type === 'SCHEDULED' && (
                                     <div className="flex-1">
                                         <label>Choose Date</label>
                                         <Flatpickr
@@ -196,7 +200,7 @@ const CampaignCreateModal = () => {
                                         />
                                     </div>
                                 )}
-                                {formik.values.campaignType === 'DRIP' && (
+                                {formik.values.type === 'DRIP' && (
                                     <div className="flex-1">
                                         <label htmlFor="sendAfter">Send After</label>
                                         <input
@@ -212,7 +216,7 @@ const CampaignCreateModal = () => {
                                     </div>
                                 )}
 
-                                {formik.values.campaignType === 'OCCASIONAL' && (
+                                {formik.values.type === 'OCCASIONAL' && (
                                     <div className="flex-1">
                                         <label htmlFor="sendBefore">Send Before</label>
                                         <input
@@ -228,7 +232,7 @@ const CampaignCreateModal = () => {
                                     </div>
                                 )}
 
-                                {formik.values.campaignType === 'OCCASIONAL' && (
+                                {formik.values.type === 'OCCASIONAL' && (
                                     <div className="flex-1">
                                         <label htmlFor="customDate">Date</label>
                                         <Select placeholder="Select Date" options={customFieldList} onChange={(data: any) => formik.setFieldValue('customDate', data.value)} />
@@ -262,13 +266,13 @@ const CampaignCreateModal = () => {
                                         options={sendToDropdown}
                                         onChange={(data: any) => {
                                             formik.setFieldValue('sendTo', data.value);
-                                            formik.setFieldValue('statusId', { label: 'All', value: 'All' });
+                                            formik.setFieldValue('statusId', 'All');
                                         }}
                                     />
                                 </div>
                                 {formik.values.sendTo === 'LEAD' && (
                                     <div className="flex-1">
-                                        <label htmlFor="product">Lead Status</label>
+                                        <label htmlFor="statusId">Lead Status</label>
                                         <Select
                                             placeholder="Select Lead Status"
                                             options={leadStatusDropdown}
@@ -284,16 +288,16 @@ const CampaignCreateModal = () => {
                                     <Select
                                         placeholder="Select Source"
                                         options={sourceDropdown}
-                                        onChange={(data: any) => formik.setFieldValue('source', data.value)}
+                                        onChange={(data: any) => formik.setFieldValue('sourceId', data.value)}
                                         defaultValue={{ label: 'All', value: 'All' }}
                                     />
                                 </div>
                                 <div className="flex-1">
-                                    <label htmlFor="product">Product</label>
+                                    <label htmlFor="productId">Product</label>
                                     <Select
                                         placeholder="Select Product"
                                         options={sourceDropdown}
-                                        onChange={(data: any) => formik.setFieldValue('product', data.value)}
+                                        onChange={(data: any) => formik.setFieldValue('productId', data.value)}
                                         defaultValue={{ label: 'All', value: 'All' }}
                                     />
                                 </div>

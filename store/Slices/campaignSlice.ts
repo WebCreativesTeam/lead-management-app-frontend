@@ -12,6 +12,7 @@ const initialState: CampaignInitialStateProps = {
     editModal: false,
     deleteModal: false,
     viewModal: false,
+    campaignActivationModal: false,
     isBtnDisabled: false,
     isFetching: false,
     isAbleToRead: false,
@@ -96,6 +97,17 @@ const campaignSlice = createSlice({
                 state.singleData = {} as ICampaign;
             }
         },
+        setCampaigndActivationModal(state, action: PayloadAction<{ open: boolean; id?: string }>) {
+            const { open, id } = action.payload;
+            state.campaignActivationModal = open;
+            const findRequestedData: ICampaign | undefined = state.data.find((item: ICampaign) => item.id === id);
+
+            if (findRequestedData && state.campaignActivationModal) {
+                state.singleData = findRequestedData;
+            } else {
+                state.singleData = {} as ICampaign;
+            }
+        },
         getAllCampaigns(state, action: PayloadAction<ICampaign[]>) {
             state.data = action.payload;
         },
@@ -149,5 +161,6 @@ export const {
     setCampaignDataLength,
     getAllLeadStatusForCampaign,
     getAllSourceForCampaign,
+    setCampaigndActivationModal,
 } = campaignSlice.actions;
 export default campaignSlice.reducer;

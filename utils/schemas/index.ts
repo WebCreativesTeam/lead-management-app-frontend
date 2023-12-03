@@ -18,7 +18,7 @@ export const signInSchema = Yup.object().shape({
 
 //schedule message
 export const campaignSchema = Yup.object().shape({
-    campaignName: Yup.string().required('Enter Campaign Name'),
+    name: Yup.string().required('Enter Campaign Name'),
 });
 
 //schedule message

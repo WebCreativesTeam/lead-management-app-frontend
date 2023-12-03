@@ -28,8 +28,8 @@ const CampaignDeleteModal = () => {
             open={deleteModal}
             onClose={() => dispatch(setDeleteModal({ open: false }))}
             onDiscard={() => dispatch(setDeleteModal({ open: false }))}
-            description={isFetching ? <Loader /> : <>Are you sure you want to delete Scheduled Message?</>}
-            title="Delete Schedule Message"
+            description={isFetching ? <Loader /> : <>Are you sure you want to delete Campaign?</>}
+            title="Delete Campaign"
             isBtnDisabled={isBtnDisabled}
             onSubmit={onDeleteCampaign}
             btnSubmitText="Delete"

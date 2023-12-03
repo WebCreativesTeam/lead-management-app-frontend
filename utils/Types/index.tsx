@@ -518,6 +518,7 @@ export interface CampaignInitialStateProps extends InitialStateProps {
     sourceList: SourceDataType[];
     leadStatusList: ILeadStatus[];
     customDateFields: ICustomField[];
+    campaignActivationModal: boolean;
 }
 
 //dashboard slice intial props

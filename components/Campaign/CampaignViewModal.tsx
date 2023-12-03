@@ -7,16 +7,20 @@ import { IRootState } from '@/store';
 const CampaignViewModal = () => {
     const { viewModal, singleData } = useSelector((state: IRootState) => state.campaign);
     const dispatch = useDispatch();
-    const { statusId, name, isActive } = singleData;
+    const { name, isActive, createdAt, sendTo, updatedAt, type } = singleData;
 
     const reqData: any = {
         ['Campaign Name']: name,
+        ['Campaign Type']: `${type?.toLowerCase()} campaign`,
         ['Active Status']: isActive ? 'Active' : 'Not Active',
+        ['Send To']: sendTo,
+        ['Created Date']: new Date(createdAt).toLocaleString(),
+        ['Last Updated']: new Date(updatedAt).toLocaleString(),
     };
 
     return (
         <ViewModal
-            title="View Schedule Message Detail"
+            title="View Campaign Details"
             open={viewModal}
             onClose={() => dispatch(setViewModal({ open: false }))}
             content={

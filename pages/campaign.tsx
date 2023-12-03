@@ -11,12 +11,23 @@ import { setPageTitle } from '@/store/themeConfigSlice';
 import { GetMethodResponseType, ICampaign, ILeadStatus, LeadStatusSecondaryEndpoint, SourceDataType } from '@/utils/Types';
 import { ApiClient } from '@/utils/http';
 import { IRootState } from '@/store';
-import { getAllLeadStatusForCampaign, getAllCampaigns, getAllSourceForCampaign, setCreateModal, setDeleteModal, setEditModal, setCampaignDataLength, setViewModal } from '@/store/Slices/campaignSlice';
+import {
+    getAllLeadStatusForCampaign,
+    getAllCampaigns,
+    getAllSourceForCampaign,
+    setCreateModal,
+    setDeleteModal,
+    setEditModal,
+    setCampaignDataLength,
+    setViewModal,
+    setCampaigndActivationModal,
+} from '@/store/Slices/campaignSlice';
 import CampaignViewModal from '@/components/Campaign/CampaignViewModal';
 import CampaignCreateModal from '@/components/Campaign/CampaignCreateModal';
 import CampaignEditModal from '@/components/Campaign/CampaignEditModal';
 import CampaignDeleteModal from '@/components/Campaign/CampaignDeleteModal';
 import ToggleSwitch from '@/components/__Shared/ToggleSwitch';
+import CampaignActivateModal from '@/components/Campaign/CampaignActivateModal';
 
 const Campaign = () => {
     const dispatch = useDispatch();
@@ -191,25 +202,32 @@ const Campaign = () => {
                             ),
                         },
                         {
-                            accessor: 'Status',
-                            title: 'Status',
+                            accessor: 'active',
+                            title: 'Active',
                             sortable: true,
-                            render: ({ isActive }) => (
+                            render: ({ isActive, id }) => (
+                                // isAbleToChangeDefaultStatus ? (
                                 <div>
                                     <label className="relative h-6 w-12">
                                         <input
                                             type="checkbox"
                                             className="custom_switch peer absolute z-10 h-full w-full cursor-pointer opacity-0"
                                             id="custom_switch_checkbox1"
-                                            name="permission"
-                                            defaultChecked={isActive}
-                                            // checked={isDefault}
-                                            // onChange={(e: React.ChangeEvent<HTMLInputElement>) => dispatch(setDefaultPolicyModal({ id, open: true, switchValue: e.target.checked }))}
+                                            name="active"
+                                            checked={isActive}
+                                            onChange={() => dispatch(setCampaigndActivationModal({ id, open: true }))}
                                         />
                                         <ToggleSwitch />
                                     </label>
                                 </div>
                             ),
+                            // ) : (
+                            //     isDefault && (
+                            //         <div>
+                            //             <span className="mr-2 rounded bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-300">Default</span>
+                            //         </div>
+                            //     )
+                            // ),
                         },
                     ]}
                     totalRecords={totalRecords}
@@ -237,6 +255,9 @@ const Campaign = () => {
 
             {/* create modal */}
             <CampaignCreateModal />
+
+            {/* campaign activation modal */}
+            <CampaignActivateModal />
         </div>
     );
 };
