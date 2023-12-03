@@ -28,9 +28,9 @@ export const campaignRawData: ICampaign[] = [
 ];
 
 export const platformListRawData: SelectOptionsType[] = [
-    { value: 'whatsapp', label: 'WhatsApp' },
-    { value: 'email', label: 'Email' },
-    { value: 'sms', label: 'SMS' },
+    { value: 'WhatsApp', label: 'WhatsApp' },
+    { value: 'Email', label: 'Email' },
+    { value: 'SMS', label: 'SMS' },
 ];
 
 export const dummyTemplateListRawData: SelectOptionsType[] = [
@@ -68,7 +68,7 @@ export const sendToDropdown: SelectOptionsType[] = [
 export const platformListDropdown: SelectOptionsType[] = [
     {
         label: 'Email',
-        value: 'EMAIL',
+        value: 'Email',
     },
     {
         label: 'SMS',
@@ -76,6 +76,6 @@ export const platformListDropdown: SelectOptionsType[] = [
     },
     {
         label: 'Whatsapp',
-        value: 'WHATSAPP',
+        value: 'WhatsApp',
     },
 ];
