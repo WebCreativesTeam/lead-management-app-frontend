@@ -100,7 +100,7 @@ const EditCustomFieldModal = () => {
         setFieldsListDropdown(createFieldListDropdown);
     }, [fieldsList]);
 
-    console.log('singleData', singleData);
+    // console.log('singleData', singleData);
     console.log('ParentFieldDropdown', parentFieldDropdown);
 
     const getCustomFieldById = async (id: string | undefined) => {
@@ -355,12 +355,14 @@ const EditCustomFieldModal = () => {
                                     <div className="flex-1">
                                         <label htmlFor="parentValue">Parent Field Value</label>
                                         {parentFieldType === 'SELECT' || parentFieldType === 'CHECKBOX' || parentFieldType === 'RADIO' ? (
-                                            <Select
-                                                placeholder="Parent Field Value"
-                                                options={parentFieldDropdown}
-                                                onChange={(data: any) => formik.setFieldValue('parentValue', data.value)}
-                                                defaultValue={defaultParentValue}
-                                            />
+                                            defaultParentValue.label && (
+                                                <Select
+                                                    placeholder="Parent Field Value"
+                                                    options={parentFieldDropdown}
+                                                    onChange={(data: any) => formik.setFieldValue('parentValue', data.value)}
+                                                    defaultValue={defaultParentValue}
+                                                />
+                                            )
                                         ) : (
                                             <input
                                                 onChange={formik.handleChange}
