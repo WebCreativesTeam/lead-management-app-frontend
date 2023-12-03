@@ -25,9 +25,9 @@ const CampaignEditModal = () => {
     });
 
     useEffect(() => {
-        const { campaignName, source } = singleData;
-        setFieldValue('campaignName', campaignName);
-        setFieldValue('source', source);
+        const { name, sourceId } = singleData;
+        setFieldValue('campaignName', name);
+        // setFieldValue('source', source);
     }, [singleData]);
 
     const initialValues = {

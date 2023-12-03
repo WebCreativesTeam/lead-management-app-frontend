@@ -7,7 +7,7 @@ import { sortBy } from 'lodash';
 import { ChatIcon, Delete, Edit, Email, View, Sms } from '@/utils/icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { setPageTitle } from '@/store/themeConfigSlice';
-import { GetMethodResponseType, IFollowup, LeadStatusSecondaryEndpoint, SourceDataType } from '@/utils/Types';
+import { GetMethodResponseType, IFollowup, ILeadStatus, LeadStatusSecondaryEndpoint, SourceDataType } from '@/utils/Types';
 import { ApiClient } from '@/utils/http';
 import { IRootState } from '@/store';
 import Select from 'react-select';
@@ -117,9 +117,9 @@ const Dashboard = () => {
     //get all lead status list
     const getLeadStatus = async () => {
         const leadStatusList: GetMethodResponseType = await new ApiClient().get('lead-status/list');
-        const status: LeadStatusSecondaryEndpoint[] = leadStatusList?.data;
+        const status: ILeadStatus[] = leadStatusList?.data;
         if (typeof status === 'undefined') {
-            dispatch(getAllLeadStatusForCampaign([] as LeadStatusSecondaryEndpoint[]));
+            dispatch(getAllLeadStatusForCampaign([] as ILeadStatus[]));
             return;
         }
         dispatch(getAllLeadStatusForCampaign(status));

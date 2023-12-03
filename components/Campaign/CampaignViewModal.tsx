@@ -7,17 +7,11 @@ import { IRootState } from '@/store';
 const CampaignViewModal = () => {
     const { viewModal, singleData } = useSelector((state: IRootState) => state.campaign);
     const dispatch = useDispatch();
-    const { leadStatus, platform, product, schedule, campaignName, source, status, template } = singleData;
+    const { statusId, name, isActive } = singleData;
 
     const reqData: any = {
-        ['Campaign Name']: campaignName,
-        source,
-        product,
-        ['schedule time']: schedule,
-        ['Active Status']: status ? 'Active' : 'Not Active',
-        ['Lead Status']: leadStatus,
-        Platforms: platform?.join(' , '),
-        template,
+        ['Campaign Name']: name,
+        ['Active Status']: isActive ? 'Active' : 'Not Active',
     };
 
     return (

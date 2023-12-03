@@ -8,12 +8,17 @@ import { campaignSchema } from '@/utils/schemas';
 import { ApiClient } from '@/utils/http';
 import { showToastAlert } from '@/utils/contant';
 import Loader from '../__Shared/Loader';
-import { ICustomField, ILeadStatus, LeadStatusSecondaryEndpoint, SelectOptionsType, SourceDataType } from '@/utils/Types';
+import { ICustomField, ILeadStatus, LeadStatusSecondaryEndpoint, SourceDataType } from '@/utils/Types';
 import Flatpickr from 'react-flatpickr';
 import Select from 'react-select';
 import 'flatpickr/dist/flatpickr.css';
 import { campaignTypeList, dummyTemplateListRawData, platformListDropdown, platformListRawData, sendToDropdown } from '@/utils/Raw Data';
 import ToggleSwitch from '../__Shared/ToggleSwitch';
+
+type SelectOptionsType = {
+    value: string;
+    label: string;
+};
 
 const CampaignCreateModal = () => {
     const { createModal, isBtnDisabled, isFetching, sourceList, customDateFields, leadStatusList } = useSelector((state: IRootState) => state.campaign);

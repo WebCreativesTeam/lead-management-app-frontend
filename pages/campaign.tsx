@@ -16,7 +16,6 @@ import CampaignViewModal from '@/components/Campaign/CampaignViewModal';
 import CampaignCreateModal from '@/components/Campaign/CampaignCreateModal';
 import CampaignEditModal from '@/components/Campaign/CampaignEditModal';
 import CampaignDeleteModal from '@/components/Campaign/CampaignDeleteModal';
-import { campaignRawData } from '@/utils/Raw Data';
 import ToggleSwitch from '@/components/__Shared/ToggleSwitch';
 
 const Campaign = () => {

@@ -1,31 +1,31 @@
 import { ICampaign, SelectOptionsType, CampaignType } from '../Types';
 
-export const campaignRawData: ICampaign[] = [
-    {
-        id: '1',
-        campaignName: 'Schedule 1',
-        leadStatus: 'New Lead',
-        source: 'Website',
-        product: 'Product A',
-        template: 'Template  A',
-        schedule: '2023-11-15',
-        platform: ['Whatsapp', 'Email'],
-        status: false,
-        campaignType: 'OCCASIONAL',
-    },
-    {
-        id: '2',
-        campaignName: 'Schedule 2',
-        leadStatus: 'Fresh',
-        source: 'off campus',
-        product: 'Product B',
-        template: 'Template B',
-        schedule: '2023-11-15',
-        platform: ['SMS', 'Email'],
-        status: true,
-        campaignType: 'SCHEDULED',
-    },
-];
+// export const campaignRawData: ICampaign[] = [
+//     {
+//         id: '1',
+//         name: 'Schedule 1',
+//         leadStatus: 'New Lead',
+//         source: 'Website',
+//         product: 'Product A',
+//         template: 'Template  A',
+//         schedule: '2023-11-15',
+//         platform: ['Whatsapp', 'Email'],
+//         status: false,
+//         campaignType: 'OCCASIONAL',
+//     },
+//     {
+//         id: '2',
+//         campaignName: 'Schedule 2',
+//         leadStatus: 'Fresh',
+//         source: 'off campus',
+//         product: 'Product B',
+//         template: 'Template B',
+//         schedule: '2023-11-15',
+//         platform: ['SMS', 'Email'],
+//         status: true,
+//         campaignType: 'SCHEDULED',
+//     },
+// ];
 
 export const platformListRawData: SelectOptionsType[] = [
     { value: 'WhatsApp', label: 'WhatsApp' },
