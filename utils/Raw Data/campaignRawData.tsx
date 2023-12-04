@@ -27,7 +27,7 @@ import { ICampaign, SelectOptionsType, CampaignType } from '../Types';
 //     },
 // ];
 
-export const platformListRawData: SelectOptionsType[] = [
+export const platformListRawData: { value: string; label: string }[] = [
     { value: 'WhatsApp', label: 'WhatsApp' },
     { value: 'Email', label: 'Email' },
     { value: 'SMS', label: 'SMS' },
@@ -54,7 +54,7 @@ export const campaignTypeList: SelectOptionsType[] = [
     },
 ];
 
-export const sendToDropdown: SelectOptionsType[] = [
+export const sendToDropdown: { value: string; label: string }[] = [
     {
         label: 'Lead',
         value: 'LEAD',

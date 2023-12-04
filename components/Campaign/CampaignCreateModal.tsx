@@ -12,7 +12,7 @@ import { ICustomField, ILeadStatus, LeadStatusSecondaryEndpoint, SourceDataType 
 import Flatpickr from 'react-flatpickr';
 import Select from 'react-select';
 import 'flatpickr/dist/flatpickr.css';
-import { campaignTypeList, dummyTemplateListRawData, platformListDropdown, platformListRawData, sendToDropdown } from '@/utils/Raw Data';
+import { campaignTypeList, platformListRawData, sendToDropdown } from '@/utils/Raw Data';
 import ToggleSwitch from '../__Shared/ToggleSwitch';
 
 type SelectOptionsType = {
@@ -131,7 +131,6 @@ const CampaignCreateModal = () => {
     function padTo2Digits(num: number) {
         return String(num).padStart(2, '0');
     }
-    console.log(formik.values);
     return (
         <Modal
             open={createModal}
@@ -154,7 +153,7 @@ const CampaignCreateModal = () => {
                 formik.values.productId &&
                 formik.values.instance[formik.values.instance.length - 1].platform &&
                 formik.values.instance[formik.values.instance.length - 1].templateId &&
-                formik.values.instance.length < 3 &&
+                formik.values.instance.length <= 3 &&
                 !isBtnDisabled
                     ? false
                     : true

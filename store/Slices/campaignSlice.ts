@@ -72,7 +72,7 @@ const campaignSlice = createSlice({
                 state.singleData = {} as ICampaign;
             }
         },
-        setEditModal(state, action) {
+        setEditModal(state, action: PayloadAction<{ open: boolean; id?: string }>) {
             const { open, id } = action.payload;
             state.editModal = open;
             const findRequestedData: ICampaign | undefined = state.data.find((item: ICampaign) => item.id === id);

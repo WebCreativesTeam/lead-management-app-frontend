@@ -384,8 +384,9 @@ export interface ICampaign {
     date: string;
     updatedAt: string;
     createdAt: string;
-    sendTo: string[];
+    sendTo: string;
     isActive: boolean;
+    instance: { platform: string; templateId: string }[];
 }
 
 // dashboard page types
