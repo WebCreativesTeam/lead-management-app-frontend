@@ -66,10 +66,10 @@ const CampaignCreateModal = () => {
             if (value.type === 'SCHEDULED') {
                 campaignCreateObj.date = value.date;
             } else if (value.type === 'DRIP') {
-                campaignCreateObj.sendAfter = value.sendAfter;
+                campaignCreateObj.sendAfter = value.sendAfter.toString();
             } else {
                 campaignCreateObj.customDateId = value.customDate;
-                campaignCreateObj.sendBefore = value.sendBefore;
+                campaignCreateObj.sendBefore = value.sendBefore.toString();
             }
             if (value.sendTo === 'LEAD') {
                 campaignCreateObj.statusId = value.statusId;
@@ -131,6 +131,7 @@ const CampaignCreateModal = () => {
     function padTo2Digits(num: number) {
         return String(num).padStart(2, '0');
     }
+    console.log(formik.values);
     return (
         <Modal
             open={createModal}
@@ -144,7 +145,20 @@ const CampaignCreateModal = () => {
             size="large"
             onSubmit={() => formik.submitForm()}
             title="Add Campaign"
-            isBtnDisabled={formik.values.name && formik.values.hour && formik.values.type && formik.values.sendTo && formik.values.sourceId && formik.values.productId && !isBtnDisabled ? false : true}
+            isBtnDisabled={
+                formik.values.name &&
+                formik.values.hour &&
+                formik.values.type &&
+                formik.values.sendTo &&
+                formik.values.sourceId &&
+                formik.values.productId &&
+                formik.values.instance[formik.values.instance.length - 1].platform &&
+                formik.values.instance[formik.values.instance.length - 1].templateId &&
+                formik.values.instance.length < 3 &&
+                !isBtnDisabled
+                    ? false
+                    : true
+            }
             disabledDiscardBtn={isBtnDisabled}
             content={
                 isFetching ? (
@@ -311,7 +325,13 @@ const CampaignCreateModal = () => {
                                                 type="button"
                                                 className="btn btn-primary rounded"
                                                 onClick={() => arrayHelpers.push({ platform: '', templateId: '' })}
-                                                // disabled={!formik.formik.values.options[formik.formik.values.options.length - 1].name && !formik.formik.values.options[formik.formik.values.options.length - 1].value}
+                                                disabled={
+                                                    formik.values.instance[formik.values.instance.length - 1].platform &&
+                                                    formik.values.instance[formik.values.instance.length - 1].templateId &&
+                                                    formik.values.instance.length < 3
+                                                        ? false
+                                                        : true
+                                                }
                                             >
                                                 Add Instance
                                             </button>
@@ -331,7 +351,7 @@ const CampaignCreateModal = () => {
                                                     <div className="flex flex-1 gap-3">
                                                         <Select
                                                             placeholder="Select Template"
-                                                            options={dummyTemplateListRawData}
+                                                            options={sourceDropdown.slice(1)}
                                                             onChange={(data: any) => formik.setFieldValue(`instance[${index}].templateId`, data.value)}
                                                             className="flex-1"
                                                         />
