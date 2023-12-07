@@ -46,7 +46,7 @@ const CustomFieldsTab = () => {
 
         switch (item?.operator) {
             case 'eq':
-                return value[item?.parentId] === item?.parentValue || value[item?.parentId].includes(item?.parentValue);
+                return value[item?.parentId] === item?.parentValue || value[item?.parentId]?.includes(item?.parentValue);
             case 'neq':
                 return value[item?.parentId] !== item?.parentValue;
             case 'gt':
