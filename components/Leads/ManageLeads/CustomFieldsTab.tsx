@@ -46,7 +46,7 @@ const CustomFieldsTab = () => {
 
         switch (item?.operator) {
             case 'eq':
-                return value[item?.parentId] === item?.parentValue;
+                return value[item?.parentId] === item?.parentValue || value[item?.parentId].includes(item?.parentValue);
             case 'neq':
                 return value[item?.parentId] !== item?.parentValue;
             case 'gt':
@@ -62,7 +62,7 @@ const CustomFieldsTab = () => {
         }
     };
 
-    console.log(values)
+    console.log(values);
 
     return (
         <div>
@@ -86,14 +86,7 @@ const CustomFieldsTab = () => {
                                         />
                                     )}
                                     {item?.fieldType === 'FILE' && (
-                                        <input
-                                            onChange={handleChange}
-                                            onBlur={handleBlur}
-                                            name={item?.id}
-                                            type="file"
-                                            placeholder={'Enter ' + item?.label}
-                                            className="form-input"
-                                        />
+                                        <input onChange={handleChange} onBlur={handleBlur} name={item?.id} type="file" placeholder={'Enter ' + item?.label} className="form-input" />
                                     )}
                                     {item?.fieldType === 'SELECT' && (
                                         <Select
