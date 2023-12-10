@@ -13,7 +13,7 @@ const CustomFieldsTab = () => {
     const { customFieldsList } = useSelector((state: IRootState) => state.lead);
     const customFieldTabSchema = getYupSchemaFromMetaData(customFieldsList, [], []);
 
-    const { values, handleChange, handleSubmit, setFieldValue, handleBlur, errors } = useFormik({
+    const { values, handleChange, handleSubmit, setFieldValue, handleBlur, errors, setFieldError } = useFormik({
         initialValues: {} as any,
         validationSchema: customFieldTabSchema,
         validateOnChange: true,
@@ -40,9 +40,9 @@ const CustomFieldsTab = () => {
 
     // Function to evaluate the condition based on the operator
     const evaluateCondition = (value: any, item: ICustomField) => {
-        console.log('value', value[item?.parentId]);
-        console.log('parentValue', item?.parentValue);
-        console.log('operator', item?.operator);
+        // console.log('value', value[item?.parentId]);
+        // console.log('parentValue', item?.parentValue);
+        // console.log('operator', item?.operator);
 
         switch (item?.operator) {
             case 'eq':
@@ -62,7 +62,7 @@ const CustomFieldsTab = () => {
         }
     };
 
-    console.log(values);
+    // console.log(errors);
 
     return (
         <div>
@@ -72,18 +72,58 @@ const CustomFieldsTab = () => {
                         return (
                             ((item?.active && !item?.conditional) || (item?.active && item?.conditional && evaluateCondition(values, item))) && (
                                 <div key={index}>
-                                    <label htmlFor={item?.id}>{item?.label}</label>
-                                    {item?.fieldType === 'TEXT' && <input onChange={handleChange} onBlur={handleBlur} name={item?.id} type="text" placeholder={item?.label} className="form-input" />}
+                                    <label htmlFor={item?.id}>
+                                        {item?.label} {item?.required && <span className="text-danger">*</span>}
+                                    </label>
+                                    {item?.fieldType === 'TEXT' && (
+                                        <>
+                                            <input
+                                                onChange={(e) => {
+                                                    handleChange(item?.id);
+                                                    if (item?.required && !e.target.value.trim()) {
+                                                        setFieldError(item?.id, 'Please Enter ' + item?.label);
+                                                    } else {
+                                                        setFieldError(item?.id, undefined);
+                                                    }
+                                                }}
+                                                onBlur={(e) => {
+                                                    handleBlur(item?.id);
+                                                    if (!e.target.value.trim()) {
+                                                        setFieldError(item?.id, 'Please Enter ' + item?.label);
+                                                    }
+                                                }}
+                                                name={item?.id}
+                                                type="text"
+                                                placeholder={item?.label}
+                                                className="form-input"
+                                            />
+                                            {item?.required && <span className="text-sm text-danger">{errors[item?.id]?.toString()}</span>}
+                                        </>
+                                    )}
                                     {item?.fieldType === 'NUMBER' && (
-                                        <input
-                                            onChange={handleChange}
-                                            onBlur={handleBlur}
-                                            // value={values.id}
-                                            name={item?.id}
-                                            type="number"
-                                            placeholder={'Enter ' + item?.label}
-                                            className="form-input"
-                                        />
+                                        <>
+                                            <input
+                                                onChange={(e) => {
+                                                    handleChange(item?.id);
+                                                    if (item?.required && !e.target.value.trim()) {
+                                                        setFieldError(item?.id, 'Please Enter ' + item?.label);
+                                                    } else {
+                                                        setFieldError(item?.id, undefined);
+                                                    }
+                                                }}
+                                                onBlur={(e) => {
+                                                    handleBlur(item?.id);
+                                                    if (!e.target.value.trim()) {
+                                                        setFieldError(item?.id, 'Please Enter ' + item?.label);
+                                                    }
+                                                }}
+                                                name={item?.id}
+                                                type="number"
+                                                placeholder={'Enter ' + item?.label}
+                                                className="form-input"
+                                            />
+                                            {item?.required && <span className="text-sm  text-danger">{errors[item?.id]?.toString()}</span>}
+                                        </>
                                     )}
                                     {item?.fieldType === 'FILE' && (
                                         <input onChange={handleChange} onBlur={handleBlur} name={item?.id} type="file" placeholder={'Enter ' + item?.label} className="form-input" />

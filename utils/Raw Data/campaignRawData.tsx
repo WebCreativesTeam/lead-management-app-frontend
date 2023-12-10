@@ -65,17 +65,17 @@ export const sendToDropdown: { value: string; label: string }[] = [
     },
 ];
 
-export const platformListDropdown: SelectOptionsType[] = [
-    {
-        label: 'Email',
-        value: 'Email',
-    },
-    {
-        label: 'SMS',
-        value: 'SMS',
-    },
-    {
-        label: 'Whatsapp',
-        value: 'WhatsApp',
-    },
-];
+// export const platformListDropdown: SelectOptionsType[] = [
+//     {
+//         label: 'Email',
+//         value: 'Email',
+//     },
+//     {
+//         label: 'SMS',
+//         value: 'SMS',
+//     },
+//     {
+//         label: 'Whatsapp',
+//         value: 'WhatsApp',
+//     },
+// ];

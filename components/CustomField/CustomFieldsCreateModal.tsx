@@ -91,7 +91,6 @@ const CreateCustomFieldModal = () => {
         },
     });
 
-    console.log(formik.values);
     useEffect(() => {
         const createFieldListDropdown: SelectOptionsType[] = fieldsList?.map(({ id, label }: IFiedlListType) => {
             return { label, value: id };
