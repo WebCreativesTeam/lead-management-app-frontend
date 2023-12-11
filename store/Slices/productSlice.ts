@@ -1,0 +1,114 @@
+import { IProduct, ProductInitialStateProps, UserDataType } from '@/utils/Types';
+import { fetchUserInfo } from '@/utils/contant';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+
+const initialState: ProductInitialStateProps = {
+    data: [] as IProduct[],
+    singleData: {} as IProduct,
+    createModal: false,
+    editModal: false,
+    deleteModal: false,
+    viewModal: false,
+    isBtnDisabled: false,
+    isFetching: false,
+    isAbleToRead: false,
+    isAbleToCreate: false,
+    isAbleToUpdate: false,
+    isAbleToDelete: false,
+    userPolicyArr: [] as string[],
+    totalRecords: 0,
+};
+
+const productSlice = createSlice({
+    initialState,
+    name: 'product',
+    extraReducers(builder) {
+        builder.addCase(fetchUserInfo.fulfilled, (state, action: PayloadAction<UserDataType>) => {
+            if (action.payload) {
+                state.userPolicyArr = action.payload.permissions;
+            }
+        });
+    },
+    reducers: {
+        setViewModal(state, action) {
+            const { open, id } = action.payload;
+            state.viewModal = open;
+            const findRequestedData: IProduct | undefined = state.data.find((item: IProduct) => item.id === id);
+
+            if (findRequestedData && state.viewModal) {
+                state.singleData = findRequestedData;
+            } else {
+                state.singleData = {} as IProduct;
+            }
+        },
+        setEditModal(state, action) {
+            const { open, id } = action.payload;
+            state.editModal = open;
+            const findRequestedData: IProduct | undefined = state.data.find((item: IProduct) => item.id === id);
+
+            if (findRequestedData && state.editModal) {
+                state.singleData = findRequestedData;
+            } else {
+                state.singleData = {} as IProduct;
+            }
+        },
+        setCreateModal(state, action) {
+            state.createModal = action.payload;
+        },
+        setDeleteModal(state, action) {
+            const { open, id } = action.payload;
+            state.deleteModal = open;
+            const findRequestedData: IProduct | undefined = state.data.find((item: IProduct) => item.id === id);
+
+            if (findRequestedData && state.deleteModal) {
+                state.singleData = findRequestedData;
+            } else {
+                state.singleData = {} as IProduct;
+            }
+        },
+        getAllProducts(state, action) {
+            state.data = action.payload;
+        },
+        setDisableBtn(state, action) {
+            state.isBtnDisabled = action.payload;
+        },
+        setFetching(state, action) {
+            state.isFetching = action.payload;
+        },
+        setProductReadPolicy(state, action) {
+            const verifyPolicy: boolean = state.userPolicyArr.includes(action.payload);
+            state.isAbleToRead = verifyPolicy;
+        },
+        setProductCreatePolicy(state, action) {
+            const verifyPolicy: boolean = state.userPolicyArr.includes(action.payload);
+            state.isAbleToCreate = verifyPolicy;
+        },
+        setProductUpdatePolicy(state, action) {
+            const verifyPolicy: boolean = state.userPolicyArr.includes(action.payload);
+            state.isAbleToUpdate = verifyPolicy;
+        },
+        setProductDeletePolicy(state, action) {
+            const verifyPolicy: boolean = state.userPolicyArr.includes(action.payload);
+            state.isAbleToDelete = verifyPolicy;
+        },
+        setProductDataLength(state, action: PayloadAction<number>) {
+            state.totalRecords = action.payload;
+        },
+    },
+});
+
+export const {
+    setCreateModal,
+    setDeleteModal,
+    setEditModal,
+    setViewModal,
+    getAllProducts,
+    setDisableBtn,
+    setFetching,
+    setProductCreatePolicy,
+    setProductDeletePolicy,
+    setProductReadPolicy,
+    setProductUpdatePolicy,
+    setProductDataLength,
+} = productSlice.actions;
+export default productSlice.reducer;

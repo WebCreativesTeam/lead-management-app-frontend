@@ -72,6 +72,11 @@ export const sourceSchema = Yup.object().shape({
     name: Yup.string().required('Enter Source Name'),
 });
 
+//source schema
+export const productSchema = Yup.object().shape({
+    name: Yup.string().required('Enter Product Name'),
+});
+
 //task Schema
 
 export const taskSchema = Yup.object().shape({
@@ -110,6 +115,11 @@ export const taskStatusSchema = Yup.object().shape({
 
 //lead status schema
 export const leadStatusSchema = Yup.object().shape({
+    name: Yup.string().required('Enter lead Status name'),
+});
+
+//product color schema
+export const productColorSchema = Yup.object().shape({
     name: Yup.string().required('Enter lead Status name'),
 });
 

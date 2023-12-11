@@ -21,6 +21,8 @@ import whatsappTemplateSlice from './Slices/templateSlice/whatsappTemplateSlice'
 import dashbordSlice from './Slices/dashbordSlice';
 import customFieldSlice from './Slices/customFieldSlice';
 import campaignSlice from './Slices/campaignSlice';
+import productSlice from './Slices/productSlice';
+import productColorSlice from './Slices/productColorSlice';
 
 const rootReducer = combineReducers({
     themeConfig: themeConfigSlice,
@@ -45,6 +47,8 @@ const rootReducer = combineReducers({
     campaign: campaignSlice,
     dashboard: dashbordSlice,
     customField: customFieldSlice,
+    product: productSlice,
+    productColor: productColorSlice,
 });
 
 export const store = configureStore({

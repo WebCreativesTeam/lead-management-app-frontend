@@ -59,6 +59,16 @@ export type SourceDataType = {
     id: string;
 };
 
+//source page
+export type IProduct = {
+    name: string;
+    id: string;
+    description: string;
+    createdAt: string;
+    updatedAt: string;
+    subProducts: { id: string; name: string; colors: { id: string; name: string; value: string }[] }[];
+};
+
 //taskPage
 
 export type TaskDataType = {
@@ -330,6 +340,7 @@ export interface ILeadStatus {
     createdAt: string;
     updatedAt: string;
 }
+
 export interface ILeadPriority {
     id: string;
     name: string;
@@ -426,6 +437,14 @@ export interface IFiedlListType {
     id: string;
 }
 
+export interface IProductColor {
+    id: string;
+    name: string;
+    value: string;
+    createdAt: string;
+    updatedAt: string;
+}
+
 // ----------------- authentication types : start -------------------//
 
 export interface ISignInResponse {
@@ -504,6 +523,17 @@ export interface SourceInitialStateProps extends InitialStateProps {
     singleData: SourceDataType;
 }
 
+//product slice initial props
+export interface ProductInitialStateProps extends InitialStateProps {
+    data: IProduct[];
+    singleData: IProduct;
+}
+//productColor slice initial props
+export interface ProductColorInitialStateProps extends InitialStateProps {
+    data: IProductColor[];
+    singleData: IProductColor;
+}
+
 //custom field slice initial props
 export interface CustomFieldInitialStateProps extends InitialStateProps {
     data: ICustomField[];
@@ -567,7 +597,7 @@ export interface WhatsappTemplateInitialStateProps extends InitialStateProps {
     singleData: IWhatsappTemplate;
 }
 
-//task status slice initial props
+//lead status slice initial props
 export interface LeadStatusInitialStateProps extends InitialStateProps {
     data: LeadStatusType[];
     singleData: LeadStatusType;
