@@ -58,10 +58,7 @@ const productColorSlice = createSlice({
         setDeleteModal(state, action) {
             const { open, id } = action.payload;
             const findRequestedData: IProductColor | undefined = state.data.find((item: IProductColor) => item.id === id);
-            if (findRequestedData?.isDefault === true) {
-                showToastAlert('Please make other option default to Delete this Status');
-                return;
-            }
+
             state.deleteModal = open;
             if (findRequestedData && state.deleteModal) {
                 state.singleData = findRequestedData;
