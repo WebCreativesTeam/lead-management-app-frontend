@@ -8,10 +8,10 @@ import { Delete, Edit, Plus, View } from '@/utils/icons';
 import PageHeadingSection from '@/components/__Shared/PageHeadingSection/index.';
 import { useDispatch, useSelector } from 'react-redux';
 import { setPageTitle } from '@/store/themeConfigSlice';
-import { GetMethodResponseType, IProduct } from '@/utils/Types';
+import { GetMethodResponseType, IProduct, IProductColor, ProductColorSecondaryEndpointType } from '@/utils/Types';
 import { ApiClient } from '@/utils/http';
 import { IRootState } from '@/store';
-import { getAllProducts, setCreateModal, setDeleteModal, setEditModal, setProductDataLength, setViewModal } from '@/store/Slices/productSlice';
+import { getAllProductColorForProduct, getAllProducts, setCreateModal, setDeleteModal, setEditModal, setProductDataLength, setViewModal } from '@/store/Slices/productSlice';
 import ProductViewModal from '@/components/Product/ProductViewModal';
 import ProductCreateModal from '@/components/Product/ProductCreateModal';
 import ProductEditModal from '@/components/Product/ProductEditModal';
@@ -57,6 +57,10 @@ const Product = () => {
         setRecordsData(data);
     }, [data]);
 
+    useEffect(() => {
+        getAllProductColors();
+    }, []);
+
     //get all Product list
     const getProductList = async () => {
         setLoading(true);
@@ -69,6 +73,18 @@ const Product = () => {
         dispatch(getAllProducts(product));
         dispatch(setProductDataLength(res?.meta?.totalCount));
         setLoading(false);
+    };
+
+    //get all colors's list
+    const getAllProductColors = async () => {
+        setLoading(true);
+        const colorsList: GetMethodResponseType = await new ApiClient().get('color/list');
+        const colors: ProductColorSecondaryEndpointType[] = colorsList?.data;
+        if (typeof colors === 'undefined') {
+            dispatch(getAllProductColorForProduct([] as ProductColorSecondaryEndpointType[]));
+            return;
+        }
+        dispatch(getAllProductColorForProduct(colors));
     };
 
     return (

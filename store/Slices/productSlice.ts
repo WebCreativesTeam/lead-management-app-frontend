@@ -1,4 +1,4 @@
-import { IProduct, ProductInitialStateProps, UserDataType } from '@/utils/Types';
+import { IProduct, ProductColorSecondaryEndpointType, ProductInitialStateProps, UserDataType } from '@/utils/Types';
 import { fetchUserInfo } from '@/utils/contant';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
@@ -17,6 +17,7 @@ const initialState: ProductInitialStateProps = {
     isAbleToDelete: false,
     userPolicyArr: [] as string[],
     totalRecords: 0,
+    colors: [] as ProductColorSecondaryEndpointType[],
 };
 
 const productSlice = createSlice({
@@ -41,7 +42,7 @@ const productSlice = createSlice({
                 state.singleData = {} as IProduct;
             }
         },
-        setEditModal(state, action) {
+        setEditModal(state, action: PayloadAction<{ id?: string; open: boolean }>) {
             const { open, id } = action.payload;
             state.editModal = open;
             const findRequestedData: IProduct | undefined = state.data.find((item: IProduct) => item.id === id);
@@ -68,6 +69,9 @@ const productSlice = createSlice({
         },
         getAllProducts(state, action) {
             state.data = action.payload;
+        },
+        getAllProductColorForProduct(state, action: PayloadAction<ProductColorSecondaryEndpointType[]>) {
+            state.colors = action.payload;
         },
         setDisableBtn(state, action) {
             state.isBtnDisabled = action.payload;
@@ -110,5 +114,6 @@ export const {
     setProductReadPolicy,
     setProductUpdatePolicy,
     setProductDataLength,
+    getAllProductColorForProduct,
 } = productSlice.actions;
 export default productSlice.reducer;

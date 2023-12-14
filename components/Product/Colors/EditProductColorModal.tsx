@@ -52,7 +52,6 @@ const EditProductColorModal = () => {
     };
     useEffect(() => {
         setFieldValue('name', singleData?.name);
-        setInputColor(singleData?.value);
     }, [singleData]);
     return (
         <Modal
@@ -73,20 +72,11 @@ const EditProductColorModal = () => {
                     <form className="space-y-5" onSubmit={handleSubmit}>
                         <div>
                             <label htmlFor="editProductColor">Color Name</label>
-                            <input
-                                onChange={handleChange}
-                                onBlur={handleBlur}
-                                value={values.name}
-                                id="editProductColor"
-                                name="name"
-                                type="text"
-                                placeholder="Color Name"
-                                className="form-input"
-                            />
+                            <input onChange={handleChange} onBlur={handleBlur} value={values.name} id="editProductColor" name="name" type="text" placeholder="Color Name" className="form-input" />
                         </div>
                         <div>
                             <label htmlFor="statusColor">Select Color</label>
-                            <input onBlur={(e: React.ChangeEvent<HTMLInputElement>) => setInputColor(e.target.value)} id="statusColor" name="color" type="color" />
+                            <input onBlur={(e: React.ChangeEvent<HTMLInputElement>) => setInputColor(e.target.value)} id="statusColor" name="color" type="color" defaultValue={singleData.value} />
                         </div>
                     </form>
                 )
@@ -95,4 +85,4 @@ const EditProductColorModal = () => {
     );
 };
 
-export default EditProductColorModal;
+export default memo(EditProductColorModal);

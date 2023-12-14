@@ -445,6 +445,12 @@ export interface IProductColor {
     updatedAt: string;
 }
 
+export interface ProductColorSecondaryEndpointType {
+    id: string;
+    name: string;
+    value: string;
+}
+
 // ----------------- authentication types : start -------------------//
 
 export interface ISignInResponse {
@@ -527,6 +533,7 @@ export interface SourceInitialStateProps extends InitialStateProps {
 export interface ProductInitialStateProps extends InitialStateProps {
     data: IProduct[];
     singleData: IProduct;
+    colors: ProductColorSecondaryEndpointType[];
 }
 //productColor slice initial props
 export interface ProductColorInitialStateProps extends InitialStateProps {
