@@ -9,8 +9,13 @@ import { productSchema } from '@/utils/schemas';
 import { ApiClient } from '@/utils/http';
 import { showToastAlert } from '@/utils/contant';
 import Loader from '../__Shared/Loader';
-import { ProductColorSecondaryEndpointType, SelectOptionsType } from '@/utils/Types';
+import { ProductColorSecondaryEndpointType } from '@/utils/Types';
 import Select from 'react-select';
+
+type SelectOptionsType = {
+    value: string;
+    label: string;
+};
 
 const ProductEditModal = () => {
     const { editModal, singleData, isBtnDisabled, isFetching, colors } = useSelector((state: IRootState) => state.product);
