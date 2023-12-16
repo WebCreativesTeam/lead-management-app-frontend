@@ -70,6 +70,7 @@ const LeadCreateModal = () => {
         job: '',
         occupation: '',
         id: '',
+        contactDate: '',
     };
     const { values, handleChange, submitForm, handleSubmit, setFieldValue, errors, handleBlur, resetForm } = useFormik({
         initialValues,
@@ -130,7 +131,7 @@ const LeadCreateModal = () => {
         return {
             value: item.id,
             label: (
-                <div className={`rounded px-2.5 py-0.5 text-sm font-medium dark:bg-blue-900 dark:text-blue-300 text-center`} style={{ color: item?.color, backgroundColor: item?.color + '20' }}>
+                <div className={`rounded px-2.5 py-0.5 text-center text-sm font-medium dark:bg-blue-900 dark:text-blue-300`} style={{ color: item?.color, backgroundColor: item?.color + '20' }}>
                     {item?.name}
                 </div>
             ),
@@ -551,9 +552,28 @@ const LeadCreateModal = () => {
                                                 <Select placeholder="Assign To" options={userListDropdown} onChange={(data: any) => setFieldValue('leadAssign', data.value)} />
                                             </div>
                                         </div>
-                                        <div className="flex-1">
-                                            <label htmlFor="state">Tele Caller</label>
-                                            <Select placeholder="Tele Caller" options={userListDropdown} onChange={(data: any) => setFieldValue('teleCaller', data.value)} />
+                                        <div className="flex flex-col gap-4 sm:flex-row">
+                                            <div className="flex-1">
+                                                <label htmlFor="state">Tele Caller</label>
+                                                <Select placeholder="Tele Caller" options={userListDropdown} onChange={(data: any) => setFieldValue('teleCaller', data.value)} />
+                                            </div>
+                                            <div className="flex-1">
+                                                <label>Contact Date</label>
+                                                <Flatpickr
+                                                    data-enable-time
+                                                    options={{
+                                                        enableTime: true,
+                                                        dateFormat: 'Y-m-d H:i',
+                                                        position: 'auto',
+                                                    }}
+                                                    id="contactDate"
+                                                    placeholder="Contact Date"
+                                                    name="contactDate"
+                                                    className="form-input"
+                                                    onChange={(e) => setFieldValue('contactDate', e)}
+                                                    value={values.contactDate}
+                                                />
+                                            </div>
                                         </div>
                                     </form>
                                 </Tab.Panel>

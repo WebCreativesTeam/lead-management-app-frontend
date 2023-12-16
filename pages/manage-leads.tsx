@@ -482,13 +482,6 @@ const ManageLeads = () => {
                             hidden: hideCols.includes('priority'),
                         },
                         {
-                            accessor: 'endDate',
-                            title: 'End Date',
-                            sortable: true,
-                            render: ({ updatedAt }) => <div>{new Date(updatedAt).toLocaleString()}</div>,
-                            hidden: hideCols.includes('endDate'),
-                        },
-                        {
                             accessor: 'action',
                             title: 'Actions',
                             titleClassName: '!text-center',

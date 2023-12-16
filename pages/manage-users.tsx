@@ -125,6 +125,12 @@ const ManageUsers = () => {
                     records={recordsData}
                     columns={[
                         {
+                            accessor: 'index',
+                            title: '#',
+                            width: 40,
+                            render: (record) => recordsData.indexOf(record) + 1,
+                        },
+                        {
                             accessor: 'firstName',
                             title: 'First Name',
                             sortable: true,

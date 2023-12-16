@@ -68,6 +68,7 @@ const LeadEditModal = () => {
         facebookCampaignName: '',
         serviceInterestedIn: '',
         job: '',
+        contactDate: '',
     };
     const { values, handleChange, submitForm, handleSubmit, setFieldValue, errors, handleBlur, resetForm } = useFormik({
         initialValues,
@@ -259,9 +260,28 @@ const LeadEditModal = () => {
                                 />
                             </div>
                         </div>
-                        <div>
-                            <label htmlFor="leadJob">Job</label>
-                            <input onChange={handleChange} onBlur={handleBlur} value={values.job} id="leadJob" name="job" type="text" placeholder="Enter Job" className="form-input" />
+                        <div className="flex flex-col gap-4 sm:flex-row">
+                            <div className="flex-1">
+                                <label htmlFor="leadJob">Job</label>
+                                <input onChange={handleChange} onBlur={handleBlur} value={values.job} id="leadJob" name="job" type="text" placeholder="Enter Job" className="form-input" />
+                            </div>
+                            <div className="flex-1">
+                                <label>Contact Date</label>
+                                <Flatpickr
+                                    data-enable-time
+                                    options={{
+                                        enableTime: true,
+                                        dateFormat: 'Y-m-d H:i',
+                                        position: 'auto',
+                                    }}
+                                    id="contactDate"
+                                    placeholder="Contact Date"
+                                    name="contactDate"
+                                    className="form-input"
+                                    onChange={(e) => setFieldValue('contactDate', e)}
+                                    value={values.contactDate}
+                                />
+                            </div>
                         </div>
                         <div>
                             <label htmlFor="leadDescription"> Description</label>
