@@ -145,7 +145,16 @@ const CreateCustomFieldModal = () => {
             size="large"
             onSubmit={() => formik.submitForm()}
             title="Create Custom Field"
-            isBtnDisabled={label && formik.values.fieldType && order && !isBtnDisabled ? false : true}
+            isBtnDisabled={
+                label &&
+                formik.values.fieldType &&
+                order &&
+                formik.values.options[formik.values.options.length - 1].name &&
+                formik.values.options[formik.values.options.length - 1].value &&
+                !isBtnDisabled
+                    ? false
+                    : true
+            }
             disabledDiscardBtn={isBtnDisabled}
             content={
                 isFetching ? (
@@ -201,7 +210,7 @@ const CreateCustomFieldModal = () => {
                                                     type="button"
                                                     className="btn btn-primary rounded"
                                                     onClick={() => arrayHelpers.push({ name: '', value: '' })}
-                                                    disabled={!formik.values.options[formik.values.options.length - 1].name && !formik.values.options[formik.values.options.length - 1].value}
+                                                    disabled={!formik.values.options[formik.values.options.length - 1].name || !formik.values.options[formik.values.options.length - 1].value}
                                                 >
                                                     Add Options
                                                 </button>
@@ -236,7 +245,12 @@ const CreateCustomFieldModal = () => {
                                                             />
                                                         </div>
                                                         <div className="flex items-end">
-                                                            <button type="button" className="btn btn-outline-danger" onClick={() => arrayHelpers.remove(index)}>
+                                                            <button
+                                                                type="button"
+                                                                className="btn btn-outline-danger"
+                                                                onClick={() => arrayHelpers.remove(index)}
+                                                                disabled={formik.values.options.length === 1}
+                                                            >
                                                                 X
                                                             </button>
                                                         </div>

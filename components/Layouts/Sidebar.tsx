@@ -53,7 +53,7 @@ import { setEmailSmtpCreatePermission, setEmailSmtpDeletePermission, setEmailSmt
 import { setSmsTemplateCreatePermission, setSmsTemplateDeletePermission, setSmsTemplateReadPermission, setSmsTemplateUpdatePermission } from '@/store/Slices/templateSlice/smsTemplateSlice';
 
 //other imports
-import { ArrowRight, Branch, Phone, Shield, Tasks, User, File, Talegram, Setting, ChatIcon } from '../../utils/icons';
+import { ArrowRight, Branch, Phone, Shield, Tasks, User, File, Talegram, Setting, ChatIcon, ShopingBag } from '../../utils/icons';
 import { fetchUserInfo } from '@/utils/contant';
 import SideabarLabel from '../__Shared/SidebarLabel';
 
@@ -496,7 +496,7 @@ const Sidebar = () => {
                             <li className="menu nav-item">
                                 <Link href="/manage-products" className="group">
                                     <div className="flex items-center">
-                                        <User />
+                                        <ShopingBag />
                                         <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Manage Products')}</span>
                                     </div>
                                 </Link>

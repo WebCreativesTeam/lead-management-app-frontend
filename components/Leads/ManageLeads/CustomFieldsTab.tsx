@@ -2,7 +2,7 @@ import { IRootState } from '@/store';
 import { ICustomField } from '@/utils/Types';
 import { showToastAlert } from '@/utils/contant';
 import { useFormik } from 'formik';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import Select from 'react-select';
 import Flatpickr from 'react-flatpickr';
@@ -12,8 +12,9 @@ import { getYupSchemaFromMetaData } from './yupValidationSchema';
 const CustomFieldsTab = () => {
     const { customFieldsList } = useSelector((state: IRootState) => state.lead);
     const customFieldTabSchema = getYupSchemaFromMetaData(customFieldsList, [], []);
+    const [errorObj, setErrorObj] = useState({} as any);
 
-    const { values, handleChange, handleSubmit, setFieldValue, handleBlur, errors, setFieldError } = useFormik({
+    const { values, handleChange, handleSubmit, setFieldValue, handleBlur, setFieldTouched, touched } = useFormik({
         initialValues: {} as any,
         validationSchema: customFieldTabSchema,
         validateOnChange: true,
@@ -45,8 +46,14 @@ const CustomFieldsTab = () => {
         // console.log('operator', item?.operator);
 
         switch (item?.operator) {
-            case 'eq':
+            case 'eq': {
+                // if (value[item?.parentId] === item?.parentValue || value[item?.parentId]?.includes(item?.parentValue)) {
+                //     setErrorObj((preVal: any) => {
+                //         return { ...preVal, [item?.id]: `${item?.label} is required` };
+                //     });
+                // }
                 return value[item?.parentId] === item?.parentValue || value[item?.parentId]?.includes(item?.parentValue);
+            }
             case 'neq':
                 return value[item?.parentId] !== item?.parentValue;
             case 'gt':
@@ -62,8 +69,15 @@ const CustomFieldsTab = () => {
         }
     };
 
-    // console.log(errors);
-
+    useEffect(() => {
+        let createErrorObj = {} as any;
+        for (let index = 0; index < customFieldsList.length; index++) {
+            if (!customFieldsList[index].conditional && customFieldsList[index].required && customFieldsList[index].active) {
+                createErrorObj[customFieldsList[index].id] = `${customFieldsList[index].label} is Required`;
+            }
+        }
+        setErrorObj(createErrorObj);
+    }, [customFieldsList]);
     return (
         <div>
             <form onSubmit={handleSubmit}>
@@ -80,16 +94,27 @@ const CustomFieldsTab = () => {
                                             <input
                                                 onChange={(e) => {
                                                     handleChange(item?.id);
-                                                    if (item?.required && !e.target.value.trim()) {
-                                                        setFieldError(item?.id, 'Please Enter ' + item?.label);
+                                                    if (e.target.value.trim().length > 0 && item?.required) {
+                                                        setErrorObj((preVal: any) => {
+                                                            return { ...preVal, [item?.id]: undefined };
+                                                        });
                                                     } else {
-                                                        setFieldError(item?.id, undefined);
+                                                        setErrorObj((preVal: any) => {
+                                                            return { ...preVal, [item?.id]: `${item?.label} is required` };
+                                                        });
                                                     }
                                                 }}
                                                 onBlur={(e) => {
                                                     handleBlur(item?.id);
-                                                    if (!e.target.value.trim()) {
-                                                        setFieldError(item?.id, 'Please Enter ' + item?.label);
+                                                    setFieldTouched(item?.id, true);
+                                                    if (!e.target.value.trim() && item?.required) {
+                                                        setErrorObj((preVal: any) => {
+                                                            return { ...preVal, [item?.id]: `${item?.label} is required` };
+                                                        });
+                                                    } else {
+                                                        setErrorObj((preVal: any) => {
+                                                            return { ...preVal, [item?.id]: undefined };
+                                                        });
                                                     }
                                                 }}
                                                 name={item?.id}
@@ -97,7 +122,7 @@ const CustomFieldsTab = () => {
                                                 placeholder={item?.label}
                                                 className="form-input"
                                             />
-                                            {item?.required && <span className="text-sm text-danger">{errors[item?.id]?.toString()}</span>}
+                                            {item?.required && touched[item?.id] && errorObj[item?.id]?.length > 0 && <span className="text-sm text-danger">{errorObj[item?.id]?.toString()}</span>}
                                         </>
                                     )}
                                     {item?.fieldType === 'NUMBER' && (
@@ -105,16 +130,27 @@ const CustomFieldsTab = () => {
                                             <input
                                                 onChange={(e) => {
                                                     handleChange(item?.id);
-                                                    if (item?.required && !e.target.value.trim()) {
-                                                        setFieldError(item?.id, 'Please Enter ' + item?.label);
+                                                    if (e.target.value.trim().length > 0 && item?.required) {
+                                                        setErrorObj((preVal: any) => {
+                                                            return { ...preVal, [item?.id]: undefined };
+                                                        });
                                                     } else {
-                                                        setFieldError(item?.id, undefined);
+                                                        setErrorObj((preVal: any) => {
+                                                            return { ...preVal, [item?.id]: `${item?.label} is required` };
+                                                        });
                                                     }
                                                 }}
                                                 onBlur={(e) => {
+                                                    setFieldTouched(item?.id, true);
                                                     handleBlur(item?.id);
                                                     if (!e.target.value.trim()) {
-                                                        setFieldError(item?.id, 'Please Enter ' + item?.label);
+                                                        setErrorObj((preVal: any) => {
+                                                            return { ...preVal, [item?.id]: `${item?.label} is required` };
+                                                        });
+                                                    } else {
+                                                        setErrorObj((preVal: any) => {
+                                                            return { ...preVal, [item?.id]: undefined };
+                                                        });
                                                     }
                                                 }}
                                                 name={item?.id}
@@ -122,85 +158,153 @@ const CustomFieldsTab = () => {
                                                 placeholder={'Enter ' + item?.label}
                                                 className="form-input"
                                             />
-                                            {item?.required && <span className="text-sm  text-danger">{errors[item?.id]?.toString()}</span>}
+                                            {item?.required && touched[item?.id] && errorObj[item?.id] && <span className="text-sm  text-danger">{errorObj[item?.id]?.toString()}</span>}
                                         </>
                                     )}
                                     {item?.fieldType === 'FILE' && (
                                         <input onChange={handleChange} onBlur={handleBlur} name={item?.id} type="file" placeholder={'Enter ' + item?.label} className="form-input" />
                                     )}
                                     {item?.fieldType === 'SELECT' && (
-                                        <Select
-                                            placeholder={`Select ${item?.label}`}
-                                            options={item?.options?.map((item) => {
-                                                return { label: item.name, value: item.value };
-                                            })}
-                                            onChange={(data: any) => setFieldValue(item?.id, data.value)}
-                                        />
+                                        <>
+                                            <Select
+                                                placeholder={`Select ${item?.label}`}
+                                                options={item?.options?.map((item) => {
+                                                    return { label: item.name, value: item.value };
+                                                })}
+                                                onChange={(data: any) => {
+                                                    setFieldValue(item?.id, data.value);
+                                                    if (data?.value && item?.required) {
+                                                        setErrorObj((preVal: any) => {
+                                                            return { ...preVal, [item?.id]: undefined };
+                                                        });
+                                                    }
+                                                }}
+                                                onBlur={() => {
+                                                    setFieldTouched(item?.id, true);
+                                                    if (!values[item?.id] && item?.required) {
+                                                        setErrorObj((preVal: any) => {
+                                                            return { ...preVal, [item?.id]: `${item?.label} is required` };
+                                                        });
+                                                    }
+                                                }}
+                                            />
+                                            {item?.required && touched[item?.id] && errorObj[item?.id] && <span className="text-sm text-danger">{errorObj[item?.id]?.toString()}</span>}
+                                        </>
                                     )}
                                     {item?.fieldType === 'DATE' && (
-                                        <Flatpickr
-                                            data-enable-time
-                                            options={{
-                                                enableTime: true,
-                                                dateFormat: 'Y-m-d H:i',
-                                                position: 'auto',
-                                            }}
-                                            placeholder={`Select ${item?.label}`}
-                                            name={item?.id}
-                                            className="form-input"
-                                            onChange={(e) => setFieldValue(item?.id, e)}
-                                        />
+                                        <>
+                                            <Flatpickr
+                                                data-enable-time
+                                                options={{
+                                                    enableTime: true,
+                                                    dateFormat: 'Y-m-d H:i',
+                                                    position: 'auto',
+                                                }}
+                                                placeholder={`Select ${item?.label}`}
+                                                name={item?.id}
+                                                className="form-input"
+                                                onChange={(e) => {
+                                                    setFieldValue(item?.id, e);
+                                                    if (e[0].toISOString() && item?.required) {
+                                                        setErrorObj((preVal: any) => {
+                                                            return { ...preVal, [item?.id]: undefined };
+                                                        });
+                                                    }
+                                                }}
+                                                onBlur={(e) => {
+                                                    setFieldTouched(item?.id, true);
+                                                    if (!e.target.value && item?.required) {
+                                                        setErrorObj((preVal: any) => {
+                                                            return { ...preVal, [item?.id]: `${item?.label} is required` };
+                                                        });
+                                                    }
+                                                }}
+                                            />
+                                            {item?.required && touched[item?.id] && errorObj[item?.id] && <span className="text-sm text-danger">{errorObj[item?.id]?.toString()}</span>}
+                                        </>
                                     )}
                                     {item?.fieldType === 'RADIO' && (
-                                        <div className="flex gap-x-5">
-                                            {item?.options?.map((item2, index) => {
-                                                return (
-                                                    <div key={index}>
-                                                        <input
-                                                            type="radio"
-                                                            name={item?.id}
-                                                            className="peer form-radio"
-                                                            id={item?.id}
-                                                            value={item2?.value}
-                                                            onChange={handleChange}
-                                                            onBlur={handleBlur}
-                                                        />
-                                                        <label className="inline-flex" htmlFor={item?.id}>
-                                                            {item2?.name}
-                                                        </label>
-                                                    </div>
-                                                );
-                                            })}
-                                        </div>
+                                        <>
+                                            <div className="flex gap-x-5">
+                                                {item?.options?.map((item2, index) => {
+                                                    return (
+                                                        <div key={index}>
+                                                            <input
+                                                                type="radio"
+                                                                name={item?.id}
+                                                                className="peer form-radio"
+                                                                id={item?.id}
+                                                                value={item2?.value}
+                                                                onChange={(e) => {
+                                                                    handleChange(item?.id);
+                                                                    console.log(e.target.value);
+                                                                    if (e.target.value && item?.required) {
+                                                                        setErrorObj((preVal: any) => {
+                                                                            return { ...preVal, [item?.id]: undefined };
+                                                                        });
+                                                                    }
+                                                                }}
+                                                                onBlur={(e) => {
+                                                                    setFieldTouched(item?.id, true);
+                                                                    if (e.target.value && item?.required) {
+                                                                        setErrorObj((preVal: any) => {
+                                                                            return { ...preVal, [item?.id]: undefined };
+                                                                        });
+                                                                    }
+                                                                }}
+                                                            />
+                                                            <label className="inline-flex" htmlFor={item?.id}>
+                                                                {item2?.name}
+                                                            </label>
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                            {item?.required && touched[item?.id] && errorObj[item?.id] && <div className="text-sm text-danger">{errorObj[item?.id]?.toString()}</div>}
+                                        </>
                                     )}
                                     {item?.fieldType === 'CHECKBOX' && (
-                                        <div className="flex items-center gap-x-5">
-                                            {item?.options?.map((item2, index) => {
-                                                return (
-                                                    <div key={index}>
-                                                        <input
-                                                            type="checkbox"
-                                                            name={item?.id}
-                                                            className="form-checkbox"
-                                                            id={item?.id + index}
-                                                            value={item2?.value}
-                                                            onChange={handleChange}
-                                                            onBlur={handleBlur}
-                                                        />
-                                                        <label className="inline-flex" htmlFor={item?.id}>
-                                                            {item2?.name}
-                                                        </label>
-                                                    </div>
-                                                );
-                                            })}
-                                        </div>
+                                        <>
+                                            <div className="flex items-center gap-x-5">
+                                                {item?.options?.map((item2, index) => {
+                                                    return (
+                                                        <div key={index}>
+                                                            <input
+                                                                type="checkbox"
+                                                                name={item?.id}
+                                                                className="form-checkbox"
+                                                                id={item?.id + index}
+                                                                value={item2?.value}
+                                                                onChange={handleChange}
+                                                                onBlur={() => {
+                                                                    setFieldTouched(item?.id, true);
+                                                                    if (values[item?.id]?.length > 0) {
+                                                                        setErrorObj((preVal: any) => {
+                                                                            return { ...preVal, [item?.id]: undefined };
+                                                                        });
+                                                                    } else {
+                                                                        setErrorObj((preVal: any) => {
+                                                                            return { ...preVal, [item?.id]: `${item?.label} is required` };
+                                                                        });
+                                                                    }
+                                                                }}
+                                                            />
+                                                            <label className="inline-flex" htmlFor={item?.id}>
+                                                                {item2?.name}
+                                                            </label>
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                            {item?.required && touched[item.id] && errorObj[item?.id] && <span className="text-sm  text-danger">{errorObj[item?.id]?.toString()}</span>}
+                                        </>
                                     )}
                                 </div>
                             )
                         );
                     })}
                 </div>
-                <input type="submit" className="btn btn-primary" />
+                <input type="submit" className="btn btn-primary" disabled={true} />
             </form>
         </div>
     );

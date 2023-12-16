@@ -19,7 +19,7 @@ import {
     ContactListSecondaryEndpoint,
     LeadPrioritySecondaryEndpoint,
     UserListSecondaryEndpointType,
-    ICustomField,
+    // ICustomField,
     LeadStatusSecondaryEndpoint,
 } from '@/utils/Types';
 import { Tab } from '@headlessui/react';
@@ -142,13 +142,13 @@ const LeadCreateModal = () => {
         return { value: item.id, label: `${item.firstName} ${item.lastName} (${item?.email})` };
     });
 
-    const leadBranchDropdown: SelectOptionsType[] = leadBranchList?.map((item: BranchListSecondaryEndpoint) => {
-        return { value: item.id, label: item.name };
-    });
+    // const leadBranchDropdown: SelectOptionsType[] = leadBranchList?.map((item: BranchListSecondaryEndpoint) => {
+    //     return { value: item.id, label: item.name };
+    // });
 
-    const leadContactDropdown: SelectOptionsType[] = leadContactsList?.map((item: ContactListSecondaryEndpoint) => {
-        return { value: item.id, label: `${item.name} (${item?.email})` };
-    });
+    // const leadContactDropdown: SelectOptionsType[] = leadContactsList?.map((item: ContactListSecondaryEndpoint) => {
+    //     return { value: item.id, label: `${item.name} (${item?.email})` };
+    // });
 
     const leadSourceDropdown: SelectOptionsType[] = leadSourceList?.map((item: SourceDataType) => {
         return { value: item.id, label: item.name };

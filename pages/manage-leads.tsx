@@ -5,7 +5,7 @@ import 'tippy.js/dist/tippy.css';
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
 import { sortBy } from 'lodash';
 import 'flatpickr/dist/flatpickr.css';
-import { Delete, Edit, Plus, View } from '@/utils/icons';
+import { ChatIcon, Delete, Edit, Email, Plus, Sms, View } from '@/utils/icons';
 import PageHeadingSection from '@/components/__Shared/PageHeadingSection/index.';
 import {
     BranchListSecondaryEndpoint,
@@ -480,6 +480,34 @@ const ManageLeads = () => {
                                 </div>
                             ),
                             hidden: hideCols.includes('priority'),
+                        },
+                        {
+                            accessor: 'quickMessage',
+                            title: 'Quick Message',
+                            titleClassName: '!text-center',
+                            render: ({ id }) => (
+                                <div className="flex justify-center gap-2  p-3 text-center ">
+                                    <Tippy content="WhatsApp">
+                                        <button type="button" onClick={() => dispatch(setViewModal({ id, open: true }))}>
+                                            <Sms />
+                                        </button>
+                                    </Tippy>
+                                    {/* {isAbleToUpdate && ( */}
+                                    <Tippy content="SMS">
+                                        <button type="button" onClick={() => dispatch(setEditModal({ id, open: true }))}>
+                                            <ChatIcon />
+                                        </button>
+                                    </Tippy>
+                                    {/* )} */}
+                                    {/* {isAbleToDelete && ( */}
+                                    <Tippy content="Email">
+                                        <button type="button" onClick={() => dispatch(setDeleteModal({ id, open: true }))}>
+                                            <Email />
+                                        </button>
+                                    </Tippy>
+                                    {/* )} */}
+                                </div>
+                            ),
                         },
                         {
                             accessor: 'action',

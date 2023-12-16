@@ -28,3 +28,4 @@ export * from './Automation';
 export * from './DropdownDoubleLayer';
 export * from './EyeIcon';
 export * from './ChatIcon';
+export * from './ShopingBag';

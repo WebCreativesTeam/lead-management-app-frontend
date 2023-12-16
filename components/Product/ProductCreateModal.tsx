@@ -128,7 +128,7 @@ const CreateProductModal = () => {
                                                         formik.values.instances[formik.values.instances.length - 1].colorIds.length < 1
                                                     }
                                                 >
-                                                    Add instances
+                                                    Add Sub Product
                                                 </button>
                                             </div>
                                             {formik.values.instances.map((instances, index) => (
