@@ -8,7 +8,7 @@ import { Delete, Edit, Plus, View } from '@/utils/icons';
 import PageHeadingSection from '@/components/__Shared/PageHeadingSection/index.';
 import { useDispatch, useSelector } from 'react-redux';
 import { setPageTitle } from '@/store/themeConfigSlice';
-import { GetMethodResponseType, ICampaign, ILeadStatus, LeadStatusSecondaryEndpoint, SourceDataType } from '@/utils/Types';
+import { GetMethodResponseType, ICampaign, ILeadStatus, LeadStatusSecondaryEndpoint, ProductSecondaryEndpointType, SourceDataType } from '@/utils/Types';
 import { ApiClient } from '@/utils/http';
 import { IRootState } from '@/store';
 import {
@@ -21,6 +21,7 @@ import {
     setCampaignDataLength,
     setViewModal,
     setCampaigndActivationModal,
+    getAllProductsForCampaign,
 } from '@/store/Slices/campaignSlice';
 import CampaignViewModal from '@/components/Campaign/CampaignViewModal';
 import CampaignCreateModal from '@/components/Campaign/CampaignCreateModal';
@@ -71,6 +72,7 @@ const Campaign = () => {
     useEffect(() => {
         getAllSourceList();
         getLeadStatus();
+        getAllProducts();
     }, []);
 
     //get all Campaign list
@@ -107,6 +109,18 @@ const Campaign = () => {
             return;
         }
         dispatch(getAllLeadStatusForCampaign(status));
+    };
+
+    //get products list
+    const getAllProducts = async () => {
+        setLoading(true);
+        const productsList: GetMethodResponseType = await new ApiClient().get('product/list');
+        const products: ProductSecondaryEndpointType[] = productsList?.data;
+        if (typeof products === 'undefined') {
+            dispatch(getAllProductsForCampaign([] as ProductSecondaryEndpointType[]));
+            return;
+        }
+        dispatch(getAllProductsForCampaign(products));
     };
 
     return (

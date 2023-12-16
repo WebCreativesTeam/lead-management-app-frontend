@@ -1,5 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
-import React, { Fragment, memo } from 'react';
+import React, { Fragment, memo, useEffect, useState } from 'react';
 import Modal from '@/components/__Shared/Modal';
 import { useSelector, useDispatch } from 'react-redux';
 import { IRootState } from '@/store';
@@ -20,6 +20,7 @@ import {
     LeadPrioritySecondaryEndpoint,
     UserListSecondaryEndpointType,
     ICustomField,
+    LeadStatusSecondaryEndpoint,
 } from '@/utils/Types';
 import { Tab } from '@headlessui/react';
 import { Home, Phone, Note, Setting } from '@/utils/icons';
@@ -27,15 +28,20 @@ import CustomFieldsTab from './CustomFieldsTab';
 
 const LeadCreateModal = () => {
     const dispatch = useDispatch();
-    const { isFetching, createModal, isBtnDisabled, leadPriorityList, leadBranchList, leadContactsList, leadSourceList, leadUserList, customFieldsList } = useSelector(
+    const { isFetching, createModal, isBtnDisabled, leadPriorityList, leadBranchList, leadContactsList, leadSourceList, leadUserList, leadProductList, leadStatusList } = useSelector(
         (state: IRootState) => state.lead
     );
+    const [productDropdown, setProductDropdown] = useState<SelectOptionsType[]>([] as SelectOptionsType[]);
 
     const initialValues = {
         name: '',
         phoneNumber: '',
         reference: '',
         priority: {
+            value: '',
+            label: '',
+        },
+        status: {
             value: '',
             label: '',
         },
@@ -50,6 +56,10 @@ const LeadCreateModal = () => {
             label: '',
         },
         source: {
+            value: '',
+            label: '',
+        },
+        product: {
             value: '',
             label: '',
         },
@@ -76,8 +86,10 @@ const LeadCreateModal = () => {
                     estimatedBudget: +value.estimatedBudget,
                     sourceId: values.source.value,
                     priorityId: values.priority.value,
+                    statusId: values.status.value,
                     branchId: value.branch.value,
                     contactId: values.contact.value,
+                    productId: values.product.value,
                     reference: value.reference,
                     DOB: new Date(value.DOB).toISOString(),
                     facebookCampaignName: value.facebookCampaignName,
@@ -113,6 +125,18 @@ const LeadCreateModal = () => {
             ),
         };
     });
+
+    const leadStatusDropdown: SelectOptionsType[] = leadStatusList?.map((item: LeadStatusSecondaryEndpoint) => {
+        return {
+            value: item.id,
+            label: (
+                <div className={`rounded px-2.5 py-0.5 text-sm font-medium dark:bg-blue-900 dark:text-blue-300 text-center`} style={{ color: item?.color, backgroundColor: item?.color + '20' }}>
+                    {item?.name}
+                </div>
+            ),
+        };
+    });
+
     const userListDropdown: SelectOptionsType[] = leadUserList?.map((item: UserListSecondaryEndpointType) => {
         return { value: item.id, label: `${item.firstName} ${item.lastName} (${item?.email})` };
     });
@@ -144,6 +168,13 @@ const LeadCreateModal = () => {
             showToastAlert(errors.serviceInterestedIn);
         }
     };
+
+    useEffect(() => {
+        const createProductDropdown: SelectOptionsType[] = leadProductList?.map((item) => {
+            return { label: item?.name, value: item?.id };
+        });
+        setProductDropdown(createProductDropdown);
+    }, [leadProductList]);
 
     return (
         <Modal
@@ -264,14 +295,14 @@ const LeadCreateModal = () => {
                                                 <Select placeholder="Select Source" options={leadSourceDropdown} id="leadSource" onChange={(e) => setFieldValue('source', e)} />
                                             </div>
                                             <div className="flex-1">
-                                                <label htmlFor="leadSource">Product</label>
-                                                <Select placeholder="Product" options={leadSourceDropdown} id="leadSource" onChange={(e) => setFieldValue('source', e)} />
+                                                <label htmlFor="leadProduct">Product</label>
+                                                <Select placeholder="Product" options={productDropdown} id="leadProduct" onChange={(e) => setFieldValue('product', e)} />
                                             </div>
                                         </div>
                                         <div className="flex flex-col gap-4 sm:flex-row">
                                             <div className="flex-1">
                                                 <label htmlFor="leadStatus">Lead Status</label>
-                                                <Select placeholder="Select lead Status" options={leadPriorityDropdown} id="leadStatus" onChange={(e) => setFieldValue('priority', e)} />
+                                                <Select placeholder="Select lead Status" options={leadStatusDropdown} id="leadStatus" onChange={(e) => setFieldValue('status', e)} />
                                             </div>
                                             <div className="flex-1">
                                                 <label htmlFor="leadPriority">Lead Priority</label>

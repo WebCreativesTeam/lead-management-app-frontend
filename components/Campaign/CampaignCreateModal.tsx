@@ -21,10 +21,11 @@ type SelectOptionsType = {
 };
 
 const CampaignCreateModal = () => {
-    const { createModal, isBtnDisabled, isFetching, sourceList, customDateFields, leadStatusList } = useSelector((state: IRootState) => state.campaign);
+    const { createModal, isBtnDisabled, isFetching, sourceList, customDateFields, leadStatusList, leadProductList } = useSelector((state: IRootState) => state.campaign);
     const [customFieldList, setCustomFieldList] = useState<SelectOptionsType[]>([] as SelectOptionsType[]);
     const [leadStatusDropdown, setLeadStatusDropdown] = useState<SelectOptionsType[]>([] as SelectOptionsType[]);
     const [sourceDropdown, setSourceDropdown] = useState<SelectOptionsType[]>([] as SelectOptionsType[]);
+    const [productDropdown, setProductDropdown] = useState<SelectOptionsType[]>([] as SelectOptionsType[]);
 
     const dispatch = useDispatch<AppDispatch>();
     const formik = useFormik({
@@ -116,6 +117,17 @@ const CampaignCreateModal = () => {
         });
         setLeadStatusDropdown(createLeadStatusDropdown);
     }, [leadStatusList]);
+
+    useEffect(() => {
+        const createProductDropdown: SelectOptionsType[] = leadProductList?.map((item) => {
+            return { label: item?.name, value: item?.id };
+        });
+        createProductDropdown.unshift({
+            label: 'All',
+            value: 'All',
+        });
+        setProductDropdown(createProductDropdown);
+    }, [leadProductList]);
 
     useEffect(() => {
         const createSourceDropdown: SelectOptionsType[] = sourceList?.map((item: SourceDataType) => {
@@ -309,7 +321,7 @@ const CampaignCreateModal = () => {
                                     <label htmlFor="productId">Product</label>
                                     <Select
                                         placeholder="Select Product"
-                                        options={sourceDropdown}
+                                        options={productDropdown}
                                         onChange={(data: any) => formik.setFieldValue('productId', data.value)}
                                         defaultValue={{ label: 'All', value: 'All' }}
                                     />

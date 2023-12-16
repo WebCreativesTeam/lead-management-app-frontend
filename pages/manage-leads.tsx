@@ -14,6 +14,7 @@ import {
     ICustomField,
     LeadPrioritySecondaryEndpoint,
     LeadStatusSecondaryEndpoint,
+    ProductSecondaryEndpointType,
     SourceDataType,
     UserListSecondaryEndpointType,
 } from '@/utils/Types';
@@ -29,6 +30,7 @@ import {
     getAllLeadPriorities,
     getAllLeadStatus,
     getAllLeads,
+    getAllProductsForLead,
     getAllSourceForLead,
     getAllUsersForLeads,
     setChangePriorityModal,
@@ -107,6 +109,7 @@ const ManageLeads = () => {
         getSourceList();
         getAllUsersList();
         getCustomFieldList();
+        getAllProducts();
     }, []);
 
     useEffect(() => {
@@ -222,6 +225,18 @@ const ManageLeads = () => {
         }
         dispatch(getAllCustomFieldsForLeads(customField));
         setLoading(false);
+    };
+
+    //get products list
+    const getAllProducts = async () => {
+        setLoading(true);
+        const productList: GetMethodResponseType = await new ApiClient().get('product/list');
+        const products: ProductSecondaryEndpointType[] = productList?.data;
+        if (typeof products === 'undefined') {
+            dispatch(getAllProductsForLead([] as ProductSecondaryEndpointType[]));
+            return;
+        }
+        dispatch(getAllProductsForLead(products));
     };
 
     return !isAbleToRead ? null : (

@@ -21,7 +21,7 @@ type SelectOptionsType = {
 };
 
 const CampaignEditModal = () => {
-    const { editModal, isBtnDisabled, isFetching, sourceList, customDateFields, leadStatusList, singleData } = useSelector((state: IRootState) => state.campaign);
+    const { editModal, isBtnDisabled, isFetching, sourceList, customDateFields, leadStatusList, singleData, leadProductList } = useSelector((state: IRootState) => state.campaign);
     const [customFieldList, setCustomFieldList] = useState<SelectOptionsType[]>([] as SelectOptionsType[]);
     const [leadStatusDropdown, setLeadStatusDropdown] = useState<SelectOptionsType[]>([] as SelectOptionsType[]);
     const [sourceDropdown, setSourceDropdown] = useState<SelectOptionsType[]>([] as SelectOptionsType[]);
@@ -30,6 +30,7 @@ const CampaignEditModal = () => {
     const [defaultSourceValue, setDefaultSourceValue] = useState({} as SelectOptionsType);
     const [defaultLeadStatusValue, setDefaultLeadStatusValue] = useState({} as SelectOptionsType);
     const [defaultCustomDateValue, setDefaultCustomDateValue] = useState({} as SelectOptionsType);
+    const [productDropdown, setProductDropdown] = useState<SelectOptionsType[]>([] as SelectOptionsType[]);
 
     useEffect(() => {
         formik.setFieldValue('date', singleData?.date);
@@ -51,7 +52,7 @@ const CampaignEditModal = () => {
             setDefaultSendToValue(findSendToDefaultValue);
         }
 
-        const findProductDefaultValue: SelectOptionsType | undefined = sourceDropdown.find((item: SelectOptionsType) => item.value === singleData?.productId);
+        const findProductDefaultValue: SelectOptionsType | undefined = productDropdown.find((item: SelectOptionsType) => item.value === singleData?.productId);
         if (findProductDefaultValue) {
             setDefaultProductValue(findProductDefaultValue);
         }
@@ -170,6 +171,17 @@ const CampaignEditModal = () => {
         });
         setSourceDropdown(editSourceDropdown);
     }, [sourceList]);
+
+    useEffect(() => {
+        const createProductDropdown: SelectOptionsType[] = leadProductList?.map((item) => {
+            return { label: item?.name, value: item?.id };
+        });
+        createProductDropdown.unshift({
+            label: 'All',
+            value: 'All',
+        });
+        setProductDropdown(createProductDropdown);
+    }, [leadProductList]);
 
     function padTo2Digits(num: number) {
         return String(num).padStart(2, '0');
@@ -347,7 +359,7 @@ const CampaignEditModal = () => {
                                     <label htmlFor="productId">Product</label>
                                     <Select
                                         placeholder="Select Product"
-                                        options={sourceDropdown}
+                                        options={productDropdown}
                                         onChange={(data: any) => formik.setFieldValue('productId', data.value)}
                                         defaultValue={defaultProductValue}
                                     />

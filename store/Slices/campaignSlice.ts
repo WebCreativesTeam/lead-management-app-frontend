@@ -1,4 +1,4 @@
-import { ICampaign, CampaignInitialStateProps, SourceDataType, UserDataType, GetMethodResponseType, ICustomField, LeadStatusSecondaryEndpoint, ILeadStatus } from '@/utils/Types';
+import { ICampaign, CampaignInitialStateProps, SourceDataType, UserDataType, GetMethodResponseType, ICustomField, LeadStatusSecondaryEndpoint, ILeadStatus, ProductSecondaryEndpointType } from '@/utils/Types';
 import { fetchUserInfo } from '@/utils/contant';
 import { ApiClient } from '@/utils/http';
 import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
@@ -8,6 +8,7 @@ const initialState: CampaignInitialStateProps = {
     sourceList: [] as SourceDataType[],
     leadStatusList: [] as ILeadStatus[],
     singleData: {} as ICampaign,
+    leadProductList: [] as ProductSecondaryEndpointType[],
     createModal: false,
     editModal: false,
     deleteModal: false,
@@ -117,7 +118,9 @@ const campaignSlice = createSlice({
         getAllSourceForCampaign(state, action: PayloadAction<SourceDataType[]>) {
             state.sourceList = action.payload;
         },
-
+        getAllProductsForCampaign(state, action: PayloadAction<ProductSecondaryEndpointType[]>) {
+            state.leadProductList = action.payload;
+        },
         setDisableBtn(state, action) {
             state.isBtnDisabled = action.payload;
         },
@@ -162,5 +165,6 @@ export const {
     getAllLeadStatusForCampaign,
     getAllSourceForCampaign,
     setCampaigndActivationModal,
+    getAllProductsForCampaign,
 } = campaignSlice.actions;
 export default campaignSlice.reducer;

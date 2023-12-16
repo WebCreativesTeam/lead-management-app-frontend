@@ -16,6 +16,7 @@ import DeleteProductColorModal from '@/components/Product/Colors/DeleteProductCo
 import CreateProductColorModal from '@/components/Product/Colors/CreateProductColorModal';
 import EditProductColorModal from '@/components/Product/Colors/EditProductColorModal';
 import ViewProductColorModal from '@/components/Product/Colors/ViewProductColorModal';
+import Link from 'next/link';
 
 const ProductColorPage = () => {
     const dispatch = useDispatch();
@@ -78,11 +79,14 @@ const ProductColorPage = () => {
                 {/* {!isAbleToCreate ? (
                     <div className="flex-1"></div>
                 ) : ( */}
-                <div className="flex-1">
-                    <button className="btn btn-primary h-full w-full max-w-[250px] max-sm:mx-auto" type="button" onClick={() => dispatch(setCreateModal(true))}>
+                <div className="flex flex-1 flex-col gap-4 sm:flex-row">
+                    <button className="btn btn-primary h-full w-full max-w-fit max-sm:mx-auto" type="button" onClick={() => dispatch(setCreateModal(true))}>
                         <Plus />
                         Add New Color
                     </button>
+                    <Link className="btn btn-primary h-full w-full max-w-fit max-sm:mx-auto" href="/manage-products">
+                        Manage Products
+                    </Link>
                 </div>
                 {/* )} */}
                 <div className="relative  flex-1">

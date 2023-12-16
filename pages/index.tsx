@@ -7,7 +7,7 @@ import { sortBy } from 'lodash';
 import { ChatIcon, Delete, Edit, Email, View, Sms } from '@/utils/icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { setPageTitle } from '@/store/themeConfigSlice';
-import { GetMethodResponseType, IFollowup, ILeadStatus, LeadStatusSecondaryEndpoint, SourceDataType } from '@/utils/Types';
+import { GetMethodResponseType, IFollowup, ILeadStatus, LeadStatusSecondaryEndpoint, SelectOptionsType, SourceDataType } from '@/utils/Types';
 import { ApiClient } from '@/utils/http';
 import { IRootState } from '@/store';
 import Select from 'react-select';
@@ -16,7 +16,7 @@ import ScheduleMessageViewModal from '@/components/Campaign/CampaignViewModal';
 import ScheduleMessageEditModal from '@/components/Campaign/CampaignEditModal';
 import ScheduleMessageDeleteModal from '@/components/Campaign/CampaignDeleteModal';
 import { followUpDropdownList, followupData } from '@/utils/Raw Data';
-import { getAllPendingFollowups, getAllTodayFollowups, getAllTomorrowFollowups } from '@/store/Slices/dashbordSlice';
+import { getAllLeadStatusForDashboard, getAllPendingFollowups, getAllTodayFollowups, getAllTomorrowFollowups } from '@/store/Slices/dashbordSlice';
 import FollowUpCard from '@/components/Dashboard/FollowUpCard';
 
 const Dashboard = () => {
@@ -24,11 +24,12 @@ const Dashboard = () => {
     useEffect(() => {
         dispatch(setPageTitle('Track Leads | ScheduleMessages'));
     });
-    const { todayFollowUps, isFetching, totalRecords } = useSelector((state: IRootState) => state.dashboard);
+    const { todayFollowUps, isFetching, totalRecords, leadStatusList } = useSelector((state: IRootState) => state.dashboard);
 
     //hooks
     const [loading, setLoading] = useState<boolean>(false);
     const [followupBy, setFollowupBy] = useState<string>('');
+    const [leadSatusDropdown, setLeadSatusDropdown] = useState<SelectOptionsType[]>([] as SelectOptionsType[]);
 
     //datatable
     const [page, setPage] = useState(1);
@@ -119,11 +120,25 @@ const Dashboard = () => {
         const leadStatusList: GetMethodResponseType = await new ApiClient().get('lead-status/list');
         const status: ILeadStatus[] = leadStatusList?.data;
         if (typeof status === 'undefined') {
-            dispatch(getAllLeadStatusForCampaign([] as ILeadStatus[]));
+            dispatch(getAllLeadStatusForDashboard([] as ILeadStatus[]));
             return;
         }
-        dispatch(getAllLeadStatusForCampaign(status));
+        dispatch(getAllLeadStatusForDashboard(status));
     };
+
+    useEffect(() => {
+        const createLeadStatusDropdown: SelectOptionsType[] = leadStatusList?.map((item: LeadStatusSecondaryEndpoint) => {
+            return {
+                value: item.id,
+                label: (
+                    <div className={`rounded px-2.5 py-0.5 text-sm font-medium dark:bg-blue-900 dark:text-blue-300 text-center`} style={{ color: item?.color, backgroundColor: item?.color + '20' }}>
+                        {item?.name}
+                    </div>
+                ),
+            };
+        });
+        setLeadSatusDropdown(createLeadStatusDropdown);
+    }, [leadStatusList]);
 
     return (
         <div>
@@ -139,8 +154,9 @@ const Dashboard = () => {
                     <div className="flex-1">
                         <p className="text-lg font-bold">Followups</p>
                     </div>
-                    <div className="flex-1">
-                        <Select placeholder="Choose Followup" className="z-10" options={followUpDropdownList} onChange={(data: any) => setFollowupBy(data.value)} />
+                    <div className="flex flex-1 gap-6">
+                        <Select placeholder="Select Status" className="z-10 flex-1" options={leadSatusDropdown} onChange={(data: any) => setFollowupBy(data.value)} />
+                        <Select placeholder="Choose Followup" className="z-10 flex-1" options={followUpDropdownList} onChange={(data: any) => setFollowupBy(data.value)} />
                     </div>
                 </div>
 

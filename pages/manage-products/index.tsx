@@ -95,13 +95,12 @@ const Product = () => {
                     <div className="flex-1"></div>
                 ) : ( */}
                 <div className="flex flex-1 flex-col gap-4 sm:flex-row">
-                    <button className="btn btn-primary h-full w-full max-w-[200px] max-sm:mx-auto" type="button" onClick={() => dispatch(setCreateModal(true))}>
+                    <button className="btn btn-primary h-full w-full max-w-fit max-sm:mx-auto" type="button" onClick={() => dispatch(setCreateModal(true))}>
                         <Plus />
                         Add New Product
                     </button>
-                    <Link className="btn btn-primary h-full w-full max-w-[200px] max-sm:mx-auto" href="/manage-products/product-colors">
-                        <Plus />
-                        Add New Color
+                    <Link className="btn btn-primary h-full w-full max-w-fit max-sm:mx-auto" href="/manage-products/product-colors">
+                        Manage Colors
                     </Link>
                 </div>
                 {/* )} */}

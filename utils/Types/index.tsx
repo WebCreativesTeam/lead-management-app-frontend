@@ -451,6 +451,11 @@ export interface ProductColorSecondaryEndpointType {
     value: string;
 }
 
+export interface ProductSecondaryEndpointType {
+    id: string;
+    name: string;
+}
+
 // ----------------- authentication types : start -------------------//
 
 export interface ISignInResponse {
@@ -521,6 +526,7 @@ export interface ManageLeadInitialStateProps extends InitialStateProps {
     leadSourceList: SourceDataType[];
     leadUserList: UserListSecondaryEndpointType[];
     customFieldsList: ICustomField[];
+    leadProductList: ProductSecondaryEndpointType[];
 }
 
 //source slice initial props
@@ -556,6 +562,7 @@ export interface CampaignInitialStateProps extends InitialStateProps {
     sourceList: SourceDataType[];
     leadStatusList: ILeadStatus[];
     customDateFields: ICustomField[];
+    leadProductList: ProductSecondaryEndpointType[];
     campaignActivationModal: boolean;
 }
 
