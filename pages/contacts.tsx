@@ -51,7 +51,7 @@ const Contacts = () => {
         { accessor: 'email', title: 'Email' },
         { accessor: 'position', title: 'Position' },
         { accessor: 'industry', title: 'Industry' },
-        { accessor: 'anniversary', title: 'anniversary' },
+        { accessor: 'anniversary', title: ' Wedding Anniversary' },
         { accessor: 'DOB', title: 'Date Of Birth' },
         { accessor: 'altPhoneNumber', title: 'Alternative Phone Number' },
         { accessor: 'city', title: 'City' },
@@ -241,7 +241,7 @@ const Contacts = () => {
                         },
                         {
                             accessor: 'anniversary',
-                            title: 'Anniversary',
+                            title: 'Wedding Anniversary',
                             sortable: true,
                             render: ({ anniversary }) => <div>{new Date(anniversary).toLocaleString()}</div>,
                             hidden: hideCols.includes('anniversary'),
