@@ -35,7 +35,21 @@ const Campaign = () => {
     useEffect(() => {
         dispatch(setPageTitle('Track Leads | Campaigns'));
     });
-    const { data, isFetching, isAbleToCreate, isAbleToDelete, isAbleToUpdate, totalRecords } = useSelector((state: IRootState) => state.campaign);
+    const {
+        data,
+        isFetching,
+        isAbleToRead,
+        isAbleToCreate,
+        isAbleToDelete,
+        isAbleToUpdate,
+        totalRecords,
+        createModal,
+        editModal,
+        viewModal,
+        deleteModal,
+        campaignActivationModal,
+        isAbleToActivateCampaign,
+    } = useSelector((state: IRootState) => state.campaign);
 
     //hooks
     const [searchInputText, setSearchInputText] = useState<string>('');
@@ -124,155 +138,154 @@ const Campaign = () => {
     };
 
     return (
-        <div>
-            <PageHeadingSection description="campaign message using template and for different platforms." heading="Campaign Message" />
-            <div className="my-6 flex flex-col gap-5 sm:flex-row ">
-                {/* {!isAbleToCreate ? (
-                    <div className="flex-1"></div>
-                ) : ( */}
-                <div className="flex-1">
-                    <button className="btn btn-primary h-full max-w-fit max-sm:mx-auto" type="button" onClick={() => dispatch(setCreateModal(true))}>
-                        <Plus />
-                        Add Campaign
-                    </button>
+        isAbleToRead && (
+            <div>
+                <PageHeadingSection description="campaign message using template and for different platforms." heading="Campaign Message" />
+                <div className="my-6 flex flex-col gap-5 sm:flex-row ">
+                    {!isAbleToCreate ? (
+                        <div className="flex-1"></div>
+                    ) : (
+                        <div className="flex-1">
+                            <button className="btn btn-primary h-full max-w-fit max-sm:mx-auto" type="button" onClick={() => dispatch(setCreateModal(true))}>
+                                <Plus />
+                                Add Campaign
+                            </button>
+                        </div>
+                    )}
+                    <div className="relative  flex-1">
+                        <input
+                            type="text"
+                            placeholder="Find A Campaign"
+                            className="form-input py-3 ltr:pr-[100px] rtl:pl-[100px]"
+                            onChange={(e) => setSearchInputText(e.target.value)}
+                            value={searchInputText}
+                        />
+                        <button type="button" className="btn btn-primary absolute top-1 shadow-none ltr:right-1 rtl:left-1" onClick={() => setSearch(searchInputText)}>
+                            Search
+                        </button>
+                    </div>
                 </div>
-                {/* )} */}
-                <div className="relative  flex-1">
-                    <input
-                        type="text"
-                        placeholder="Find A Campaign"
-                        className="form-input py-3 ltr:pr-[100px] rtl:pl-[100px]"
-                        onChange={(e) => setSearchInputText(e.target.value)}
-                        value={searchInputText}
+
+                {/* campaign List table*/}
+                <div className="datatables panel mt-6">
+                    <DataTable
+                        className="table-hover whitespace-nowrap"
+                        records={recordsData}
+                        columns={[
+                            {
+                                accessor: 'name',
+                                title: 'Campaign Name',
+                                sortable: true,
+                                render: ({ name }) => <div>{name}</div>,
+                            },
+                            {
+                                accessor: 'type',
+                                title: 'Type',
+                                sortable: true,
+                                render: ({ type }) => <div>{type}</div>,
+                            },
+                            {
+                                accessor: 'sendTo',
+                                title: 'Send To',
+                                sortable: true,
+                                render: ({ sendTo }) => <div>{sendTo}</div>,
+                            },
+                            {
+                                accessor: 'createdAt',
+                                title: 'Created Date',
+                                sortable: true,
+                                render: ({ createdAt }) => <div>{new Date(createdAt).toLocaleString()}</div>,
+                            },
+                            {
+                                accessor: 'updatedAt',
+                                title: 'Last Updated',
+                                sortable: true,
+                                render: ({ updatedAt }) => <div>{new Date(updatedAt).toLocaleString()}</div>,
+                            },
+                            {
+                                accessor: 'action',
+                                title: 'Actions',
+                                titleClassName: '!text-center',
+                                render: ({ id }) => (
+                                    <div className="flex justify-center gap-2  p-3 text-center ">
+                                        <Tippy content="View">
+                                            <button type="button" onClick={() => dispatch(setViewModal({ id, open: true }))}>
+                                                <View />
+                                            </button>
+                                        </Tippy>
+                                        {isAbleToUpdate && (
+                                            <Tippy content="Edit">
+                                                <button type="button" onClick={() => dispatch(setEditModal({ id, open: true }))}>
+                                                    <Edit />
+                                                </button>
+                                            </Tippy>
+                                        )}
+                                        {isAbleToDelete && (
+                                            <Tippy content="Delete">
+                                                <button type="button" onClick={() => dispatch(setDeleteModal({ id, open: true }))}>
+                                                    <Delete />
+                                                </button>
+                                            </Tippy>
+                                        )}
+                                    </div>
+                                ),
+                            },
+                            {
+                                accessor: 'active',
+                                title: 'Active',
+                                sortable: true,
+                                render: ({ isActive, id }) =>
+                                    isAbleToActivateCampaign ? (
+                                        <div>
+                                            <label className="relative h-6 w-12">
+                                                <input
+                                                    type="checkbox"
+                                                    className="custom_switch peer absolute z-10 h-full w-full cursor-pointer opacity-0"
+                                                    id="custom_switch_checkbox1"
+                                                    name="active"
+                                                    checked={isActive}
+                                                    onChange={() => dispatch(setCampaigndActivationModal({ id, open: true }))}
+                                                />
+                                                <ToggleSwitch />
+                                            </label>
+                                        </div>
+                                    ) : (
+                                        <span className="mr-2 rounded bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+                                            {isActive ? 'Active' : 'In Active'}
+                                        </span>
+                                    ),
+                            },
+                        ]}
+                        totalRecords={totalRecords}
+                        recordsPerPage={pageSize}
+                        page={page}
+                        onPageChange={(p) => setPage(p)}
+                        recordsPerPageOptions={data?.length < 10 ? [10] : PAGE_SIZES}
+                        onRecordsPerPageChange={setPageSize}
+                        sortStatus={sortStatus}
+                        onSortStatusChange={setSortStatus}
+                        minHeight={200}
+                        paginationText={({ from, to, totalRecords }) => `Showing  ${from} to ${to} of ${totalRecords} entries`}
+                        fetching={loading}
                     />
-                    <button type="button" className="btn btn-primary absolute top-1 shadow-none ltr:right-1 rtl:left-1" onClick={() => setSearch(searchInputText)}>
-                        Search
-                    </button>
                 </div>
+
+                {/* edit modal */}
+                {isAbleToUpdate && <CampaignEditModal />}
+
+                {/* view modal */}
+                {viewModal && <CampaignViewModal />}
+
+                {/* delete modal */}
+                {isAbleToDelete && deleteModal && <CampaignDeleteModal />}
+
+                {/* create modal */}
+                {isAbleToCreate && createModal && <CampaignCreateModal />}
+
+                {/* campaign activation modal */}
+                {isAbleToActivateCampaign && campaignActivationModal && <CampaignActivateModal />}
             </div>
-
-            {/* campaign List table*/}
-            <div className="datatables panel mt-6">
-                <DataTable
-                    className="table-hover whitespace-nowrap"
-                    records={recordsData}
-                    columns={[
-                        {
-                            accessor: 'name',
-                            title: 'Campaign Name',
-                            sortable: true,
-                            render: ({ name }) => <div>{name}</div>,
-                        },
-                        {
-                            accessor: 'type',
-                            title: 'Type',
-                            sortable: true,
-                            render: ({ type }) => <div>{type}</div>,
-                        },
-                        {
-                            accessor: 'sendTo',
-                            title: 'Send To',
-                            sortable: true,
-                            render: ({ sendTo }) => <div>{sendTo}</div>,
-                        },
-                        {
-                            accessor: 'createdAt',
-                            title: 'Created Date',
-                            sortable: true,
-                            render: ({ createdAt }) => <div>{new Date(createdAt).toLocaleString()}</div>,
-                        },
-                        {
-                            accessor: 'updatedAt',
-                            title: 'Last Updated',
-                            sortable: true,
-                            render: ({ updatedAt }) => <div>{new Date(updatedAt).toLocaleString()}</div>,
-                        },
-                        {
-                            accessor: 'action',
-                            title: 'Actions',
-                            titleClassName: '!text-center',
-                            render: ({ id }) => (
-                                <div className="flex justify-center gap-2  p-3 text-center ">
-                                    <Tippy content="View">
-                                        <button type="button" onClick={() => dispatch(setViewModal({ id, open: true }))}>
-                                            <View />
-                                        </button>
-                                    </Tippy>
-                                    {/* {isAbleToUpdate && ( */}
-                                    <Tippy content="Edit">
-                                        <button type="button" onClick={() => dispatch(setEditModal({ id, open: true }))}>
-                                            <Edit />
-                                        </button>
-                                    </Tippy>
-                                    {/* )} */}
-                                    {/* {isAbleToDelete && ( */}
-                                    <Tippy content="Delete">
-                                        <button type="button" onClick={() => dispatch(setDeleteModal({ id, open: true }))}>
-                                            <Delete />
-                                        </button>
-                                    </Tippy>
-                                    {/* )} */}
-                                </div>
-                            ),
-                        },
-                        {
-                            accessor: 'active',
-                            title: 'Active',
-                            sortable: true,
-                            render: ({ isActive, id }) => (
-                                // isAbleToChangeDefaultStatus ? (
-                                <div>
-                                    <label className="relative h-6 w-12">
-                                        <input
-                                            type="checkbox"
-                                            className="custom_switch peer absolute z-10 h-full w-full cursor-pointer opacity-0"
-                                            id="custom_switch_checkbox1"
-                                            name="active"
-                                            checked={isActive}
-                                            onChange={() => dispatch(setCampaigndActivationModal({ id, open: true }))}
-                                        />
-                                        <ToggleSwitch />
-                                    </label>
-                                </div>
-                            ),
-                            // ) : (
-                            //     isDefault && (
-                            //         <div>
-                            //             <span className="mr-2 rounded bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-300">Default</span>
-                            //         </div>
-                            //     )
-                            // ),
-                        },
-                    ]}
-                    totalRecords={totalRecords}
-                    recordsPerPage={pageSize}
-                    page={page}
-                    onPageChange={(p) => setPage(p)}
-                    recordsPerPageOptions={data?.length < 10 ? [10] : PAGE_SIZES}
-                    onRecordsPerPageChange={setPageSize}
-                    sortStatus={sortStatus}
-                    onSortStatusChange={setSortStatus}
-                    minHeight={200}
-                    paginationText={({ from, to, totalRecords }) => `Showing  ${from} to ${to} of ${totalRecords} entries`}
-                    fetching={loading}
-                />
-            </div>
-
-            {/* edit modal */}
-            <CampaignEditModal />
-
-            {/* view modal */}
-            <CampaignViewModal />
-
-            {/* delete modal */}
-            <CampaignDeleteModal />
-
-            {/* create modal */}
-            <CampaignCreateModal />
-
-            {/* campaign activation modal */}
-            <CampaignActivateModal />
-        </div>
+        )
     );
 };
 

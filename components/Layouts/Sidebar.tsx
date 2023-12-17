@@ -56,6 +56,8 @@ import { setSmsTemplateCreatePermission, setSmsTemplateDeletePermission, setSmsT
 import { ArrowRight, Branch, Phone, Shield, Tasks, User, File, Talegram, Setting, ChatIcon, ShopingBag } from '../../utils/icons';
 import { fetchUserInfo } from '@/utils/contant';
 import SideabarLabel from '../__Shared/SidebarLabel';
+import { setProductCreatePolicy, setProductDeletePolicy, setProductReadPolicy, setProductUpdatePolicy } from '@/store/Slices/productSlice';
+import { setCampaignActivationPermission, setCampaignCreatePermission, setCampaignDeletePermission, setCampaignReadPermission, setCampaignUpdatePermission } from '@/store/Slices/campaignSlice';
 
 const Sidebar = () => {
     const router = useRouter();
@@ -129,6 +131,14 @@ const Sidebar = () => {
     //Manage sms template page
     const userPolicySmsTemplateArray: string[] = useSelector((state: IRootState) => state.smsTemplate.userPolicyArr);
     const isAbleToReadSmsTemplate: boolean = useSelector((state: IRootState) => state.smsTemplate?.isAbleToRead);
+
+    //Manage Product page
+    const userPermissionProductArray: string[] = useSelector((state: IRootState) => state.product.userPolicyArr);
+    const isAbleToReadProduct: boolean = useSelector((state: IRootState) => state.product?.isAbleToRead);
+
+    //Manage Campaign page
+    const userPermissionCampaignArray: string[] = useSelector((state: IRootState) => state.campaign.userPolicyArr);
+    const isAbleToReadCampaign: boolean = useSelector((state: IRootState) => state.campaign?.isAbleToRead);
 
     useEffect(() => {
         dispatch(fetchUserInfo());
@@ -246,13 +256,30 @@ const Sidebar = () => {
         dispatch(setEmailSmtpDeletePermission('smtp:Delete::Document'));
     }, [userPolicyEmailSmtpArray]);
 
-    //access for Manage Lead page
+    //*access for Manage Lead page
     useEffect(() => {
         dispatch(setLeadReadPolicy('lead:Read::Documents'));
         dispatch(setLeadCreatePolicy('lead:Create::Document'));
         dispatch(setLeadUpdatePolicy('lead:Update::Document'));
         dispatch(setLeadDeletePolicy('lead:Delete::Document'));
     }, [userPolicyLeadArray]);
+
+    //*permission for access product page
+    useEffect(() => {
+        dispatch(setProductReadPolicy('product:Read::Documents'));
+        dispatch(setProductCreatePolicy('product:Create::Document'));
+        dispatch(setProductUpdatePolicy('product:Update::Document'));
+        dispatch(setProductDeletePolicy('product:Delete::Document'));
+    }, [userPermissionProductArray]);
+
+    //*permission to access campaign page
+    useEffect(() => {
+        dispatch(setCampaignReadPermission('campaign:Read::Documents'));
+        dispatch(setCampaignCreatePermission('campaign:Create::Document'));
+        dispatch(setCampaignUpdatePermission('campaign:Update::Document'));
+        dispatch(setCampaignDeletePermission('campaign:Delete::Document'));
+        dispatch(setCampaignActivationPermission('campaign:Update::DocumentToggleActive'));
+    }, [userPermissionCampaignArray]);
 
     useEffect(() => {
         const selector = document.querySelector('.sidebar ul a[href="' + window.location.pathname + '"]');
@@ -388,14 +415,16 @@ const Sidebar = () => {
                             </li>
 
                             {/* Campaign */}
-                            <li className="menu nav-item">
-                                <Link href="/campaign" className="group">
-                                    <div className="flex items-center">
-                                        <Phone />
-                                        <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Campaign')}</span>
-                                    </div>
-                                </Link>
-                            </li>
+                            {isAbleToReadCampaign && (
+                                <li className="menu nav-item">
+                                    <Link href="/campaign" className="group">
+                                        <div className="flex items-center">
+                                            <Phone />
+                                            <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Campaign')}</span>
+                                        </div>
+                                    </Link>
+                                </li>
+                            )}
 
                             {/* Message */}
                             <li className="menu nav-item">
@@ -493,14 +522,16 @@ const Sidebar = () => {
                             </li>
 
                             {/* Manage Products */}
-                            <li className="menu nav-item">
-                                <Link href="/manage-products" className="group">
-                                    <div className="flex items-center">
-                                        <ShopingBag />
-                                        <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Manage Products')}</span>
-                                    </div>
-                                </Link>
-                            </li>
+                            {isAbleToReadProduct && (
+                                <li className="menu nav-item">
+                                    <Link href="/manage-products" className="group">
+                                        <div className="flex items-center">
+                                            <ShopingBag />
+                                            <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Manage Products')}</span>
+                                        </div>
+                                    </Link>
+                                </li>
+                            )}
 
                             {/* Custom Fields */}
                             <li className="menu nav-item">

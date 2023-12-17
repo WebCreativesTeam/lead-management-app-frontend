@@ -13,6 +13,8 @@ import { SelectOptionsType, SourceDataType, ICountryData, UserListSecondaryEndpo
 import { showToastAlert } from '@/utils/contant';
 import countryJson from '@/utils/Raw Data/select-address.json';
 import Loader from '../__Shared/Loader';
+import Flatpickr from 'react-flatpickr';
+import 'flatpickr/dist/flatpickr.css';
 
 const ContactEditModal = () => {
     const { editModal, isBtnDisabled, singleData, isFetching, usersList, sourceList } = useSelector((state: IRootState) => state.contacts);
@@ -36,7 +38,7 @@ const ContactEditModal = () => {
     });
 
     useEffect(() => {
-        const { email, comment, name, phoneNumber, position, assignedTo, facebookProfile, twitterProfile, industry, location, source, title, website } = singleData;
+        const { email, comment, name, phoneNumber, position, assignedTo, facebookProfile, twitterProfile, industry, location, source, title, website, DOB, altPhoneNumber, anniversary } = singleData;
         setFieldValue('email', email);
         setFieldValue('comment', comment);
         setFieldValue('name', name);
@@ -53,6 +55,9 @@ const ContactEditModal = () => {
         setFieldValue('city', location?.city);
         setFieldValue('assignedTo', assignedTo?.id);
         setFieldValue('source', source?.id);
+        setFieldValue('DOB', DOB);
+        setFieldValue('anniversary', anniversary);
+        setFieldValue('altPhoneNumber', altPhoneNumber);
 
         const creatCountryJsonList: SelectOptionsType[] = countryJson.countries.map((data: ICountryData) => {
             return { value: data.country, label: data.country };
@@ -108,6 +113,9 @@ const ContactEditModal = () => {
         city: '',
         state: '',
         country: '',
+        DOB: '',
+        anniversary: '',
+        altPhoneNumber: '',
     };
     const { values, handleChange, submitForm, handleSubmit, setFieldValue, errors, handleBlur, resetForm } = useFormik({
         initialValues,
@@ -117,7 +125,27 @@ const ContactEditModal = () => {
         onSubmit: async (value, action) => {
             dispatch(setFetching(true));
             try {
-                const { address, assignedTo, city, comment, country, email, facebookProfile, industry, name, phoneNumber, position, source, state, title, twitterProfile, website } = value;
+                const {
+                    address,
+                    assignedTo,
+                    city,
+                    comment,
+                    country,
+                    email,
+                    facebookProfile,
+                    industry,
+                    name,
+                    phoneNumber,
+                    position,
+                    source,
+                    state,
+                    title,
+                    twitterProfile,
+                    website,
+                    DOB,
+                    anniversary,
+                    altPhoneNumber,
+                } = value;
                 const editContactObj = {
                     title,
                     name,
@@ -137,6 +165,9 @@ const ContactEditModal = () => {
                         country,
                         state,
                     },
+                    DOB,
+                    anniversary,
+                    altPhoneNumber,
                 };
                 dispatch(setDisableBtn(true));
                 await new ApiClient().patch('contact/' + singleData.id, editContactObj);
@@ -212,6 +243,9 @@ const ContactEditModal = () => {
                 values.facebookProfile &&
                 values.twitterProfile &&
                 values.comment &&
+                values.anniversary &&
+                values.DOB &&
+                values.altPhoneNumber &&
                 !isBtnDisabled
                     ? false
                     : true
@@ -255,8 +289,53 @@ const ContactEditModal = () => {
                                 />
                             </div>
                             <div className="flex-1">
-                                <label htmlFor="createEmail">Email</label>
-                                <input onChange={handleChange} onBlur={handleBlur} value={values.email} id="createEmail" name="email" type="email" placeholder="Your Email" className="form-input" />
+                                <label htmlFor="altPhoneNumber"> Alternative Number</label>
+                                <input
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    value={values.altPhoneNumber}
+                                    id="altPhoneNumber"
+                                    name="altPhoneNumber"
+                                    type="text"
+                                    placeholder="Alternative Number"
+                                    className="form-input"
+                                />
+                            </div>
+                        </div>
+                        <div className="flex flex-col gap-4 sm:flex-row">
+                            <div className="flex-1">
+                                <label>Date Of Birth</label>
+                                <Flatpickr
+                                    data-enable-time={false}
+                                    options={{
+                                        enableTime: false,
+                                        dateFormat: 'Y-m-d H:i',
+                                        position: 'auto',
+                                    }}
+                                    id="DOB"
+                                    placeholder="Date Of Birth"
+                                    name="DOB"
+                                    className="form-input"
+                                    onChange={(e) => setFieldValue('DOB', e[0].toISOString())}
+                                    value={values.DOB}
+                                />
+                            </div>
+                            <div className="flex-1">
+                                <label>Wedding Anniversary</label>
+                                <Flatpickr
+                                    data-enable-time={false}
+                                    options={{
+                                        enableTime: false,
+                                        dateFormat: 'Y-m-d H:i',
+                                        position: 'auto',
+                                    }}
+                                    id="anniversary"
+                                    placeholder="Wedding Anniversary"
+                                    name="anniversary"
+                                    className="form-input"
+                                    onChange={(e) => setFieldValue('anniversary', e[0].toISOString())}
+                                    value={values.anniversary}
+                                />
                             </div>
                         </div>
                         <div className="flex flex-col gap-4 sm:flex-row">
@@ -343,9 +422,15 @@ const ContactEditModal = () => {
                                     }}
                                 />
                             </div>
+                        </div>
+                        <div className="flex flex-col gap-4 sm:flex-row">
                             <div className="flex-1">
                                 <label htmlFor="city">City</label>
                                 <input onChange={handleChange} onBlur={handleBlur} value={values.city} id="city" name="city" type="text" placeholder="Enter City Name" className="form-input" />
+                            </div>
+                            <div className="flex-1">
+                                <label htmlFor="createEmail">Email</label>
+                                <input onChange={handleChange} onBlur={handleBlur} value={values.email} id="createEmail" name="email" type="email" placeholder="Your Email" className="form-input" />
                             </div>
                         </div>
                         <div>

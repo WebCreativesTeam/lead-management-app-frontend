@@ -7,7 +7,27 @@ import { IRootState } from '@/store';
 const ContactViewModal = () => {
     const { viewModal, singleData } = useSelector((state: IRootState) => state.contacts);
     const dispatch = useDispatch();
-    const { location, assignedTo, comment, createdAt, email, facebookProfile, industry, name, phoneNumber, position, source, title, twitterProfile, updatedAt, website, addedBy } = singleData;
+    const {
+        location,
+        assignedTo,
+        comment,
+        createdAt,
+        email,
+        facebookProfile,
+        industry,
+        name,
+        phoneNumber,
+        position,
+        source,
+        title,
+        twitterProfile,
+        updatedAt,
+        website,
+        addedBy,
+        anniversary,
+        DOB,
+        altPhoneNumber,
+    } = singleData;
 
     const reqData: any = {
         name: title + ' ' + name,
@@ -15,6 +35,9 @@ const ContactViewModal = () => {
         phoneNumber,
         industry,
         position,
+        ['Wedding Anniversary']: anniversary,
+        ['Date Of Birth']: DOB,
+        ['Alternative Phone Number']: altPhoneNumber,
         ['Assigned To']: `${assignedTo?.firstName} ${assignedTo?.lastName} (${assignedTo?.email})`,
         ['source Name']: source?.name,
         ['Added By']: `${addedBy?.firstName} ${addedBy?.lastName} (${addedBy?.email})`,
@@ -35,6 +58,7 @@ const ContactViewModal = () => {
             title="View Contact Detail"
             open={viewModal}
             onClose={() => dispatch(setViewModal({ open: false }))}
+            size="large"
             content={
                 <>
                     <ul className="flex flex-col gap-4">

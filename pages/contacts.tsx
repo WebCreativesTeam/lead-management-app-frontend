@@ -24,7 +24,7 @@ const Contacts = () => {
         dispatch(setPageTitle('Contacts'));
     });
     //hooks
-    const { data, isFetching, isAbleToCreate, isAbleToDelete, isAbleToUpdate, isAbleToRead, totalRecords } = useSelector((state: IRootState) => state.contacts);
+    const { data, isFetching, isAbleToCreate, isAbleToDelete, isAbleToUpdate, isAbleToRead, totalRecords, viewModal, deleteModal, createModal } = useSelector((state: IRootState) => state.contacts);
     const isRtl = useSelector((state: IRootState) => state.themeConfig.rtlClass) === 'rtl' ? true : false;
     const [searchInputText, setSearchInputText] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(false);
@@ -51,6 +51,9 @@ const Contacts = () => {
         { accessor: 'email', title: 'Email' },
         { accessor: 'position', title: 'Position' },
         { accessor: 'industry', title: 'Industry' },
+        { accessor: 'anniversary', title: 'anniversary' },
+        { accessor: 'DOB', title: 'Date Of Birth' },
+        { accessor: 'altPhoneNumber', title: 'Alternative Phone Number' },
         { accessor: 'city', title: 'City' },
         { accessor: 'state', title: 'State' },
         { accessor: 'country', title: 'Country' },
@@ -162,7 +165,7 @@ const Contacts = () => {
                             </>
                         }
                     >
-                        <ul className="!min-w-[170px]">
+                        <ul className="!min-w-[250px]">
                             {cols.map((col, i) => {
                                 return (
                                     <li
@@ -235,6 +238,27 @@ const Contacts = () => {
                             sortable: true,
                             render: ({ industry }) => <div>{industry}</div>,
                             hidden: hideCols.includes('industry'),
+                        },
+                        {
+                            accessor: 'anniversary',
+                            title: 'Anniversary',
+                            sortable: true,
+                            render: ({ anniversary }) => <div>{new Date(anniversary).toLocaleString()}</div>,
+                            hidden: hideCols.includes('anniversary'),
+                        },
+                        {
+                            accessor: 'DOB',
+                            title: 'Date Of Birth',
+                            sortable: true,
+                            render: ({ DOB }) => <div>{new Date(DOB).toLocaleString()}</div>,
+                            hidden: hideCols.includes('DOB'),
+                        },
+                        {
+                            accessor: 'altPhoneNumber',
+                            title: 'Alternative Number',
+                            sortable: true,
+                            render: ({ altPhoneNumber }) => <div>{altPhoneNumber}</div>,
+                            hidden: hideCols.includes('altPhoneNumber'),
                         },
                         {
                             accessor: 'city',
@@ -315,16 +339,16 @@ const Contacts = () => {
             </div>
 
             {/* edit modal */}
-            <ContactEditModal />
+            {isAbleToUpdate && <ContactEditModal />}
 
             {/* view modal */}
-            <ContactViewModal />
+            {viewModal && <ContactViewModal />}
 
             {/* delete modal */}
-            <ContactDeleteModal />
+            {isAbleToDelete && deleteModal && <ContactDeleteModal />}
 
             {/* create modal */}
-            <ContactCreateModal />
+            {isAbleToCreate && createModal && <ContactCreateModal />}
         </div>
     );
 };

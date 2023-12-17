@@ -100,8 +100,10 @@ const CampaignCreateModal = () => {
         formik.setFieldValue('productId', 'All');
     }, []);
 
+    console.log("createModal")
+
     useEffect(() => {
-        const createCustomFieldDropdown: SelectOptionsType[] = customDateFields.map((item: ICustomField) => {
+        const createCustomFieldDropdown: SelectOptionsType[] = customDateFields?.map((item: ICustomField) => {
             return { label: item?.label, value: item?.id };
         });
         setCustomFieldList(createCustomFieldDropdown);

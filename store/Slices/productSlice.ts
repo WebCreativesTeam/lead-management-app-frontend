@@ -80,20 +80,20 @@ const productSlice = createSlice({
             state.isFetching = action.payload;
         },
         setProductReadPolicy(state, action) {
-            const verifyPolicy: boolean = state.userPolicyArr.includes(action.payload);
-            state.isAbleToRead = verifyPolicy;
+            const verifyPermission: boolean = state.userPolicyArr.includes(action.payload);
+            state.isAbleToRead = verifyPermission;
         },
         setProductCreatePolicy(state, action) {
-            const verifyPolicy: boolean = state.userPolicyArr.includes(action.payload);
-            state.isAbleToCreate = verifyPolicy;
+            const verifyPermission: boolean = state.userPolicyArr.includes(action.payload);
+            state.isAbleToCreate = verifyPermission;
         },
         setProductUpdatePolicy(state, action) {
-            const verifyPolicy: boolean = state.userPolicyArr.includes(action.payload);
-            state.isAbleToUpdate = verifyPolicy;
+            const verifyPermission: boolean = state.userPolicyArr.includes(action.payload);
+            state.isAbleToUpdate = verifyPermission;
         },
         setProductDeletePolicy(state, action) {
-            const verifyPolicy: boolean = state.userPolicyArr.includes(action.payload);
-            state.isAbleToDelete = verifyPolicy;
+            const verifyPermission: boolean = state.userPolicyArr.includes(action.payload);
+            state.isAbleToDelete = verifyPermission;
         },
         setProductDataLength(state, action: PayloadAction<number>) {
             state.totalRecords = action.payload;

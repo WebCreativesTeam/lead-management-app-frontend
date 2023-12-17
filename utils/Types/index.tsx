@@ -246,6 +246,9 @@ export interface ContactDataType {
         state: string;
         country: string;
     };
+    altPhoneNumber: string;
+    DOB: string;
+    anniversary: string;
 }
 
 //branch page types //
@@ -564,6 +567,7 @@ export interface CampaignInitialStateProps extends InitialStateProps {
     customDateFields: ICustomField[];
     leadProductList: ProductSecondaryEndpointType[];
     campaignActivationModal: boolean;
+    isAbleToActivateCampaign: boolean;
 }
 
 //dashboard slice intial props

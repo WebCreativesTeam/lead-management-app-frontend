@@ -74,7 +74,8 @@ const CampaignEditModal = () => {
     }, [singleData]);
 
     useEffect(() => {
-        dispatch(getCustomDateFieldsList());
+        //uncomment
+        // dispatch(getCustomDateFieldsList());
     }, []);
 
     const dispatch = useDispatch<AppDispatch>();
