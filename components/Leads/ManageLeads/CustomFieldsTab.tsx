@@ -225,7 +225,7 @@ const CustomFieldsTab = () => {
                                     )}
                                     {item?.fieldType === 'RADIO' && (
                                         <>
-                                            <div className="flex gap-x-5">
+                                            <div className="flex flex-wrap gap-x-5">
                                                 {item?.options?.map((item2, index) => {
                                                     return (
                                                         <div key={index}>
@@ -237,7 +237,6 @@ const CustomFieldsTab = () => {
                                                                 value={item2?.value}
                                                                 onChange={(e) => {
                                                                     handleChange(item?.id);
-                                                                    console.log(e.target.value);
                                                                     if (e.target.value && item?.required) {
                                                                         setErrorObj((preVal: any) => {
                                                                             return { ...preVal, [item?.id]: undefined };
@@ -253,9 +252,7 @@ const CustomFieldsTab = () => {
                                                                     }
                                                                 }}
                                                             />
-                                                            <label className="inline-flex" htmlFor={item?.id}>
-                                                                {item2?.name}
-                                                            </label>
+                                                            <label className="inline-flex">{item2?.name}</label>
                                                         </div>
                                                     );
                                                 })}
@@ -265,7 +262,7 @@ const CustomFieldsTab = () => {
                                     )}
                                     {item?.fieldType === 'CHECKBOX' && (
                                         <>
-                                            <div className="flex items-center gap-x-5">
+                                            <div className="flex flex-wrap items-center gap-x-5">
                                                 {item?.options?.map((item2, index) => {
                                                     return (
                                                         <div key={index}>

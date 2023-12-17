@@ -11,10 +11,10 @@ import { GetMethodResponseType, IFollowup, ILeadStatus, LeadStatusSecondaryEndpo
 import { ApiClient } from '@/utils/http';
 import { IRootState } from '@/store';
 import Select from 'react-select';
-import { getAllLeadStatusForCampaign, getAllSourceForCampaign, setDeleteModal, setEditModal, setCampaignDataLength, setViewModal } from '@/store/Slices/campaignSlice';
-import ScheduleMessageViewModal from '@/components/Campaign/CampaignViewModal';
-import ScheduleMessageEditModal from '@/components/Campaign/CampaignEditModal';
-import ScheduleMessageDeleteModal from '@/components/Campaign/CampaignDeleteModal';
+// import { getAllLeadStatusForCampaign, getAllSourceForCampaign, setDeleteModal, setEditModal, setCampaignDataLength, setViewModal } from '@/store/Slices/campaignSlice';
+// import ScheduleMessageViewModal from '@/components/Campaign/CampaignViewModal';
+// import ScheduleMessageEditModal from '@/components/Campaign/CampaignEditModal';
+// import ScheduleMessageDeleteModal from '@/components/Campaign/CampaignDeleteModal';
 import { followUpDropdownList, followupData } from '@/utils/Raw Data';
 import { getAllLeadStatusForDashboard, getAllPendingFollowups, getAllTodayFollowups, getAllTomorrowFollowups } from '@/store/Slices/dashbordSlice';
 import FollowUpCard from '@/components/Dashboard/FollowUpCard';
@@ -58,8 +58,8 @@ const Dashboard = () => {
     }, [todayFollowUps]);
 
     useEffect(() => {
-        getAllSourceList();
-        getLeadStatus();
+        // getAllSourceList();
+        // getLeadStatus();
     }, []);
 
     //get all ScheduleMessage list
@@ -72,7 +72,7 @@ const Dashboard = () => {
         //     return;
         // }
         dispatch(getAllTodayFollowups(followupData));
-        dispatch(setCampaignDataLength(followupData.length));
+        // dispatch(setCampaignDataLength(followupData.length));
         setLoading(false);
     };
 
@@ -86,7 +86,7 @@ const Dashboard = () => {
         //     return;
         // }
         dispatch(getAllTomorrowFollowups(followupData));
-        dispatch(setCampaignDataLength(followupData.length));
+        // dispatch(setCampaignDataLength(followupData.length));
         setLoading(false);
     };
 
@@ -100,45 +100,45 @@ const Dashboard = () => {
         //     return;
         // }
         dispatch(getAllPendingFollowups(followupData));
-        dispatch(setCampaignDataLength(followupData.length));
+        // dispatch(setCampaignDataLength(followupData.length));
         setLoading(false);
     };
 
     //get all Source list
-    const getAllSourceList = async () => {
-        const sourceList: GetMethodResponseType = await new ApiClient().get('source/list');
-        const source: SourceDataType[] = sourceList?.data;
-        if (typeof source === 'undefined') {
-            dispatch(getAllSourceForCampaign([] as SourceDataType[]));
-            return;
-        }
-        dispatch(getAllSourceForCampaign(source));
-    };
+    // const getAllSourceList = async () => {
+    //     const sourceList: GetMethodResponseType = await new ApiClient().get('source/list');
+    //     const source: SourceDataType[] = sourceList?.data;
+    //     if (typeof source === 'undefined') {
+    //         dispatch(getAllSourceForCampaign([] as SourceDataType[]));
+    //         return;
+    //     }
+    //     dispatch(getAllSourceForCampaign(source));
+    // };
 
     //get all lead status list
-    const getLeadStatus = async () => {
-        const leadStatusList: GetMethodResponseType = await new ApiClient().get('lead-status/list');
-        const status: ILeadStatus[] = leadStatusList?.data;
-        if (typeof status === 'undefined') {
-            dispatch(getAllLeadStatusForDashboard([] as ILeadStatus[]));
-            return;
-        }
-        dispatch(getAllLeadStatusForDashboard(status));
-    };
+    // const getLeadStatus = async () => {
+    //     const leadStatusList: GetMethodResponseType = await new ApiClient().get('lead-status/list');
+    //     const status: ILeadStatus[] = leadStatusList?.data;
+    //     if (typeof status === 'undefined') {
+    //         dispatch(getAllLeadStatusForDashboard([] as ILeadStatus[]));
+    //         return;
+    //     }
+    //     dispatch(getAllLeadStatusForDashboard(status));
+    // };
 
-    useEffect(() => {
-        const createLeadStatusDropdown: SelectOptionsType[] = leadStatusList?.map((item: LeadStatusSecondaryEndpoint) => {
-            return {
-                value: item.id,
-                label: (
-                    <div className={`rounded px-2.5 py-0.5 text-sm font-medium dark:bg-blue-900 dark:text-blue-300 text-center`} style={{ color: item?.color, backgroundColor: item?.color + '20' }}>
-                        {item?.name}
-                    </div>
-                ),
-            };
-        });
-        setLeadSatusDropdown(createLeadStatusDropdown);
-    }, [leadStatusList]);
+    // useEffect(() => {
+    //     const createLeadStatusDropdown: SelectOptionsType[] = leadStatusList?.map((item: LeadStatusSecondaryEndpoint) => {
+    //         return {
+    //             value: item.id,
+    //             label: (
+    //                 <div className={`rounded px-2.5 py-0.5 text-sm font-medium dark:bg-blue-900 dark:text-blue-300 text-center`} style={{ color: item?.color, backgroundColor: item?.color + '20' }}>
+    //                     {item?.name}
+    //                 </div>
+    //             ),
+    //         };
+    //     });
+    //     setLeadSatusDropdown(createLeadStatusDropdown);
+    // }, [leadStatusList]);
 
     return (
         <div>
@@ -226,20 +226,29 @@ const Dashboard = () => {
                             render: ({ id }) => (
                                 <div className="flex justify-center gap-2  p-3 text-center ">
                                     <Tippy content="WhatsApp">
-                                        <button type="button" onClick={() => dispatch(setViewModal({ id, open: true }))}>
+                                        <button
+                                            type="button"
+                                            // onClick={() => dispatch(setViewModal({ id, open: true }))}
+                                        >
                                             <Sms />
                                         </button>
                                     </Tippy>
                                     {/* {isAbleToUpdate && ( */}
                                     <Tippy content="SMS">
-                                        <button type="button" onClick={() => dispatch(setEditModal({ id, open: true }))}>
+                                        <button
+                                            type="button"
+                                            // onClick={() => dispatch(setEditModal({ id, open: true }))}
+                                        >
                                             <ChatIcon />
                                         </button>
                                     </Tippy>
                                     {/* )} */}
                                     {/* {isAbleToDelete && ( */}
                                     <Tippy content="Email">
-                                        <button type="button" onClick={() => dispatch(setDeleteModal({ id, open: true }))}>
+                                        <button
+                                            type="button"
+                                            // onClick={() => dispatch(setDeleteModal({ id, open: true }))}
+                                        >
                                             <Email />
                                         </button>
                                     </Tippy>
@@ -254,20 +263,29 @@ const Dashboard = () => {
                             render: ({ id }) => (
                                 <div className="flex justify-center gap-2  p-3 text-center ">
                                     <Tippy content="View">
-                                        <button type="button" onClick={() => dispatch(setViewModal({ id, open: true }))}>
+                                        <button
+                                            type="button"
+                                            // onClick={() => dispatch(setViewModal({ id, open: true }))}
+                                        >
                                             <View />
                                         </button>
                                     </Tippy>
                                     {/* {isAbleToUpdate && ( */}
                                     <Tippy content="Edit">
-                                        <button type="button" onClick={() => dispatch(setEditModal({ id, open: true }))}>
+                                        <button
+                                            type="button"
+                                            // onClick={() => dispatch(setEditModal({ id, open: true }))}
+                                        >
                                             <Edit />
                                         </button>
                                     </Tippy>
                                     {/* )} */}
                                     {/* {isAbleToDelete && ( */}
                                     <Tippy content="Delete">
-                                        <button type="button" onClick={() => dispatch(setDeleteModal({ id, open: true }))}>
+                                        <button
+                                            type="button"
+                                            // onClick={() => dispatch(setDeleteModal({ id, open: true }))}
+                                        >
                                             <Delete />
                                         </button>
                                     </Tippy>
@@ -291,13 +309,13 @@ const Dashboard = () => {
             </div>
 
             {/* edit modal */}
-            <ScheduleMessageEditModal />
+            {/* <ScheduleMessageEditModal /> */}
 
             {/* view modal */}
-            <ScheduleMessageViewModal />
+            {/* <ScheduleMessageViewModal /> */}
 
             {/* delete modal */}
-            <ScheduleMessageDeleteModal />
+            {/* <ScheduleMessageDeleteModal /> */}
         </div>
     );
 };

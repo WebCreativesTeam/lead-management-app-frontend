@@ -144,7 +144,7 @@ const CampaignEditModal = () => {
     });
 
     useEffect(() => {
-        const editCustomFieldDropdown: SelectOptionsType[] = customDateFields.map((item: ICustomField) => {
+        const editCustomFieldDropdown: SelectOptionsType[] = customDateFields?.map((item: ICustomField) => {
             return { label: item?.label, value: item?.id };
         });
         setCustomFieldList(editCustomFieldDropdown);

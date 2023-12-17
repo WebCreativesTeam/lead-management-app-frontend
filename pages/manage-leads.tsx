@@ -49,6 +49,7 @@ import ViewLeadModal from '@/components/Leads/ManageLeads/ViewLeadModal';
 import ChangeLeadPriorityModal from '@/components/Leads/ManageLeads/ChangeLeadPriorityModal';
 import ChangeLeadStatusModal from '@/components/Leads/ManageLeads/ChangeLeadStatusModal';
 import { getAllCustomField } from '@/store/Slices/customFieldSlice';
+import Link from 'next/link';
 
 const ManageLeads = () => {
     const dispatch = useDispatch();
@@ -218,7 +219,7 @@ const ManageLeads = () => {
         setLoading(true);
         const res: GetMethodResponseType = await new ApiClient().get(`custom-field?sortBy=order`);
         const customField: ICustomField[] = res?.data;
-    
+
         if (typeof customField === 'undefined') {
             dispatch(getAllCustomFieldsForLeads([] as ICustomField[]));
             return;
@@ -488,22 +489,22 @@ const ManageLeads = () => {
                             render: ({ id }) => (
                                 <div className="flex justify-center gap-2  p-3 text-center ">
                                     <Tippy content="WhatsApp">
-                                        <button type="button" onClick={() => dispatch(setViewModal({ id, open: true }))}>
+                                        <Link href={'/message/whatsapp'}>
                                             <Sms />
-                                        </button>
+                                        </Link>
                                     </Tippy>
                                     {/* {isAbleToUpdate && ( */}
                                     <Tippy content="SMS">
-                                        <button type="button" onClick={() => dispatch(setEditModal({ id, open: true }))}>
+                                        <Link href={'/message/sms'}>
                                             <ChatIcon />
-                                        </button>
+                                        </Link>
                                     </Tippy>
                                     {/* )} */}
                                     {/* {isAbleToDelete && ( */}
                                     <Tippy content="Email">
-                                        <button type="button" onClick={() => dispatch(setDeleteModal({ id, open: true }))}>
+                                        <Link href={'/message/email'}>
                                             <Email />
-                                        </button>
+                                        </Link>
                                     </Tippy>
                                     {/* )} */}
                                 </div>

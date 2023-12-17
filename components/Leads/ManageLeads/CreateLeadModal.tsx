@@ -317,42 +317,6 @@ const LeadCreateModal = () => {
                                         </div>
                                         <div className="flex flex-col gap-4 sm:flex-row">
                                             <div className="flex-1">
-                                                <label>Created Date</label>
-                                                <Flatpickr
-                                                    data-enable-time
-                                                    options={{
-                                                        enableTime: true,
-                                                        dateFormat: 'Y-m-d H:i',
-                                                        position: 'auto',
-                                                    }}
-                                                    id="taskStartDate"
-                                                    placeholder="Task Start Date"
-                                                    name="startDate"
-                                                    className="form-input"
-                                                    onChange={(e) => setFieldValue('startDate', e)}
-                                                    // value={values.startDate}
-                                                />
-                                            </div>
-                                            <div className="flex-1">
-                                                <label>Last Update</label>
-                                                <Flatpickr
-                                                    data-enable-time
-                                                    options={{
-                                                        enableTime: true,
-                                                        dateFormat: 'Y-m-d H:i',
-                                                        position: 'auto',
-                                                    }}
-                                                    id="taskEndDate"
-                                                    placeholder="Task End Date"
-                                                    name="endDate"
-                                                    className="form-input"
-                                                    onChange={(e) => setFieldValue('endDate', e)}
-                                                    // value={values.endDate}
-                                                />
-                                            </div>
-                                        </div>
-                                        <div className="flex flex-col gap-4 sm:flex-row">
-                                            <div className="flex-1">
                                                 <label>Next Follow Up</label>
                                                 <Flatpickr
                                                     data-enable-time
