@@ -3,18 +3,20 @@ import { ICustomField } from '@/utils/Types';
 import { showToastAlert } from '@/utils/contant';
 import { useFormik } from 'formik';
 import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import Select from 'react-select';
 import Flatpickr from 'react-flatpickr';
 import 'flatpickr/dist/flatpickr.css';
 import { getYupSchemaFromMetaData } from './yupValidationSchema';
+import { setCreateModal } from '@/store/Slices/leadSlice/manageLeadSlice';
 
 const CustomFieldsTab = () => {
     const { customFieldsList } = useSelector((state: IRootState) => state.lead);
     const customFieldTabSchema = getYupSchemaFromMetaData(customFieldsList, [], []);
     const [errorObj, setErrorObj] = useState({} as any);
+    const dispatch = useDispatch();
 
-    const { values, handleChange, handleSubmit, setFieldValue, handleBlur, setFieldTouched, touched } = useFormik({
+    const { values, handleChange, handleSubmit, setFieldValue, handleBlur, setFieldTouched, touched, submitForm } = useFormik({
         initialValues: {} as any,
         validationSchema: customFieldTabSchema,
         validateOnChange: true,
@@ -301,7 +303,21 @@ const CustomFieldsTab = () => {
                         );
                     })}
                 </div>
-                <input type="submit" className="btn btn-primary" disabled={true} />
+                <div className="mt-8 flex items-center justify-end">
+                    <button
+                        type="button"
+                        className="btn btn-outline-danger"
+                        onClick={() => {
+                            dispatch(setCreateModal(false));
+                        }}
+                        disabled={false}
+                    >
+                        Discard
+                    </button>
+                    <button type="submit" className="btn  btn-primary cursor-pointer ltr:ml-4 rtl:mr-4" disabled={true} onClick={() => submitForm()}>
+                        Submit
+                    </button>
+                </div>
             </form>
         </div>
     );
