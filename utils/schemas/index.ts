@@ -85,12 +85,7 @@ export const taskSchema = Yup.object().shape({
 
 //task Schema
 export const leadSchema = Yup.object().shape({
-    reference: Yup.string().required('Enter Reference'),
-    estimatedBudget: Yup.number().required('Enter Budget'),
-    description: Yup.string().required('Enter Description'),
-    facebookCampaignName: Yup.string().required('Enter facebook Campaign Name'),
-    serviceInterestedIn: Yup.string().required('Enter Service Intrested'),
-    job: Yup.string().required('Enter Job'),
+    zip: Yup.string().required('Enter Zip Code'),
 });
 
 //task priority schema

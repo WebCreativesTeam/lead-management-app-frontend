@@ -527,7 +527,6 @@ export interface ManageLeadInitialStateProps extends InitialStateProps {
     leadContactsList: ContactListSecondaryEndpoint[];
     leadBranchList: BranchListSecondaryEndpoint[];
     leadSourceList: SourceDataType[];
-    leadUserList: UserListSecondaryEndpointType[];
     customFieldsList: ICustomField[];
     leadProductList: ProductSecondaryEndpointType[];
 }

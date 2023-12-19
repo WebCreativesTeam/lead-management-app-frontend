@@ -32,7 +32,6 @@ import {
     getAllLeads,
     getAllProductsForLead,
     getAllSourceForLead,
-    getAllUsersForLeads,
     setChangePriorityModal,
     setChangeStatusModal,
     setCreateModal,
@@ -48,7 +47,6 @@ import EditLeadModal from '@/components/Leads/ManageLeads/EditLeadModal';
 import ViewLeadModal from '@/components/Leads/ManageLeads/ViewLeadModal';
 import ChangeLeadPriorityModal from '@/components/Leads/ManageLeads/ChangeLeadPriorityModal';
 import ChangeLeadStatusModal from '@/components/Leads/ManageLeads/ChangeLeadStatusModal';
-import { getAllCustomField } from '@/store/Slices/customFieldSlice';
 import Link from 'next/link';
 
 const ManageLeads = () => {
@@ -108,7 +106,6 @@ const ManageLeads = () => {
         getContactsList();
         getBranchList();
         getSourceList();
-        getAllUsersList();
         getCustomFieldList();
         getAllProducts();
     }, []);
@@ -192,18 +189,6 @@ const ManageLeads = () => {
             return;
         }
         dispatch(getAllLeadStatus(status));
-    };
-
-    //get all user's list
-    const getAllUsersList = async () => {
-        setLoading(true);
-        const usersList: GetMethodResponseType = await new ApiClient().get('user/list');
-        const users: UserListSecondaryEndpointType[] = usersList?.data;
-        if (typeof users === 'undefined') {
-            dispatch(getAllUsersForLeads([] as UserListSecondaryEndpointType[]));
-            return;
-        }
-        dispatch(getAllUsersForLeads(users));
     };
 
     const showHideColumns = (col: string) => {

@@ -14,3 +14,18 @@ export const namePrefix: SelectOptionsType[] = [
         label: 'Ms',
     },
 ];
+
+export const genderList: SelectOptionsType[] = [
+    {
+        value: 'M',
+        label: 'Male',
+    },
+    {
+        value: 'F',
+        label: 'Female',
+    },
+    {
+        value: 'Others',
+        label: 'Others',
+    },
+];
