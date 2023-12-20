@@ -364,7 +364,7 @@ const Sidebar = () => {
                                 </li>
                             )}
                             {/* manage leads */}
-                            {isAbleToReadContact && (
+                            {isAbleToReadLeads && (
                                 <li className="menu nav-item">
                                     <Link href="/manage-leads" className="group">
                                         <div className="flex items-center">
@@ -413,7 +413,6 @@ const Sidebar = () => {
                                     </div>
                                 </Link>
                             </li>
-
                             {/* Campaign */}
                             {isAbleToReadCampaign && (
                                 <li className="menu nav-item">
@@ -425,7 +424,6 @@ const Sidebar = () => {
                                     </Link>
                                 </li>
                             )}
-
                             {/* Message */}
                             <li className="menu nav-item">
                                 <button type="button" className={`${currentMenu === 'Message' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('Message')}>
@@ -454,7 +452,6 @@ const Sidebar = () => {
                                     </ul>
                                 </AnimateHeight>
                             </li>
-
                             {/* Templates */}
                             {!isAbleToReadEmailTemplates && !isAbleToReadEmailSmtp ? null : (
                                 <li className="menu nav-item">
@@ -490,7 +487,6 @@ const Sidebar = () => {
                                 </li>
                             )}
                             <SideabarLabel label="System" />
-
                             {/* Integrations */}
                             <li className="menu nav-item">
                                 <Link href="/integrations" className="group">
@@ -500,7 +496,6 @@ const Sidebar = () => {
                                     </div>
                                 </Link>
                             </li>
-
                             {/* manage users */}
                             <li className="menu nav-item">
                                 <Link href="/manage-users" className="group">
@@ -510,7 +505,6 @@ const Sidebar = () => {
                                     </div>
                                 </Link>
                             </li>
-
                             {/* Access policies */}
                             <li className="menu nav-item">
                                 <Link href="/access-policies" className="group">
@@ -520,7 +514,6 @@ const Sidebar = () => {
                                     </div>
                                 </Link>
                             </li>
-
                             {/* Manage Products */}
                             {isAbleToReadProduct && (
                                 <li className="menu nav-item">
@@ -532,7 +525,6 @@ const Sidebar = () => {
                                     </Link>
                                 </li>
                             )}
-
                             {/* Custom Fields */}
                             <li className="menu nav-item">
                                 <Link href="/custom-fields" className="group">
@@ -542,7 +534,6 @@ const Sidebar = () => {
                                     </div>
                                 </Link>
                             </li>
-
                             {/* Logs */}
                             <li className="menu nav-item">
                                 <Link href="/logs" className="group">
@@ -552,10 +543,8 @@ const Sidebar = () => {
                                     </div>
                                 </Link>
                             </li>
-
                             {/* settigs */}
                             <SideabarLabel label="Settings" />
-
                             {/* Campaign Integration */}
                             <li className="menu nav-item">
                                 <button type="button" className={`${currentMenu === 'Campaign Integration' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('Campaign Integration')}>
@@ -584,7 +573,6 @@ const Sidebar = () => {
                                     </ul>
                                 </AnimateHeight>
                             </li>
-
                             {/* branches */}
                             <li className="menu nav-item">
                                 <Link href="/branches" className="group">
@@ -594,7 +582,6 @@ const Sidebar = () => {
                                     </div>
                                 </Link>
                             </li>
-
                             {/* Lead Settings */}
                             <li className="menu nav-item">
                                 <button type="button" className={`${currentMenu === 'Lead Settings' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('Lead Settings')}>
@@ -622,7 +609,6 @@ const Sidebar = () => {
                                     </ul>
                                 </AnimateHeight>
                             </li>
-
                             {/* Task Settings */}
                             <li className="menu nav-item">
                                 <button type="button" className={`${currentMenu === 'Task Settings' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('Task Settings')}>

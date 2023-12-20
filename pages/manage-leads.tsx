@@ -224,7 +224,6 @@ const ManageLeads = () => {
         }
         dispatch(getAllProductsForLead(products));
     };
-
     return !isAbleToRead ? null : (
         <div>
             <PageHeadingSection description="View, create, update, and close leads. Organize by status, priority, and due date. Stay on top of work." heading="Lead Management" />

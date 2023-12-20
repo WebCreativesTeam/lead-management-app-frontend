@@ -80,6 +80,8 @@ const CustomFieldsTab = () => {
         }
         setErrorObj(createErrorObj);
     }, [customFieldsList]);
+
+    console.log(Object.values(errorObj).every((value) => value === undefined));
     return (
         <div>
             <form onSubmit={handleSubmit}>
@@ -314,7 +316,12 @@ const CustomFieldsTab = () => {
                     >
                         Discard
                     </button>
-                    <button type="submit" className="btn  btn-primary cursor-pointer ltr:ml-4 rtl:mr-4" disabled={true} onClick={() => submitForm()}>
+                    <button
+                        type="submit"
+                        className="btn  btn-primary cursor-pointer ltr:ml-4 rtl:mr-4"
+                        disabled={!Object.values(errorObj).every((value) => value === undefined)}
+                        onClick={() => submitForm()}
+                    >
                         Submit
                     </button>
                 </div>
