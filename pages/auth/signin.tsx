@@ -39,6 +39,7 @@ const LoginPage = () => {
                     password: value.password,
                 });
                 localStorage.setItem('uid', res?.data?.id);
+                localStorage.setItem('token', res?.data?.token);
                 if (!res?.data?.isVerified) {
                     //below is path of api endpoint
                     const sendMail = await new ApiClient().get('auth/confirm-email');

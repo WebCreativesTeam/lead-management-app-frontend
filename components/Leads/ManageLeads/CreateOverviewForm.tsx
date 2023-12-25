@@ -71,11 +71,11 @@ const CreateOverviewForm = () => {
                     followUpDate: new Date(value.followUpDate).toISOString(),
                     sourceId: values.source.value,
                     priorityId: values.priority.value,
-                    statusId: values.status.value,
+                    // statusId: values.status.value,
                     branchId: value.branch.value,
                     contactId: values.contact.value,
                     productId: values.product.value,
-                    zip: values.zip,
+                    zip: values.zip.toString(),
                     subProductId: values.subProduct.value,
                     gender: values.gender.value,
                 };
@@ -100,25 +100,23 @@ const CreateOverviewForm = () => {
         return {
             value: item.id,
             label: (
-                <>
-                    <span className={`rounded px-2.5 py-0.5 text-sm font-medium dark:bg-blue-900 dark:text-blue-300`} style={{ color: item?.color, backgroundColor: item?.color + '20' }}>
-                        {item?.name}
-                    </span>
-                </>
+                <span className={`rounded px-2.5 py-0.5 text-sm font-medium dark:bg-blue-900 dark:text-blue-300`} style={{ color: item?.color, backgroundColor: item?.color + '20' }}>
+                    {item?.name}
+                </span>
             ),
         };
     });
 
-    const leadStatusDropdown: SelectOptionsType[] = leadStatusList?.map((item: LeadStatusSecondaryEndpoint) => {
-        return {
-            value: item.id,
-            label: (
-                <div className={`rounded px-2.5 py-0.5 text-center text-sm font-medium dark:bg-blue-900 dark:text-blue-300`} style={{ color: item?.color, backgroundColor: item?.color + '20' }}>
-                    {item?.name}
-                </div>
-            ),
-        };
-    });
+    // const leadStatusDropdown: SelectOptionsType[] = leadStatusList?.map((item: LeadStatusSecondaryEndpoint) => {
+    //     return {
+    //         value: item.id,
+    //         label: (
+    //             <div className={`rounded px-2.5 py-0.5 text-center text-sm font-medium dark:bg-blue-900 dark:text-blue-300`} style={{ color: item?.color, backgroundColor: item?.color + '20' }}>
+    //                 {item?.name}
+    //             </div>
+    //         ),
+    //     };
+    // });
 
     const leadBranchDropdown: SelectOptionsType[] = leadBranchList?.map((item: BranchListSecondaryEndpoint) => {
         return { value: item.id, label: item.name };
@@ -140,9 +138,15 @@ const CreateOverviewForm = () => {
     }, [leadProductList]);
     return (
         <form className="space-y-5" onSubmit={handleSubmit}>
-            <div className="flex-1">
-                <label htmlFor="contact">Contact</label>
-                <Select placeholder="Select Contact" options={leadContactDropdown} id="contact" onChange={(e) => setFieldValue('contact', e)} />
+            <div className="flex flex-col gap-4 sm:flex-row">
+                <div className="flex-1">
+                    <label htmlFor="contact">Contact</label>
+                    <Select placeholder="Select Contact" options={leadContactDropdown} id="contact" onChange={(e) => setFieldValue('contact', e)} />
+                </div>
+                <div className="flex-1">
+                    <label htmlFor="leadPriority">Lead Priority</label>
+                    <Select placeholder="Select lead priority" options={leadPriorityDropdown} id="leadPriority" onChange={(e) => setFieldValue('priority', e)} />
+                </div>
             </div>
             <div className="flex flex-col gap-4 sm:flex-row">
                 <div className="flex-1">
@@ -152,16 +156,6 @@ const CreateOverviewForm = () => {
                 <div className="flex-1">
                     <label htmlFor="subProduct">Sub Product</label>
                     <Select placeholder="Sub Product" options={productDropdown} id="subProduct" onChange={(e) => setFieldValue('subProduct', e)} />
-                </div>
-            </div>
-            <div className="flex flex-col gap-4 sm:flex-row">
-                <div className="flex-1">
-                    <label htmlFor="leadStatus">Lead Status</label>
-                    <Select placeholder="Select lead Status" options={leadStatusDropdown} id="leadStatus" onChange={(e) => setFieldValue('status', e)} />
-                </div>
-                <div className="flex-1">
-                    <label htmlFor="leadPriority">Lead Priority</label>
-                    <Select placeholder="Select lead priority" options={leadPriorityDropdown} id="leadPriority" onChange={(e) => setFieldValue('priority', e)} />
                 </div>
             </div>
             <div className="flex flex-col gap-4 sm:flex-row">
@@ -244,7 +238,7 @@ const CreateOverviewForm = () => {
                         values.priority.value &&
                         values.product?.value &&
                         values.subProduct.value &&
-                        values.status.value &&
+                        // values.status.value &&
                         values.gender.value &&
                         values.zip &&
                         !isBtnDisabled
