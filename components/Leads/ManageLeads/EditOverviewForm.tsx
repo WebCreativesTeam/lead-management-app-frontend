@@ -17,7 +17,6 @@ const EditOverviewForm = () => {
     const dispatch = useDispatch();
     const { isBtnDisabled, leadBranchList, leadSourceList, leadProductList, leadStatusList, singleData } = useSelector((state: IRootState) => state.lead);
     const [productDropdown, setProductDropdown] = useState<SelectOptionsType[]>([] as SelectOptionsType[]);
-
     const [branchDropdown, setBranchDropdown] = useState<SelectOptionsType[]>([] as SelectOptionsType[]);
     const [sourceDropdown, setSourceDropdown] = useState<SelectOptionsType[]>([] as SelectOptionsType[]);
     const [defaultSourceValue, setDefaultSourceValue] = useState<SelectOptionsType>({} as SelectOptionsType);
@@ -108,7 +107,7 @@ const EditOverviewForm = () => {
         }
     }, [singleData]);
 
-    //create brnach dropdown
+    //create branch dropdown
     useEffect(() => {
         const leadBranchDropdown: SelectOptionsType[] = leadBranchList?.map((item: BranchListSecondaryEndpoint) => {
             return { value: item.id, label: item.name };
