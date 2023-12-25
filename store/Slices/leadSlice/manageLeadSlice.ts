@@ -63,7 +63,7 @@ const manageLeadSlice = createSlice({
                 state.singleData = {} as LeadDataType;
             }
         },
-        setEditModal(state, action) {
+        setEditModal(state, action: PayloadAction<{ open: boolean; id?: string }>) {
             const { open, id } = action.payload;
             state.editModal = open;
             const findRequestedData: LeadDataType | undefined = state.data.find((item: LeadDataType) => item.id === id);

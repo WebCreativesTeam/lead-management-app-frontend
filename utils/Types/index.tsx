@@ -299,19 +299,24 @@ export interface ISmsTemplate {
 //whatsapp template types
 export interface IWhatsappTemplate extends ISmsTemplate {}
 
+enum Gender {
+    Male = 'M',
+    Female = 'F',
+    Others = 'Others',
+}
+
 //lead page types
 export type LeadDataType = {
     id: string;
     createdAt: string;
     updatedAt: string;
-    reference: string;
+    productId: string;
+    subProductId: string;
     estimatedDate: string;
-    estimatedBudget: string;
-    DOB: string;
-    facebookCampaignName: string;
-    serviceInterestedIn: string;
-    job: string;
-    description: string;
+    followUpDate: string;
+    gender: Gender;
+    zip: string;
+    customFields: string;
     status: {
         color: string;
         id: string;

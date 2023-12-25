@@ -1,305 +1,277 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import React, { memo, useEffect, useState } from 'react';
-import Modal from '@/components/__Shared/Modal';
-import { useSelector, useDispatch } from 'react-redux';
+/* eslint-disable @next/next/no-img-element */
+import React, { Fragment, memo, useEffect } from 'react';
 import { IRootState } from '@/store';
-import { setDisableBtn, setEditModal, setFetching } from '@/store/Slices/leadSlice/manageLeadSlice';
-import { useFormik } from 'formik';
-import { leadSchema } from '@/utils/schemas';
-import { ApiClient } from '@/utils/http';
-import { showToastAlert } from '@/utils/contant';
-import Swal from 'sweetalert2';
+import { setEditModal } from '@/store/Slices/leadSlice/manageLeadSlice';
 import Loader from '@/components/__Shared/Loader';
-import Flatpickr from 'react-flatpickr';
 import 'flatpickr/dist/flatpickr.css';
-import Select from 'react-select';
-import { BranchDataType, BranchListSecondaryEndpoint, SelectOptionsType, SourceDataType } from '@/utils/Types';
+import { Dialog, Tab, Transition } from '@headlessui/react';
+import { Home, Note, Setting, Close } from '@/utils/icons';
+import CustomFieldsTab from './CustomFieldsTab';
+import { useDispatch, useSelector } from 'react-redux';
+import EditOverviewForm from './EditOverviewForm';
 
 const LeadEditModal = () => {
     const dispatch = useDispatch();
-    const [defaultSource, setDefaultSource] = useState<SelectOptionsType>({} as SelectOptionsType);
-    const [defaultBranch, setDefaultBranch] = useState<SelectOptionsType>({} as SelectOptionsType);
-
-    const { isFetching, editModal, isBtnDisabled, singleData, leadSourceList, leadBranchList } = useSelector((state: IRootState) => state.lead);
-
-    const leadSourceDropdown: SelectOptionsType[] = leadSourceList?.map((item: SourceDataType) => {
-        return { value: item.id, label: item.name };
-    });
-    const leadBranchDropdown: SelectOptionsType[] = leadBranchList?.map((item: BranchListSecondaryEndpoint) => {
-        return { value: item.id, label: item.name };
-    });
-
-    useEffect(() => {
-        setFieldValue('DOB', singleData?.DOB);
-        setFieldValue('description', singleData?.description);
-        setFieldValue('estimatedBudget', singleData?.estimatedBudget);
-        setFieldValue('estimatedDate', singleData?.estimatedDate);
-        setFieldValue('facebookCampaignName', singleData?.facebookCampaignName);
-        setFieldValue('job', singleData?.job);
-        setFieldValue('reference', singleData?.reference);
-        setFieldValue('serviceInterestedIn', singleData?.serviceInterestedIn);
-        setFieldValue('branch', singleData?.branch);
-        setFieldValue('source', singleData?.source);
-
-        const findSource: SelectOptionsType | undefined = leadSourceDropdown.find((item: SelectOptionsType) => item?.value === singleData?.source?.id);
-        if (findSource) {
-            setDefaultSource(findSource);
-        }
-        const findBranch: SelectOptionsType | undefined = leadBranchDropdown.find((item: SelectOptionsType) => item?.value === singleData?.branch?.id);
-        if (findBranch) {
-            setDefaultBranch(findBranch);
-        }
-    }, [singleData]);
-
-    const initialValues = {
-        reference: '',
-        estimatedDate: '',
-        estimatedBudget: '',
-        branch: {
-            value: '',
-            label: '',
-        },
-        source: {
-            value: '',
-            label: '',
-        },
-        description: '',
-        DOB: '',
-        facebookCampaignName: '',
-        serviceInterestedIn: '',
-        job: '',
-        contactDate: '',
-    };
-    const { values, handleChange, submitForm, handleSubmit, setFieldValue, errors, handleBlur, resetForm } = useFormik({
-        initialValues,
-        validationSchema: leadSchema,
-        validateOnChange: false,
-        enableReinitialize: true,
-        onSubmit: async (value, action) => {
-            dispatch(setFetching(true));
-            try {
-                dispatch(setDisableBtn(true));
-                const editLeadObj = {
-                    estimatedDate: new Date(value.estimatedDate).toISOString(),
-                    description: value.description,
-                    estimatedBudget: +value.estimatedBudget,
-                    sourceId: values.source.value,
-                    branchId: value.branch.value,
-                    reference: value.reference,
-                    DOB: new Date(value.DOB).toISOString(),
-                    facebookCampaignName: value.facebookCampaignName,
-                    serviceInterestedIn: value.serviceInterestedIn,
-                    job: value.job,
-                };
-                await new ApiClient().patch(`lead/${singleData?.id}`, editLeadObj);
-                dispatch(setEditModal({ open: false }));
-                action.resetForm();
-            } catch (error: any) {
-                if (typeof error?.response?.data?.message === 'object') {
-                    showToastAlert(error?.response?.data?.message.join(' , '));
-                } else {
-                    showToastAlert(error?.response?.data?.message);
-                }
-                showToastAlert(error?.response?.data?.message);
-            }
-            dispatch(setDisableBtn(false));
-            dispatch(setFetching(false));
-        },
-    });
-
-    const showAlert = async () => {
-        if (errors.description) {
-            showToastAlert(errors.description);
-        } else if (errors.estimatedBudget) {
-            showToastAlert(errors.estimatedBudget);
-        } else if (errors.facebookCampaignName) {
-            showToastAlert(errors.facebookCampaignName);
-        } else if (errors.job) {
-            showToastAlert(errors.job);
-        } else if (errors.serviceInterestedIn) {
-            showToastAlert(errors.serviceInterestedIn);
-        } else if (errors.reference) {
-            showToastAlert(errors.reference);
-        }
-    };
+    const { isFetching, editModal } = useSelector((state: IRootState) => state.lead);
 
     return (
-        <Modal
-            open={editModal}
-            onClose={() => {
-                dispatch(setEditModal({ open: false }));
-            }}
-            onDiscard={() => {
-                dispatch(setEditModal({ open: false }));
-                resetForm();
-            }}
-            size="large"
-            onSubmit={() => {
-                errors && showAlert();
-                submitForm();
-            }}
-            title="Edit Lead"
-            isBtnDisabled={
-                values.DOB &&
-                values.description &&
-                values.branch &&
-                values.estimatedBudget &&
-                values.estimatedDate &&
-                values.facebookCampaignName &&
-                values.job &&
-                values.reference &&
-                values.serviceInterestedIn &&
-                values.source &&
-                !isBtnDisabled
-                    ? false
-                    : true
-            }
-            disabledDiscardBtn={isBtnDisabled}
-            content={
-                isFetching ? (
-                    <Loader />
-                ) : (
-                    <form className="space-y-5" onSubmit={handleSubmit}>
-                        <div className="flex flex-col gap-4 sm:flex-row">
-                            <div className="flex-1">
-                                <label htmlFor="createLeadReference">Lead Reference</label>
-                                <input
-                                    onChange={handleChange}
-                                    onBlur={handleBlur}
-                                    value={values.reference}
-                                    id="createLeadReference"
-                                    name="reference"
-                                    type="text"
-                                    placeholder="Lead Reference"
-                                    className="form-input"
-                                />
-                            </div>
-                            <div className="flex-1">
-                                <label htmlFor="leadestimatedBudget">Estimated Budget</label>
-                                <input
-                                    onChange={handleChange}
-                                    onBlur={handleBlur}
-                                    value={values.estimatedBudget}
-                                    id="leadestimatedBudget"
-                                    name="estimatedBudget"
-                                    type="number"
-                                    placeholder="Enter estimated Budget"
-                                    className="form-input"
-                                />
-                            </div>
-                        </div>
-                        <div className="flex flex-col gap-4 sm:flex-row">
-                            <div className="flex-1">
-                                <label>Estimate Date</label>
-                                <Flatpickr
-                                    data-enable-time
-                                    options={{
-                                        enableTime: true,
-                                        dateFormat: 'Y-m-d H:i',
-                                        position: 'auto',
-                                    }}
-                                    id="leadEstimateDate"
-                                    name="startDate"
-                                    className="form-input"
-                                    onChange={(e) => setFieldValue('estimatedDate', e)}
-                                    value={values.estimatedDate}
-                                />
-                            </div>
-                            <div className="flex-1">
-                                <label>DOB</label>
-                                <Flatpickr
-                                    data-enable-time
-                                    options={{
-                                        enableTime: true,
-                                        dateFormat: 'Y-m-d H:i',
-                                        position: 'auto',
-                                    }}
-                                    id="DOB"
-                                    name="DOB"
-                                    className="form-input"
-                                    onChange={(e) => setFieldValue('DOB', e)}
-                                    value={values.DOB}
-                                />
-                            </div>
-                        </div>
-                        <div className="flex flex-col gap-4 sm:flex-row">
-                            <div className="flex-1">
-                                <label htmlFor="leadBranch">Select Branch</label>
-                                <Select placeholder="Select Branch" defaultValue={defaultBranch} options={leadBranchDropdown} id="leadBranch" onChange={(e) => setFieldValue('branch', e)} />
-                            </div>
-                            <div className="flex-1">
-                                <label htmlFor="leadSource">Select Source</label>
-                                <Select placeholder="Select Source" defaultValue={defaultSource} options={leadSourceDropdown} id="leadSource" onChange={(e) => setFieldValue('source', e)} />
-                            </div>
-                        </div>
-                        <div className="flex flex-col gap-4 sm:flex-row">
-                            <div className="flex-1">
-                                <label htmlFor="leadFacebookCampaignName">Facebook Campaign Name</label>
-                                <input
-                                    onChange={handleChange}
-                                    onBlur={handleBlur}
-                                    value={values.facebookCampaignName}
-                                    id="leadFacebookCampaignName"
-                                    name="facebookCampaignName"
-                                    type="text"
-                                    placeholder="Facebook Campaign Name"
-                                    className="form-input"
-                                />
-                            </div>
-                            <div className="flex-1">
-                                <label htmlFor="leadServiceInterestedIn">Service Interest</label>
-                                <input
-                                    onChange={handleChange}
-                                    onBlur={handleBlur}
-                                    value={values.serviceInterestedIn}
-                                    id="leadServiceInterestedIn"
-                                    name="serviceInterestedIn"
-                                    type="text"
-                                    placeholder="Service Interest"
-                                    className="form-input"
-                                />
-                            </div>
-                        </div>
-                        <div className="flex flex-col gap-4 sm:flex-row">
-                            <div className="flex-1">
-                                <label htmlFor="leadJob">Job</label>
-                                <input onChange={handleChange} onBlur={handleBlur} value={values.job} id="leadJob" name="job" type="text" placeholder="Enter Job" className="form-input" />
-                            </div>
-                            <div className="flex-1">
-                                <label>Contact Date</label>
-                                <Flatpickr
-                                    data-enable-time
-                                    options={{
-                                        enableTime: true,
-                                        dateFormat: 'Y-m-d H:i',
-                                        position: 'auto',
-                                    }}
-                                    id="contactDate"
-                                    placeholder="Contact Date"
-                                    name="contactDate"
-                                    className="form-input"
-                                    onChange={(e) => setFieldValue('contactDate', e)}
-                                    value={values.contactDate}
-                                />
-                            </div>
-                        </div>
-                        <div>
-                            <label htmlFor="leadDescription"> Description</label>
-                            <textarea
-                                id="leadDescription"
-                                rows={5}
-                                className="form-textarea"
-                                placeholder="Enter Description"
-                                name="description"
-                                onChange={handleChange}
-                                onBlur={handleBlur}
-                                value={values.description}
-                            ></textarea>
-                        </div>
-                    </form>
-                )
-            }
-        />
+        <Transition appear show={editModal} as={Fragment}>
+            <Dialog
+                as="div"
+                open={editModal}
+                onClose={() => {
+                    dispatch(setEditModal({ open: false }));
+                }}
+            >
+                <Transition.Child as={Fragment} enter="ease-out duration-300" enterFrom="opacity-0" enterTo="opacity-100" leave="ease-in duration-200" leaveFrom="opacity-100" leaveTo="opacity-0">
+                    <div className="fixed inset-0" />
+                </Transition.Child>
+                <div className="fixed inset-0 z-[999] overflow-y-auto bg-[black]/60">
+                    <div className="flex min-h-screen items-center justify-center px-4 ">
+                        <Transition.Child
+                            as={Fragment}
+                            enter="ease-out duration-300"
+                            enterFrom="opacity-0 scale-95"
+                            enterTo="opacity-100 scale-100"
+                            leave="ease-in duration-200"
+                            leaveFrom="opacity-100 scale-100"
+                            leaveTo="opacity-0 scale-95"
+                        >
+                            <Dialog.Panel as="div" className="panel my-8 w-full max-w-[48rem] overflow-visible rounded-lg border-0 p-0 text-black dark:text-white-dark">
+                                <div className="flex items-center justify-between rounded-t-lg bg-[#fbfbfb] px-5 py-3 dark:bg-[#121c2c]">
+                                    <h5 className="text-lg font-bold">Update Lead</h5>
+                                    <button
+                                        type="button"
+                                        className="text-white-dark hover:text-dark"
+                                        onClick={() => {
+                                            dispatch(setEditModal({ open: false }));
+                                        }}
+                                    >
+                                        <Close />
+                                    </button>
+                                </div>
+                                <div className="p-5">
+                                    {isFetching ? (
+                                        <Loader />
+                                    ) : (
+                                        <Tab.Group>
+                                            <Tab.List className="mb-8 flex flex-col flex-wrap gap-2 sm:flex-row">
+                                                <Tab as={Fragment}>
+                                                    {({ selected }) => (
+                                                        <button
+                                                            className={`${
+                                                                selected ? 'bg-green-600 text-white shadow-xl !outline-none' : ''
+                                                            } -mb-[1px] flex flex-1 items-center justify-center rounded-lg p-3.5 py-2 before:inline-block hover:bg-green-600 hover:text-white`}
+                                                        >
+                                                            <Home />
+                                                            Overview
+                                                        </button>
+                                                    )}
+                                                </Tab>
+                                                <Tab as={Fragment}>
+                                                    {({ selected }) => (
+                                                        <button
+                                                            className={`${
+                                                                selected ? 'bg-green-600 text-white shadow-xl !outline-none' : ''
+                                                            } -mb-[1px] flex flex-1 items-center justify-center rounded-lg p-3.5 py-2 before:inline-block hover:bg-green-600 hover:text-white`}
+                                                        >
+                                                            <Setting />
+                                                            Custom Fields
+                                                        </button>
+                                                    )}
+                                                </Tab>
+                                                <Tab as={Fragment}>
+                                                    {({ selected }) => (
+                                                        <button
+                                                            className={`${
+                                                                selected ? 'bg-green-600 text-white  shadow-xl !outline-none' : ''
+                                                            } -mb-[1px] flex flex-1 items-center justify-center rounded-lg p-3.5 py-2  before:inline-block hover:bg-green-600 hover:text-white`}
+                                                        >
+                                                            <Note />
+                                                            Note
+                                                        </button>
+                                                    )}
+                                                </Tab>
+                                            </Tab.List>
+                                            <Tab.Panels>
+                                                {/* overview form :start */}
+                                                <Tab.Panel>
+                                                    <EditOverviewForm />
+                                                </Tab.Panel>
+                                                {/* overview form :end */}
+
+                                                {/* Custom fields tab : start */}
+                                                <Tab.Panel>
+                                                    <CustomFieldsTab />
+                                                </Tab.Panel>
+                                                {/* custom fields tab :end */}
+
+                                                {/* Notes tab content : start */}
+                                                <Tab.Panel>
+                                                    <div className="mb-5">
+                                                        <div className="panel max-h-[60vh] overflow-y-auto">
+                                                            <div className="sm:flex">
+                                                                <div className="relative z-[2] mx-auto mb-5 before:absolute before:-bottom-[15px] before:left-1/2 before:top-12 before:-z-[1] before:hidden before:h-auto before:w-0 before:-translate-x-1/2 before:border-l-2 before:border-[#ebedf2] dark:before:border-[#191e3a] sm:mb-0 sm:before:block ltr:sm:mr-8 rtl:sm:ml-8">
+                                                                    <img
+                                                                        src="/assets/images/profile-16.jpeg"
+                                                                        alt="img"
+                                                                        className="mx-auto h-12 w-12 rounded-full shadow-[0_4px_9px_0_rgba(31,45,61,0.31)]"
+                                                                    />
+                                                                </div>
+
+                                                                <div className="flex-1">
+                                                                    <h4 className="text-center text-base font-bold text-primary ltr:sm:text-left rtl:sm:text-right">Laurie Fox</h4>
+                                                                    <p className="text-xs tracking-wide text-gray-500">31/01/2024, 12:00 AM</p>
+                                                                    <div className="mb-16 mt-2 sm:mt-7">
+                                                                        <h6 className="mb-2 inline-block text-base font-bold">Trending Style</h6>
+                                                                        <p className="font-semibold text-white-dark ltr:pl-8 rtl:pr-8">
+                                                                            Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                                                                            Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                                                                        </p>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div className="sm:flex">
+                                                                <div className="relative z-[2] mx-auto mb-5 before:absolute before:-bottom-[15px] before:left-1/2 before:top-12 before:-z-[1] before:hidden before:h-auto before:w-0 before:-translate-x-1/2 before:border-l-2 before:border-[#ebedf2] dark:before:border-[#191e3a] sm:mb-0 sm:before:block ltr:sm:mr-8 rtl:sm:ml-8">
+                                                                    <img
+                                                                        src="/assets/images/profile-7.jpeg"
+                                                                        alt="img"
+                                                                        className="mx-auto h-12 w-12 rounded-full shadow-[0_4px_9px_0_rgba(31,45,61,0.31)]"
+                                                                    />
+                                                                </div>
+                                                                <div className="flex-1">
+                                                                    <h4 className="text-center text-base font-bold text-primary ltr:sm:text-left rtl:sm:text-right">Justin Cross</h4>
+                                                                    <p className="text-xs tracking-wide text-gray-500">31/01/2024, 12:00 AM</p>
+                                                                    <div className="mb-16 mt-4 sm:mt-7">
+                                                                        <h6 className="mb-2 inline-block text-base font-bold">Nature Photography</h6>
+                                                                        <p className="font-semibold text-white-dark ltr:pl-8 rtl:pr-8">
+                                                                            Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                                                                            Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                                                                        </p>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div className="sm:flex">
+                                                                <div className="relative z-[2] mx-auto mb-5 before:absolute before:-bottom-[15px] before:left-1/2 before:top-12 before:-z-[1] before:hidden before:h-auto before:w-0 before:-translate-x-1/2 before:border-l-2 before:border-[#ebedf2] dark:before:border-[#191e3a] sm:mb-0 sm:before:block ltr:sm:mr-8 rtl:sm:ml-8">
+                                                                    <img
+                                                                        src="/assets/images/profile-16.jpeg"
+                                                                        alt="img"
+                                                                        className="mx-auto h-12 w-12 rounded-full shadow-[0_4px_9px_0_rgba(31,45,61,0.31)]"
+                                                                    />
+                                                                </div>
+
+                                                                <div className="flex-1">
+                                                                    <h4 className="text-center text-base font-bold text-primary ltr:sm:text-left rtl:sm:text-right">Laurie Fox</h4>
+                                                                    <p className="text-xs tracking-wide text-gray-500">31/01/2024, 12:00 AM</p>
+                                                                    <div className="mb-16 mt-2 sm:mt-7">
+                                                                        <h6 className="mb-2 inline-block text-base font-bold">Trending Style</h6>
+                                                                        <p className="font-semibold text-white-dark ltr:pl-8 rtl:pr-8">
+                                                                            Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                                                                            Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                                                                        </p>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div className="sm:flex">
+                                                                <div className="relative z-[2] mx-auto mb-5 before:absolute before:-bottom-[15px] before:left-1/2 before:top-12 before:-z-[1] before:hidden before:h-auto before:w-0 before:-translate-x-1/2 before:border-l-2 before:border-[#ebedf2] dark:before:border-[#191e3a] sm:mb-0 sm:before:block ltr:sm:mr-8 rtl:sm:ml-8">
+                                                                    <img
+                                                                        src="/assets/images/profile-7.jpeg"
+                                                                        alt="img"
+                                                                        className="mx-auto h-12 w-12 rounded-full shadow-[0_4px_9px_0_rgba(31,45,61,0.31)]"
+                                                                    />
+                                                                </div>
+                                                                <div className="flex-1">
+                                                                    <h4 className="text-center text-base font-bold text-primary ltr:sm:text-left rtl:sm:text-right">Justin Cross</h4>
+                                                                    <p className="text-xs tracking-wide text-gray-500">31/01/2024, 12:00 AM</p>
+                                                                    <div className="mb-16 mt-4 sm:mt-7">
+                                                                        <h6 className="mb-2 inline-block text-base font-bold">Nature Photography</h6>
+                                                                        <p className="font-semibold text-white-dark ltr:pl-8 rtl:pr-8">
+                                                                            Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                                                                            Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                                                                        </p>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        {/* <div className="sm:flex">
+                                                                <div className="relative z-[2] mx-auto mb-5 before:absolute before:-bottom-[15px] before:left-1/2 before:top-12 before:-z-[1] before:hidden before:h-auto before:w-0 before:-translate-x-1/2 before:border-l-2 before:border-[#ebedf2] dark:before:border-[#191e3a] sm:mb-0 sm:before:block ltr:sm:mr-8 rtl:sm:ml-8">
+                                                                    <img
+                                                                        src="/assets/images/profile-16.jpeg"
+                                                                        alt="img"
+                                                                        className="mx-auto h-12 w-12 rounded-full shadow-[0_4px_9px_0_rgba(31,45,61,0.31)]"
+                                                                    />
+                                                                </div>
+                                                                <div className="flex-1">
+                                                                    <h4 className="text-center text-xl font-bold text-primary ltr:sm:text-left rtl:sm:text-right">Laurie Fox</h4>
+
+                                                                    <div className="mb-16 mt-4 sm:mt-7">
+                                                                        <h6 className="mb-2 inline-block text-lg font-bold">Create new Project</h6>
+                                                                        <p className="font-semibold text-white-dark ltr:pl-8 rtl:pr-8">
+                                                                            Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                                                                            Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                                                                        </p>
+                                                                    </div>
+                                                                </div>
+                                                            </div> */}
+                                                        <div className="mt-10">
+                                                            <textarea id="addNoteArea" rows={10} className="form-textarea" placeholder="Enter Note"></textarea>
+                                                        </div>
+                                                        <div className="flex justify-center">
+                                                            <button type="button" className="btn btn-primary">
+                                                                Add Note
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </Tab.Panel>
+                                                {/* Notes tab content : end */}
+
+                                                {/* logs tab content : start */}
+                                                {/* <Tab.Panel>
+                                    <div className="mb-5">
+                                        <div className="mx-auto max-w-[900px]">
+                                            <div className="flex">
+                                                <p className="mr-3 w-[100px] py-2.5 text-base font-semibold text-[#3b3f5c] dark:text-white-light">2 Days Ago</p>
+                                                <div className="relative before:absolute before:left-1/2 before:top-[15px] before:h-2.5 before:w-2.5 before:-translate-x-1/2 before:rounded-full before:border-2 before:border-primary after:absolute after:-bottom-[15px] after:left-1/2 after:top-[25px] after:h-auto after:w-0 after:-translate-x-1/2 after:rounded-full after:border-l-2 after:border-primary"></div>
+                                                <div className="self-center p-2.5 ltr:ml-2.5 rtl:ml-2.5 rtl:ltr:mr-2.5">
+                                                    <p className="text-[13px] font-semibold text-[#3b3f5c] dark:text-white-light">Call with John Doe</p>
+                                                    <p className="min-w-[100px] max-w-[100px] self-center text-xs font-bold text-white-dark">Duration :25 mins</p>
+                                                    <audio controls muted>
+                                                        <source src="horse.ogg" type="audio/ogg" />
+                                                        <source src="horse.mp3" type="audio/mpeg" />
+                                                        Your browser does not support the audio element.
+                                                    </audio>
+                                                </div>
+                                            </div>
+                                            <div className="flex">
+                                                <p className="mr-3 w-[100px] py-2.5 text-base font-semibold text-[#3b3f5c] dark:text-white-light">2 Days Ago</p>
+                                                <div className="relative before:absolute before:left-1/2 before:top-[15px] before:h-2.5 before:w-2.5 before:-translate-x-1/2 before:rounded-full before:border-2 before:border-secondary after:absolute after:-bottom-[15px] after:left-1/2 after:top-[25px] after:h-auto after:w-0 after:-translate-x-1/2 after:rounded-full after:border-l-2 after:border-secondary"></div>
+                                                <div className="self-center p-2.5 ltr:ml-2.5 rtl:ml-2.5 rtl:ltr:mr-2.5">
+                                                    <p className="text-[13px] font-semibold text-[#3b3f5c] dark:text-white-light">Whatsapp With Jane Smith</p>
+                                                    <p className="min-w-[100px] self-center text-xs font-bold text-white-dark">Last Message: Birthday wish content</p>
+                                                </div>
+                                            </div>
+                                            <div className="flex">
+                                                <p className="mr-3 w-[100px] py-2.5 text-base font-semibold text-[#3b3f5c] dark:text-white-light">2 Days Ago</p>
+                                                <div className="relative before:absolute before:left-1/2 before:top-[15px] before:h-2.5 before:w-2.5 before:-translate-x-1/2 before:rounded-full before:border-2 before:border-success after:absolute after:-bottom-[15px] after:left-1/2 after:top-[25px] after:h-auto after:w-0 after:-translate-x-1/2 after:rounded-full after:border-l-2 after:border-success"></div>
+                                                <div className="self-center p-2.5 ltr:ml-2.5 rtl:ml-2.5 rtl:ltr:mr-2.5">
+                                                    <p className="text-[13px] font-semibold text-[#3b3f5c] dark:text-white-light">Email to HR and Admin</p>
+                                                    <p className="min-w-[100px]  self-center text-xs font-bold text-white-dark">Last Message: Birthday wish content</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </Tab.Panel> */}
+                                                {/* logs tab content : end */}
+                                            </Tab.Panels>
+                                        </Tab.Group>
+                                    )}
+                                </div>
+                            </Dialog.Panel>
+                        </Transition.Child>
+                    </div>
+                </div>
+            </Dialog>
+        </Transition>
     );
 };
 
