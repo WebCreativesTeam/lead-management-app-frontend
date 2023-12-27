@@ -8,11 +8,10 @@ import Select from 'react-select';
 import Flatpickr from 'react-flatpickr';
 import 'flatpickr/dist/flatpickr.css';
 import { getYupSchemaFromMetaData } from './yupValidationSchema';
-import { setActiveTab, setCreateModal, setDisableBtn, setFetching, setIsOverviewTabDisabled } from '@/store/Slices/leadSlice/manageLeadSlice';
-import { ApiClient } from '@/utils/http';
+import { setCreateModal } from '@/store/Slices/leadSlice/manageLeadSlice';
 
-const CustomFieldsTab = () => {
-    const { customFieldsList, overViewFormData } = useSelector((state: IRootState) => state.lead);
+const EditCustomFieldsTab = () => {
+    const { customFieldsList } = useSelector((state: IRootState) => state.lead);
     const customFieldTabSchema = getYupSchemaFromMetaData(customFieldsList, [], []);
     const [errorObj, setErrorObj] = useState({} as any);
     const dispatch = useDispatch();
@@ -23,13 +22,12 @@ const CustomFieldsTab = () => {
         validateOnChange: true,
         enableReinitialize: false,
         onSubmit: async (value, action) => {
-            dispatch(setFetching(true));
+            // dispatch(setFetching(true));
             try {
-                await new ApiClient().post('lead', { ...overViewFormData, customFields: value });
-                action.resetForm();
-                dispatch(setCreateModal(false));
-                dispatch(setIsOverviewTabDisabled(false));
-                dispatch(setActiveTab(0));
+                // console.log(createLeadObj);
+                // await new ApiClient().post('lead', createLeadObj);
+                // console.log(value);
+                // action.resetForm();
             } catch (error: any) {
                 if (typeof error?.response?.data?.message === 'object') {
                     showToastAlert(error?.response?.data?.message.join(' , '));
@@ -38,10 +36,11 @@ const CustomFieldsTab = () => {
                 }
                 showToastAlert(error?.response?.data?.message);
             }
-            dispatch(setDisableBtn(false));
-            dispatch(setFetching(false));
+            // dispatch(setDisableBtn(false));
+            // dispatch(setFetching(false));
         },
     });
+
     // Function to evaluate the condition based on the operator
     const evaluateCondition = (value: any, item: ICustomField) => {
         // console.log('value', value[item?.parentId]);
@@ -82,6 +81,7 @@ const CustomFieldsTab = () => {
         setErrorObj(createErrorObj);
     }, [customFieldsList]);
 
+    console.log(Object.values(errorObj).every((value) => value === undefined));
     return (
         <div>
             <form onSubmit={handleSubmit}>
@@ -239,7 +239,14 @@ const CustomFieldsTab = () => {
                                                                 className="peer form-radio"
                                                                 id={item?.id}
                                                                 value={item2?.value}
-                                                                onChange={handleChange}
+                                                                onChange={(e) => {
+                                                                    handleChange(item?.id);
+                                                                    if (e.target.value && item?.required) {
+                                                                        setErrorObj((preVal: any) => {
+                                                                            return { ...preVal, [item?.id]: undefined };
+                                                                        });
+                                                                    }
+                                                                }}
                                                                 onBlur={(e) => {
                                                                     setFieldTouched(item?.id, true);
                                                                     if (e.target.value && item?.required) {
@@ -304,8 +311,6 @@ const CustomFieldsTab = () => {
                         className="btn btn-outline-danger"
                         onClick={() => {
                             dispatch(setCreateModal(false));
-                            dispatch(setIsOverviewTabDisabled(false));
-                            dispatch(setActiveTab(0));
                         }}
                         disabled={false}
                     >
@@ -314,7 +319,7 @@ const CustomFieldsTab = () => {
                     <button
                         type="submit"
                         className="btn  btn-primary cursor-pointer ltr:ml-4 rtl:mr-4"
-                        disabled={!Object.values(errorObj).every((value) => value === undefined) && Object.keys(overViewFormData).length > 0 ? true : false}
+                        disabled={!Object.values(errorObj).every((value) => value === undefined)}
                         onClick={() => submitForm()}
                     >
                         Submit
@@ -325,4 +330,4 @@ const CustomFieldsTab = () => {
     );
 };
 
-export default CustomFieldsTab;
+export default EditCustomFieldsTab;

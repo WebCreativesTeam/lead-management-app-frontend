@@ -2,7 +2,7 @@
 import React, { Fragment, memo, useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { IRootState } from '@/store';
-import { setCreateModal, setDisableBtn, setFetching } from '@/store/Slices/leadSlice/manageLeadSlice';
+import { setActiveTab, setCreateModal, setDisableBtn, setFetching, setIsOverviewTabDisabled, setOverViewFormData } from '@/store/Slices/leadSlice/manageLeadSlice';
 import { useFormik } from 'formik';
 import { leadSchema } from '@/utils/schemas';
 import { ApiClient } from '@/utils/http';
@@ -15,7 +15,7 @@ import { genderList } from '@/utils/Raw Data';
 
 const CreateOverviewForm = () => {
     const dispatch = useDispatch();
-    const { isFetching, createModal, isBtnDisabled, leadPriorityList, leadBranchList, leadContactsList, leadSourceList, leadProductList, leadStatusList } = useSelector(
+    const { isFetching, createModal, isBtnDisabled, leadPriorityList, leadBranchList, leadContactsList, leadSourceList, leadProductList, leadStatusList, overViewFormData } = useSelector(
         (state: IRootState) => state.lead
     );
     const [productDropdown, setProductDropdown] = useState<SelectOptionsType[]>([] as SelectOptionsType[]);
@@ -63,9 +63,9 @@ const CreateOverviewForm = () => {
         validateOnChange: false,
         enableReinitialize: true,
         onSubmit: async (value, action) => {
-            dispatch(setFetching(true));
+            // dispatch(setFetching(true));
             try {
-                dispatch(setDisableBtn(true));
+                // dispatch(setDisableBtn(true));
                 const createLeadObj = {
                     estimatedDate: new Date(value.estimatedDate).toISOString(),
                     followUpDate: new Date(value.followUpDate).toISOString(),
@@ -80,9 +80,13 @@ const CreateOverviewForm = () => {
                     gender: values.gender.value,
                 };
                 console.log(createLeadObj);
-                await new ApiClient().post('lead', createLeadObj);
-                dispatch(setCreateModal(false));
-                action.resetForm();
+
+                dispatch(setOverViewFormData(createLeadObj));
+                dispatch(setIsOverviewTabDisabled(true));
+                dispatch(setActiveTab(1));
+                // await new ApiClient().post('lead', createLeadObj);
+                // dispatch(setCreateModal(false));
+                // action.resetForm();
             } catch (error: any) {
                 if (typeof error?.response?.data?.message === 'object') {
                     showToastAlert(error?.response?.data?.message.join(' , '));
@@ -221,6 +225,8 @@ const CreateOverviewForm = () => {
                     className="btn btn-outline-danger"
                     onClick={() => {
                         dispatch(setCreateModal(false));
+                        dispatch(setIsOverviewTabDisabled(false));
+                        dispatch(setActiveTab(0));
                     }}
                     disabled={isBtnDisabled}
                 >
@@ -247,7 +253,7 @@ const CreateOverviewForm = () => {
                     }
                     onClick={() => submitForm()}
                 >
-                    Submit
+                    Next
                 </button>
             </div>
         </form>

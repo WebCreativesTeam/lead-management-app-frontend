@@ -519,6 +519,19 @@ export interface ManageTaskInitialStateProps extends InitialStateProps {
     isAbleToTransferTask: boolean;
     transferTaskModal: boolean;
 }
+
+export type OverviewFormType = {
+    estimatedDate: string;
+    followUpDate: string;
+    sourceId: string;
+    priorityId: string;
+    branchId: string;
+    contactId: string;
+    productId: string;
+    zip: string;
+    subProductId: string;
+    gender: string;
+};
 //manage lead slice initial props
 export interface ManageLeadInitialStateProps extends InitialStateProps {
     data: LeadDataType[];
@@ -534,6 +547,9 @@ export interface ManageLeadInitialStateProps extends InitialStateProps {
     leadSourceList: SourceDataType[];
     customFieldsList: ICustomField[];
     leadProductList: ProductSecondaryEndpointType[];
+    activeTab: number;
+    overViewFormData: OverviewFormType;
+    isOverviewTabDisabled : boolean
 }
 
 //source slice initial props

@@ -9,6 +9,7 @@ import {
     BranchListSecondaryEndpoint,
     ICustomField,
     ProductSecondaryEndpointType,
+    OverviewFormType,
 } from '@/utils/Types';
 import { fetchUserInfo } from '@/utils/contant';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
@@ -39,6 +40,9 @@ const initialState: ManageLeadInitialStateProps = {
     isAbleToDelete: false,
     userPolicyArr: [] as string[],
     totalRecords: 0,
+    activeTab: 0,
+    overViewFormData: {} as OverviewFormType,
+    isOverviewTabDisabled: false,
 };
 
 const manageLeadSlice = createSlice({
@@ -165,6 +169,15 @@ const manageLeadSlice = createSlice({
         setLeadDataLength(state, action: PayloadAction<number>) {
             state.totalRecords = action.payload;
         },
+        setActiveTab(state, action: PayloadAction<number>) {
+            state.activeTab = action.payload;
+        },
+        setOverViewFormData(state, action: PayloadAction<OverviewFormType>) {
+            state.overViewFormData = action.payload;
+        },
+        setIsOverviewTabDisabled(state, action: PayloadAction<boolean>) {
+            state.isOverviewTabDisabled = action.payload;
+        },
     },
 });
 
@@ -190,5 +203,8 @@ export const {
     setLeadDataLength,
     getAllCustomFieldsForLeads,
     getAllProductsForLead,
+    setActiveTab,
+    setOverViewFormData,
+    setIsOverviewTabDisabled,
 } = manageLeadSlice.actions;
 export default manageLeadSlice.reducer;

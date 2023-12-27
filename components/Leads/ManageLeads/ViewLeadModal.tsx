@@ -9,7 +9,7 @@ import { genderList } from '@/utils/Raw Data';
 const LeadViewModal = () => {
     const { viewModal, singleData, leadProductList } = useSelector((state: IRootState) => state.lead);
     const dispatch = useDispatch();
-    const { createdAt, status, updatedAt, branch, contact, estimatedDate, priority, source, followUpDate, gender, zip, productId, subProductId } = singleData;
+    const { createdAt, status, updatedAt, branch, contact, estimatedDate, priority, source, followUpDate, zip } = singleData;
     const [defaultGender, setDefaultGender] = useState<SelectOptionsType>({} as SelectOptionsType);
     const [defaultProduct, setDefaultProduct] = useState<SelectOptionsType>({} as SelectOptionsType);
     const [defaultSubProduct, setDefaultSubProduct] = useState<SelectOptionsType>({} as SelectOptionsType);
@@ -65,7 +65,7 @@ const LeadViewModal = () => {
                 {status?.name}
             </span>
         ),
-        ['FollowUp Date']: followUpDate,
+        ['FollowUp Date']: new Date(followUpDate).toLocaleString(),
         ['Estimate Date']: new Date(estimatedDate).toLocaleString(),
         ['Created']: new Date(createdAt).toLocaleString(),
         ['Updated']: new Date(updatedAt).toLocaleString(),

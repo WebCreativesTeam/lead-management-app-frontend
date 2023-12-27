@@ -68,9 +68,8 @@ const ManageLeads = () => {
     ];
 
     //hooks
-    const { data, isFetching, leadPriorityList, leadStatusList, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate, totalRecords, editModal, createModal } = useSelector(
-        (state: IRootState) => state.lead
-    );
+    const { data, isFetching, leadPriorityList, leadStatusList, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate, totalRecords, editModal, createModal, deleteModal, viewModal } =
+        useSelector((state: IRootState) => state.lead);
     const isRtl = useSelector((state: IRootState) => state.themeConfig.rtlClass) === 'rtl' ? true : false;
     const [searchInputText, setSearchInputText] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(false);
@@ -543,10 +542,10 @@ const ManageLeads = () => {
             {isAbleToUpdate && editModal && <EditLeadModal />}
 
             {/* view modal */}
-            <ViewLeadModal />
+            {viewModal && <ViewLeadModal />}
 
             {/* delete modal */}
-            <DeleteLeadModal />
+            {isAbleToDelete && deleteModal && <DeleteLeadModal />}
 
             {/* change Status modal */}
             <ChangeLeadStatusModal />
