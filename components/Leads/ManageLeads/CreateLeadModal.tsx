@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 import React, { Fragment, memo } from 'react';
 import { IRootState } from '@/store';
-import { setActiveTab, setCreateModal, setIsOverviewTabDisabled } from '@/store/Slices/leadSlice/manageLeadSlice';
+import { setActiveTab, setCreateModal, setIsOverviewTabDisabled, setOverViewFormData } from '@/store/Slices/leadSlice/manageLeadSlice';
 import Loader from '@/components/__Shared/Loader';
 import 'flatpickr/dist/flatpickr.css';
 import { Dialog, Tab, Transition } from '@headlessui/react';
@@ -9,6 +9,7 @@ import { Home, Note, Setting, Close } from '@/utils/icons';
 import CustomFieldsTab from './CustomFieldsTab';
 import CreateOverviewForm from './CreateOverviewForm';
 import { useDispatch, useSelector } from 'react-redux';
+import { OverviewFormType } from '@/utils/Types';
 
 const LeadCreateModal = () => {
     const dispatch = useDispatch();
@@ -48,6 +49,7 @@ const LeadCreateModal = () => {
                                             dispatch(setCreateModal(false));
                                             dispatch(setIsOverviewTabDisabled(false));
                                             dispatch(setActiveTab(0));
+                                            dispatch(setOverViewFormData({} as OverviewFormType));
                                         }}
                                     >
                                         <Close />

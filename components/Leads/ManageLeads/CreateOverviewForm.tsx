@@ -10,7 +10,7 @@ import { showToastAlert } from '@/utils/contant';
 import Select from 'react-select';
 import Flatpickr from 'react-flatpickr';
 import 'flatpickr/dist/flatpickr.css';
-import { SelectOptionsType, BranchListSecondaryEndpoint, SourceDataType, ContactListSecondaryEndpoint, LeadPrioritySecondaryEndpoint, LeadStatusSecondaryEndpoint } from '@/utils/Types';
+import { SelectOptionsType, BranchListSecondaryEndpoint, SourceDataType, ContactListSecondaryEndpoint, LeadPrioritySecondaryEndpoint, LeadStatusSecondaryEndpoint, OverviewFormType } from '@/utils/Types';
 import { genderList } from '@/utils/Raw Data';
 
 const CreateOverviewForm = () => {
@@ -227,6 +227,7 @@ const CreateOverviewForm = () => {
                         dispatch(setCreateModal(false));
                         dispatch(setIsOverviewTabDisabled(false));
                         dispatch(setActiveTab(0));
+                        dispatch(setOverViewFormData({} as OverviewFormType));
                     }}
                     disabled={isBtnDisabled}
                 >

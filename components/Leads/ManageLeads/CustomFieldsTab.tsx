@@ -1,5 +1,5 @@
 import { IRootState } from '@/store';
-import { ICustomField } from '@/utils/Types';
+import { ICustomField, OverviewFormType } from '@/utils/Types';
 import { showToastAlert } from '@/utils/contant';
 import { useFormik } from 'formik';
 import React, { useEffect, useState } from 'react';
@@ -8,7 +8,7 @@ import Select from 'react-select';
 import Flatpickr from 'react-flatpickr';
 import 'flatpickr/dist/flatpickr.css';
 import { getYupSchemaFromMetaData } from './yupValidationSchema';
-import { setActiveTab, setCreateModal, setDisableBtn, setFetching, setIsOverviewTabDisabled } from '@/store/Slices/leadSlice/manageLeadSlice';
+import { setActiveTab, setCreateModal, setDisableBtn, setFetching, setIsOverviewTabDisabled, setOverViewFormData } from '@/store/Slices/leadSlice/manageLeadSlice';
 import { ApiClient } from '@/utils/http';
 
 const CustomFieldsTab = () => {
@@ -30,6 +30,7 @@ const CustomFieldsTab = () => {
                 dispatch(setCreateModal(false));
                 dispatch(setIsOverviewTabDisabled(false));
                 dispatch(setActiveTab(0));
+                dispatch(setOverViewFormData({} as OverviewFormType));
             } catch (error: any) {
                 if (typeof error?.response?.data?.message === 'object') {
                     showToastAlert(error?.response?.data?.message.join(' , '));
@@ -306,6 +307,7 @@ const CustomFieldsTab = () => {
                             dispatch(setCreateModal(false));
                             dispatch(setIsOverviewTabDisabled(false));
                             dispatch(setActiveTab(0));
+                            dispatch(setOverViewFormData({} as OverviewFormType));
                         }}
                         disabled={false}
                     >
@@ -314,7 +316,7 @@ const CustomFieldsTab = () => {
                     <button
                         type="submit"
                         className="btn  btn-primary cursor-pointer ltr:ml-4 rtl:mr-4"
-                        disabled={!Object.values(errorObj).every((value) => value === undefined) && Object.keys(overViewFormData).length > 0 ? true : false}
+                        disabled={!Object.values(errorObj).every((value) => value === undefined) || Object.keys(overViewFormData).length === 0 ? true : false}
                         onClick={() => submitForm()}
                     >
                         Submit
