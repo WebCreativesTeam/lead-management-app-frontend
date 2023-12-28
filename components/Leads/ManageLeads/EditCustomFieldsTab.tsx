@@ -8,10 +8,10 @@ import Select from 'react-select';
 import Flatpickr from 'react-flatpickr';
 import 'flatpickr/dist/flatpickr.css';
 import { getYupSchemaFromMetaData } from './yupValidationSchema';
-import { setCreateModal } from '@/store/Slices/leadSlice/manageLeadSlice';
+import { setEditModal } from '@/store/Slices/leadSlice/manageLeadSlice';
 
-const EditCustomFieldsTab = () => {
-    const { customFieldsList } = useSelector((state: IRootState) => state.lead);
+const EditCustomFieldsTab: React.FC = () => {
+    const { customFieldsList, singleData } = useSelector((state: IRootState) => state.lead);
     const customFieldTabSchema = getYupSchemaFromMetaData(customFieldsList, [], []);
     const [errorObj, setErrorObj] = useState({} as any);
     const dispatch = useDispatch();
@@ -81,7 +81,8 @@ const EditCustomFieldsTab = () => {
         setErrorObj(createErrorObj);
     }, [customFieldsList]);
 
-    console.log(Object.values(errorObj).every((value) => value === undefined));
+    console.log(singleData);
+
     return (
         <div>
             <form onSubmit={handleSubmit}>
@@ -96,18 +97,21 @@ const EditCustomFieldsTab = () => {
                                     {item?.fieldType === 'TEXT' && (
                                         <>
                                             <input
-                                                onChange={(e) => {
-                                                    handleChange(item?.id);
-                                                    if (e.target.value.trim().length > 0 && item?.required) {
-                                                        setErrorObj((preVal: any) => {
-                                                            return { ...preVal, [item?.id]: undefined };
-                                                        });
-                                                    } else {
-                                                        setErrorObj((preVal: any) => {
-                                                            return { ...preVal, [item?.id]: `${item?.label} is required` };
-                                                        });
-                                                    }
-                                                }}
+                                                onChange={
+                                                    //     (e) => {
+                                                    //     handleChange(item?.id);
+                                                    //     if (e.target.value.trim().length > 0 && item?.required) {
+                                                    //         setErrorObj((preVal: any) => {
+                                                    //             return { ...preVal, [item?.id]: undefined };
+                                                    //         });
+                                                    //     } else {
+                                                    //         setErrorObj((preVal: any) => {
+                                                    //             return { ...preVal, [item?.id]: `${item?.label} is required` };
+                                                    //         });
+                                                    //     }
+                                                    // }
+                                                    handleChange
+                                                }
                                                 onBlur={(e) => {
                                                     handleBlur(item?.id);
                                                     setFieldTouched(item?.id, true);
@@ -125,6 +129,7 @@ const EditCustomFieldsTab = () => {
                                                 type="text"
                                                 placeholder={item?.label}
                                                 className="form-input"
+                                                defaultValue={singleData.customFields[item?.id]}
                                             />
                                             {item?.required && touched[item?.id] && errorObj[item?.id]?.length > 0 && <span className="text-sm text-danger">{errorObj[item?.id]?.toString()}</span>}
                                         </>
@@ -132,18 +137,21 @@ const EditCustomFieldsTab = () => {
                                     {item?.fieldType === 'NUMBER' && (
                                         <>
                                             <input
-                                                onChange={(e) => {
-                                                    handleChange(item?.id);
-                                                    if (e.target.value.trim().length > 0 && item?.required) {
-                                                        setErrorObj((preVal: any) => {
-                                                            return { ...preVal, [item?.id]: undefined };
-                                                        });
-                                                    } else {
-                                                        setErrorObj((preVal: any) => {
-                                                            return { ...preVal, [item?.id]: `${item?.label} is required` };
-                                                        });
-                                                    }
-                                                }}
+                                                onChange={
+                                                    // (e) => {
+                                                    // handleChange(item?.id);
+                                                    // if (e.target.value.trim().length > 0 && item?.required) {
+                                                    //     setErrorObj((preVal: any) => {
+                                                    //         return { ...preVal, [item?.id]: undefined };
+                                                    //     });
+                                                    // } else {
+                                                    //     setErrorObj((preVal: any) => {
+                                                    //         return { ...preVal, [item?.id]: `${item?.label} is required` };
+                                                    //     });
+                                                    // }
+                                                    // }
+                                                    handleChange
+                                                }
                                                 onBlur={(e) => {
                                                     setFieldTouched(item?.id, true);
                                                     handleBlur(item?.id);
@@ -161,6 +169,7 @@ const EditCustomFieldsTab = () => {
                                                 type="number"
                                                 placeholder={'Enter ' + item?.label}
                                                 className="form-input"
+                                                defaultValue={singleData.customFields[item?.id]}
                                             />
                                             {item?.required && touched[item?.id] && errorObj[item?.id] && <span className="text-sm  text-danger">{errorObj[item?.id]?.toString()}</span>}
                                         </>
@@ -191,6 +200,7 @@ const EditCustomFieldsTab = () => {
                                                         });
                                                     }
                                                 }}
+                                                defaultValue={{ value: singleData.customFields[item?.id], label: singleData.customFields[item?.id] }}
                                             />
                                             {item?.required && touched[item?.id] && errorObj[item?.id] && <span className="text-sm text-danger">{errorObj[item?.id]?.toString()}</span>}
                                         </>
@@ -208,7 +218,7 @@ const EditCustomFieldsTab = () => {
                                                 name={item?.id}
                                                 className="form-input"
                                                 onChange={(e) => {
-                                                    setFieldValue(item?.id, e);
+                                                    setFieldValue(item?.id, e[0].toISOString());
                                                     if (e[0].toISOString() && item?.required) {
                                                         setErrorObj((preVal: any) => {
                                                             return { ...preVal, [item?.id]: undefined };
@@ -217,12 +227,13 @@ const EditCustomFieldsTab = () => {
                                                 }}
                                                 onBlur={(e) => {
                                                     setFieldTouched(item?.id, true);
-                                                    if (!e.target.value && item?.required) {
+                                                    if ((!e.target.value || !singleData.customFields[item?.id]) && item?.required) {
                                                         setErrorObj((preVal: any) => {
                                                             return { ...preVal, [item?.id]: `${item?.label} is required` };
                                                         });
                                                     }
                                                 }}
+                                                defaultValue={singleData.customFields[item?.id]}
                                             />
                                             {item?.required && touched[item?.id] && errorObj[item?.id] && <span className="text-sm text-danger">{errorObj[item?.id]?.toString()}</span>}
                                         </>
@@ -310,7 +321,7 @@ const EditCustomFieldsTab = () => {
                         type="button"
                         className="btn btn-outline-danger"
                         onClick={() => {
-                            dispatch(setCreateModal(false));
+                            dispatch(setEditModal({ open: false }));
                         }}
                         disabled={false}
                     >

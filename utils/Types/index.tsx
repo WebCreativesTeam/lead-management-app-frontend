@@ -316,7 +316,7 @@ export type LeadDataType = {
     followUpDate: string;
     gender: Gender;
     zip: string;
-    customFields: string;
+    customFields: any;
     status: {
         color: string;
         id: string;
@@ -549,7 +549,7 @@ export interface ManageLeadInitialStateProps extends InitialStateProps {
     leadProductList: ProductSecondaryEndpointType[];
     activeTab: number;
     overViewFormData: OverviewFormType;
-    isOverviewTabDisabled : boolean
+    isOverviewTabDisabled: boolean;
 }
 
 //source slice initial props

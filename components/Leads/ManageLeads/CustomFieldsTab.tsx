@@ -83,6 +83,8 @@ const CustomFieldsTab = () => {
         setErrorObj(createErrorObj);
     }, [customFieldsList]);
 
+    console.log(values);
+
     return (
         <div>
             <form onSubmit={handleSubmit}>
@@ -97,18 +99,21 @@ const CustomFieldsTab = () => {
                                     {item?.fieldType === 'TEXT' && (
                                         <>
                                             <input
-                                                onChange={(e) => {
-                                                    handleChange(item?.id);
-                                                    if (e.target.value.trim().length > 0 && item?.required) {
-                                                        setErrorObj((preVal: any) => {
-                                                            return { ...preVal, [item?.id]: undefined };
-                                                        });
-                                                    } else {
-                                                        setErrorObj((preVal: any) => {
-                                                            return { ...preVal, [item?.id]: `${item?.label} is required` };
-                                                        });
-                                                    }
-                                                }}
+                                                onChange={
+                                                    // (e) => {
+                                                    // handleChange(item?.id);
+                                                    // if (e.target.value.trim().length > 0 && item?.required) {
+                                                    //     setErrorObj((preVal: any) => {
+                                                    //         return { ...preVal, [item?.id]: undefined };
+                                                    //     });
+                                                    // } else {
+                                                    //     setErrorObj((preVal: any) => {
+                                                    //         return { ...preVal, [item?.id]: `${item?.label} is required` };
+                                                    //     });
+                                                    // }
+                                                    // }
+                                                    handleChange
+                                                }
                                                 onBlur={(e) => {
                                                     handleBlur(item?.id);
                                                     setFieldTouched(item?.id, true);
@@ -133,18 +138,21 @@ const CustomFieldsTab = () => {
                                     {item?.fieldType === 'NUMBER' && (
                                         <>
                                             <input
-                                                onChange={(e) => {
-                                                    handleChange(item?.id);
-                                                    if (e.target.value.trim().length > 0 && item?.required) {
-                                                        setErrorObj((preVal: any) => {
-                                                            return { ...preVal, [item?.id]: undefined };
-                                                        });
-                                                    } else {
-                                                        setErrorObj((preVal: any) => {
-                                                            return { ...preVal, [item?.id]: `${item?.label} is required` };
-                                                        });
-                                                    }
-                                                }}
+                                                onChange={
+                                                    // (e) => {
+                                                    // handleChange(item?.id);
+                                                    // if (e.target.value.trim().length > 0 && item?.required) {
+                                                    //     setErrorObj((preVal: any) => {
+                                                    //         return { ...preVal, [item?.id]: undefined };
+                                                    //     });
+                                                    // } else {
+                                                    //     setErrorObj((preVal: any) => {
+                                                    //         return { ...preVal, [item?.id]: `${item?.label} is required` };
+                                                    //     });
+                                                    // }
+                                                    // }
+                                                    handleChange
+                                                }
                                                 onBlur={(e) => {
                                                     setFieldTouched(item?.id, true);
                                                     handleBlur(item?.id);
@@ -209,7 +217,7 @@ const CustomFieldsTab = () => {
                                                 name={item?.id}
                                                 className="form-input"
                                                 onChange={(e) => {
-                                                    setFieldValue(item?.id, e);
+                                                    setFieldValue(item?.id, e[0].toISOString());
                                                     if (e[0].toISOString() && item?.required) {
                                                         setErrorObj((preVal: any) => {
                                                             return { ...preVal, [item?.id]: undefined };

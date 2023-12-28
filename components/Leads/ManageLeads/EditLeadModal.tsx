@@ -9,6 +9,7 @@ import { Home, Note, Setting, Close } from '@/utils/icons';
 import CustomFieldsTab from './CustomFieldsTab';
 import { useDispatch, useSelector } from 'react-redux';
 import EditOverviewForm from './EditOverviewForm';
+import EditCustomFieldsTab from './EditCustomFieldsTab';
 
 const LeadEditModal = () => {
     const dispatch = useDispatch();
@@ -102,7 +103,7 @@ const LeadEditModal = () => {
 
                                                 {/* Custom fields tab : start */}
                                                 <Tab.Panel>
-                                                    <CustomFieldsTab />
+                                                    <EditCustomFieldsTab />
                                                 </Tab.Panel>
                                                 {/* custom fields tab :end */}
 
