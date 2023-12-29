@@ -1,3 +1,4 @@
+import { ILeadNotes } from './../../../utils/Types/index';
 import {
     LeadDataType,
     ManageLeadInitialStateProps,
@@ -43,6 +44,7 @@ const initialState: ManageLeadInitialStateProps = {
     activeTab: 0,
     overViewFormData: {} as OverviewFormType,
     isOverviewTabDisabled: false,
+    leadNoteList: [] as ILeadNotes[],
 };
 
 const manageLeadSlice = createSlice({
@@ -129,6 +131,9 @@ const manageLeadSlice = createSlice({
         getAllProductsForLead(state, action: PayloadAction<ProductSecondaryEndpointType[]>) {
             state.leadProductList = action.payload;
         },
+        getAllNotesForLead(state, action: PayloadAction<ILeadNotes[]>) {
+            state.leadNoteList = action.payload;
+        },
         getAllBranchForLead(state, action) {
             state.leadBranchList = action.payload;
         },
@@ -206,5 +211,6 @@ export const {
     setActiveTab,
     setOverViewFormData,
     setIsOverviewTabDisabled,
+    getAllNotesForLead,
 } = manageLeadSlice.actions;
 export default manageLeadSlice.reducer;

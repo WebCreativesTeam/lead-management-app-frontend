@@ -464,6 +464,16 @@ export interface ProductSecondaryEndpointType {
     name: string;
 }
 
+export interface ILeadNotes {
+    id: string;
+    createdAt: string;
+    updatedAt: string;
+    title: string;
+    content: string;
+    userId: string;
+    leadId: string;
+}
+
 // ----------------- authentication types : start -------------------//
 
 export interface ISignInResponse {
@@ -550,6 +560,7 @@ export interface ManageLeadInitialStateProps extends InitialStateProps {
     activeTab: number;
     overViewFormData: OverviewFormType;
     isOverviewTabDisabled: boolean;
+    leadNoteList: ILeadNotes[];
 }
 
 //source slice initial props

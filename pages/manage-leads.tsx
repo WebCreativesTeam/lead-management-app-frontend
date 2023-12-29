@@ -12,6 +12,7 @@ import {
     ContactDataType,
     GetMethodResponseType,
     ICustomField,
+    ILeadNotes,
     LeadPrioritySecondaryEndpoint,
     LeadStatusSecondaryEndpoint,
     ProductSecondaryEndpointType,
@@ -30,6 +31,7 @@ import {
     getAllLeadPriorities,
     getAllLeadStatus,
     getAllLeads,
+    getAllNotesForLead,
     getAllProductsForLead,
     getAllSourceForLead,
     setChangePriorityModal,
@@ -216,7 +218,6 @@ const ManageLeads = () => {
 
     //get products list
     const getAllProducts = async () => {
-        setLoading(true);
         const productList: GetMethodResponseType = await new ApiClient().get('product/list');
         const products: ProductSecondaryEndpointType[] = productList?.data;
         if (typeof products === 'undefined') {
@@ -224,7 +225,7 @@ const ManageLeads = () => {
             return;
         }
         dispatch(getAllProductsForLead(products));
-    };
+    }
     return !isAbleToRead ? null : (
         <div>
             <PageHeadingSection description="View, create, update, and close leads. Organize by status, priority, and due date. Stay on top of work." heading="Lead Management" />

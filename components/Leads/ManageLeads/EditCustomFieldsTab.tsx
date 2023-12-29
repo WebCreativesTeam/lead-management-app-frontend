@@ -11,7 +11,7 @@ import { getYupSchemaFromMetaData } from './yupValidationSchema';
 import { setEditModal } from '@/store/Slices/leadSlice/manageLeadSlice';
 
 const EditCustomFieldsTab: React.FC = () => {
-    const { customFieldsList, singleData } = useSelector((state: IRootState) => state.lead);
+    const { customFieldsList, singleData, leadNoteList } = useSelector((state: IRootState) => state.lead);
     const customFieldTabSchema = getYupSchemaFromMetaData(customFieldsList, [], []);
     const [errorObj, setErrorObj] = useState({} as any);
     const dispatch = useDispatch();

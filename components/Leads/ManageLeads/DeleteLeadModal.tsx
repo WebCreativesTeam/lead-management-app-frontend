@@ -19,7 +19,6 @@ const LeadDeleteModal = () => {
         if (deleteLead === null) {
             return;
         }
-
         dispatch(setDeleteModal({ open: false }));
     };
     return (
