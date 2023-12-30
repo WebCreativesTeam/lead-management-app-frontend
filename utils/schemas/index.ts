@@ -89,7 +89,7 @@ export const leadSchema = Yup.object().shape({
 });
 
 //task priority schema
-export const leadRuleSchema = Yup.object().shape({
+export const leadAssignmentSchema = Yup.object().shape({
     name: Yup.string().required('Enter Rule name'),
 });
 

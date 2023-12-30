@@ -92,17 +92,17 @@ const Contacts = () => {
         setLoading(false);
     };
 
-    //get all user's list
-    const getAllUsersList = async () => {
-        setLoading(true);
-        const usersList: GetMethodResponseType = await new ApiClient().get('user/list');
-        const users: UserListSecondaryEndpointType[] = usersList?.data;
-        if (typeof users === 'undefined') {
-            dispatch(getAllUsersForContact([] as UserListSecondaryEndpointType[]));
-            return;
-        }
-        dispatch(getAllUsersForContact(users));
-    };
+//get all user's list
+const getAllUsersList = async () => {
+    setLoading(true);
+    const usersList: GetMethodResponseType = await new ApiClient().get('user/list');
+    const users: UserListSecondaryEndpointType[] = usersList?.data;
+    if (typeof users === 'undefined') {
+        dispatch(getAllUsersForContact([] as UserListSecondaryEndpointType[]));
+        return;
+    }
+    dispatch(getAllUsersForContact(users));
+};
 
     //get all Source list
     const getAllSourceList = async () => {

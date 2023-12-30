@@ -58,6 +58,13 @@ import { fetchUserInfo } from '@/utils/contant';
 import SideabarLabel from '../__Shared/SidebarLabel';
 import { setProductCreatePolicy, setProductDeletePolicy, setProductReadPolicy, setProductUpdatePolicy } from '@/store/Slices/productSlice';
 import { setCampaignActivationPermission, setCampaignCreatePermission, setCampaignDeletePermission, setCampaignReadPermission, setCampaignUpdatePermission } from '@/store/Slices/campaignSlice';
+import {
+    setLeadAssignmentActivationPermission,
+    setLeadAssignmentCreatePermission,
+    setLeadAssignmentDeletePermission,
+    setLeadAssignmentReadPermission,
+    setLeadAssignmentUpdatePermission,
+} from '@/store/Slices/leadSlice/leadAssigningSlice';
 
 const Sidebar = () => {
     const router = useRouter();
@@ -139,6 +146,10 @@ const Sidebar = () => {
     //Manage Campaign page
     const userPermissionCampaignArray: string[] = useSelector((state: IRootState) => state.campaign.userPolicyArr);
     const isAbleToReadCampaign: boolean = useSelector((state: IRootState) => state.campaign?.isAbleToRead);
+
+    //Manage lead assignment page
+    const userPermissionLeadAssignmentArray: string[] = useSelector((state: IRootState) => state.leadAssignment.userPolicyArr);
+    const isAbleToReadLeadAssignment: boolean = useSelector((state: IRootState) => state.leadAssignment?.isAbleToRead);
 
     useEffect(() => {
         dispatch(fetchUserInfo());
@@ -281,6 +292,15 @@ const Sidebar = () => {
         dispatch(setCampaignActivationPermission('campaign:Update::DocumentToggleActive'));
     }, [userPermissionCampaignArray]);
 
+    //*permission to access lead assignment page
+    useEffect(() => {
+        dispatch(setLeadAssignmentReadPermission('leadassignment:Read::Documents'));
+        dispatch(setLeadAssignmentCreatePermission('leadassignment:Create::Document'));
+        dispatch(setLeadAssignmentUpdatePermission('leadassignment:Update::Document'));
+        dispatch(setLeadAssignmentDeletePermission('leadassignment:Delete::Document'));
+        dispatch(setLeadAssignmentActivationPermission('leadassignment:Update::DocumentToggleActive'));
+    }, [userPermissionLeadAssignmentArray]);
+
     useEffect(() => {
         const selector = document.querySelector('.sidebar ul a[href="' + window.location.pathname + '"]');
         if (selector) {
@@ -405,14 +425,17 @@ const Sidebar = () => {
                             </li>
                             <SideabarLabel label="Automation" />
                             {/* Lead Assigning */}
-                            <li className="menu nav-item">
-                                <Link href="/lead-assigning" className="group">
-                                    <div className="flex items-center">
-                                        <Phone />
-                                        <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Lead Assigning')}</span>
-                                    </div>
-                                </Link>
-                            </li>
+                            {isAbleToReadLeadAssignment && (
+                                <li className="menu nav-item">
+                                    <Link href="/lead-assigning" className="group">
+                                        <div className="flex items-center">
+                                            <Phone />
+                                            <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Lead Assigning')}</span>
+                                        </div>
+                                    </Link>
+                                </li>
+                            )}
+
                             {/* Campaign */}
                             {isAbleToReadCampaign && (
                                 <li className="menu nav-item">

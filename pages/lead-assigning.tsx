@@ -1,29 +1,41 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState, Fragment, useDeferredValue } from 'react';
+import React, { useEffect, useState, useDeferredValue } from 'react';
 import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
 import { sortBy } from 'lodash';
 import { Delete, Edit, Plus, View } from '@/utils/icons';
 import PageHeadingSection from '@/components/__Shared/PageHeadingSection/index.';
-import ConfirmationModal from '@/components/__Shared/ConfirmationModal';
 import { useDispatch, useSelector } from 'react-redux';
 import { setPageTitle } from '@/store/themeConfigSlice';
-import { GetMethodResponseType, ILeadRules, SourceDataType } from '@/utils/Types';
+import { GetMethodResponseType, ILeadAssignment, SourceDataType, UserListSecondaryEndpointType } from '@/utils/Types';
 import { ApiClient } from '@/utils/http';
 import { IRootState } from '@/store';
-import { getAllLeadRules, getAllSourceForLeadRule, setCreateModal, setDeleteModal, setEditModal, setLeadRuleDataLength, setViewModal } from '@/store/Slices/leadSlice/leadRuleSlice';
-import LeadRuleViewModal from '@/components/Leads/LeadRule/LeadRuleViewModal';
-import LeadRuleCreateModal from '@/components/Leads/LeadRule/LeadRuleCreateModal';
-import LeadRuleEditModal from '@/components/Leads/LeadRule/LeadRuleEditModal';
-import LeadRuleDeleteModal from '@/components/Leads/LeadRule/LeadRuleDeleteModal';
+import {
+    getAllLeadAssignments,
+    getAllSourceForLeadAssignment,
+    getAllUsersForLeadAssignment,
+    setCreateModal,
+    setDeleteModal,
+    setEditModal,
+    setLeadAssignmentActivationModal,
+    setLeadAssignmentDataLength,
+    setViewModal,
+} from '@/store/Slices/leadSlice/leadAssigningSlice';
+import LeadAssignmentViewModal from '@/components/Leads/LeadAssignment/LeadAssignmentViewModal';
+import LeadAssignmentCreateModal from '@/components/Leads/LeadAssignment/LeadAssignmentCreateModal';
+import LeadAssignmentEditModal from '@/components/Leads/LeadAssignment/LeadAssignmentEditModal';
+import LeadAssignmentDeleteModal from '@/components/Leads/LeadAssignment/LeadAssignmentDeleteModal';
+import ToggleSwitch from '@/components/__Shared/ToggleSwitch';
+import LeadAssignmentActivationModal from '@/components/Leads/LeadAssignment/LeadAssignmentActivationModal';
 
 const LeadAssigning = () => {
     const dispatch = useDispatch();
     useEffect(() => {
-        dispatch(setPageTitle('Track Leads | LeadRules'));
+        dispatch(setPageTitle('Track Leads | LeadAssignments'));
     });
-    const { data, isFetching, isBtnDisabled, deleteModal, singleData, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate, totalRecords } = useSelector((state: IRootState) => state.leadRule);
+    const { data, isFetching, deleteModal, isAbleToCreate, isAbleToDelete, isAbleToUpdate, totalRecords, editModal, createModal, viewModal, isAbleToActivate, leadAssignmentActivationModal } =
+        useSelector((state: IRootState) => state.leadAssignment);
 
     //hooks
     const [searchInputText, setSearchInputText] = useState<string>('');
@@ -34,7 +46,7 @@ const LeadAssigning = () => {
     const [page, setPage] = useState(1);
     const PAGE_SIZES = [10, 20, 30];
     const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
-    const [recordsData, setRecordsData] = useState<ILeadRules[]>([] as ILeadRules[]);
+    const [recordsData, setRecordsData] = useState<ILeadAssignment[]>([] as ILeadAssignment[]);
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
         columnAccessor: 'name',
         direction: 'asc',
@@ -48,9 +60,9 @@ const LeadAssigning = () => {
         setPage(1);
     }, [sortStatus]);
 
-    //get all leadRule after page render
+    //get all leadAssignment after page render
     useEffect(() => {
-        getLeadRuleList();
+        getLeadAssignmentList();
     }, [isFetching, pageSize, page, searchQuery]);
 
     useEffect(() => {
@@ -59,19 +71,20 @@ const LeadAssigning = () => {
 
     useEffect(() => {
         getAllSourceList();
+        getAllUsersList();
     }, []);
 
-    //get all LeadRule list
-    const getLeadRuleList = async () => {
+    //get all LeadAssignment list
+    const getLeadAssignmentList = async () => {
         setLoading(true);
-        const res: GetMethodResponseType = await new ApiClient().get(`source?limit=${pageSize}&page=${page}&search=${searchQuery}`);
-        const leadRule: ILeadRules[] = res?.data;
-        if (typeof leadRule === 'undefined') {
-            dispatch(getAllLeadRules([] as ILeadRules[]));
+        const res: GetMethodResponseType = await new ApiClient().get(`lead-assignment`);
+        const leadAssignment: ILeadAssignment[] = res?.data;
+        if (typeof leadAssignment === 'undefined') {
+            dispatch(getAllLeadAssignments([] as ILeadAssignment[]));
             return;
         }
-        dispatch(getAllLeadRules(leadRule));
-        dispatch(setLeadRuleDataLength(res?.meta?.totalCount));
+        dispatch(getAllLeadAssignments(leadAssignment));
+        dispatch(setLeadAssignmentDataLength(res?.meta?.totalCount));
         setLoading(false);
     };
 
@@ -81,26 +94,38 @@ const LeadAssigning = () => {
         const sourceList: GetMethodResponseType = await new ApiClient().get('source/list');
         const source: SourceDataType[] = sourceList?.data;
         if (typeof source === 'undefined') {
-            dispatch(getAllSourceForLeadRule([] as SourceDataType[]));
+            dispatch(getAllSourceForLeadAssignment([] as SourceDataType[]));
             return;
         }
-        dispatch(getAllSourceForLeadRule(source));
+        dispatch(getAllSourceForLeadAssignment(source));
+    };
+
+    //get all user's list
+    const getAllUsersList = async () => {
+        setLoading(true);
+        const usersList: GetMethodResponseType = await new ApiClient().get('user/list');
+        const users: UserListSecondaryEndpointType[] = usersList?.data;
+        if (typeof users === 'undefined') {
+            dispatch(getAllUsersForLeadAssignment([] as UserListSecondaryEndpointType[]));
+            return;
+        }
+        dispatch(getAllUsersForLeadAssignment(users));
     };
 
     return (
         <div>
-            <PageHeadingSection description="Identify and categorize lead leadRules. Update descriptions. Add or remove leadRule channels." heading="Track Leads" />
+            <PageHeadingSection description="Identify and categorize lead lead Assignments. Update descriptions. Add or remove leadAssignment channels." heading="Track Leads" />
             <div className="my-6 flex flex-col gap-5 sm:flex-row ">
-                {/* {!isAbleToCreate ? (
+                {!isAbleToCreate ? (
                     <div className="flex-1"></div>
-                ) : ( */}
-                <div className="flex-1">
-                    <button className="btn btn-primary h-full w-full max-w-[200px] max-sm:mx-auto" type="button" onClick={() => dispatch(setCreateModal(true))}>
-                        <Plus />
-                        Add New Rule
-                    </button>
-                </div>
-                {/* )} */}
+                ) : (
+                    <div className="flex-1">
+                        <button className="btn btn-primary h-full w-full max-w-[200px] max-sm:mx-auto" type="button" onClick={() => dispatch(setCreateModal(true))}>
+                            <Plus />
+                            Add New Rule
+                        </button>
+                    </div>
+                )}
                 <div className="relative flex-1">
                     <input type="text" placeholder="Find Rule" className="form-input py-3 ltr:pr-[100px] rtl:pl-[100px]" onChange={(e) => setSearchInputText(e.target.value)} value={searchInputText} />
                     <button type="button" className="btn btn-primary absolute top-1 shadow-none ltr:right-1 rtl:left-1" onClick={() => setSearch(searchInputText)}>
@@ -109,7 +134,7 @@ const LeadAssigning = () => {
                 </div>
             </div>
 
-            {/* leadRule List table*/}
+            {/* leadAssignment List table*/}
             <div className="datatables panel mt-6">
                 <DataTable
                     className="table-hover whitespace-nowrap"
@@ -117,9 +142,49 @@ const LeadAssigning = () => {
                     columns={[
                         {
                             accessor: 'name',
-                            title: 'LeadRule Name',
+                            title: 'Lead Assigning Name',
                             sortable: true,
                             render: ({ name }) => <div>{name}</div>,
+                        },
+                        {
+                            accessor: 'source',
+                            title: 'Source',
+                            sortable: true,
+                            render: ({ source }) => <div>{source?.name}</div>,
+                        },
+                        {
+                            accessor: 'product',
+                            title: 'Product',
+                            sortable: true,
+                            render: ({ product }) => <div>{product?.name}</div>,
+                        },
+                        {
+                            accessor: 'active',
+                            title: 'Active',
+                            sortable: true,
+                            render: ({ isActive, id }) => (
+                                // isAbleToChangeDefaultStatus ? (
+                                <div>
+                                    <label className="relative h-6 w-12">
+                                        <input
+                                            type="checkbox"
+                                            className="custom_switch peer absolute z-10 h-full w-full cursor-pointer opacity-0"
+                                            id="custom_switch_checkbox1"
+                                            name="active"
+                                            checked={isActive}
+                                            onChange={() => dispatch(setLeadAssignmentActivationModal({ id, open: true }))}
+                                        />
+                                        <ToggleSwitch />
+                                    </label>
+                                </div>
+                            ),
+                            // ) : (
+                            //     isDefault && (
+                            //         <div>
+                            //             <span className="mr-2 rounded bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-300">Default</span>
+                            //         </div>
+                            //     )
+                            // ),
                         },
                         {
                             accessor: 'action',
@@ -165,16 +230,19 @@ const LeadAssigning = () => {
             </div>
 
             {/* edit modal */}
-            <LeadRuleEditModal />
+            {isAbleToUpdate && editModal && <LeadAssignmentEditModal />}
 
             {/* view modal */}
-            <LeadRuleViewModal />
+            {viewModal && <LeadAssignmentViewModal />}
 
             {/* delete modal */}
-            <LeadRuleDeleteModal />
+            {isAbleToDelete && deleteModal && <LeadAssignmentDeleteModal />}
 
             {/* create modal */}
-            <LeadRuleCreateModal />
+            {isAbleToCreate && createModal && <LeadAssignmentCreateModal />}
+
+            {/* lead assignment activate modal */}
+            {isAbleToActivate && leadAssignmentActivationModal && <LeadAssignmentActivationModal />}
         </div>
     );
 };

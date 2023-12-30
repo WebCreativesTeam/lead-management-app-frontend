@@ -10,6 +10,12 @@ export type GetMethodResponseType = {
     };
 };
 
+export interface ICommonResponse {
+    id: string;
+    createdAt: string;
+    updatedAt: string;
+}
+
 export type SelectOptionsType = {
     value: string;
     label: string | React.ReactNode;
@@ -372,15 +378,6 @@ export interface IEmailSmtp {
     updatedAt: string;
 }
 
-//lead Rule types
-export interface ILeadRules {
-    id: string;
-    name: string;
-    isEdited: boolean;
-    isAdded: boolean;
-    source: SourceDataType;
-}
-
 //campaign page
 
 export enum CampaignType {
@@ -474,6 +471,23 @@ export interface ILeadNotes {
     leadId: string;
 }
 
+export interface ILeadAssignment extends ICommonResponse {
+    name: string;
+    product: {
+        id: string;
+        name: string;
+    };
+    source: {
+        id: string;
+        name: string;
+    };
+    isActive: boolean;
+    userPercentages: {
+        userId: string;
+        percentage: string;
+    }[];
+}
+
 // ----------------- authentication types : start -------------------//
 
 export interface ISignInResponse {
@@ -509,10 +523,14 @@ export interface ContactInitialStateProps extends InitialStateProps {
 }
 
 //lead rules slice initial props
-export interface LeadRuleInitialStateProps extends InitialStateProps {
-    data: ILeadRules[];
-    singleData: ILeadRules;
+export interface LeadAssignmentInitialStateProps extends InitialStateProps {
+    data: ILeadAssignment[];
+    singleData: ILeadAssignment;
     sourceList: SourceDataType[];
+    usersList: UserListSecondaryEndpointType[];
+    productList: ProductSecondaryEndpointType[];
+    isAbleToActivate: boolean;
+    leadAssignmentActivationModal: boolean;
 }
 //manage task slice initial props
 export interface ManageTaskInitialStateProps extends InitialStateProps {

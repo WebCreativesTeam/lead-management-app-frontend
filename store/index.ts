@@ -16,7 +16,7 @@ import leadStatusSlice from './Slices/leadSlice/leadStatusSlice';
 import emailSmtpSlice from './Slices/emailSlice/emailSmtpSlice';
 import emailLogSlice from './Slices/emailSlice/emailLogSlice';
 import smsTemplateSlice from './Slices/templateSlice/smsTemplateSlice';
-import leadRuleSlice from './Slices/leadSlice/leadRuleSlice';
+import leadAssignmentSlice from './Slices/leadSlice/leadAssigningSlice';
 import whatsappTemplateSlice from './Slices/templateSlice/whatsappTemplateSlice';
 import dashbordSlice from './Slices/dashbordSlice';
 import customFieldSlice from './Slices/customFieldSlice';
@@ -37,7 +37,7 @@ const rootReducer = combineReducers({
     lead: manageLeadSlice,
     leadPriority: leadPrioritySlice,
     leadStatus: leadStatusSlice,
-    leadRule: leadRuleSlice,
+    leadAssignment: leadAssignmentSlice,
     emailTemplate: emailTemplateSlice,
     emailSmtp: emailSmtpSlice,
     emailLog: emailLogSlice,

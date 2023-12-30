@@ -2,19 +2,20 @@ import React, { memo } from 'react';
 import ConfirmationModal from '@/components/__Shared/ConfirmationModal';
 import { useDispatch, useSelector } from 'react-redux';
 import { IRootState } from '@/store';
-import { setDeleteModal, setDisableBtn, setFetching } from '@/store/Slices/leadSlice/leadRuleSlice';
-import { ILeadRules } from '@/utils/Types';
+import { setDeleteModal, setDisableBtn, setFetching } from '@/store/Slices/leadSlice/leadAssigningSlice';
+import { ILeadAssignment } from '@/utils/Types';
 import { ApiClient } from '@/utils/http';
 import Loader from '@/components/__Shared/Loader';
 
-const LeadRuleDeleteModal = () => {
-    const { isFetching, isBtnDisabled, deleteModal, singleData } = useSelector((state: IRootState) => state.leadRule);
+const LeadAssignmentDeleteModal = () => {
+    const { isFetching, isBtnDisabled, deleteModal, singleData } = useSelector((state: IRootState) => state.leadAssignment);
     const dispatch = useDispatch();
-    const onDeleteLeadRule = async () => {
+    const onDeleteLeadAssignment = async () => {
         dispatch(setFetching(true));
         dispatch(setDisableBtn(true));
-        const deleteLeadRule: ILeadRules = await new ApiClient().delete('lead-rule/' + singleData.id);
-        if (deleteLeadRule === null) {
+        const deleteLeadAssignment: ILeadAssignment = await new ApiClient().delete('lead-assignment/' + singleData.id);
+        if (deleteLeadAssignment === null) {
+            dispatch(setFetching(false));
             dispatch(setDisableBtn(false));
             return;
         }
@@ -31,10 +32,10 @@ const LeadRuleDeleteModal = () => {
             description={isFetching ? <Loader /> : <>Are you sure you want to delete this rule? It will also remove form database.</>}
             title="Delete Lead Rule"
             isBtnDisabled={isBtnDisabled}
-            onSubmit={onDeleteLeadRule}
+            onSubmit={onDeleteLeadAssignment}
             btnSubmitText="Delete"
         />
     );
 };
 
-export default memo(LeadRuleDeleteModal);
+export default memo(LeadAssignmentDeleteModal);
