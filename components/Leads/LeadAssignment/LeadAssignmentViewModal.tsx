@@ -46,7 +46,7 @@ const LeadAssignmentViewModal = () => {
                         </li>
                         <li className="flex flex-wrap">
                             <span className="flex-1 text-lg font-bold">Is Active</span>
-                            <p className="flex-[2]">{singleData?.isActive? "Active" : "Not Active"}</p>
+                            <p className="flex-[2]">{singleData?.isActive ? 'Active' : 'Not Active'}</p>
                         </li>
                         <li className="flex flex-wrap">
                             <span className="flex-1 text-lg font-bold">User Percentage</span>

@@ -3,24 +3,35 @@ import ViewModal from '@/components/__Shared/ViewModal';
 import { useDispatch, useSelector } from 'react-redux';
 import { setViewModal } from '@/store/Slices/leadSlice/manageLeadSlice';
 import { IRootState } from '@/store';
-import { SelectOptionsType } from '@/utils/Types';
+import { GetMethodResponseType, IFiedlListType, SelectOptionsType } from '@/utils/Types';
 import { genderList } from '@/utils/Raw Data';
 import { Tab } from '@headlessui/react';
 import { Delete, Home, Note, Setting } from '@/utils/icons';
 import Loader from '@/components/__Shared/Loader';
 import CreateNotesTab from './CreateNotesTab';
+import { ApiClient } from '@/utils/http';
 
 const LeadViewModal = () => {
-    const { viewModal, singleData, leadProductList, leadNoteList } = useSelector((state: IRootState) => state.lead);
+    const { viewModal, singleData, leadProductList, customFieldsList } = useSelector((state: IRootState) => state.lead);
     const dispatch = useDispatch();
     const { createdAt, status, updatedAt, branch, contact, estimatedDate, priority, source, followUpDate, zip } = singleData;
     const [defaultGender, setDefaultGender] = useState<SelectOptionsType>({} as SelectOptionsType);
     const [defaultProduct, setDefaultProduct] = useState<SelectOptionsType>({} as SelectOptionsType);
     const [defaultSubProduct, setDefaultSubProduct] = useState<SelectOptionsType>({} as SelectOptionsType);
     const [productDropdown, setProductDropdown] = useState<SelectOptionsType[]>([] as SelectOptionsType[]);
-    const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [content, setContent] = useState<string>('');
-    const [title, setTitle] = useState<string>('');
+    const [customFieldCombineArr, setCustomFieldCombineArr] = useState<
+        {
+            [x: string]: any;
+            label: string | undefined;
+            id: string;
+        }[]
+    >(
+        [] as {
+            [x: string]: any;
+            label: string | undefined;
+            id: string;
+        }[]
+    );
 
     //find default selected branch
     useEffect(() => {
@@ -77,6 +88,19 @@ const LeadViewModal = () => {
         ['Created']: new Date(createdAt).toLocaleString(),
         ['Updated']: new Date(updatedAt).toLocaleString(),
     };
+
+    // janxk60
+
+    useEffect(() => {
+        const result = Object.keys(singleData?.customFields).map((key) => {
+            return {
+                [key]: singleData?.customFields[key],
+                label: customFieldsList?.find((item) => item?.id === key)?.label,
+                id: key,
+            };
+        });
+        setCustomFieldCombineArr(result);
+    }, []);
 
     return (
         <ViewModal
@@ -142,7 +166,18 @@ const LeadViewModal = () => {
                             {/* overview form :end */}
 
                             {/* Custom fields tab : start */}
-                            <Tab.Panel>Under Development...</Tab.Panel>
+                            <Tab.Panel>
+                                <ul className="flex flex-col gap-4">
+                                    {customFieldCombineArr?.map((item, i: number) => {
+                                        return (
+                                            <li className="flex flex-wrap" key={i}>
+                                                <span className="flex-1 text-lg font-bold capitalize">{item?.label}</span>
+                                                <p className="flex-[2]"> {item[item?.id]}</p>
+                                            </li>
+                                        );
+                                    })}
+                                </ul>
+                            </Tab.Panel>
                             {/* custom fields tab :end */}
 
                             {/* Notes tab content : start */}
