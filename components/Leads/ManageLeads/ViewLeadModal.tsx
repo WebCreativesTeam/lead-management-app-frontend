@@ -109,85 +109,84 @@ const LeadViewModal = () => {
             size="large"
             onClose={() => dispatch(setViewModal({ open: false }))}
             content={
-                <>
-                    <Tab.Group>
-                        <Tab.List className="mb-8 flex flex-col flex-wrap gap-2 sm:flex-row">
-                            <Tab as={Fragment}>
-                                {({ selected }) => (
-                                    <button
-                                        className={`${
-                                            selected ? 'bg-green-600 text-white shadow-xl !outline-none' : ''
-                                        } -mb-[1px] flex flex-1 items-center justify-center rounded-lg p-3.5 py-2 before:inline-block hover:bg-green-600 hover:text-white`}
-                                    >
-                                        <Home />
-                                        Overview
-                                    </button>
-                                )}
-                            </Tab>
-                            <Tab as={Fragment}>
-                                {({ selected }) => (
-                                    <button
-                                        className={`${
-                                            selected ? 'bg-green-600 text-white shadow-xl !outline-none' : ''
-                                        } -mb-[1px] flex flex-1 items-center justify-center rounded-lg p-3.5 py-2 before:inline-block hover:bg-green-600 hover:text-white`}
-                                    >
-                                        <Setting />
-                                        Custom Fields
-                                    </button>
-                                )}
-                            </Tab>
-                            <Tab as={Fragment}>
-                                {({ selected }) => (
-                                    <button
-                                        className={`${
-                                            selected ? 'bg-green-600 text-white  shadow-xl !outline-none' : ''
-                                        } -mb-[1px] flex flex-1 items-center justify-center rounded-lg p-3.5 py-2  before:inline-block hover:bg-green-600 hover:text-white`}
-                                    >
-                                        <Note />
-                                        Note
-                                    </button>
-                                )}
-                            </Tab>
-                        </Tab.List>
-                        <Tab.Panels>
-                            {/* overview form :start */}
-                            <Tab.Panel>
-                                <ul className="flex flex-col gap-4">
-                                    {Object.keys(reqData).map((item: string, i: number) => {
-                                        return (
-                                            <li className="flex flex-wrap" key={i}>
-                                                <span className="flex-1 text-lg font-bold capitalize">{item}</span>
-                                                <p className="flex-[2]"> {reqData[item]}</p>
-                                            </li>
-                                        );
-                                    })}
-                                </ul>
-                            </Tab.Panel>
-                            {/* overview form :end */}
+                <Tab.Group>
+                    <Tab.List className="mb-8 flex flex-col flex-wrap gap-2 sm:flex-row">
+                        <Tab as={Fragment}>
+                            {({ selected }) => (
+                                <button
+                                    className={`${
+                                        selected ? 'bg-green-600 text-white shadow-xl !outline-none' : ''
+                                    } -mb-[1px] flex flex-1 items-center justify-center rounded-lg p-3.5 py-2 before:inline-block hover:bg-green-600 hover:text-white`}
+                                >
+                                    <Home />
+                                    Overview
+                                </button>
+                            )}
+                        </Tab>
+                        <Tab as={Fragment}>
+                            {({ selected }) => (
+                                <button
+                                    className={`${
+                                        selected ? 'bg-green-600 text-white shadow-xl !outline-none' : ''
+                                    } -mb-[1px] flex flex-1 items-center justify-center rounded-lg p-3.5 py-2 before:inline-block hover:bg-green-600 hover:text-white`}
+                                >
+                                    <Setting />
+                                    Custom Fields
+                                </button>
+                            )}
+                        </Tab>
+                        <Tab as={Fragment}>
+                            {({ selected }) => (
+                                <button
+                                    className={`${
+                                        selected ? 'bg-green-600 text-white  shadow-xl !outline-none' : ''
+                                    } -mb-[1px] flex flex-1 items-center justify-center rounded-lg p-3.5 py-2  before:inline-block hover:bg-green-600 hover:text-white`}
+                                >
+                                    <Note />
+                                    Note
+                                </button>
+                            )}
+                        </Tab>
+                    </Tab.List>
+                    <Tab.Panels>
+                        {/* overview form :start */}
+                        <Tab.Panel>
+                            <ul className="flex flex-col gap-4">
+                                {Object.keys(reqData).map((item: string, i: number) => {
+                                    return (
+                                        <li className="flex flex-wrap" key={i}>
+                                            <span className="flex-1 text-lg font-bold capitalize">{item}</span>
+                                            <p className="flex-[2]"> {reqData[item]}</p>
+                                        </li>
+                                    );
+                                })}
+                            </ul>
+                        </Tab.Panel>
+                        {/* overview form :end */}
 
-                            {/* Custom fields tab : start */}
-                            <Tab.Panel>
-                                <ul className="flex flex-col gap-4">
-                                    {customFieldCombineArr?.map((item, i: number) => {
-                                        return (
-                                            <li className="flex flex-wrap" key={i}>
-                                                <span className="flex-1 text-lg font-bold capitalize">{item?.label}</span>
-                                                <p className="flex-[2]"> {item[item?.id]}</p>
-                                            </li>
-                                        );
-                                    })}
-                                </ul>
-                            </Tab.Panel>
-                            {/* custom fields tab :end */}
+                        {/* Custom fields tab : start */}
+                        <Tab.Panel>
+                            <ul className="flex flex-col gap-4">
+                                {customFieldCombineArr?.map((item, i: number) => {
+                                    return (
+                                        <li className="flex flex-wrap" key={i}>
+                                            <span className="flex-1 text-lg font-bold capitalize">{item?.label}</span>
+                                            <p className="flex-[2]"> {item[item?.id]}</p>
+                                        </li>
+                                    );
+                                })}
+                            </ul>
+                        </Tab.Panel>
+                        {/* custom fields tab :end */}
 
-                            {/* Notes tab content : start */}
-                            <Tab.Panel>
-                                <CreateNotesTab />
-                            </Tab.Panel>
-                            {/* Notes tab content : end */}
+                        {/* Notes tab content : start */}
+                        <Tab.Panel>
+                            <CreateNotesTab />
+                        </Tab.Panel>
+                        {/* Notes tab content : end */}
 
-                            {/* logs tab content : start */}
-                            {/* <Tab.Panel>
+                        {/* logs tab content : start */}
+                        {/* <Tab.Panel>
                                     <div className="mb-5">
                                         <div className="mx-auto max-w-[900px]">
                                             <div className="flex">
@@ -222,10 +221,9 @@ const LeadViewModal = () => {
                                         </div>
                                     </div>
                                 </Tab.Panel> */}
-                            {/* logs tab content : end */}
-                        </Tab.Panels>
-                    </Tab.Group>
-                </>
+                        {/* logs tab content : end */}
+                    </Tab.Panels>
+                </Tab.Group>
             }
         />
     );
