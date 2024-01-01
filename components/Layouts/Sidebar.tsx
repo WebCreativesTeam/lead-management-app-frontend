@@ -65,6 +65,12 @@ import {
     setLeadAssignmentReadPermission,
     setLeadAssignmentUpdatePermission,
 } from '@/store/Slices/leadSlice/leadAssigningSlice';
+import {
+    setWhatsappTemplateCreatePermission,
+    setWhatsappTemplateDeletePermission,
+    setWhatsappTemplateReadPermission,
+    setWhatsappTemplateUpdatePermission,
+} from '@/store/Slices/templateSlice/whatsappTemplateSlice';
 
 const Sidebar = () => {
     const router = useRouter();
@@ -139,6 +145,10 @@ const Sidebar = () => {
     const userPolicySmsTemplateArray: string[] = useSelector((state: IRootState) => state.smsTemplate.userPolicyArr);
     const isAbleToReadSmsTemplate: boolean = useSelector((state: IRootState) => state.smsTemplate?.isAbleToRead);
 
+    //Manage Whatsapp template page
+    const userPolicyWhatsappTemplateArray: string[] = useSelector((state: IRootState) => state.whatsappTemplate.userPolicyArr);
+    const isAbleToReadWhatsappTemplate: boolean = useSelector((state: IRootState) => state.whatsappTemplate?.isAbleToRead);
+
     //Manage Product page
     const userPermissionProductArray: string[] = useSelector((state: IRootState) => state.product.userPolicyArr);
     const isAbleToReadProduct: boolean = useSelector((state: IRootState) => state.product?.isAbleToRead);
@@ -162,6 +172,14 @@ const Sidebar = () => {
         dispatch(setSmsTemplateUpdatePermission('smstemplate:Update::Document'));
         dispatch(setSmsTemplateDeletePermission('smstemplate:Delete::Document'));
     }, [userPolicySmsTemplateArray]);
+
+    //access for sms template page
+    useEffect(() => {
+        dispatch(setWhatsappTemplateReadPermission('whatsapptemplate:Read::Documents'));
+        dispatch(setWhatsappTemplateCreatePermission('whatsapptemplate:Create::Document'));
+        dispatch(setWhatsappTemplateUpdatePermission('whatsapptemplate:Update::Document'));
+        dispatch(setWhatsappTemplateDeletePermission('whatsapptemplate:Delete::Document'));
+    }, [userPolicyWhatsappTemplateArray]);
 
     //access for branch page
     useEffect(() => {
@@ -501,10 +519,11 @@ const Sidebar = () => {
                                                     <Link href="/templates/email-template">{t('Email')}</Link>
                                                 </li>
                                             )}
-
-                                            <li>
-                                                <Link href="/templates/whatsapp-template">{t('WhatsApp')}</Link>
-                                            </li>
+                                            {isAbleToReadWhatsappTemplate && (
+                                                <li>
+                                                    <Link href="/templates/whatsapp-template">{t('WhatsApp')}</Link>
+                                                </li>
+                                            )}
                                         </ul>
                                     </AnimateHeight>
                                 </li>

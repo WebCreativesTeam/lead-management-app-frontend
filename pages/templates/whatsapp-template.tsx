@@ -60,7 +60,8 @@ const WhatsappTemplatePage = () => {
     //get all WhatsappTemplate list
     const getWhatsappTemplateList = async () => {
         setLoading(true);
-        const res: GetMethodResponseType = await new ApiClient().get(`sms-template?limit=${pageSize}&page=${page}&search=${searchQuery}`);
+        // const res: GetMethodResponseType = await new ApiClient().get(`whatspp-template?limit=${pageSize}&page=${page}&search=${searchQuery}`);
+        const res: GetMethodResponseType = await new ApiClient().get('whatsapp-template');
         const priority: IWhatsappTemplate[] = res?.data;
         if (typeof priority === 'undefined') {
             dispatch(getAllWhatsappTemplates([] as IWhatsappTemplate[]));

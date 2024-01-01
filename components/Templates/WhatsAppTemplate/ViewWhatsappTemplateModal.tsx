@@ -12,33 +12,31 @@ const WhatsappTemplateViewModal = () => {
         <ViewModal
             title="View Whatsapp Template Detail"
             open={viewModal}
-            size="large"
+            size="medium"
             onClose={() => dispatch(setViewModal({ open: false }))}
             content={
-                <>
-                    <ul className="flex flex-col gap-4">
-                        <li className="flex flex-wrap">
-                            <span className="flex-1 text-lg font-bold">Name</span>
-                            <p className="flex-[2]">
-                                <span>{singleData?.name}</span>
-                            </p>
-                        </li>
-                        <li className="flex flex-wrap">
-                            <span className="flex-1 text-lg font-bold">Message</span>
-                            <p className="flex-[2]">
-                                <span>{singleData?.message}</span>
-                            </p>
-                        </li>
-                        <li className="flex flex-wrap">
-                            <span className="flex-1 text-lg font-bold">Created</span>
-                            <p className="flex-[2]">{new Date(singleData.createdAt).toLocaleString()}</p>
-                        </li>
-                        <li className="flex flex-wrap">
-                            <span className="flex-1 text-lg font-bold">Last Updated</span>
-                            <p className="flex-[2]">{new Date(singleData.updatedAt).toLocaleString()}</p>
-                        </li>
-                    </ul>
-                </>
+                <ul className="flex flex-col gap-4">
+                    <li className="flex flex-wrap">
+                        <span className="flex-1 text-lg font-bold">Name</span>
+                        <p className="flex-[2]">
+                            <span>{singleData?.name}</span>
+                        </p>
+                    </li>
+                    <li className="flex flex-wrap">
+                        <span className="flex-1 text-lg font-bold">Message</span>
+                        <p className="flex-[2]">
+                            <span>{singleData?.message}</span>
+                        </p>
+                    </li>
+                    <li className="flex flex-wrap">
+                        <span className="flex-1 text-lg font-bold">Created Date</span>
+                        <p className="flex-[2]">{new Date(singleData.createdAt).toLocaleString()}</p>
+                    </li>
+                    <li className="flex flex-wrap">
+                        <span className="flex-1 text-lg font-bold">Last Updated</span>
+                        <p className="flex-[2]">{new Date(singleData.updatedAt).toLocaleString()}</p>
+                    </li>
+                </ul>
             }
         />
     );
