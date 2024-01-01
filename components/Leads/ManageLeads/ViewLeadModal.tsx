@@ -1,19 +1,26 @@
-import React, { memo, useEffect, useState } from 'react';
+import React, { Fragment, memo, useEffect, useState } from 'react';
 import ViewModal from '@/components/__Shared/ViewModal';
 import { useDispatch, useSelector } from 'react-redux';
 import { setViewModal } from '@/store/Slices/leadSlice/manageLeadSlice';
 import { IRootState } from '@/store';
 import { SelectOptionsType } from '@/utils/Types';
 import { genderList } from '@/utils/Raw Data';
+import { Tab } from '@headlessui/react';
+import { Delete, Home, Note, Setting } from '@/utils/icons';
+import Loader from '@/components/__Shared/Loader';
+import CreateNotesTab from './CreateNotesTab';
 
 const LeadViewModal = () => {
-    const { viewModal, singleData, leadProductList } = useSelector((state: IRootState) => state.lead);
+    const { viewModal, singleData, leadProductList, leadNoteList } = useSelector((state: IRootState) => state.lead);
     const dispatch = useDispatch();
     const { createdAt, status, updatedAt, branch, contact, estimatedDate, priority, source, followUpDate, zip } = singleData;
     const [defaultGender, setDefaultGender] = useState<SelectOptionsType>({} as SelectOptionsType);
     const [defaultProduct, setDefaultProduct] = useState<SelectOptionsType>({} as SelectOptionsType);
     const [defaultSubProduct, setDefaultSubProduct] = useState<SelectOptionsType>({} as SelectOptionsType);
     const [productDropdown, setProductDropdown] = useState<SelectOptionsType[]>([] as SelectOptionsType[]);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [content, setContent] = useState<string>('');
+    const [title, setTitle] = useState<string>('');
 
     //find default selected branch
     useEffect(() => {
@@ -79,16 +86,110 @@ const LeadViewModal = () => {
             onClose={() => dispatch(setViewModal({ open: false }))}
             content={
                 <>
-                    <ul className="flex flex-col gap-4">
-                        {Object.keys(reqData).map((item: string, i: number) => {
-                            return (
-                                <li className="flex flex-wrap" key={i}>
-                                    <span className="flex-1 text-lg font-bold capitalize">{item}</span>
-                                    <p className="flex-[2]"> {reqData[item]}</p>
-                                </li>
-                            );
-                        })}
-                    </ul>
+                    <Tab.Group>
+                        <Tab.List className="mb-8 flex flex-col flex-wrap gap-2 sm:flex-row">
+                            <Tab as={Fragment}>
+                                {({ selected }) => (
+                                    <button
+                                        className={`${
+                                            selected ? 'bg-green-600 text-white shadow-xl !outline-none' : ''
+                                        } -mb-[1px] flex flex-1 items-center justify-center rounded-lg p-3.5 py-2 before:inline-block hover:bg-green-600 hover:text-white`}
+                                    >
+                                        <Home />
+                                        Overview
+                                    </button>
+                                )}
+                            </Tab>
+                            <Tab as={Fragment}>
+                                {({ selected }) => (
+                                    <button
+                                        className={`${
+                                            selected ? 'bg-green-600 text-white shadow-xl !outline-none' : ''
+                                        } -mb-[1px] flex flex-1 items-center justify-center rounded-lg p-3.5 py-2 before:inline-block hover:bg-green-600 hover:text-white`}
+                                    >
+                                        <Setting />
+                                        Custom Fields
+                                    </button>
+                                )}
+                            </Tab>
+                            <Tab as={Fragment}>
+                                {({ selected }) => (
+                                    <button
+                                        className={`${
+                                            selected ? 'bg-green-600 text-white  shadow-xl !outline-none' : ''
+                                        } -mb-[1px] flex flex-1 items-center justify-center rounded-lg p-3.5 py-2  before:inline-block hover:bg-green-600 hover:text-white`}
+                                    >
+                                        <Note />
+                                        Note
+                                    </button>
+                                )}
+                            </Tab>
+                        </Tab.List>
+                        <Tab.Panels>
+                            {/* overview form :start */}
+                            <Tab.Panel>
+                                <ul className="flex flex-col gap-4">
+                                    {Object.keys(reqData).map((item: string, i: number) => {
+                                        return (
+                                            <li className="flex flex-wrap" key={i}>
+                                                <span className="flex-1 text-lg font-bold capitalize">{item}</span>
+                                                <p className="flex-[2]"> {reqData[item]}</p>
+                                            </li>
+                                        );
+                                    })}
+                                </ul>
+                            </Tab.Panel>
+                            {/* overview form :end */}
+
+                            {/* Custom fields tab : start */}
+                            <Tab.Panel>Under Development...</Tab.Panel>
+                            {/* custom fields tab :end */}
+
+                            {/* Notes tab content : start */}
+                            <Tab.Panel>
+                                <CreateNotesTab />
+                            </Tab.Panel>
+                            {/* Notes tab content : end */}
+
+                            {/* logs tab content : start */}
+                            {/* <Tab.Panel>
+                                    <div className="mb-5">
+                                        <div className="mx-auto max-w-[900px]">
+                                            <div className="flex">
+                                                <p className="mr-3 w-[100px] py-2.5 text-base font-semibold text-[#3b3f5c] dark:text-white-light">2 Days Ago</p>
+                                                <div className="relative before:absolute before:left-1/2 before:top-[15px] before:h-2.5 before:w-2.5 before:-translate-x-1/2 before:rounded-full before:border-2 before:border-primary after:absolute after:-bottom-[15px] after:left-1/2 after:top-[25px] after:h-auto after:w-0 after:-translate-x-1/2 after:rounded-full after:border-l-2 after:border-primary"></div>
+                                                <div className="self-center p-2.5 ltr:ml-2.5 rtl:ml-2.5 rtl:ltr:mr-2.5">
+                                                    <p className="text-[13px] font-semibold text-[#3b3f5c] dark:text-white-light">Call with John Doe</p>
+                                                    <p className="min-w-[100px] max-w-[100px] self-center text-xs font-bold text-white-dark">Duration :25 mins</p>
+                                                    <audio controls muted>
+                                                        <source src="horse.ogg" type="audio/ogg" />
+                                                        <source src="horse.mp3" type="audio/mpeg" />
+                                                        Your browser does not support the audio element.
+                                                    </audio>
+                                                </div>
+                                            </div>
+                                            <div className="flex">
+                                                <p className="mr-3 w-[100px] py-2.5 text-base font-semibold text-[#3b3f5c] dark:text-white-light">2 Days Ago</p>
+                                                <div className="relative before:absolute before:left-1/2 before:top-[15px] before:h-2.5 before:w-2.5 before:-translate-x-1/2 before:rounded-full before:border-2 before:border-secondary after:absolute after:-bottom-[15px] after:left-1/2 after:top-[25px] after:h-auto after:w-0 after:-translate-x-1/2 after:rounded-full after:border-l-2 after:border-secondary"></div>
+                                                <div className="self-center p-2.5 ltr:ml-2.5 rtl:ml-2.5 rtl:ltr:mr-2.5">
+                                                    <p className="text-[13px] font-semibold text-[#3b3f5c] dark:text-white-light">Whatsapp With Jane Smith</p>
+                                                    <p className="min-w-[100px] self-center text-xs font-bold text-white-dark">Last Message: Birthday wish content</p>
+                                                </div>
+                                            </div>
+                                            <div className="flex">
+                                                <p className="mr-3 w-[100px] py-2.5 text-base font-semibold text-[#3b3f5c] dark:text-white-light">2 Days Ago</p>
+                                                <div className="relative before:absolute before:left-1/2 before:top-[15px] before:h-2.5 before:w-2.5 before:-translate-x-1/2 before:rounded-full before:border-2 before:border-success after:absolute after:-bottom-[15px] after:left-1/2 after:top-[25px] after:h-auto after:w-0 after:-translate-x-1/2 after:rounded-full after:border-l-2 after:border-success"></div>
+                                                <div className="self-center p-2.5 ltr:ml-2.5 rtl:ml-2.5 rtl:ltr:mr-2.5">
+                                                    <p className="text-[13px] font-semibold text-[#3b3f5c] dark:text-white-light">Email to HR and Admin</p>
+                                                    <p className="min-w-[100px]  self-center text-xs font-bold text-white-dark">Last Message: Birthday wish content</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </Tab.Panel> */}
+                            {/* logs tab content : end */}
+                        </Tab.Panels>
+                    </Tab.Group>
                 </>
             }
         />
