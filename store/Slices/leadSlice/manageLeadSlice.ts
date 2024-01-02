@@ -33,6 +33,7 @@ const initialState: ManageLeadInitialStateProps = {
     leadSourceList: [] as SourceDataType[],
     customFieldsList: [] as ICustomField[],
     leadProductList: [] as ProductSecondaryEndpointType[],
+    leadSubProductList: [] as ProductSecondaryEndpointType[],
     changePriorityModal: false,
     changeStatusModal: false,
     isAbleToRead: false,
@@ -131,6 +132,9 @@ const manageLeadSlice = createSlice({
         getAllProductsForLead(state, action: PayloadAction<ProductSecondaryEndpointType[]>) {
             state.leadProductList = action.payload;
         },
+        getAllSubProductsForLead(state, action: PayloadAction<ProductSecondaryEndpointType[]>) {
+            state.leadSubProductList = action.payload;
+        },
         getAllNotesForLead(state, action: PayloadAction<ILeadNotes[]>) {
             state.leadNoteList = action.payload;
         },
@@ -212,5 +216,6 @@ export const {
     setOverViewFormData,
     setIsOverviewTabDisabled,
     getAllNotesForLead,
+    getAllSubProductsForLead,
 } = manageLeadSlice.actions;
 export default manageLeadSlice.reducer;

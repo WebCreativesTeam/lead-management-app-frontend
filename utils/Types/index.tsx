@@ -575,6 +575,7 @@ export interface ManageLeadInitialStateProps extends InitialStateProps {
     leadSourceList: SourceDataType[];
     customFieldsList: ICustomField[];
     leadProductList: ProductSecondaryEndpointType[];
+    leadSubProductList: ProductSecondaryEndpointType[];
     activeTab: number;
     overViewFormData: OverviewFormType;
     isOverviewTabDisabled: boolean;

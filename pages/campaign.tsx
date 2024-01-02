@@ -191,6 +191,31 @@ const Campaign = () => {
                                 render: ({ sendTo }) => <div>{sendTo}</div>,
                             },
                             {
+                                accessor: 'active',
+                                title: 'Active',
+                                sortable: true,
+                                render: ({ isActive, id }) =>
+                                    isAbleToActivateCampaign ? (
+                                        <div>
+                                            <label className="relative h-6 w-12">
+                                                <input
+                                                    type="checkbox"
+                                                    className="custom_switch peer absolute z-10 h-full w-full cursor-pointer opacity-0"
+                                                    id="custom_switch_checkbox1"
+                                                    name="active"
+                                                    checked={isActive}
+                                                    onChange={() => dispatch(setCampaigndActivationModal({ id, open: true }))}
+                                                />
+                                                <ToggleSwitch />
+                                            </label>
+                                        </div>
+                                    ) : (
+                                        <span className="mr-2 rounded bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+                                            {isActive ? 'Active' : 'In Active'}
+                                        </span>
+                                    ),
+                            },
+                            {
                                 accessor: 'createdAt',
                                 title: 'Created Date',
                                 sortable: true,
@@ -229,31 +254,6 @@ const Campaign = () => {
                                         )}
                                     </div>
                                 ),
-                            },
-                            {
-                                accessor: 'active',
-                                title: 'Active',
-                                sortable: true,
-                                render: ({ isActive, id }) =>
-                                    isAbleToActivateCampaign ? (
-                                        <div>
-                                            <label className="relative h-6 w-12">
-                                                <input
-                                                    type="checkbox"
-                                                    className="custom_switch peer absolute z-10 h-full w-full cursor-pointer opacity-0"
-                                                    id="custom_switch_checkbox1"
-                                                    name="active"
-                                                    checked={isActive}
-                                                    onChange={() => dispatch(setCampaigndActivationModal({ id, open: true }))}
-                                                />
-                                                <ToggleSwitch />
-                                            </label>
-                                        </div>
-                                    ) : (
-                                        <span className="mr-2 rounded bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-300">
-                                            {isActive ? 'Active' : 'In Active'}
-                                        </span>
-                                    ),
                             },
                         ]}
                         totalRecords={totalRecords}

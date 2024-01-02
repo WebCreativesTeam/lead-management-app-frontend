@@ -160,8 +160,7 @@ const LeadAssignmentCreateModal = () => {
                                                 onClick={() => arrayHelpers.push({ userId: '', percentage: '' })}
                                                 disabled={
                                                     formik.values.userPercentages[formik.values.userPercentages.length - 1].userId &&
-                                                    formik.values.userPercentages[formik.values.userPercentages.length - 1].percentage &&
-                                                    formik.values.userPercentages.length < 3
+                                                    formik.values.userPercentages[formik.values.userPercentages.length - 1].percentage
                                                         ? false
                                                         : true
                                                 }

@@ -62,7 +62,7 @@ const CampaignCreateModal = () => {
                 sourceId: value.sourceId,
                 productId: value.productId,
                 instance: value.instance,
-                isActive: value.isActive,
+                // isActive: value.isActive,
             };
             if (value.type === 'SCHEDULED') {
                 campaignCreateObj.date = value.date;
@@ -381,7 +381,7 @@ const CampaignCreateModal = () => {
                                 )}
                             />
 
-                            <div className="flex flex-1 gap-5">
+                            {/* <div className="flex flex-1 gap-5">
                                 <span>Is Active</span>
                                 <label className="relative h-6 w-12">
                                     <input
@@ -394,7 +394,7 @@ const CampaignCreateModal = () => {
                                     />
                                     <ToggleSwitch />
                                 </label>
-                            </div>
+                            </div> */}
                         </form>
                     </FormikProvider>
                 )

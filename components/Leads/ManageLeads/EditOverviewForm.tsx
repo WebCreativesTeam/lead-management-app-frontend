@@ -2,7 +2,7 @@
 import React, { Fragment, memo, useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { IRootState } from '@/store';
-import { setEditModal, setDisableBtn, setFetching } from '@/store/Slices/leadSlice/manageLeadSlice';
+import { setEditModal, setDisableBtn, setFetching, getAllSubProductsForLead } from '@/store/Slices/leadSlice/manageLeadSlice';
 import { useFormik } from 'formik';
 import { leadSchema } from '@/utils/schemas';
 import { ApiClient } from '@/utils/http';
@@ -10,7 +10,7 @@ import { showToastAlert } from '@/utils/contant';
 import Select from 'react-select';
 import Flatpickr from 'react-flatpickr';
 import 'flatpickr/dist/flatpickr.css';
-import { SelectOptionsType, BranchListSecondaryEndpoint, SourceDataType, LeadStatusSecondaryEndpoint } from '@/utils/Types';
+import { SelectOptionsType, BranchListSecondaryEndpoint, SourceDataType, LeadStatusSecondaryEndpoint, GetMethodResponseType, ProductSecondaryEndpointType } from '@/utils/Types';
 import { genderList } from '@/utils/Raw Data';
 
 const EditOverviewForm = () => {
@@ -24,7 +24,8 @@ const EditOverviewForm = () => {
     const [defaultProduct, setDefaultProduct] = useState<SelectOptionsType>({} as SelectOptionsType);
     const [defaultSubProduct, setDefaultSubProduct] = useState<SelectOptionsType>({} as SelectOptionsType);
     const [defaultGender, setDefaultGender] = useState<SelectOptionsType>({} as SelectOptionsType);
-
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [subProductDropdown, setsubProductDropdown] = useState<SelectOptionsType[]>([] as SelectOptionsType[]);
     const initialValues = {
         // status: {
         //     value: '',
@@ -157,11 +158,38 @@ const EditOverviewForm = () => {
 
     //find default selected subproduct
     useEffect(() => {
-        const findSubProduct: SelectOptionsType | undefined = productDropdown.find((item: SelectOptionsType) => item?.value === singleData?.subProductId);
+        const findSubProduct: SelectOptionsType | undefined = subProductDropdown.find((item: SelectOptionsType) => item?.value === singleData?.subProductId);
         if (findSubProduct) {
             setDefaultSubProduct(findSubProduct);
         }
-    }, [productDropdown, singleData]);
+    }, [subProductDropdown, singleData]);
+
+    // fetch all sub product list
+    const getAllSubProducts = async (id: string) => {
+        if (id) {
+            setIsLoading(true);
+            const productSubList: GetMethodResponseType = await new ApiClient().get('product/list/' + id);
+            const subProducts: ProductSecondaryEndpointType[] = productSubList?.data;
+            if (typeof subProducts === 'undefined') {
+                dispatch(getAllSubProductsForLead([] as ProductSecondaryEndpointType[]));
+                setIsLoading(false);
+                return;
+            }
+            const createSubProductDropdown: SelectOptionsType[] = subProducts?.map((item) => {
+                return { label: item?.name, value: item?.id };
+            });
+            setsubProductDropdown(createSubProductDropdown);
+            setIsLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        const createProductDropdown: SelectOptionsType[] = leadProductList?.map((item) => {
+            return { label: item?.name, value: item?.id };
+        });
+        setProductDropdown(createProductDropdown);
+        getAllSubProducts(values?.product?.value || singleData?.productId);
+    }, [values.product?.value, singleData]);
 
     return (
         <form className="space-y-5" onSubmit={handleSubmit}>
@@ -175,7 +203,14 @@ const EditOverviewForm = () => {
                 {Object.keys(defaultSubProduct).length > 0 && (
                     <div className="flex-1">
                         <label htmlFor="subProduct">Sub Product</label>
-                        <Select placeholder="Sub Product" options={productDropdown} id="subProduct" onChange={(e) => setFieldValue('subProduct', e)} defaultValue={defaultSubProduct} />
+                        <Select
+                            placeholder="Sub Product"
+                            options={subProductDropdown}
+                            id="subProduct"
+                            onChange={(e) => setFieldValue('subProduct', e)}
+                            defaultValue={defaultSubProduct}
+                            isDisabled={(!values?.subProduct?.value && !singleData?.productId) || isLoading || Object.keys(defaultProduct).length === 0}
+                        />
                     </div>
                 )}
             </div>

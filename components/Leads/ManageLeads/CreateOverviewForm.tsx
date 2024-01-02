@@ -2,7 +2,7 @@
 import React, { Fragment, memo, useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { IRootState } from '@/store';
-import { setActiveTab, setCreateModal, setDisableBtn, setFetching, setIsOverviewTabDisabled, setOverViewFormData } from '@/store/Slices/leadSlice/manageLeadSlice';
+import { getAllSubProductsForLead, setActiveTab, setCreateModal, setDisableBtn, setFetching, setIsOverviewTabDisabled, setOverViewFormData } from '@/store/Slices/leadSlice/manageLeadSlice';
 import { useFormik } from 'formik';
 import { leadSchema } from '@/utils/schemas';
 import { ApiClient } from '@/utils/http';
@@ -10,15 +10,27 @@ import { showToastAlert } from '@/utils/contant';
 import Select from 'react-select';
 import Flatpickr from 'react-flatpickr';
 import 'flatpickr/dist/flatpickr.css';
-import { SelectOptionsType, BranchListSecondaryEndpoint, SourceDataType, ContactListSecondaryEndpoint, LeadPrioritySecondaryEndpoint, LeadStatusSecondaryEndpoint, OverviewFormType } from '@/utils/Types';
+import {
+    SelectOptionsType,
+    BranchListSecondaryEndpoint,
+    SourceDataType,
+    ContactListSecondaryEndpoint,
+    LeadPrioritySecondaryEndpoint,
+    LeadStatusSecondaryEndpoint,
+    OverviewFormType,
+    GetMethodResponseType,
+    ProductSecondaryEndpointType,
+} from '@/utils/Types';
 import { genderList } from '@/utils/Raw Data';
 
 const CreateOverviewForm = () => {
     const dispatch = useDispatch();
-    const { isFetching, createModal, isBtnDisabled, leadPriorityList, leadBranchList, leadContactsList, leadSourceList, leadProductList, leadStatusList, overViewFormData } = useSelector(
+    const { isFetching, createModal, isBtnDisabled, leadPriorityList, leadBranchList, leadContactsList, leadSourceList, leadProductList, leadSubProductList, overViewFormData } = useSelector(
         (state: IRootState) => state.lead
     );
     const [productDropdown, setProductDropdown] = useState<SelectOptionsType[]>([] as SelectOptionsType[]);
+    const [subProductDropdown, setsubProductDropdown] = useState<SelectOptionsType[]>([] as SelectOptionsType[]);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
 
     const initialValues = {
         priority: {
@@ -134,12 +146,39 @@ const CreateOverviewForm = () => {
         return { value: item.id, label: item.name };
     });
 
+    // fetch all sub product list
+    const getAllSubProducts = async (id: string) => {
+        if (id) {
+            setIsLoading(true);
+            const productSubList: GetMethodResponseType = await new ApiClient().get('product/list/' + id);
+            const subProducts: ProductSecondaryEndpointType[] = productSubList?.data;
+            if (typeof subProducts === 'undefined') {
+                dispatch(getAllSubProductsForLead([] as ProductSecondaryEndpointType[]));
+                setIsLoading(false);
+                return;
+            }
+            const createSubProductDropdown: SelectOptionsType[] = subProducts?.map((item) => {
+                return { label: item?.name, value: item?.id };
+            });
+            setsubProductDropdown(createSubProductDropdown);
+            setIsLoading(false);
+        }
+    };
+
     useEffect(() => {
         const createProductDropdown: SelectOptionsType[] = leadProductList?.map((item) => {
             return { label: item?.name, value: item?.id };
         });
         setProductDropdown(createProductDropdown);
     }, [leadProductList]);
+
+    useEffect(() => {
+        const createProductDropdown: SelectOptionsType[] = leadProductList?.map((item) => {
+            return { label: item?.name, value: item?.id };
+        });
+        setProductDropdown(createProductDropdown);
+        getAllSubProducts(values?.product?.value);
+    }, [values.product?.value]);
     return (
         <form className="space-y-5" onSubmit={handleSubmit}>
             <div className="flex flex-col gap-4 sm:flex-row">
@@ -159,7 +198,7 @@ const CreateOverviewForm = () => {
                 </div>
                 <div className="flex-1">
                     <label htmlFor="subProduct">Sub Product</label>
-                    <Select placeholder="Sub Product" options={productDropdown} id="subProduct" onChange={(e) => setFieldValue('subProduct', e)} />
+                    <Select placeholder="Sub Product" options={subProductDropdown} id="subProduct" onChange={(e) => setFieldValue('subProduct', e)} isDisabled={!values?.product?.value || isLoading} />
                 </div>
             </div>
             <div className="flex flex-col gap-4 sm:flex-row">
