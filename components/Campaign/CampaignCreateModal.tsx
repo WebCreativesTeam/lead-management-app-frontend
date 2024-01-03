@@ -59,11 +59,20 @@ const CampaignCreateModal = () => {
                 hour: value.hour,
                 type: value.type,
                 sendTo: value.sendTo,
-                sourceId: value.sourceId,
-                productId: value.productId,
+                // sourceId: value.sourceId,
+                // productId: value.productId,
                 instance: value.instance,
-                // isActive: value.isActive,
             };
+            if (value.productId === 'All' && value.sourceId === 'All') {
+                campaignCreateObj.isAllSource = true;
+                campaignCreateObj.isAllProduct = true;
+            } else if (value.productId === 'All' && value.sourceId !== 'All') {
+                campaignCreateObj.isAllProduct = true;
+                campaignCreateObj.sourceId = value.sourceId;
+            } else if (value.productId !== 'All' && value.sourceId === 'All') {
+                campaignCreateObj.isAllSource = true;
+                campaignCreateObj.productId = value.productId;
+            }
             if (value.type === 'SCHEDULED') {
                 campaignCreateObj.date = value.date;
             } else if (value.type === 'DRIP') {
@@ -73,7 +82,11 @@ const CampaignCreateModal = () => {
                 campaignCreateObj.sendBefore = value.sendBefore.toString();
             }
             if (value.sendTo === 'LEAD') {
-                campaignCreateObj.statusId = value.statusId;
+                if (value.statusId === 'All') {
+                    campaignCreateObj.isAllStatus = true;
+                } else {
+                    campaignCreateObj.statusId = value.statusId;
+                }
             }
             console.log(campaignCreateObj);
             try {
@@ -100,7 +113,7 @@ const CampaignCreateModal = () => {
         formik.setFieldValue('productId', 'All');
     }, []);
 
-    console.log("createModal")
+    console.log(formik.values);
 
     useEffect(() => {
         const createCustomFieldDropdown: SelectOptionsType[] = customDateFields?.map((item: ICustomField) => {

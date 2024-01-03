@@ -13,7 +13,6 @@ import Flatpickr from 'react-flatpickr';
 import Select from 'react-select';
 import 'flatpickr/dist/flatpickr.css';
 import { platformListRawData, sendToDropdown } from '@/utils/Raw Data';
-import ToggleSwitch from '../__Shared/ToggleSwitch';
 
 type SelectOptionsType = {
     value: string;
@@ -41,11 +40,23 @@ const CampaignEditModal = () => {
         formik.setFieldValue('sendBefore', singleData?.sendBefore);
         formik.setFieldValue('customDateId', singleData?.customDateId);
         formik.setFieldValue('sendTo', singleData?.sendTo);
-        formik.setFieldValue('statusId', singleData?.statusId);
+        if (singleData.isAllStatus) {
+            formik.setFieldValue('isAllStatus', singleData?.isAllStatus);
+        } else {
+            formik.setFieldValue('statusId', singleData?.status?.id);
+        }
+        if (singleData.isAllProduct) {
+            formik.setFieldValue('isAllProduct', singleData?.isAllProduct);
+        } else {
+            formik.setFieldValue('productId', singleData?.productId);
+        }
+        if (singleData.isAllSource) {
+            formik.setFieldValue('isAllSource', singleData?.isAllSource);
+        } else {
+            formik.setFieldValue('sourceId', singleData?.sourceId);
+        }
         formik.setFieldValue('isActive', singleData?.isActive);
         formik.setFieldValue('instance', singleData?.instance);
-        formik.setFieldValue('sourceId', singleData?.sourceId);
-        formik.setFieldValue('productId', singleData?.productId);
 
         const findSendToDefaultValue: SelectOptionsType | undefined = sendToDropdown.find((item: SelectOptionsType) => item.value === singleData?.sendTo);
         if (findSendToDefaultValue) {
@@ -55,16 +66,22 @@ const CampaignEditModal = () => {
         const findProductDefaultValue: SelectOptionsType | undefined = productDropdown.find((item: SelectOptionsType) => item.value === singleData?.productId);
         if (findProductDefaultValue) {
             setDefaultProductValue(findProductDefaultValue);
+        } else {
+            setDefaultProductValue({ label: 'All', value: 'All' });
         }
 
         const findSourceDefaultValue: SelectOptionsType | undefined = sourceDropdown.find((item: SelectOptionsType) => item.value === singleData?.sourceId);
         if (findSourceDefaultValue) {
             setDefaultSourceValue(findSourceDefaultValue);
+        } else {
+            setDefaultSourceValue({ label: 'All', value: 'All' });
         }
 
-        const findLeadStatusDefaultValue: SelectOptionsType | undefined = leadStatusDropdown.find((item: SelectOptionsType) => item.value === singleData?.statusId);
+        const findLeadStatusDefaultValue: SelectOptionsType | undefined = leadStatusDropdown.find((item: SelectOptionsType) => item.value === singleData?.status?.id);
         if (findLeadStatusDefaultValue) {
             setDefaultLeadStatusValue(findLeadStatusDefaultValue);
+        } else {
+            setDefaultLeadStatusValue({ label: 'All', value: 'All' });
         }
 
         const findCustomDateDefaultValue: SelectOptionsType | undefined = customFieldList.find((item: SelectOptionsType) => item.value === singleData?.customDateId);
@@ -72,11 +89,6 @@ const CampaignEditModal = () => {
             setDefaultCustomDateValue(findCustomDateDefaultValue);
         }
     }, [singleData]);
-
-    useEffect(() => {
-        //uncomment
-        // dispatch(getCustomDateFieldsList());
-    }, []);
 
     const dispatch = useDispatch<AppDispatch>();
     const formik = useFormik({
@@ -109,11 +121,18 @@ const CampaignEditModal = () => {
                 name: value.name,
                 hour: value.hour,
                 sendTo: value.sendTo,
-                sourceId: value.sourceId,
-                productId: value.productId,
                 instance: value.instance,
-                // isActive: value.isActive,
             };
+            if (value.productId === 'All' && value.sourceId === 'All') {
+                campaignEditObj.isAllSource = true;
+                campaignEditObj.isAllProduct = true;
+            } else if (value.productId === 'All' && value.sourceId !== 'All') {
+                campaignEditObj.isAllProduct = true;
+                campaignEditObj.sourceId = value.sourceId;
+            } else if (value.productId !== 'All' && value.sourceId === 'All') {
+                campaignEditObj.isAllSource = true;
+                campaignEditObj.productId = value.productId;
+            }
             if (singleData.type === 'SCHEDULED') {
                 campaignEditObj.date = value.date;
             } else if (singleData.type === 'DRIP') {
@@ -123,7 +142,11 @@ const CampaignEditModal = () => {
                 campaignEditObj.sendBefore = value.sendBefore.toString();
             }
             if (value.sendTo === 'LEAD') {
-                campaignEditObj.statusId = value.statusId;
+                if (value.statusId === 'All') {
+                    campaignEditObj.isAllStatus = true;
+                } else {
+                    campaignEditObj.statusId = value.statusId;
+                }
             }
             console.log(campaignEditObj);
             try {
@@ -199,7 +222,7 @@ const CampaignEditModal = () => {
             }}
             size="large"
             onSubmit={() => formik.submitForm()}
-            title="Add Campaign"
+            title="Update Campaign"
             isBtnDisabled={
                 formik.values.name &&
                 formik.values.sendTo &&

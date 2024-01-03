@@ -2,7 +2,7 @@ import React, { memo, useEffect, useState } from 'react';
 import Modal from '@/components/__Shared/Modal';
 import { useSelector, useDispatch } from 'react-redux';
 import { IRootState } from '@/store';
-import { getAllProductsForLeadAssignment, getAllUsersForLeadAssignment, setCreateModal, setDisableBtn, setFetching } from '@/store/Slices/leadSlice/leadAssigningSlice';
+import { getAllProductsForLeadAssignment, setCreateModal, setDisableBtn, setFetching } from '@/store/Slices/leadSlice/leadAssigningSlice';
 import { useFormik, FormikProvider, FieldArray } from 'formik';
 import { leadAssignmentSchema } from '@/utils/schemas';
 import { ApiClient } from '@/utils/http';
@@ -27,6 +27,10 @@ const LeadAssignmentCreateModal = () => {
         const sourceOptions: SelectOptionsType[] = sourceList?.map((item: SourceDataType) => {
             return { value: item.id, label: item.name };
         });
+        sourceOptions.unshift({
+            label: 'All',
+            value: 'All',
+        });
         setSourceDropdown(sourceOptions);
     }, [sourceList]);
 
@@ -48,10 +52,24 @@ const LeadAssignmentCreateModal = () => {
         enableReinitialize: true,
         onSubmit: async (value, action) => {
             dispatch(setFetching(true));
-
+            const createLeadAssigningObj: any = {
+                name: value.name,
+                userPercentages: value.userPercentages,
+            };
+            if (value.productId === 'All' && value.sourceId === 'All') {
+                createLeadAssigningObj.isAllSource = true;
+                createLeadAssigningObj.isAllProduct = true;
+            } else if (value.productId === 'All' && value.sourceId !== 'All') {
+                createLeadAssigningObj.isAllProduct = true;
+                createLeadAssigningObj.sourceId = value.sourceId;
+            } else if (value.productId !== 'All' && value.sourceId === 'All') {
+                createLeadAssigningObj.isAllSource = true;
+                createLeadAssigningObj.productId = value.productId;
+            }
+            console.log(createLeadAssigningObj);
             try {
                 dispatch(setDisableBtn(true));
-                await new ApiClient().post('lead-assignment', value);
+                await new ApiClient().post('lead-assignment', createLeadAssigningObj);
                 dispatch(setCreateModal(false));
                 action.resetForm();
             } catch (error: any) {
@@ -75,8 +93,14 @@ const LeadAssignmentCreateModal = () => {
         const userListDropdown: SelectOptionsType[] = usersList?.map((item: UserListSecondaryEndpointType) => {
             return { value: item.id, label: `${item.firstName} ${item.lastName} (${item?.email})` };
         });
-        setUserDropdown(userListDropdown);
-    }, [usersList]);
+        const createIdArrayOfUsers: string[] = formik.values.userPercentages.map((item) => {
+            return item.userId;
+        });
+        const filterBySelectedUser = userListDropdown.filter((item) => {
+            return !createIdArrayOfUsers.includes(item?.value);
+        });
+        setUserDropdown(filterBySelectedUser);
+    }, [usersList, formik.values.userPercentages]);
 
     //get products list
     const getAllProducts = async () => {
@@ -91,10 +115,21 @@ const LeadAssignmentCreateModal = () => {
         const productDropdown: SelectOptionsType[] = products?.map((item: ProductSecondaryEndpointType) => {
             return { value: item.id, label: item?.name };
         });
+        productDropdown.unshift({
+            label: 'All',
+            value: 'All',
+        });
         setProductDropdown(productDropdown);
         dispatch(getAllProductsForLeadAssignment(products));
         setLoading(false);
     };
+
+    useEffect(() => {
+        formik.setFieldValue('sourceId', 'All');
+        formik.setFieldValue('productId', 'All');
+    }, []);
+
+    console.log(formik.values);
 
     return (
         <Modal
@@ -142,11 +177,21 @@ const LeadAssignmentCreateModal = () => {
                             <div className="flex flex-col gap-5 sm:flex-row">
                                 <div className="flex-1">
                                     <label htmlFor="state">Source</label>
-                                    <Select placeholder="Select Source" options={sourceDropdown} onChange={(data: any) => formik.setFieldValue('sourceId', data.value)} />
+                                    <Select
+                                        placeholder="Select Source"
+                                        options={sourceDropdown}
+                                        onChange={(data: any) => formik.setFieldValue('sourceId', data.value)}
+                                        defaultValue={{ label: 'All', value: 'All' }}
+                                    />
                                 </div>
                                 <div className="flex-1">
                                     <label htmlFor="state">Product</label>
-                                    <Select placeholder="Select Product" options={productDropdown} onChange={(data: any) => formik.setFieldValue('productId', data.value)} />
+                                    <Select
+                                        placeholder="Select Product"
+                                        options={productDropdown}
+                                        onChange={(data: any) => formik.setFieldValue('productId', data.value)}
+                                        defaultValue={{ label: 'All', value: 'All' }}
+                                    />
                                 </div>
                             </div>
                             <FieldArray
@@ -191,7 +236,12 @@ const LeadAssignmentCreateModal = () => {
                                                     />
                                                 </div>
                                                 <div className="flex items-end">
-                                                    <button type="button" className="btn btn-outline-danger" onClick={() => arrayHelpers.remove(index)}>
+                                                    <button
+                                                        type="button"
+                                                        className="btn btn-outline-danger"
+                                                        onClick={() => arrayHelpers.remove(index)}
+                                                        disabled={formik.values.userPercentages.length < 2}
+                                                    >
                                                         X
                                                     </button>
                                                 </div>

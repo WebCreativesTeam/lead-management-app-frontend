@@ -393,7 +393,7 @@ export interface ICampaign {
     sourceId: string;
     productId: string;
     customDateId: string;
-    statusId: string;
+    status: ILeadStatus;
     sendBefore: string;
     sendAfter: string;
     hour: string;
@@ -403,6 +403,9 @@ export interface ICampaign {
     sendTo: string;
     isActive: boolean;
     instance: { platform: string; templateId: string }[];
+    isAllSource?: boolean;
+    isAllProduct?: boolean;
+    isAllStatus?: boolean;
 }
 
 // dashboard page types
@@ -486,6 +489,8 @@ export interface ILeadAssignment extends ICommonResponse {
         userId: string;
         percentage: string;
     }[];
+    isAllSource: boolean;
+    isAllProduct: boolean;
 }
 
 // ----------------- authentication types : start -------------------//
