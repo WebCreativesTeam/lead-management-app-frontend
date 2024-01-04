@@ -22,6 +22,9 @@ import {
     setViewModal,
     setCampaigndActivationModal,
     getAllProductsForCampaign,
+    getAllWhatsappTemplatesForCampaign,
+    getAllEmailTemplatesForCampaign,
+    getAllSmsTemplatesForCampaign,
 } from '@/store/Slices/campaignSlice';
 import CampaignViewModal from '@/components/Campaign/CampaignViewModal';
 import CampaignCreateModal from '@/components/Campaign/CampaignCreateModal';
@@ -87,6 +90,9 @@ const Campaign = () => {
         getAllSourceList();
         getLeadStatus();
         getAllProducts();
+        getAllEmailTemplates();
+        getAllWhatsappTemplates();
+        getAllSmsTemplates();
     }, []);
 
     //get all Campaign list
@@ -135,6 +141,39 @@ const Campaign = () => {
             return;
         }
         dispatch(getAllProductsForCampaign(products));
+    };
+
+    //get email template list
+    const getAllEmailTemplates = async () => {
+        const emailLIst: GetMethodResponseType = await new ApiClient().get('email-template/list');
+        const emails: ProductSecondaryEndpointType[] = emailLIst?.data;
+        if (typeof emails === 'undefined') {
+            dispatch(getAllEmailTemplatesForCampaign([] as ProductSecondaryEndpointType[]));
+            return;
+        }
+        dispatch(getAllEmailTemplatesForCampaign(emails));
+    };
+
+    //get whatsapp template list
+    const getAllWhatsappTemplates = async () => {
+        const whatsappTemplateList: GetMethodResponseType = await new ApiClient().get('whatsapp-template/list');
+        const whatsappList: ProductSecondaryEndpointType[] = whatsappTemplateList?.data;
+        if (typeof whatsappList === 'undefined') {
+            dispatch(getAllWhatsappTemplatesForCampaign([] as ProductSecondaryEndpointType[]));
+            return;
+        }
+        dispatch(getAllWhatsappTemplatesForCampaign(whatsappList));
+    };
+
+    //get sms template list
+    const getAllSmsTemplates = async () => {
+        const smsList: GetMethodResponseType = await new ApiClient().get('sms-template/list');
+        const smsArr: ProductSecondaryEndpointType[] = smsList?.data;
+        if (typeof smsArr === 'undefined') {
+            dispatch(getAllSmsTemplatesForCampaign([] as ProductSecondaryEndpointType[]));
+            return;
+        }
+        dispatch(getAllSmsTemplatesForCampaign(smsArr));
     };
 
     return (

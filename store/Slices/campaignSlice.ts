@@ -19,6 +19,9 @@ const initialState: CampaignInitialStateProps = {
     leadStatusList: [] as ILeadStatus[],
     singleData: {} as ICampaign,
     leadProductList: [] as ProductSecondaryEndpointType[],
+    emailTemplateList: [] as ProductSecondaryEndpointType[],
+    whatsappTemplateList: [] as ProductSecondaryEndpointType[],
+    smsTemplateList: [] as ProductSecondaryEndpointType[],
     createModal: false,
     editModal: false,
     deleteModal: false,
@@ -122,6 +125,15 @@ const campaignSlice = createSlice({
         getAllProductsForCampaign(state, action: PayloadAction<ProductSecondaryEndpointType[]>) {
             state.leadProductList = action.payload;
         },
+        getAllEmailTemplatesForCampaign(state, action: PayloadAction<ProductSecondaryEndpointType[]>) {
+            state.emailTemplateList = action.payload;
+        },
+        getAllWhatsappTemplatesForCampaign(state, action: PayloadAction<ProductSecondaryEndpointType[]>) {
+            state.whatsappTemplateList = action.payload;
+        },
+        getAllSmsTemplatesForCampaign(state, action: PayloadAction<ProductSecondaryEndpointType[]>) {
+            state.smsTemplateList = action.payload;
+        },
         setDisableBtn(state, action) {
             state.isBtnDisabled = action.payload;
         },
@@ -172,5 +184,8 @@ export const {
     setCampaigndActivationModal,
     getAllProductsForCampaign,
     setCampaignActivationPermission,
+    getAllEmailTemplatesForCampaign,
+    getAllWhatsappTemplatesForCampaign,
+    getAllSmsTemplatesForCampaign,
 } = campaignSlice.actions;
 export default campaignSlice.reducer;

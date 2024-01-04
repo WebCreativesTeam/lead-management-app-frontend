@@ -8,12 +8,11 @@ import { campaignSchema } from '@/utils/schemas';
 import { ApiClient } from '@/utils/http';
 import { showToastAlert } from '@/utils/contant';
 import Loader from '../__Shared/Loader';
-import { ICustomField, ILeadStatus, LeadStatusSecondaryEndpoint, SourceDataType } from '@/utils/Types';
+import { ICustomField, ILeadStatus, ProductSecondaryEndpointType, SourceDataType } from '@/utils/Types';
 import Flatpickr from 'react-flatpickr';
 import Select from 'react-select';
 import 'flatpickr/dist/flatpickr.css';
 import { campaignTypeList, platformListRawData, sendToDropdown } from '@/utils/Raw Data';
-import ToggleSwitch from '../__Shared/ToggleSwitch';
 
 type SelectOptionsType = {
     value: string;
@@ -21,11 +20,17 @@ type SelectOptionsType = {
 };
 
 const CampaignCreateModal = () => {
-    const { createModal, isBtnDisabled, isFetching, sourceList, customDateFields, leadStatusList, leadProductList } = useSelector((state: IRootState) => state.campaign);
+    const { createModal, isBtnDisabled, isFetching, sourceList, customDateFields, leadStatusList, leadProductList, smsTemplateList, whatsappTemplateList, emailTemplateList } = useSelector(
+        (state: IRootState) => state.campaign
+    );
     const [customFieldList, setCustomFieldList] = useState<SelectOptionsType[]>([] as SelectOptionsType[]);
     const [leadStatusDropdown, setLeadStatusDropdown] = useState<SelectOptionsType[]>([] as SelectOptionsType[]);
     const [sourceDropdown, setSourceDropdown] = useState<SelectOptionsType[]>([] as SelectOptionsType[]);
     const [productDropdown, setProductDropdown] = useState<SelectOptionsType[]>([] as SelectOptionsType[]);
+    const [platformDropdown, setPlatformDropdown] = useState<SelectOptionsType[]>(platformListRawData);
+    const [smsTemplateDropdown, setSmsTemplateDropdown] = useState<SelectOptionsType[]>([] as SelectOptionsType[]);
+    const [emailTemplateDropdown, setEmailTemplateDropdown] = useState<SelectOptionsType[]>([] as SelectOptionsType[]);
+    const [whatsappTemplateDropdown, setWhatsappTemplateDropdown] = useState<SelectOptionsType[]>([] as SelectOptionsType[]);
 
     const dispatch = useDispatch<AppDispatch>();
     const formik = useFormik({
@@ -59,8 +64,6 @@ const CampaignCreateModal = () => {
                 hour: value.hour,
                 type: value.type,
                 sendTo: value.sendTo,
-                // sourceId: value.sourceId,
-                // productId: value.productId,
                 instance: value.instance,
             };
             if (value.productId === 'All' && value.sourceId === 'All') {
@@ -107,13 +110,18 @@ const CampaignCreateModal = () => {
         },
     });
 
+    //* sms template dropdown
+    useEffect(() => {
+        const selectedPlatform = formik.values.instance.map((item) => item.platform);
+        const filteredDropdown = platformListRawData.filter((item) => !selectedPlatform?.includes(item?.value));
+        setPlatformDropdown(filteredDropdown);
+    }, [formik.values.instance]);
+
     useEffect(() => {
         formik.setFieldValue('statusId', 'All');
         formik.setFieldValue('sourceId', 'All');
         formik.setFieldValue('productId', 'All');
     }, []);
-
-    console.log(formik.values);
 
     useEffect(() => {
         const createCustomFieldDropdown: SelectOptionsType[] = customDateFields?.map((item: ICustomField) => {
@@ -155,9 +163,40 @@ const CampaignCreateModal = () => {
         setSourceDropdown(createSourceDropdown);
     }, [sourceList]);
 
+    //* sms template list
+    useEffect(() => {
+        if (Object.keys(smsTemplateList).length > 0) {
+            const createSmsTemplateDropdown: SelectOptionsType[] = smsTemplateList?.map((item: ProductSecondaryEndpointType) => {
+                return { value: item.id, label: item.name };
+            });
+            setSmsTemplateDropdown(createSmsTemplateDropdown);
+        }
+    }, [smsTemplateList]);
+
+    //* whatsapp template list
+    useEffect(() => {
+        if (Object.keys(whatsappTemplateList).length > 0) {
+            const createWhatsappTemplateDropdown: SelectOptionsType[] = whatsappTemplateList?.map((item: ProductSecondaryEndpointType) => {
+                return { value: item.id, label: item.name };
+            });
+            setWhatsappTemplateDropdown(createWhatsappTemplateDropdown);
+        }
+    }, [whatsappTemplateList]);
+
+    //* email template list
+    useEffect(() => {
+        if (Object.keys(emailTemplateList).length > 0) {
+            const createEmailTemplateDropdown: SelectOptionsType[] = emailTemplateList?.map((item: ProductSecondaryEndpointType) => {
+                return { value: item.id, label: item.name };
+            });
+            setEmailTemplateDropdown(createEmailTemplateDropdown);
+        }
+    }, [emailTemplateList]);
+
     function padTo2Digits(num: number) {
         return String(num).padStart(2, '0');
     }
+
     return (
         <Modal
             open={createModal}
@@ -255,7 +294,6 @@ const CampaignCreateModal = () => {
                                         />
                                     </div>
                                 )}
-
                                 {formik.values.type === 'OCCASIONAL' && (
                                     <div className="flex-1">
                                         <label htmlFor="sendBefore">Send Before</label>
@@ -368,7 +406,7 @@ const CampaignCreateModal = () => {
                                                     <label htmlFor="platform">Platform</label>
                                                     <Select
                                                         placeholder="Select PlatForm"
-                                                        options={platformListRawData}
+                                                        options={platformDropdown}
                                                         onChange={(data: any) => formik.setFieldValue(`instance[${index}].platform`, data.value)}
                                                     />
                                                 </div>
@@ -377,7 +415,13 @@ const CampaignCreateModal = () => {
                                                     <div className="flex flex-1 gap-3">
                                                         <Select
                                                             placeholder="Select Template"
-                                                            options={sourceDropdown.slice(1)}
+                                                            options={
+                                                                formik.values.instance[index].platform === 'WhatsApp'
+                                                                    ? whatsappTemplateDropdown
+                                                                    : formik.values.instance[index].platform === 'Email'
+                                                                    ? emailTemplateDropdown
+                                                                    : smsTemplateDropdown
+                                                            }
                                                             onChange={(data: any) => formik.setFieldValue(`instance[${index}].templateId`, data.value)}
                                                             className="flex-1"
                                                         />
@@ -393,21 +437,6 @@ const CampaignCreateModal = () => {
                                     </div>
                                 )}
                             />
-
-                            {/* <div className="flex flex-1 gap-5">
-                                <span>Is Active</span>
-                                <label className="relative h-6 w-12">
-                                    <input
-                                        type="checkbox"
-                                        className="custom_switch peer absolute z-10 h-full w-full cursor-pointer opacity-0"
-                                        id="custom_switch_checkbox1"
-                                        name="isActive"
-                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => formik.setFieldValue('isActive', e.target.checked)}
-                                        checked={formik.values.isActive}
-                                    />
-                                    <ToggleSwitch />
-                                </label>
-                            </div> */}
                         </form>
                     </FormikProvider>
                 )

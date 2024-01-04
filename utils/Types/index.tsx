@@ -621,6 +621,9 @@ export interface CampaignInitialStateProps extends InitialStateProps {
     leadStatusList: ILeadStatus[];
     customDateFields: ICustomField[];
     leadProductList: ProductSecondaryEndpointType[];
+    emailTemplateList: ProductSecondaryEndpointType[];
+    whatsappTemplateList: ProductSecondaryEndpointType[];
+    smsTemplateList: ProductSecondaryEndpointType[];
     campaignActivationModal: boolean;
     isAbleToActivateCampaign: boolean;
 }
