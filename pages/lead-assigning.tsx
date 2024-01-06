@@ -8,11 +8,12 @@ import { Delete, Edit, Plus, View } from '@/utils/icons';
 import PageHeadingSection from '@/components/__Shared/PageHeadingSection/index.';
 import { useDispatch, useSelector } from 'react-redux';
 import { setPageTitle } from '@/store/themeConfigSlice';
-import { GetMethodResponseType, ILeadAssignment, SourceDataType, UserListSecondaryEndpointType } from '@/utils/Types';
+import { GetMethodResponseType, ILeadAssignment, ProductSecondaryEndpointType, SourceDataType, UserListSecondaryEndpointType } from '@/utils/Types';
 import { ApiClient } from '@/utils/http';
 import { IRootState } from '@/store';
 import {
     getAllLeadAssignments,
+    getAllProductsForLeadAssignment,
     getAllSourceForLeadAssignment,
     getAllUsersForLeadAssignment,
     setCreateModal,
@@ -72,6 +73,7 @@ const LeadAssigning = () => {
     useEffect(() => {
         getAllSourceList();
         getAllUsersList();
+        getAllProducts();
     }, []);
 
     //get all LeadAssignment list
@@ -112,6 +114,17 @@ const LeadAssigning = () => {
         dispatch(getAllUsersForLeadAssignment(users));
     };
 
+    //get products list
+    const getAllProducts = async () => {
+        const productsList: GetMethodResponseType = await new ApiClient().get('product/list');
+        const products: ProductSecondaryEndpointType[] = productsList?.data;
+        if (typeof products === 'undefined') {
+            dispatch(getAllProductsForLeadAssignment([] as ProductSecondaryEndpointType[]));
+            return;
+        }
+        dispatch(getAllProductsForLeadAssignment(products));
+    };
+
     return (
         <div>
             <PageHeadingSection description="Identify and categorize lead lead Assignments. Update descriptions. Add or remove leadAssignment channels." heading="Track Leads" />
@@ -150,13 +163,13 @@ const LeadAssigning = () => {
                             accessor: 'source',
                             title: 'Source',
                             sortable: true,
-                            render: ({ source }) => <div>{source?.name}</div>,
+                            render: ({ source, isAllSource }) => (isAllSource ? <div>All</div> : <div>{source?.name}</div>),
                         },
                         {
                             accessor: 'product',
                             title: 'Product',
                             sortable: true,
-                            render: ({ product }) => <div>{product?.name}</div>,
+                            render: ({ product, isAllProduct }) => (isAllProduct ? <div>All</div> : <div>{product?.name}</div>),
                         },
                         {
                             accessor: 'active',
@@ -230,7 +243,7 @@ const LeadAssigning = () => {
             </div>
 
             {/* edit modal */}
-            {isAbleToUpdate && editModal && <LeadAssignmentEditModal />}
+            <LeadAssignmentEditModal />
 
             {/* view modal */}
             {viewModal && <LeadAssignmentViewModal />}

@@ -9,12 +9,11 @@ import { ApiClient } from '@/utils/http';
 import { showToastAlert } from '@/utils/contant';
 import Loader from '@/components/__Shared/Loader';
 import Select from 'react-select';
-import { GetMethodResponseType, ProductSecondaryEndpointType, SelectOptionsType, SourceDataType, UserListSecondaryEndpointType } from '@/utils/Types';
+import { ProductSecondaryEndpointType, SelectOptionsType, SourceDataType, UserListSecondaryEndpointType } from '@/utils/Types';
 
 const LeadAssignmentEditModal = () => {
-    const { editModal, isBtnDisabled, isFetching, sourceList, singleData, usersList } = useSelector((state: IRootState) => state.leadAssignment);
+    const { editModal, isBtnDisabled, isFetching, sourceList, singleData, usersList, productList } = useSelector((state: IRootState) => state.leadAssignment);
     const [sourceDropdown, setSourceDropdown] = useState<SelectOptionsType[]>([] as SelectOptionsType[]);
-    const [loading, setLoading] = useState<boolean>(false);
     const [userDropdown, setUserDropdown] = useState<SelectOptionsType[]>([] as SelectOptionsType[]);
     const [productDropdown, setProductDropdown] = useState<SelectOptionsType[]>([] as SelectOptionsType[]);
     const [defaultProduct, setDefaultProduct] = useState<SelectOptionsType>({} as SelectOptionsType);
@@ -30,6 +29,17 @@ const LeadAssignmentEditModal = () => {
         });
         setSourceDropdown(sourceOptions);
     }, [sourceList]);
+
+    useEffect(() => {
+        const productDropdown: SelectOptionsType[] = productList?.map((item: ProductSecondaryEndpointType) => {
+            return { value: item.id, label: item?.name };
+        });
+        productDropdown.unshift({
+            label: 'All',
+            value: 'All',
+        });
+        setProductDropdown(productDropdown);
+    }, [productList]);
 
     useEffect(() => {
         formik.setFieldValue('name', singleData?.name);
@@ -53,6 +63,8 @@ const LeadAssignmentEditModal = () => {
             name: '',
             productId: '',
             sourceId: '',
+            isAllSource: false,
+            isAllProduct: false,
             userPercentages: [
                 {
                     userId: '',
@@ -69,15 +81,23 @@ const LeadAssignmentEditModal = () => {
                 name: value.name,
                 userPercentages: value.userPercentages,
             };
-            if (value.productId === 'All' && value.sourceId === 'All') {
+            console.log(value);
+            if (value.isAllSource && value.isAllProduct) {
                 createLeadAssigningObj.isAllSource = true;
                 createLeadAssigningObj.isAllProduct = true;
-            } else if (value.productId === 'All' && value.sourceId !== 'All') {
+            } else if (!value.isAllSource && value.isAllProduct) {
                 createLeadAssigningObj.isAllProduct = true;
+                createLeadAssigningObj.isAllSource = false;
                 createLeadAssigningObj.sourceId = value.sourceId;
-            } else if (value.productId !== 'All' && value.sourceId === 'All') {
+            } else if (value.isAllSource && !value.isAllProduct) {
                 createLeadAssigningObj.isAllSource = true;
+                createLeadAssigningObj.isAllProduct = false;
                 createLeadAssigningObj.productId = value.productId;
+            } else if (!value.isAllSource && !value.isAllProduct) {
+                createLeadAssigningObj.isAllSource = false;
+                createLeadAssigningObj.isAllProduct = false;
+                createLeadAssigningObj.productId = value.productId;
+                createLeadAssigningObj.sourceId = value.sourceId;
             }
             console.log(createLeadAssigningObj);
             try {
@@ -97,11 +117,6 @@ const LeadAssignmentEditModal = () => {
             dispatch(setFetching(false));
         },
     });
-
-    useEffect(() => {
-        getAllProducts();
-    }, [])
-    console.log(singleData)
 
     //find default selected product
     useEffect(() => {
@@ -123,28 +138,6 @@ const LeadAssignmentEditModal = () => {
         }
     }, [sourceDropdown, singleData]);
 
-    //get products list
-    const getAllProducts = async () => {
-        setLoading(true);
-        const productsList: GetMethodResponseType = await new ApiClient().get('product/list');
-        const products: ProductSecondaryEndpointType[] = productsList?.data;
-        if (typeof products === 'undefined') {
-            dispatch(getAllProductsForLeadAssignment([] as ProductSecondaryEndpointType[]));
-            setLoading(false);
-            return;
-        }
-        const productDropdown: SelectOptionsType[] = products?.map((item: ProductSecondaryEndpointType) => {
-            return { value: item.id, label: item?.name };
-        });
-        productDropdown.unshift({
-            label: 'All',
-            value: 'All',
-        });
-        setProductDropdown(productDropdown);
-        dispatch(getAllProductsForLeadAssignment(products));
-        setLoading(false);
-    };
-
     const changeUserDropdowon = () => {
         const userListDropdown: SelectOptionsType[] = usersList?.map((item: UserListSecondaryEndpointType) => {
             return { value: item.id, label: `${item.firstName} ${item.lastName} (${item?.email})` };
@@ -162,8 +155,15 @@ const LeadAssignmentEditModal = () => {
         const userListDropdown: SelectOptionsType[] = usersList?.map((item: UserListSecondaryEndpointType) => {
             return { value: item.id, label: `${item.firstName} ${item.lastName} (${item?.email})` };
         });
-        setUserDropdown(userListDropdown);
-    }, [usersList]);
+
+        const createIdArrayOfUsers: string[] = formik?.values?.userPercentages?.map((item) => {
+            return item?.userId;
+        });
+        const filterBySelectedUser = userListDropdown.filter((item) => {
+            return !createIdArrayOfUsers?.includes(item?.value);
+        });
+        setUserDropdown(filterBySelectedUser);
+    }, [usersList, formik.values.userPercentages]);
 
     return (
         <Modal
@@ -180,8 +180,8 @@ const LeadAssignmentEditModal = () => {
             title="Edit Lead Assignment"
             isBtnDisabled={
                 formik.values.name &&
-                formik.values.productId &&
-                formik.values.sourceId &&
+                (formik.values.productId || formik.values.isAllProduct) &&
+                (formik.values.sourceId || formik.values.isAllSource) &&
                 formik.values.userPercentages[formik.values.userPercentages.length - 1].userId &&
                 formik.values.userPercentages[formik.values.userPercentages.length - 1].percentage &&
                 !isBtnDisabled
@@ -190,7 +190,7 @@ const LeadAssignmentEditModal = () => {
             }
             disabledDiscardBtn={isBtnDisabled}
             content={
-                isFetching || loading ? (
+                isFetching ? (
                     <Loader />
                 ) : (
                     <FormikProvider value={formik}>
@@ -211,19 +211,36 @@ const LeadAssignmentEditModal = () => {
                             <div className="flex flex-col gap-5 sm:flex-row">
                                 <div className="flex-1">
                                     <label htmlFor="state">Source</label>
-                                    <Select placeholder="Select Source" options={sourceDropdown} onChange={(data: any) => formik.setFieldValue('sourceId', data.value)} defaultValue={defaultSource} />
+                                    <Select
+                                        placeholder="Select Source"
+                                        options={sourceDropdown}
+                                        onChange={(data: any) => {
+                                            if (data.value === 'All') {
+                                                formik.setFieldValue('isAllSource', true);
+                                            } else {
+                                                formik.setFieldValue('sourceId', data.value);
+                                                formik.setFieldValue('isAllSource', false);
+                                            }
+                                        }}
+                                        defaultValue={defaultSource}
+                                    />
                                 </div>
-                                {Object.keys(defaultProduct).length > 0 && (
-                                    <div className="flex-1">
-                                        <label htmlFor="state">Product</label>
-                                        <Select
-                                            placeholder="Select Product"
-                                            options={productDropdown}
-                                            onChange={(data: any) => formik.setFieldValue('productId', data.value)}
-                                            defaultValue={defaultProduct}
-                                        />
-                                    </div>
-                                )}
+                                <div className="flex-1">
+                                    <label htmlFor="state">Product</label>
+                                    <Select
+                                        placeholder="Select Product"
+                                        options={productDropdown}
+                                        onChange={(data: any) => {
+                                            if (data.value === 'All') {
+                                                formik.setFieldValue('isAllProduct', true);
+                                            } else {
+                                                formik.setFieldValue('productId', data.value);
+                                                formik.setFieldValue('isAllProduct', false);
+                                            }
+                                        }}
+                                        defaultValue={defaultProduct}
+                                    />
+                                </div>
                             </div>
                             <FieldArray
                                 name="userPercentages"
@@ -233,7 +250,7 @@ const LeadAssignmentEditModal = () => {
                                             <button
                                                 type="button"
                                                 className="btn btn-primary rounded"
-                                                onClick={() => arrayHelpers.push({ platform: '', templateId: '' })}
+                                                onClick={() => arrayHelpers.push({ userId: '', percentage: '' })}
                                                 disabled={
                                                     formik.values.userPercentages[formik.values.userPercentages.length - 1].userId &&
                                                     formik.values.userPercentages[formik.values.userPercentages.length - 1].percentage

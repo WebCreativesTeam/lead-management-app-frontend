@@ -9,7 +9,7 @@ import { ApiClient } from '@/utils/http';
 import { showToastAlert } from '@/utils/contant';
 import Loader from '@/components/__Shared/Loader';
 import Select from 'react-select';
-import { GetMethodResponseType, ProductSecondaryEndpointType, SourceDataType, UserListSecondaryEndpointType } from '@/utils/Types';
+import { ProductSecondaryEndpointType, SourceDataType, UserListSecondaryEndpointType } from '@/utils/Types';
 
 type SelectOptionsType = {
     value: string;
@@ -17,9 +17,8 @@ type SelectOptionsType = {
 };
 
 const LeadAssignmentCreateModal = () => {
-    const { createModal, isBtnDisabled, isFetching, sourceList, usersList } = useSelector((state: IRootState) => state.leadAssignment);
+    const { createModal, isBtnDisabled, isFetching, sourceList, usersList, productList } = useSelector((state: IRootState) => state.leadAssignment);
     const [sourceDropdown, setSourceDropdown] = useState<SelectOptionsType[]>([] as SelectOptionsType[]);
-    const [loading, setLoading] = useState<boolean>(false);
     const [userDropdown, setUserDropdown] = useState<SelectOptionsType[]>([] as SelectOptionsType[]);
     const [productDropdown, setProductDropdown] = useState<SelectOptionsType[]>([] as SelectOptionsType[]);
 
@@ -40,6 +39,8 @@ const LeadAssignmentCreateModal = () => {
             name: '',
             productId: '',
             sourceId: '',
+            isAllSource: true,
+            isAllProduct: true,
             userPercentages: [
                 {
                     userId: '',
@@ -56,15 +57,20 @@ const LeadAssignmentCreateModal = () => {
                 name: value.name,
                 userPercentages: value.userPercentages,
             };
-            if (value.productId === 'All' && value.sourceId === 'All') {
+            if (value.isAllSource && value.isAllProduct) {
                 createLeadAssigningObj.isAllSource = true;
                 createLeadAssigningObj.isAllProduct = true;
-            } else if (value.productId === 'All' && value.sourceId !== 'All') {
+            } else if (!value.isAllSource && value.isAllProduct) {
                 createLeadAssigningObj.isAllProduct = true;
                 createLeadAssigningObj.sourceId = value.sourceId;
-            } else if (value.productId !== 'All' && value.sourceId === 'All') {
+            } else if (value.isAllSource && !value.isAllProduct) {
                 createLeadAssigningObj.isAllSource = true;
                 createLeadAssigningObj.productId = value.productId;
+            } else if (!value.isAllSource && !value.isAllProduct) {
+                createLeadAssigningObj.isAllSource = false;
+                createLeadAssigningObj.isAllProduct = false;
+                createLeadAssigningObj.productId = value.productId;
+                createLeadAssigningObj.sourceId = value.sourceId;
             }
             console.log(createLeadAssigningObj);
             try {
@@ -86,10 +92,6 @@ const LeadAssignmentCreateModal = () => {
     });
 
     useEffect(() => {
-        getAllProducts();
-    }, []);
-
-    useEffect(() => {
         const userListDropdown: SelectOptionsType[] = usersList?.map((item: UserListSecondaryEndpointType) => {
             return { value: item.id, label: `${item.firstName} ${item.lastName} (${item?.email})` };
         });
@@ -102,17 +104,8 @@ const LeadAssignmentCreateModal = () => {
         setUserDropdown(filterBySelectedUser);
     }, [usersList, formik.values.userPercentages]);
 
-    //get products list
-    const getAllProducts = async () => {
-        setLoading(true);
-        const productsList: GetMethodResponseType = await new ApiClient().get('product/list');
-        const products: ProductSecondaryEndpointType[] = productsList?.data;
-        if (typeof products === 'undefined') {
-            dispatch(getAllProductsForLeadAssignment([] as ProductSecondaryEndpointType[]));
-            setLoading(false);
-            return;
-        }
-        const productDropdown: SelectOptionsType[] = products?.map((item: ProductSecondaryEndpointType) => {
+    useEffect(() => {
+        const productDropdown: SelectOptionsType[] = productList?.map((item: ProductSecondaryEndpointType) => {
             return { value: item.id, label: item?.name };
         });
         productDropdown.unshift({
@@ -120,14 +113,7 @@ const LeadAssignmentCreateModal = () => {
             value: 'All',
         });
         setProductDropdown(productDropdown);
-        dispatch(getAllProductsForLeadAssignment(products));
-        setLoading(false);
-    };
-
-    useEffect(() => {
-        formik.setFieldValue('sourceId', 'All');
-        formik.setFieldValue('productId', 'All');
-    }, []);
+    }, [productList]);
 
     console.log(formik.values);
 
@@ -146,8 +132,8 @@ const LeadAssignmentCreateModal = () => {
             title="Create Lead Assignment"
             isBtnDisabled={
                 formik.values.name &&
-                formik.values.productId &&
-                formik.values.sourceId &&
+                (formik.values.productId || formik.values.isAllProduct) &&
+                (formik.values.sourceId || formik.values.isAllSource) &&
                 formik.values.userPercentages[formik.values.userPercentages.length - 1].userId &&
                 formik.values.userPercentages[formik.values.userPercentages.length - 1].percentage &&
                 !isBtnDisabled
@@ -156,7 +142,7 @@ const LeadAssignmentCreateModal = () => {
             }
             disabledDiscardBtn={isBtnDisabled}
             content={
-                isFetching || loading ? (
+                isFetching ? (
                     <Loader />
                 ) : (
                     <FormikProvider value={formik}>
@@ -180,7 +166,14 @@ const LeadAssignmentCreateModal = () => {
                                     <Select
                                         placeholder="Select Source"
                                         options={sourceDropdown}
-                                        onChange={(data: any) => formik.setFieldValue('sourceId', data.value)}
+                                        onChange={(data: any) => {
+                                            if (data.value === 'All') {
+                                                formik.setFieldValue('isAllSource', true);
+                                            } else {
+                                                formik.setFieldValue('sourceId', data.value);
+                                                formik.setFieldValue('isAllSource', false);
+                                            }
+                                        }}
                                         defaultValue={{ label: 'All', value: 'All' }}
                                     />
                                 </div>
@@ -189,7 +182,14 @@ const LeadAssignmentCreateModal = () => {
                                     <Select
                                         placeholder="Select Product"
                                         options={productDropdown}
-                                        onChange={(data: any) => formik.setFieldValue('productId', data.value)}
+                                        onChange={(data: any) => {
+                                            if (data.value === 'All') {
+                                                formik.setFieldValue('isAllProduct', true);
+                                            } else {
+                                                formik.setFieldValue('productId', data.value);
+                                                formik.setFieldValue('isAllProduct', false);
+                                            }
+                                        }}
                                         defaultValue={{ label: 'All', value: 'All' }}
                                     />
                                 </div>

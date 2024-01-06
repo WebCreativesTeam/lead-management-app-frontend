@@ -49,7 +49,6 @@ const CampaignEditModal = () => {
         formik.setFieldValue('date', singleData?.date);
         formik.setFieldValue('name', singleData?.name);
         formik.setFieldValue('hour', singleData?.hour);
-        formik.setFieldValue('sendTo', singleData?.sendTo);
         formik.setFieldValue('sendAfter', singleData?.sendAfter);
         formik.setFieldValue('sendBefore', singleData?.sendBefore);
         formik.setFieldValue('customDateId', singleData?.customDateId);
@@ -182,6 +181,7 @@ const CampaignEditModal = () => {
             dispatch(setFetching(false));
         },
     });
+
 
     useEffect(() => {
         const editCustomFieldDropdown: SelectOptionsType[] = customDateFields?.map((item: ICustomField) => {
