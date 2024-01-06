@@ -89,20 +89,6 @@ const PolicyPage = () => {
         setLoading(false);
     };
 
-    useEffect(() => {
-        let srNoArray: number[] = [];
-        for (let i = pageSize * page - pageSize; i <= pageSize * page; i++) {
-            srNoArray.push(i);
-        }
-        srNoArray.shift();
-        if (recordsData.length > 0) {
-            const serializedData = recordsData?.map((item, index) => {
-                return { ...item, srNo: srNoArray[index] };
-            });
-            setRecordsData(serializedData);
-        }
-    }, [page, pageSize, recordsData]);
-
     return !isAbleToRead ? null : (
         <div>
             <PageHeadingSection description="Craft policies for in-app permissions. Link to users. Ensure secure and relevant access." heading="Define Access" />
@@ -139,12 +125,6 @@ const PolicyPage = () => {
                     records={recordsData}
                     fetching={loading}
                     columns={[
-                        {
-                            accessor: 'srNo',
-                            title: '#',
-                            width: 40,
-                            render: ({ srNo }) => srNo,
-                        },
                         {
                             accessor: 'name',
                             title: 'Policy Name',

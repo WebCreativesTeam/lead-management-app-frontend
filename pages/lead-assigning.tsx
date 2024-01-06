@@ -112,20 +112,6 @@ const LeadAssigning = () => {
         dispatch(getAllUsersForLeadAssignment(users));
     };
 
-    useEffect(() => {
-        let srNoArray: number[] = [];
-        for (let i = pageSize * page - pageSize; i <= pageSize * page; i++) {
-            srNoArray.push(i);
-        }
-        srNoArray.shift();
-        if (recordsData.length > 0) {
-            const serializedData = recordsData?.map((item, index) => {
-                return { ...item, srNo: srNoArray[index] };
-            });
-            setRecordsData(serializedData);
-        }
-    }, [page, pageSize, recordsData]);
-
     return (
         <div>
             <PageHeadingSection description="Identify and categorize lead lead Assignments. Update descriptions. Add or remove leadAssignment channels." heading="Track Leads" />
@@ -154,12 +140,6 @@ const LeadAssigning = () => {
                     className="table-hover whitespace-nowrap"
                     records={recordsData}
                     columns={[
-                        {
-                            accessor: 'srNo',
-                            title: '#',
-                            width: 40,
-                            render: ({ srNo }) => srNo,
-                        },
                         {
                             accessor: 'name',
                             title: 'Lead Assigning Name',

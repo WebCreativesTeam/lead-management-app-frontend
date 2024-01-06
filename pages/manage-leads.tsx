@@ -225,21 +225,7 @@ const ManageLeads = () => {
             return;
         }
         dispatch(getAllProductsForLead(products));
-    };
-    useEffect(() => {
-        let srNoArray: number[] = [];
-        for (let i = pageSize * page - pageSize; i <= pageSize * page; i++) {
-            srNoArray.push(i);
-        }
-        srNoArray.shift();
-        if (recordsData.length > 0) {
-            const serializedData = recordsData?.map((item, index) => {
-                return { ...item, srNo: srNoArray[index] };
-            });
-            setRecordsData(serializedData);
-        }
-    }, [page, pageSize, recordsData]);
-
+    }
     return !isAbleToRead ? null : (
         <div>
             <PageHeadingSection description="View, create, update, and close leads. Organize by status, priority, and due date. Stay on top of work." heading="Lead Management" />
@@ -350,12 +336,6 @@ const ManageLeads = () => {
                     className="table-hover whitespace-nowrap"
                     records={recordsData}
                     columns={[
-                        {
-                            accessor: 'srNo',
-                            title: '#',
-                            width: 40,
-                            render: ({ srNo }) => srNo,
-                        },
                         {
                             accessor: 'contactTitle',
                             title: 'Name',

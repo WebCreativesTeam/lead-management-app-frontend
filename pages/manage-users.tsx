@@ -64,20 +64,6 @@ const ManageUsers = () => {
         setRecordsData(data);
     }, [data]);
 
-    useEffect(() => {
-        let srNoArray: number[] = [];
-        for (let i = pageSize * page - pageSize; i <= pageSize * page; i++) {
-            srNoArray.push(i);
-        }
-        srNoArray.shift();
-        if (recordsData.length > 0) {
-            const serializedData = recordsData?.map((item, index) => {
-                return { ...item, srNo: srNoArray[index] };
-            });
-            setRecordsData(serializedData);
-        }
-    }, [page, pageSize, recordsData]);
-
     //get all users list
     const getUsersList = async () => {
         setLoading(true);
@@ -139,10 +125,10 @@ const ManageUsers = () => {
                     records={recordsData}
                     columns={[
                         {
-                            accessor: 'srNo',
+                            accessor: 'index',
                             title: '#',
                             width: 40,
-                            render: ({ srNo }) => srNo,
+                            render: (record) => recordsData.indexOf(record) + 1,
                         },
                         {
                             accessor: 'firstName',
