@@ -85,6 +85,20 @@ const BranchPage = () => {
         dispatch(setFetching(false));
     };
 
+    useEffect(() => {
+        let srNoArray: number[] = [];
+        for (let i = pageSize * page - pageSize; i <= pageSize * page; i++) {
+            srNoArray.push(i);
+        }
+        srNoArray.shift();
+        if (recordsData.length > 0) {
+            const serializedData = recordsData?.map((item, index) => {
+                return { ...item, srNo: srNoArray[index] };
+            });
+            setRecordsData(serializedData);
+        }
+    }, [page, pageSize, recordsData]);
+
     return !isAbleToRead ? null : (
         <div>
             <PageHeadingSection description="List company branches. Add new locations. Update details. Remove obsolete branches." heading="Organize Offices" />
@@ -121,6 +135,12 @@ const BranchPage = () => {
                     records={recordsData}
                     fetching={loading}
                     columns={[
+                        {
+                            accessor: 'srNo',
+                            title: '#',
+                            width: 40,
+                            render: ({ srNo }) => srNo,
+                        },
                         {
                             accessor: 'name',
                             title: 'Branch Name',

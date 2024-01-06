@@ -92,17 +92,17 @@ const Contacts = () => {
         setLoading(false);
     };
 
-//get all user's list
-const getAllUsersList = async () => {
-    setLoading(true);
-    const usersList: GetMethodResponseType = await new ApiClient().get('user/list');
-    const users: UserListSecondaryEndpointType[] = usersList?.data;
-    if (typeof users === 'undefined') {
-        dispatch(getAllUsersForContact([] as UserListSecondaryEndpointType[]));
-        return;
-    }
-    dispatch(getAllUsersForContact(users));
-};
+    //get all user's list
+    const getAllUsersList = async () => {
+        setLoading(true);
+        const usersList: GetMethodResponseType = await new ApiClient().get('user/list');
+        const users: UserListSecondaryEndpointType[] = usersList?.data;
+        if (typeof users === 'undefined') {
+            dispatch(getAllUsersForContact([] as UserListSecondaryEndpointType[]));
+            return;
+        }
+        dispatch(getAllUsersForContact(users));
+    };
 
     //get all Source list
     const getAllSourceList = async () => {
@@ -123,6 +123,20 @@ const getAllUsersList = async () => {
             setHideCols([...hideCols, col]);
         }
     };
+
+    useEffect(() => {
+        let srNoArray: number[] = [];
+        for (let i = pageSize * page - pageSize; i <= pageSize * page; i++) {
+            srNoArray.push(i);
+        }
+        srNoArray.shift();
+        if (recordsData.length > 0) {
+            const serializedData = recordsData?.map((item, index) => {
+                return { ...item, srNo: srNoArray[index] };
+            });
+            setRecordsData(serializedData);
+        }
+    }, [page, pageSize, recordsData]);
 
     return !isAbleToRead ? null : (
         <div>
@@ -204,6 +218,12 @@ const getAllUsersList = async () => {
                     className="table-hover whitespace-nowrap"
                     records={recordsData}
                     columns={[
+                        {
+                            accessor: 'srNo',
+                            title: '#',
+                            width: 40,
+                            render: ({ srNo }) => srNo,
+                        },
                         {
                             accessor: 'name',
                             title: 'Name',

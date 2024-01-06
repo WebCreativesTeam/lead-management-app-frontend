@@ -72,8 +72,21 @@ const WhatsappTemplatePage = () => {
         setLoading(false);
     };
 
-    // return !isAbleToRead ? null : (
-    return (
+    useEffect(() => {
+        let srNoArray: number[] = [];
+        for (let i = pageSize * page - pageSize; i <= pageSize * page; i++) {
+            srNoArray.push(i);
+        }
+        srNoArray.shift();
+        if (recordsData.length > 0) {
+            const serializedData = recordsData?.map((item, index) => {
+                return { ...item, srNo: srNoArray[index] };
+            });
+            setRecordsData(serializedData);
+        }
+    }, [page, pageSize, recordsData]);
+
+    return !isAbleToRead ? null : (
         <div>
             <PageHeadingSection description="Create whatsapp templates. Arrange by urgency. Enhance productivity." heading="Manage Whatsapp Templates" />
             <div className="my-6 flex flex-col gap-5 sm:flex-row ">
@@ -107,6 +120,12 @@ const WhatsappTemplatePage = () => {
                     className="table-hover whitespace-nowrap"
                     records={recordsData}
                     columns={[
+                        {
+                            accessor: 'srNo',
+                            title: '#',
+                            width: 40,
+                            render: ({ srNo }) => srNo,
+                        },
                         {
                             accessor: 'name',
                             title: 'Whatsapp Template Name',

@@ -70,6 +70,20 @@ const Source = () => {
         setLoading(false);
     };
 
+    useEffect(() => {
+        let srNoArray: number[] = [];
+        for (let i = pageSize * page - pageSize; i <= pageSize * page; i++) {
+            srNoArray.push(i);
+        }
+        srNoArray.shift();
+        if (recordsData.length > 0) {
+            const serializedData = recordsData?.map((item, index) => {
+                return { ...item, srNo: srNoArray[index] };
+            });
+            setRecordsData(serializedData);
+        }
+    }, [page, pageSize, recordsData]);
+
     return !isAbleToRead ? null : (
         <div>
             <PageHeadingSection description="Identify and categorize lead sources. Update descriptions. Add or remove source channels." heading="Track Leads" />
@@ -104,6 +118,12 @@ const Source = () => {
                     className="table-hover whitespace-nowrap"
                     records={recordsData}
                     columns={[
+                        {
+                            accessor: 'srNo',
+                            title: '#',
+                            width: 40,
+                            render: ({ srNo }) => srNo,
+                        },
                         {
                             accessor: 'name',
                             title: 'Source Name',

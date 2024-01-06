@@ -71,6 +71,20 @@ const EmailSmtpPage = () => {
         setLoading(false);
     };
 
+    useEffect(() => {
+        let srNoArray: number[] = [];
+        for (let i = pageSize * page - pageSize; i <= pageSize * page; i++) {
+            srNoArray.push(i);
+        }
+        srNoArray.shift();
+        if (recordsData.length > 0) {
+            const serializedData = recordsData?.map((item, index) => {
+                return { ...item, srNo: srNoArray[index] };
+            });
+            setRecordsData(serializedData);
+        }
+    }, [page, pageSize, recordsData]);
+
     return !isAbleToRead ? null : (
         <div>
             <PageHeadingSection description="Define Emails Smtp. Arrange by urgency. Optimize by email distribution. Enhance productivity." heading="Email SMTP" />
@@ -99,6 +113,12 @@ const EmailSmtpPage = () => {
                     className="table-hover whitespace-nowrap"
                     records={recordsData}
                     columns={[
+                        {
+                            accessor: 'srNo',
+                            title: '#',
+                            width: 40,
+                            render: ({ srNo }) => srNo,
+                        },
                         {
                             accessor: 'SMTP',
                             title: 'SMTP',
