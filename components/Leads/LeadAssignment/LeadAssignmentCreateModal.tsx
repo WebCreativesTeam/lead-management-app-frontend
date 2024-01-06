@@ -115,8 +115,6 @@ const LeadAssignmentCreateModal = () => {
         setProductDropdown(productDropdown);
     }, [productList]);
 
-    console.log(formik.values);
-
     return (
         <Modal
             open={createModal}

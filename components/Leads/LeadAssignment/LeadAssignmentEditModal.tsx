@@ -81,7 +81,6 @@ const LeadAssignmentEditModal = () => {
                 name: value.name,
                 userPercentages: value.userPercentages,
             };
-            console.log(value);
             if (value.isAllSource && value.isAllProduct) {
                 createLeadAssigningObj.isAllSource = true;
                 createLeadAssigningObj.isAllProduct = true;

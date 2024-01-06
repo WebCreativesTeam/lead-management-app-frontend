@@ -53,6 +53,9 @@ const CampaignCreateModal = () => {
             ],
             sourceId: '',
             productId: '',
+            isAllSource: true,
+            isAllProduct: true,
+            isAllStatus: false,
         },
         validationSchema: campaignSchema,
         validateOnChange: true,
@@ -66,15 +69,20 @@ const CampaignCreateModal = () => {
                 sendTo: value.sendTo,
                 instance: value.instance,
             };
-            if (value.productId === 'All' && value.sourceId === 'All') {
+            if (value.isAllSource && value.isAllProduct) {
                 campaignCreateObj.isAllSource = true;
                 campaignCreateObj.isAllProduct = true;
-            } else if (value.productId === 'All' && value.sourceId !== 'All') {
+            } else if (!value.isAllSource && value.isAllProduct) {
                 campaignCreateObj.isAllProduct = true;
                 campaignCreateObj.sourceId = value.sourceId;
-            } else if (value.productId !== 'All' && value.sourceId === 'All') {
+            } else if (value.isAllSource && !value.isAllProduct) {
                 campaignCreateObj.isAllSource = true;
                 campaignCreateObj.productId = value.productId;
+            } else if (!value.isAllSource && !value.isAllProduct) {
+                campaignCreateObj.isAllSource = false;
+                campaignCreateObj.isAllProduct = false;
+                campaignCreateObj.productId = value.productId;
+                campaignCreateObj.sourceId = value.sourceId;
             }
             if (value.type === 'SCHEDULED') {
                 campaignCreateObj.date = value.date;
@@ -85,13 +93,14 @@ const CampaignCreateModal = () => {
                 campaignCreateObj.sendBefore = value.sendBefore.toString();
             }
             if (value.sendTo === 'LEAD') {
-                if (value.statusId === 'All') {
+                if (value.isAllStatus) {
                     campaignCreateObj.isAllStatus = true;
                 } else {
                     campaignCreateObj.statusId = value.statusId;
+                    campaignCreateObj.isAllStatus = false;
                 }
             }
-            console.log(campaignCreateObj);
+            console.log("campaignCreateObj",campaignCreateObj);
             try {
                 dispatch(setDisableBtn(true));
                 await new ApiClient().post('campaign', campaignCreateObj);
@@ -116,12 +125,6 @@ const CampaignCreateModal = () => {
         const filteredDropdown = platformListRawData.filter((item) => !selectedPlatform?.includes(item?.value));
         setPlatformDropdown(filteredDropdown);
     }, [formik.values.instance]);
-
-    useEffect(() => {
-        formik.setFieldValue('statusId', 'All');
-        formik.setFieldValue('sourceId', 'All');
-        formik.setFieldValue('productId', 'All');
-    }, []);
 
     useEffect(() => {
         const createCustomFieldDropdown: SelectOptionsType[] = customDateFields?.map((item: ICustomField) => {
@@ -197,6 +200,8 @@ const CampaignCreateModal = () => {
         return String(num).padStart(2, '0');
     }
 
+    console.log(formik.values)
+
     return (
         <Modal
             open={createModal}
@@ -215,8 +220,8 @@ const CampaignCreateModal = () => {
                 formik.values.hour &&
                 formik.values.type &&
                 formik.values.sendTo &&
-                formik.values.sourceId &&
-                formik.values.productId &&
+                (formik.values.productId || formik.values.isAllProduct) &&
+                (formik.values.sourceId || formik.values.isAllSource) &&
                 formik.values.instance[formik.values.instance.length - 1].platform &&
                 formik.values.instance[formik.values.instance.length - 1].templateId &&
                 formik.values.instance.length <= 3 &&
@@ -344,7 +349,7 @@ const CampaignCreateModal = () => {
                                         options={sendToDropdown}
                                         onChange={(data: any) => {
                                             formik.setFieldValue('sendTo', data.value);
-                                            formik.setFieldValue('statusId', 'All');
+                                            formik.setFieldValue('isAllStatus', true);
                                         }}
                                     />
                                 </div>
@@ -354,7 +359,14 @@ const CampaignCreateModal = () => {
                                         <Select
                                             placeholder="Select Lead Status"
                                             options={leadStatusDropdown}
-                                            onChange={(data: any) => formik.setFieldValue('statusId', data.value)}
+                                            onChange={(data: any) => {
+                                                if (data.value === 'All') {
+                                                    formik.setFieldValue('isAllStatus', true);
+                                                } else {
+                                                    formik.setFieldValue('statusId', data.value);
+                                                    formik.setFieldValue('isAllStatus', false);
+                                                }
+                                            }}
                                             defaultValue={{ label: 'All', value: 'All' }}
                                         />
                                     </div>
@@ -366,7 +378,14 @@ const CampaignCreateModal = () => {
                                     <Select
                                         placeholder="Select Source"
                                         options={sourceDropdown}
-                                        onChange={(data: any) => formik.setFieldValue('sourceId', data.value)}
+                                        onChange={(data: any) => {
+                                            if (data.value === 'All') {
+                                                formik.setFieldValue('isAllSource', true);
+                                            } else {
+                                                formik.setFieldValue('sourceId', data.value);
+                                                formik.setFieldValue('isAllSource', false);
+                                            }
+                                        }}
                                         defaultValue={{ label: 'All', value: 'All' }}
                                     />
                                 </div>
@@ -375,7 +394,14 @@ const CampaignCreateModal = () => {
                                     <Select
                                         placeholder="Select Product"
                                         options={productDropdown}
-                                        onChange={(data: any) => formik.setFieldValue('productId', data.value)}
+                                        onChange={(data: any) => {
+                                            if (data.value === 'All') {
+                                                formik.setFieldValue('isAllProduct', true);
+                                            } else {
+                                                formik.setFieldValue('productId', data.value);
+                                                formik.setFieldValue('isAllProduct', false);
+                                            }
+                                        }}
                                         defaultValue={{ label: 'All', value: 'All' }}
                                     />
                                 </div>
