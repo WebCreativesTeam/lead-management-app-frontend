@@ -12,6 +12,8 @@ import dynamic from 'next/dynamic';
 import 'react-quill/dist/quill.snow.css';
 import Loader from '@/components/__Shared/Loader';
 import { IEmailTemplate } from '@/utils/Types';
+import Select from 'react-select';
+import { variablesEmailTemplate } from '@/utils/Raw Data';
 const ReactQuill = dynamic(import('react-quill'), { ssr: false });
 
 const UpdateEmailTemplate = () => {
@@ -76,8 +78,6 @@ const UpdateEmailTemplate = () => {
         setFieldValue('message', email?.message);
     }, [email]);
 
-    console.log('render');
-
     return loading ? (
         <Loader />
     ) : (
@@ -109,6 +109,14 @@ const UpdateEmailTemplate = () => {
                         className="rtl:file-ml-5 form-input cursor-pointer p-0 file:border-0 file:bg-primary/90 file:px-4 file:py-2 file:font-semibold file:text-white file:hover:bg-primary ltr:file:mr-5"
                     />
                 </div>
+                <Select
+                    placeholder="Select variable"
+                    options={variablesEmailTemplate}
+                    onChange={(data: any) => {
+                        setFieldValue('variable', data.value);
+                        setFieldValue('message', values.message + data.value);
+                    }}
+                />
                 <div>
                     <label htmlFor="editMessage">Template Message</label>
                     <ReactQuill

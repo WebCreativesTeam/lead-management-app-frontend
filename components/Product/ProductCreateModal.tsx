@@ -161,7 +161,12 @@ const CreateProductModal = () => {
                                                         />
                                                     </div>
                                                     <div className="flex items-end">
-                                                        <button type="button" className="btn btn-outline-danger" onClick={() => arrayHelpers.remove(index)}>
+                                                        <button
+                                                            type="button"
+                                                            className="btn btn-outline-danger"
+                                                            onClick={() => arrayHelpers.remove(index)}
+                                                            disabled={formik.values.instances.length <= 1}
+                                                        >
                                                             X
                                                         </button>
                                                     </div>
