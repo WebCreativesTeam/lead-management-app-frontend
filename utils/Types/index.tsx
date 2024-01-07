@@ -324,13 +324,21 @@ enum Gender {
     Others = 'Others',
 }
 
+export interface ISubProduct {
+    colorIds: string[];
+    id: string;
+    modelName: string;
+    name: string;
+    productId: string;
+}
+
 //lead page types
 export type LeadDataType = {
     id: string;
     createdAt: string;
     updatedAt: string;
-    productId: string;
-    subProductId: string;
+    product: IProduct;
+    subProduct: ISubProduct;
     estimatedDate: string;
     followUpDate: string;
     gender: Gender;

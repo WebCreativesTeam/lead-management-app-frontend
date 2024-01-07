@@ -51,7 +51,7 @@ const LeadViewModal = () => {
 
     //find default selected product
     useEffect(() => {
-        const findProduct: SelectOptionsType | undefined = productDropdown.find((item: SelectOptionsType) => item?.value === singleData?.productId);
+        const findProduct: SelectOptionsType | undefined = productDropdown.find((item: SelectOptionsType) => item?.value === singleData?.product?.id);
         if (findProduct) {
             setDefaultProduct(findProduct);
         }
@@ -59,7 +59,7 @@ const LeadViewModal = () => {
 
     //find default selected subproduct
     useEffect(() => {
-        const findSubProduct: SelectOptionsType | undefined = productDropdown.find((item: SelectOptionsType) => item?.value === singleData?.subProductId);
+        const findSubProduct: SelectOptionsType | undefined = productDropdown.find((item: SelectOptionsType) => item?.value === singleData?.subProduct?.id);
         if (findSubProduct) {
             setDefaultSubProduct(findSubProduct);
         }

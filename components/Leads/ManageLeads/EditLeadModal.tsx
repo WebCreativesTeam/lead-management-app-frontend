@@ -12,7 +12,7 @@ import CreateNotesTab from './CreateNotesTab';
 
 const LeadEditModal = () => {
     const dispatch = useDispatch();
-    const { editModal } = useSelector((state: IRootState) => state.lead);
+    const { editModal, isFetching } = useSelector((state: IRootState) => state.lead);
     return (
         <Transition appear show={editModal} as={Fragment}>
             <Dialog
@@ -56,8 +56,9 @@ const LeadEditModal = () => {
                                                 {({ selected }) => (
                                                     <button
                                                         className={`${
-                                                            selected ? 'bg-green-600 text-white shadow-xl !outline-none' : ''
-                                                        } -mb-[1px] flex flex-1 items-center justify-center rounded-lg p-3.5 py-2 before:inline-block hover:bg-green-600 hover:text-white`}
+                                                            selected ? 'bg-green-600 text-white shadow-xl !outline-none disabled:text-black' : ''
+                                                        } -mb-[1px] flex flex-1 items-center justify-center rounded-lg p-3.5 py-2 before:inline-block hover:bg-green-600 hover:text-white disabled:bg-slate-200 disabled:hover:text-black`}
+                                                        disabled={isFetching}
                                                     >
                                                         <Home />
                                                         Overview
@@ -69,7 +70,8 @@ const LeadEditModal = () => {
                                                     <button
                                                         className={`${
                                                             selected ? 'bg-green-600 text-white shadow-xl !outline-none' : ''
-                                                        } -mb-[1px] flex flex-1 items-center justify-center rounded-lg p-3.5 py-2 before:inline-block hover:bg-green-600 hover:text-white`}
+                                                        } -mb-[1px] flex flex-1 items-center justify-center rounded-lg p-3.5 py-2 before:inline-block hover:bg-green-600 hover:text-white disabled:bg-slate-200 disabled:hover:text-black`}
+                                                        disabled={isFetching}
                                                     >
                                                         <Setting />
                                                         Custom Fields
@@ -81,7 +83,8 @@ const LeadEditModal = () => {
                                                     <button
                                                         className={`${
                                                             selected ? 'bg-green-600 text-white  shadow-xl !outline-none' : ''
-                                                        } -mb-[1px] flex flex-1 items-center justify-center rounded-lg p-3.5 py-2  before:inline-block hover:bg-green-600 hover:text-white`}
+                                                        } -mb-[1px] flex flex-1 items-center justify-center rounded-lg p-3.5 py-2  before:inline-block hover:bg-green-600 hover:text-white disabled:bg-slate-200 disabled:hover:text-black`}
+                                                        disabled={isFetching}
                                                     >
                                                         <Note />
                                                         Note

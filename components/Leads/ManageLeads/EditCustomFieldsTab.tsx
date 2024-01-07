@@ -8,12 +8,15 @@ import Select from 'react-select';
 import Flatpickr from 'react-flatpickr';
 import 'flatpickr/dist/flatpickr.css';
 import { getYupSchemaFromMetaData } from './yupValidationSchema';
-import { setEditModal } from '@/store/Slices/leadSlice/manageLeadSlice';
+import { setEditModal, setFetching } from '@/store/Slices/leadSlice/manageLeadSlice';
+import { ApiClient } from '@/utils/http';
+import Loader from '@/components/__Shared/Loader';
 
 const EditCustomFieldsTab: React.FC = () => {
-    const { customFieldsList, singleData, leadNoteList } = useSelector((state: IRootState) => state.lead);
+    const { customFieldsList, singleData, isFetching } = useSelector((state: IRootState) => state.lead);
     const customFieldTabSchema = getYupSchemaFromMetaData(customFieldsList, [], []);
     const [errorObj, setErrorObj] = useState({} as any);
+    const [isBtnDisabled, setIsBtnDisabled] = useState<boolean>(false);
     const dispatch = useDispatch();
 
     const { values, handleChange, handleSubmit, setFieldValue, handleBlur, setFieldTouched, touched, submitForm } = useFormik({
@@ -22,12 +25,16 @@ const EditCustomFieldsTab: React.FC = () => {
         validateOnChange: true,
         enableReinitialize: false,
         onSubmit: async (value, action) => {
-            // dispatch(setFetching(true));
+            dispatch(setFetching(true));
             try {
-                // console.log(createLeadObj);
-                // await new ApiClient().post('lead', createLeadObj);
-                // console.log(value);
-                // action.resetForm();
+                setIsBtnDisabled(true);
+                const editLeadObj = {
+                    customFields: value,
+                };
+                console.log(editLeadObj);
+                await new ApiClient().patch('lead/' + singleData?.id, { customFields: value });
+                dispatch(setEditModal({ open: false }));
+                action.resetForm();
             } catch (error: any) {
                 if (typeof error?.response?.data?.message === 'object') {
                     showToastAlert(error?.response?.data?.message.join(' , '));
@@ -35,9 +42,10 @@ const EditCustomFieldsTab: React.FC = () => {
                     showToastAlert(error?.response?.data?.message);
                 }
                 showToastAlert(error?.response?.data?.message);
+            } finally {
+                setIsBtnDisabled(false);
+                dispatch(setFetching(false));
             }
-            // dispatch(setDisableBtn(false));
-            // dispatch(setFetching(false));
         },
     });
 
@@ -81,8 +89,24 @@ const EditCustomFieldsTab: React.FC = () => {
         setErrorObj(createErrorObj);
     }, [customFieldsList]);
 
+    useEffect(() => {
+        for (const key in singleData.customFields) {
+            setFieldValue(key, singleData.customFields[key]);
+        }
+    }, [singleData]);
 
-    return (
+    useEffect(() => {
+        const haveAllValues: boolean = Object.values(values)
+            .map((item: any) => {
+                return item?.toString();
+            })
+            .every((item: string) => item?.length > 0);
+        setIsBtnDisabled(!haveAllValues);
+    }, [values]);
+
+    return isFetching ? (
+        <Loader />
+    ) : (
         <div>
             <form onSubmit={handleSubmit}>
                 <div className="grid gap-x-6 gap-y-4 sm:grid-cols-2">
@@ -207,9 +231,9 @@ const EditCustomFieldsTab: React.FC = () => {
                                     {item?.fieldType === 'DATE' && (
                                         <>
                                             <Flatpickr
-                                                data-enable-time
+                                                data-enable-time={false}
                                                 options={{
-                                                    enableTime: true,
+                                                    enableTime: false,
                                                     dateFormat: 'Y-m-d H:i',
                                                     position: 'auto',
                                                 }}
@@ -249,15 +273,8 @@ const EditCustomFieldsTab: React.FC = () => {
                                                                 className="peer form-radio"
                                                                 id={item?.id}
                                                                 value={item2?.value}
-                                                                // defaultChecked={item2.value === }
-                                                                onChange={(e) => {
-                                                                    handleChange(item?.id);
-                                                                    if (e.target.value && item?.required) {
-                                                                        setErrorObj((preVal: any) => {
-                                                                            return { ...preVal, [item?.id]: undefined };
-                                                                        });
-                                                                    }
-                                                                }}
+                                                                onChange={handleChange}
+                                                                defaultChecked={item2.value === singleData.customFields[item?.id] ? true : false}
                                                                 onBlur={(e) => {
                                                                     setFieldTouched(item?.id, true);
                                                                     if (e.target.value && item?.required) {
@@ -300,6 +317,7 @@ const EditCustomFieldsTab: React.FC = () => {
                                                                         });
                                                                     }
                                                                 }}
+                                                                defaultChecked={singleData?.customFields[item?.id].includes(item2?.value)}
                                                             />
                                                             <label className="inline-flex" htmlFor={item?.id}>
                                                                 {item2?.name}
@@ -323,16 +341,11 @@ const EditCustomFieldsTab: React.FC = () => {
                         onClick={() => {
                             dispatch(setEditModal({ open: false }));
                         }}
-                        disabled={false}
+                        disabled={isFetching}
                     >
                         Discard
                     </button>
-                    <button
-                        type="submit"
-                        className="btn  btn-primary cursor-pointer ltr:ml-4 rtl:mr-4"
-                        disabled={!Object.values(errorObj).every((value) => value === undefined)}
-                        onClick={() => submitForm()}
-                    >
+                    <button type="submit" className="btn  btn-primary cursor-pointer ltr:ml-4 rtl:mr-4" onClick={() => submitForm()} disabled={isBtnDisabled || isFetching}>
                         Submit
                     </button>
                 </div>

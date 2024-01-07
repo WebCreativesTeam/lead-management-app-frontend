@@ -12,10 +12,11 @@ import Flatpickr from 'react-flatpickr';
 import 'flatpickr/dist/flatpickr.css';
 import { SelectOptionsType, BranchListSecondaryEndpoint, SourceDataType, LeadStatusSecondaryEndpoint, GetMethodResponseType, ProductSecondaryEndpointType } from '@/utils/Types';
 import { genderList } from '@/utils/Raw Data';
+import Loader from '@/components/__Shared/Loader';
 
 const EditOverviewForm = () => {
     const dispatch = useDispatch();
-    const { isBtnDisabled, leadBranchList, leadSourceList, leadProductList, leadStatusList, singleData } = useSelector((state: IRootState) => state.lead);
+    const { isBtnDisabled, leadBranchList, leadSourceList, leadProductList, singleData, isFetching } = useSelector((state: IRootState) => state.lead);
     const [productDropdown, setProductDropdown] = useState<SelectOptionsType[]>([] as SelectOptionsType[]);
     const [branchDropdown, setBranchDropdown] = useState<SelectOptionsType[]>([] as SelectOptionsType[]);
     const [sourceDropdown, setSourceDropdown] = useState<SelectOptionsType[]>([] as SelectOptionsType[]);
@@ -73,7 +74,6 @@ const EditOverviewForm = () => {
                     followUpDate: new Date(value.followUpDate).toISOString(),
                     zip: values.zip.toString(),
                     subProductId: values.subProduct.value,
-                    // statusId: values.status.value,
                 };
                 console.log(editLeadObj);
                 await new ApiClient().patch('lead/' + singleData?.id, editLeadObj);
@@ -93,8 +93,8 @@ const EditOverviewForm = () => {
     });
 
     useEffect(() => {
-        setFieldValue('product', singleData?.productId);
-        setFieldValue('subProduct', singleData?.subProductId);
+        setFieldValue('product', singleData?.product?.id);
+        setFieldValue('subProduct', singleData?.subProduct?.id);
         setFieldValue('followUpDate', singleData?.followUpDate);
         setFieldValue('estimatedDate', singleData?.estimatedDate);
         setFieldValue('source', singleData?.source?.id);
@@ -150,7 +150,7 @@ const EditOverviewForm = () => {
 
     //find default selected product
     useEffect(() => {
-        const findProduct: SelectOptionsType | undefined = productDropdown.find((item: SelectOptionsType) => item?.value === singleData?.productId);
+        const findProduct: SelectOptionsType | undefined = productDropdown.find((item: SelectOptionsType) => item?.value === singleData?.product?.id);
         if (findProduct) {
             setDefaultProduct(findProduct);
         }
@@ -158,7 +158,7 @@ const EditOverviewForm = () => {
 
     //find default selected subproduct
     useEffect(() => {
-        const findSubProduct: SelectOptionsType | undefined = subProductDropdown.find((item: SelectOptionsType) => item?.value === singleData?.subProductId);
+        const findSubProduct: SelectOptionsType | undefined = subProductDropdown.find((item: SelectOptionsType) => item?.value === singleData?.subProduct?.id);
         if (findSubProduct) {
             setDefaultSubProduct(findSubProduct);
         }
@@ -188,10 +188,12 @@ const EditOverviewForm = () => {
             return { label: item?.name, value: item?.id };
         });
         setProductDropdown(createProductDropdown);
-        getAllSubProducts(values?.product?.value || singleData?.productId);
+        getAllSubProducts(values?.product?.value || singleData?.product?.id);
     }, [values.product?.value, singleData]);
 
-    return (
+    return isFetching ? (
+        <Loader />
+    ) : (
         <form className="space-y-5" onSubmit={handleSubmit}>
             <div className="flex flex-col gap-4 sm:flex-row">
                 {Object.keys(defaultProduct).length > 0 && (
@@ -209,7 +211,7 @@ const EditOverviewForm = () => {
                             id="subProduct"
                             onChange={(e) => setFieldValue('subProduct', e)}
                             defaultValue={defaultSubProduct}
-                            isDisabled={(!values?.subProduct?.value && !singleData?.productId) || isLoading || Object.keys(defaultProduct).length === 0}
+                            isDisabled={(!values?.subProduct?.value && !singleData?.product?.id) || isLoading || Object.keys(defaultProduct).length === 0}
                         />
                     </div>
                 )}
@@ -298,9 +300,8 @@ const EditOverviewForm = () => {
                         values.followUpDate &&
                         (values.source.value || singleData?.source?.id) &&
                         (values.branch.value || singleData?.branch?.id) &&
-                        (values.product?.value || singleData?.productId) &&
-                        (values.subProduct?.value || singleData.subProductId) &&
-                        // values.status.value &&
+                        (values.product?.value || singleData?.product?.id) &&
+                        (values.subProduct?.value || singleData.subProduct?.id) &&
                         (values.gender?.value || values.gender) &&
                         values.zip &&
                         !isBtnDisabled
