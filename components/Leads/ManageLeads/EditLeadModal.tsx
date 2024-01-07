@@ -1,86 +1,18 @@
 /* eslint-disable @next/next/no-img-element */
-import React, { Fragment, memo, useEffect, useState } from 'react';
+import React, { Fragment, memo } from 'react';
 import { IRootState } from '@/store';
-import { getAllNotesForLead, setEditModal } from '@/store/Slices/leadSlice/manageLeadSlice';
-import Loader from '@/components/__Shared/Loader';
+import { setEditModal } from '@/store/Slices/leadSlice/manageLeadSlice';
 import 'flatpickr/dist/flatpickr.css';
 import { Dialog, Tab, Transition } from '@headlessui/react';
-import { Home, Note, Setting, Close, Delete } from '@/utils/icons';
+import { Home, Note, Setting, Close } from '@/utils/icons';
 import { useDispatch, useSelector } from 'react-redux';
 import EditOverviewForm from './EditOverviewForm';
 import EditCustomFieldsTab from './EditCustomFieldsTab';
-import { ApiClient } from '@/utils/http';
-import { GetMethodResponseType, ILeadNotes } from '@/utils/Types';
 import CreateNotesTab from './CreateNotesTab';
 
 const LeadEditModal = () => {
     const dispatch = useDispatch();
-    const { isFetching, editModal, singleData, leadNoteList } = useSelector((state: IRootState) => state.lead);
-    const [content, setContent] = useState<string>('');
-    const [title, setTitle] = useState<string>('');
-    const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [fetching, setFetching] = useState<boolean>(false);
-    const {
-        data: { id },
-    } = useSelector((state: IRootState) => state.userInfo);
-
-    useEffect(() => {
-        handleFetchNotes();
-    }, [fetching]);
-
-    const handleFetchNotes = async () => {
-        setIsLoading(true);
-        try {
-            const LeadNoteList: GetMethodResponseType = await new ApiClient().get(`lead-note?leadId=${singleData?.id}&sortBy=-createdAt`);
-            const leadNotes: ILeadNotes[] = LeadNoteList?.data;
-            if (typeof leadNotes === 'undefined') {
-                dispatch(getAllNotesForLead([] as ILeadNotes[]));
-                setIsLoading(false);
-                return;
-            }
-            dispatch(getAllNotesForLead(leadNotes));
-            setIsLoading(false);
-        } catch (error) {
-            console.log(error);
-            setIsLoading(false);
-        }
-    };
-
-    const handleCreateNote = async () => {
-        const createNoteObj = {
-            content,
-            userId: id,
-            leadId: singleData?.id,
-            title,
-        };
-        try {
-            setIsLoading(true);
-            await new ApiClient().post('lead-note', createNoteObj);
-            setContent('');
-            setTitle('');
-            setIsLoading(false);
-            setFetching(!fetching);
-        } catch (error) {
-            console.log(error);
-        }
-    };
-
-    const handleDeleteNote = async (id: string) => {
-        try {
-            setIsLoading(true);
-            const deleteNote: ILeadNotes = await new ApiClient().delete('lead-note/' + id);
-            if (deleteNote === null) {
-                setIsLoading(false);
-                return;
-            }
-            setIsLoading(false);
-            setFetching(!fetching);
-        } catch (error) {
-            setIsLoading(false);
-            console.log(error);
-        }
-    };
-
+    const { editModal } = useSelector((state: IRootState) => state.lead);
     return (
         <Transition appear show={editModal} as={Fragment}>
             <Dialog
@@ -118,69 +50,66 @@ const LeadEditModal = () => {
                                     </button>
                                 </div>
                                 <div className="p-5">
-                                    {isFetching ? (
-                                        <Loader />
-                                    ) : (
-                                        <Tab.Group>
-                                            <Tab.List className="mb-8 flex flex-col flex-wrap gap-2 sm:flex-row">
-                                                <Tab as={Fragment}>
-                                                    {({ selected }) => (
-                                                        <button
-                                                            className={`${
-                                                                selected ? 'bg-green-600 text-white shadow-xl !outline-none' : ''
-                                                            } -mb-[1px] flex flex-1 items-center justify-center rounded-lg p-3.5 py-2 before:inline-block hover:bg-green-600 hover:text-white`}
-                                                        >
-                                                            <Home />
-                                                            Overview
-                                                        </button>
-                                                    )}
-                                                </Tab>
-                                                <Tab as={Fragment}>
-                                                    {({ selected }) => (
-                                                        <button
-                                                            className={`${
-                                                                selected ? 'bg-green-600 text-white shadow-xl !outline-none' : ''
-                                                            } -mb-[1px] flex flex-1 items-center justify-center rounded-lg p-3.5 py-2 before:inline-block hover:bg-green-600 hover:text-white`}
-                                                        >
-                                                            <Setting />
-                                                            Custom Fields
-                                                        </button>
-                                                    )}
-                                                </Tab>
-                                                <Tab as={Fragment}>
-                                                    {({ selected }) => (
-                                                        <button
-                                                            className={`${
-                                                                selected ? 'bg-green-600 text-white  shadow-xl !outline-none' : ''
-                                                            } -mb-[1px] flex flex-1 items-center justify-center rounded-lg p-3.5 py-2  before:inline-block hover:bg-green-600 hover:text-white`}
-                                                        >
-                                                            <Note />
-                                                            Note
-                                                        </button>
-                                                    )}
-                                                </Tab>
-                                            </Tab.List>
-                                            <Tab.Panels>
-                                                {/* overview form :start */}
-                                                <Tab.Panel>
-                                                    <EditOverviewForm />
-                                                </Tab.Panel>
-                                                {/* overview form :end */}
+                                    <Tab.Group>
+                                        <Tab.List className="mb-8 flex flex-col flex-wrap gap-2 sm:flex-row">
+                                            <Tab as={Fragment}>
+                                                {({ selected }) => (
+                                                    <button
+                                                        className={`${
+                                                            selected ? 'bg-green-600 text-white shadow-xl !outline-none' : ''
+                                                        } -mb-[1px] flex flex-1 items-center justify-center rounded-lg p-3.5 py-2 before:inline-block hover:bg-green-600 hover:text-white`}
+                                                    >
+                                                        <Home />
+                                                        Overview
+                                                    </button>
+                                                )}
+                                            </Tab>
+                                            <Tab as={Fragment}>
+                                                {({ selected }) => (
+                                                    <button
+                                                        className={`${
+                                                            selected ? 'bg-green-600 text-white shadow-xl !outline-none' : ''
+                                                        } -mb-[1px] flex flex-1 items-center justify-center rounded-lg p-3.5 py-2 before:inline-block hover:bg-green-600 hover:text-white`}
+                                                    >
+                                                        <Setting />
+                                                        Custom Fields
+                                                    </button>
+                                                )}
+                                            </Tab>
+                                            <Tab as={Fragment}>
+                                                {({ selected }) => (
+                                                    <button
+                                                        className={`${
+                                                            selected ? 'bg-green-600 text-white  shadow-xl !outline-none' : ''
+                                                        } -mb-[1px] flex flex-1 items-center justify-center rounded-lg p-3.5 py-2  before:inline-block hover:bg-green-600 hover:text-white`}
+                                                    >
+                                                        <Note />
+                                                        Note
+                                                    </button>
+                                                )}
+                                            </Tab>
+                                        </Tab.List>
+                                        <Tab.Panels>
+                                            {/* overview form :start */}
+                                            <Tab.Panel>
+                                                <EditOverviewForm />
+                                            </Tab.Panel>
+                                            {/* overview form :end */}
 
-                                                {/* Custom fields tab : start */}
-                                                <Tab.Panel>
-                                                    <EditCustomFieldsTab />
-                                                </Tab.Panel>
-                                                {/* custom fields tab :end */}
+                                            {/* Custom fields tab : start */}
+                                            <Tab.Panel>
+                                                <EditCustomFieldsTab />
+                                            </Tab.Panel>
+                                            {/* custom fields tab :end */}
 
-                                                {/* Notes tab content : start */}
-                                                <Tab.Panel>
-                                                    <CreateNotesTab />
-                                                </Tab.Panel>
-                                                {/* Notes tab content : end */}
+                                            {/* Notes tab content : start */}
+                                            <Tab.Panel>
+                                                <CreateNotesTab />
+                                            </Tab.Panel>
+                                            {/* Notes tab content : end */}
 
-                                                {/* logs tab content : start */}
-                                                {/* <Tab.Panel>
+                                            {/* logs tab content : start */}
+                                            {/* <Tab.Panel>
                                     <div className="mb-5">
                                         <div className="mx-auto max-w-[900px]">
                                             <div className="flex">
@@ -215,10 +144,9 @@ const LeadEditModal = () => {
                                         </div>
                                     </div>
                                 </Tab.Panel> */}
-                                                {/* logs tab content : end */}
-                                            </Tab.Panels>
-                                        </Tab.Group>
-                                    )}
+                                            {/* logs tab content : end */}
+                                        </Tab.Panels>
+                                    </Tab.Group>
                                 </div>
                             </Dialog.Panel>
                         </Transition.Child>

@@ -81,7 +81,6 @@ const EditCustomFieldsTab: React.FC = () => {
         setErrorObj(createErrorObj);
     }, [customFieldsList]);
 
-    console.log(singleData);
 
     return (
         <div>
@@ -250,6 +249,7 @@ const EditCustomFieldsTab: React.FC = () => {
                                                                 className="peer form-radio"
                                                                 id={item?.id}
                                                                 value={item2?.value}
+                                                                // defaultChecked={item2.value === }
                                                                 onChange={(e) => {
                                                                     handleChange(item?.id);
                                                                     if (e.target.value && item?.required) {
