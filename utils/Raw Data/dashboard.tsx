@@ -7,6 +7,7 @@ export const followupData: IFollowup[] = [
         source: {
             name: 'facebook',
             id: '1',
+            srNo: 1,
         },
         product: 'Product A',
         status: {

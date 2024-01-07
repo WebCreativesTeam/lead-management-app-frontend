@@ -11,20 +11,32 @@ import { setPageTitle } from '@/store/themeConfigSlice';
 import { GetMethodResponseType, ICustomField, IFiedlListType } from '@/utils/Types';
 import { ApiClient } from '@/utils/http';
 import { IRootState } from '@/store';
-import { getAllCustomField, setCreateModal, setDeleteModal, setEditModal, setCustomFieldDataLength, setViewModal, getAllFieldsList, setFieldActivationModal } from '@/store/Slices/customFieldSlice';
+import {
+    getAllCustomField,
+    setCreateModal,
+    setDeleteModal,
+    setEditModal,
+    setCustomFieldDataLength,
+    setViewModal,
+    getAllFieldsList,
+    setFieldActivationModal,
+    setPage,
+    setPageSize,
+} from '@/store/Slices/customFieldSlice';
 import CustomFieldViewModal from '@/components/CustomField/CustomFieldViewModal';
 import CustomFieldCreateModal from '@/components/CustomField/CustomFieldsCreateModal';
 import CustomFieldEditModal from '@/components/CustomField/CustomFieldEditModal';
 import CustomFieldDeleteModal from '@/components/CustomField/CustomFieldsDeleteModal';
 import ToggleSwitch from '@/components/__Shared/ToggleSwitch';
 import CustomFieldActivateModal from '@/components/CustomField/CustomFieldActivateModal';
+import { PAGE_SIZES } from '@/utils/contant';
 
 const CustomFields = () => {
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('Custom Fields | Create custom fields'));
     }, []);
-    const { data, isFetching, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate, totalRecords } = useSelector((state: IRootState) => state.customField);
+    const { data, isFetching, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate, totalRecords, pageSize, page } = useSelector((state: IRootState) => state.customField);
 
     //hooks
     const [searchInputText, setSearchInputText] = useState<string>('');
@@ -32,9 +44,7 @@ const CustomFields = () => {
     const [search, setSearch] = useState<string>('');
 
     //datatable
-    const [page, setPage] = useState(1);
-    const PAGE_SIZES = [10, 20, 30];
-    const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
+
     const [recordsData, setRecordsData] = useState<ICustomField[]>([] as ICustomField[]);
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
         columnAccessor: 'name',
@@ -46,7 +56,7 @@ const CustomFields = () => {
     useEffect(() => {
         const data = sortBy(recordsData, sortStatus.columnAccessor);
         setRecordsData(sortStatus.direction === 'desc' ? data.reverse() : data);
-        setPage(1);
+        dispatch(setPage(1));
     }, [sortStatus]);
 
     //get all customField after page render
@@ -118,6 +128,7 @@ const CustomFields = () => {
                     className="table-hover whitespace-nowrap"
                     records={recordsData}
                     columns={[
+                        { accessor: 'index', title: '#', width: 40, render: ({ srNo }) => srNo },
                         {
                             accessor: 'label',
                             title: 'Label Name',
@@ -220,9 +231,9 @@ const CustomFields = () => {
                     totalRecords={totalRecords}
                     recordsPerPage={pageSize}
                     page={page}
-                    onPageChange={(p) => setPage(p)}
+                    onPageChange={(page) => dispatch(setPage(page))}
                     recordsPerPageOptions={data?.length < 10 ? [10] : PAGE_SIZES}
-                    onRecordsPerPageChange={setPageSize}
+                    onRecordsPerPageChange={(recordsPerPage) => dispatch(setPageSize(recordsPerPage))}
                     sortStatus={sortStatus}
                     onSortStatusChange={setSortStatus}
                     minHeight={200}

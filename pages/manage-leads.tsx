@@ -40,6 +40,8 @@ import {
     setDeleteModal,
     setEditModal,
     setLeadDataLength,
+    setPage,
+    setPageSize,
     setViewModal,
 } from '@/store/Slices/leadSlice/manageLeadSlice';
 import { ApiClient } from '@/utils/http';
@@ -50,6 +52,7 @@ import ViewLeadModal from '@/components/Leads/ManageLeads/ViewLeadModal';
 import ChangeLeadPriorityModal from '@/components/Leads/ManageLeads/ChangeLeadPriorityModal';
 import ChangeLeadStatusModal from '@/components/Leads/ManageLeads/ChangeLeadStatusModal';
 import Link from 'next/link';
+import { PAGE_SIZES } from '@/utils/contant';
 
 const ManageLeads = () => {
     const dispatch = useDispatch();
@@ -70,8 +73,23 @@ const ManageLeads = () => {
     ];
 
     //hooks
-    const { data, isFetching, leadPriorityList, leadStatusList, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate, totalRecords, editModal, createModal, deleteModal, viewModal } =
-        useSelector((state: IRootState) => state.lead);
+    const {
+        data,
+        isFetching,
+        leadPriorityList,
+        leadStatusList,
+        isAbleToCreate,
+        isAbleToDelete,
+        isAbleToRead,
+        isAbleToUpdate,
+        totalRecords,
+        editModal,
+        createModal,
+        deleteModal,
+        viewModal,
+        pageSize,
+        page,
+    } = useSelector((state: IRootState) => state.lead);
     const isRtl = useSelector((state: IRootState) => state.themeConfig.rtlClass) === 'rtl' ? true : false;
     const [searchInputText, setSearchInputText] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(false);
@@ -83,9 +101,7 @@ const ManageLeads = () => {
     const searchQuery = useDeferredValue(search);
 
     //datatable
-    const [page, setPage] = useState(1);
-    const PAGE_SIZES = [10, 20, 30];
-    const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
+
     const [recordsData, setRecordsData] = useState<LeadDataType[]>([] as LeadDataType[]);
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
         columnAccessor: 'title',
@@ -95,7 +111,7 @@ const ManageLeads = () => {
     useEffect(() => {
         const data = sortBy(recordsData, sortStatus.columnAccessor);
         setRecordsData(sortStatus.direction === 'desc' ? data.reverse() : data);
-        setPage(1);
+        dispatch(setPage(1));
     }, [sortStatus]);
 
     //get all lead after page render
@@ -225,7 +241,7 @@ const ManageLeads = () => {
             return;
         }
         dispatch(getAllProductsForLead(products));
-    }
+    };
     return !isAbleToRead ? null : (
         <div>
             <PageHeadingSection description="View, create, update, and close leads. Organize by status, priority, and due date. Stay on top of work." heading="Lead Management" />
@@ -336,6 +352,12 @@ const ManageLeads = () => {
                     className="table-hover whitespace-nowrap"
                     records={recordsData}
                     columns={[
+                        {
+                            accessor: 'index',
+                            title: '#',
+                            width: 40,
+                            render: ({ srNo }) => srNo,
+                        },
                         {
                             accessor: 'contactTitle',
                             title: 'Name',
@@ -528,9 +550,9 @@ const ManageLeads = () => {
                     totalRecords={totalRecords}
                     recordsPerPage={pageSize}
                     page={page}
-                    onPageChange={(p) => setPage(p)}
+                    onPageChange={(page) => dispatch(setPage(page))}
                     recordsPerPageOptions={data?.length < 10 ? [10] : PAGE_SIZES}
-                    onRecordsPerPageChange={setPageSize}
+                    onRecordsPerPageChange={(recordsPerPage) => dispatch(setPageSize(recordsPerPage))}
                     sortStatus={sortStatus}
                     onSortStatusChange={setSortStatus}
                     minHeight={200}

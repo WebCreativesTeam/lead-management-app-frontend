@@ -1,5 +1,5 @@
 import { ICustomField, CustomFieldInitialStateProps, UserDataType, IFiedlListType } from '@/utils/Types';
-import { fetchUserInfo } from '@/utils/contant';
+import { PAGE_SIZES, fetchUserInfo } from '@/utils/contant';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 const initialState: CustomFieldInitialStateProps = {
@@ -19,6 +19,8 @@ const initialState: CustomFieldInitialStateProps = {
     userPolicyArr: [] as string[],
     totalRecords: 0,
     fieldsList: [] as IFiedlListType[],
+    pageSize: PAGE_SIZES[0],
+    page: 1,
 };
 
 const customFieldSlice = createSlice({
@@ -68,7 +70,7 @@ const customFieldSlice = createSlice({
                 state.singleData = {} as ICustomField;
             }
         },
-        setFieldActivationModal(state, action: PayloadAction<{ open: boolean; id?: string;  }>) {
+        setFieldActivationModal(state, action: PayloadAction<{ open: boolean; id?: string }>) {
             const { open, id } = action.payload;
             state.fieldActivationModal = open;
             const findRequestedData: ICustomField | undefined = state.data.find((item: ICustomField) => item.id === id);
@@ -79,8 +81,24 @@ const customFieldSlice = createSlice({
                 state.singleData = {} as ICustomField;
             }
         },
-        getAllCustomField(state, action) {
-            state.data = action.payload;
+        getAllCustomField(state, action: PayloadAction<ICustomField[]>) {
+            let srNoArray: number[] = [];
+            for (let i = state.pageSize * state.page - state.pageSize; i <= state.pageSize * state.page; i++) {
+                srNoArray.push(i);
+            }
+            srNoArray.shift();
+            if (action.payload.length > 0) {
+                const serializedData = action.payload?.map((item, index) => {
+                    return { ...item, srNo: srNoArray[index] };
+                });
+                state.data = serializedData;
+            }
+        },
+        setPage(state, { payload }: PayloadAction<number>) {
+            state.page = payload;
+        },
+        setPageSize(state, { payload }: PayloadAction<number>) {
+            state.pageSize = payload;
         },
         getAllFieldsList(state, action: PayloadAction<IFiedlListType[]>) {
             state.fieldsList = action.payload;
@@ -128,5 +146,7 @@ export const {
     setCustomFieldDataLength,
     getAllFieldsList,
     setFieldActivationModal,
+    setPageSize,
+    setPage,
 } = customFieldSlice.actions;
 export default customFieldSlice.reducer;

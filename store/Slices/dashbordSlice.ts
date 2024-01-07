@@ -1,6 +1,6 @@
 import { LeadStatusSecondaryEndpoint } from '@/utils/Types';
 import { DashboardInitialStateProps, SourceDataType, UserDataType, ILeadStatus, IFollowup } from '@/utils/Types';
-import { fetchUserInfo } from '@/utils/contant';
+import { PAGE_SIZES, fetchUserInfo } from '@/utils/contant';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 const initialState: DashboardInitialStateProps = {
@@ -22,6 +22,8 @@ const initialState: DashboardInitialStateProps = {
     isAbleToDelete: false,
     userPolicyArr: [] as string[],
     totalRecords: 0,
+    pageSize: PAGE_SIZES[0],
+    page: 1,
 };
 
 const dashboardSlice = createSlice({

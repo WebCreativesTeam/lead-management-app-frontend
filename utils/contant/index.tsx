@@ -29,3 +29,5 @@ export const fetchUserInfo: any = createAsyncThunk('user/id', async (arg, thunkA
         }
     }
 });
+
+export const PAGE_SIZES: number[] = [10, 20, 30];

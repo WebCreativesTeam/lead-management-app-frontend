@@ -1,5 +1,5 @@
 import { PolicyListSecondaryEndpoint, UserDataType, UserInitialStateProps } from '@/utils/Types';
-import { fetchUserInfo } from '@/utils/contant';
+import { PAGE_SIZES, fetchUserInfo } from '@/utils/contant';
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 
 const initialState: UserInitialStateProps = {
@@ -23,6 +23,8 @@ const initialState: UserInitialStateProps = {
     isAbleToChangeActiveStatus: false,
     userPolicyArr: [] as string[],
     totalRecords: 0,
+    pageSize: PAGE_SIZES[0],
+    page: 1,
 };
 
 const userSlice = createSlice({
@@ -96,8 +98,24 @@ const userSlice = createSlice({
                 state.singleData = {} as UserDataType;
             }
         },
-        getAllUsers(state, action) {
-            state.data = action.payload;
+        getAllUsers(state, action: PayloadAction<UserDataType[]>) {
+            let srNoArray: number[] = [];
+            for (let i = state.pageSize * state.page - state.pageSize; i <= state.pageSize * state.page; i++) {
+                srNoArray.push(i);
+            }
+            srNoArray.shift();
+            if (action.payload.length > 0) {
+                const serializedData = action.payload?.map((item, index) => {
+                    return { ...item, srNo: srNoArray[index] };
+                });
+                state.data = serializedData;
+            }
+        },
+        setPage(state, { payload }: PayloadAction<number>) {
+            state.page = payload;
+        },
+        setPageSize(state, { payload }: PayloadAction<number>) {
+            state.pageSize = payload;
         },
         getAllPolicies(state, action) {
             state.policies = action.payload;
@@ -156,5 +174,7 @@ export const {
     setChangeUsersPolicy,
     setChangeActiveStatusPermission,
     setUserDataLength,
+    setPageSize,
+    setPage,
 } = userSlice.actions;
 export default userSlice.reducer;

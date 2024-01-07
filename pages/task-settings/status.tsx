@@ -10,7 +10,7 @@ import { GetMethodResponseType, TaskStatusType } from '@/utils/Types';
 import { useDispatch, useSelector } from 'react-redux';
 import { setPageTitle } from '@/store/themeConfigSlice';
 import { ApiClient } from '@/utils/http';
-import { getAllTaskStatus, setCreateModal, setDefaultStatusModal, setDeleteModal, setEditModal, setTaskStatusDataLength, setViewModal } from '@/store/Slices/taskSlice/taskStatusSlice';
+import { getAllTaskStatus, setCreateModal, setDefaultStatusModal, setDeleteModal, setEditModal, setPage, setPageSize, setTaskStatusDataLength, setViewModal } from '@/store/Slices/taskSlice/taskStatusSlice';
 import { IRootState } from '@/store';
 import DeleteTaskStatusModal from '@/components/Tasks/TaskStatus/DeleteTaskStatusModal';
 import CreateTaskStatusModal from '@/components/Tasks/TaskStatus/CreateTaskStatusModal';
@@ -18,6 +18,7 @@ import EditTaskStatusModal from '@/components/Tasks/TaskStatus/EditTaskStatusMod
 import ChangeDefaultStatusModal from '@/components/Tasks/TaskStatus/ChangeDefaultStatusModal';
 import ViewTaskStatusModal from '@/components/Tasks/TaskStatus/ViewTaskStatusModal';
 import ToggleSwitch from '@/components/__Shared/ToggleSwitch';
+import { PAGE_SIZES } from '@/utils/contant';
 
 const TaskStatusPage = () => {
     const dispatch = useDispatch();
@@ -26,15 +27,15 @@ const TaskStatusPage = () => {
     });
 
     //hooks
-    const { data, isFetching, isAbleToChangeDefaultStatus, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate, totalRecords } = useSelector((state: IRootState) => state.taskStatus);
+    const { data, isFetching, isAbleToChangeDefaultStatus, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate, totalRecords, pageSize, page } = useSelector(
+        (state: IRootState) => state.taskStatus
+    );
     const [searchInputText, setSearchInputText] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(false);
     const [search, setSearch] = useState<string>('');
 
     //datatable
-    const [page, setPage] = useState(1);
-    const PAGE_SIZES = [10, 20, 30];
-    const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
+
     const [recordsData, setRecordsData] = useState<TaskStatusType[]>([] as TaskStatusType[]);
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
         columnAccessor: 'name',
@@ -47,7 +48,7 @@ const TaskStatusPage = () => {
     useEffect(() => {
         const data = sortBy(recordsData, sortStatus.columnAccessor);
         setRecordsData(sortStatus.direction === 'desc' ? data.reverse() : data);
-        setPage(1);
+        dispatch(setPage(1));
     }, [sortStatus]);
 
     //get all taskStatus after page render
@@ -106,6 +107,12 @@ const TaskStatusPage = () => {
                     className="table-hover whitespace-nowrap"
                     records={recordsData}
                     columns={[
+                        {
+                            accessor: 'index',
+                            title: '#',
+                            width: 40,
+                            render: ({ srNo }) => srNo,
+                        },
                         {
                             accessor: 'name',
                             title: 'Task Status Name',
@@ -185,9 +192,9 @@ const TaskStatusPage = () => {
                     totalRecords={totalRecords}
                     recordsPerPage={pageSize}
                     page={page}
-                    onPageChange={(p) => setPage(p)}
+                    onPageChange={(page) => dispatch(setPage(page))}
                     recordsPerPageOptions={data?.length < 10 ? [10] : PAGE_SIZES}
-                    onRecordsPerPageChange={setPageSize}
+                    onRecordsPerPageChange={(recordsPerPage) => dispatch(setPageSize(recordsPerPage))}
                     sortStatus={sortStatus}
                     onSortStatusChange={setSortStatus}
                     minHeight={200}

@@ -1,5 +1,5 @@
 import { EmailSmtpInitialStateProps, IEmailSmtp, UserDataType } from '@/utils/Types';
-import { fetchUserInfo } from '@/utils/contant';
+import { PAGE_SIZES, fetchUserInfo } from '@/utils/contant';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 const initialState: EmailSmtpInitialStateProps = {
@@ -16,7 +16,9 @@ const initialState: EmailSmtpInitialStateProps = {
     isAbleToUpdate: false,
     isAbleToDelete: false,
     userPolicyArr: [] as string[],
-    totalRecords:0
+    totalRecords: 0,
+    pageSize: PAGE_SIZES[0],
+    page: 1,
 };
 
 const emailSmtpSlice = createSlice({
@@ -66,8 +68,24 @@ const emailSmtpSlice = createSlice({
                 state.singleData = {} as IEmailSmtp;
             }
         },
-        getAllEmailSmtp(state, action) {
-            state.data = action.payload;
+        getAllEmailSmtp(state, action: PayloadAction<IEmailSmtp[]>) {
+            let srNoArray: number[] = [];
+            for (let i = state.pageSize * state.page - state.pageSize; i <= state.pageSize * state.page; i++) {
+                srNoArray.push(i);
+            }
+            srNoArray.shift();
+            if (action.payload.length > 0) {
+                const serializedData = action.payload?.map((item, index) => {
+                    return { ...item, srNo: srNoArray[index] };
+                });
+                state.data = serializedData;
+            }
+        },
+        setPage(state, { payload }: PayloadAction<number>) {
+            state.page = payload;
+        },
+        setPageSize(state, { payload }: PayloadAction<number>) {
+            state.pageSize = payload;
         },
         setDisableBtn(state, action) {
             state.isBtnDisabled = action.payload;
@@ -110,5 +128,7 @@ export const {
     setEmailSmtpReadPermission,
     setEmailSmtpUpdatePermission,
     setEmailSmtpDataLength,
+    setPageSize,
+    setPage,
 } = emailSmtpSlice.actions;
 export default emailSmtpSlice.reducer;

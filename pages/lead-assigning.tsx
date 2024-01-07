@@ -21,6 +21,8 @@ import {
     setEditModal,
     setLeadAssignmentActivationModal,
     setLeadAssignmentDataLength,
+    setPage,
+    setPageSize,
     setViewModal,
 } from '@/store/Slices/leadSlice/leadAssigningSlice';
 import LeadAssignmentViewModal from '@/components/Leads/LeadAssignment/LeadAssignmentViewModal';
@@ -29,14 +31,29 @@ import LeadAssignmentEditModal from '@/components/Leads/LeadAssignment/LeadAssig
 import LeadAssignmentDeleteModal from '@/components/Leads/LeadAssignment/LeadAssignmentDeleteModal';
 import ToggleSwitch from '@/components/__Shared/ToggleSwitch';
 import LeadAssignmentActivationModal from '@/components/Leads/LeadAssignment/LeadAssignmentActivationModal';
+import { PAGE_SIZES } from '@/utils/contant';
 
 const LeadAssigning = () => {
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('Track Leads | LeadAssignments'));
     });
-    const { data, isFetching, deleteModal, isAbleToCreate, isAbleToDelete, isAbleToUpdate, totalRecords, editModal, createModal, viewModal, isAbleToActivate, leadAssignmentActivationModal } =
-        useSelector((state: IRootState) => state.leadAssignment);
+    const {
+        data,
+        isFetching,
+        deleteModal,
+        isAbleToCreate,
+        isAbleToDelete,
+        isAbleToUpdate,
+        totalRecords,
+        editModal,
+        createModal,
+        viewModal,
+        isAbleToActivate,
+        pageSize,
+        page,
+        leadAssignmentActivationModal,
+    } = useSelector((state: IRootState) => state.leadAssignment);
 
     //hooks
     const [searchInputText, setSearchInputText] = useState<string>('');
@@ -44,9 +61,7 @@ const LeadAssigning = () => {
     const [search, setSearch] = useState<string>('');
 
     //datatable
-    const [page, setPage] = useState(1);
-    const PAGE_SIZES = [10, 20, 30];
-    const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
+
     const [recordsData, setRecordsData] = useState<ILeadAssignment[]>([] as ILeadAssignment[]);
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
         columnAccessor: 'name',
@@ -58,7 +73,7 @@ const LeadAssigning = () => {
     useEffect(() => {
         const data = sortBy(recordsData, sortStatus.columnAccessor);
         setRecordsData(sortStatus.direction === 'desc' ? data.reverse() : data);
-        setPage(1);
+        dispatch(setPage(1));
     }, [sortStatus]);
 
     //get all leadAssignment after page render
@@ -154,6 +169,12 @@ const LeadAssigning = () => {
                     records={recordsData}
                     columns={[
                         {
+                            accessor: 'index',
+                            title: '#',
+                            width: 40,
+                            render: ({ srNo }) => srNo,
+                        },
+                        {
                             accessor: 'name',
                             title: 'Lead Assigning Name',
                             sortable: true,
@@ -231,9 +252,9 @@ const LeadAssigning = () => {
                     totalRecords={totalRecords}
                     recordsPerPage={pageSize}
                     page={page}
-                    onPageChange={(p) => setPage(p)}
+                    onPageChange={(page) => dispatch(setPage(page))}
                     recordsPerPageOptions={data?.length < 10 ? [10] : PAGE_SIZES}
-                    onRecordsPerPageChange={setPageSize}
+                    onRecordsPerPageChange={(recordsPerPage) => dispatch(setPageSize(recordsPerPage))}
                     sortStatus={sortStatus}
                     onSortStatusChange={setSortStatus}
                     minHeight={200}

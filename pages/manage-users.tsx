@@ -9,7 +9,19 @@ import PageHeadingSection from '@/components/__Shared/PageHeadingSection/index.'
 import { setPageTitle } from '@/store/themeConfigSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { ApiClient } from '@/utils/http';
-import { getAllPolicies, getAllUsers, setCreateModal, setDeactivateModal, setDeleteModal, setEditModal, setPolicyModal, setUserDataLength, setViewModal } from '@/store/Slices/userSlice';
+import {
+    getAllPolicies,
+    getAllUsers,
+    setCreateModal,
+    setDeactivateModal,
+    setDeleteModal,
+    setEditModal,
+    setPage,
+    setPageSize,
+    setPolicyModal,
+    setUserDataLength,
+    setViewModal,
+} from '@/store/Slices/userSlice';
 import { IRootState } from '@/store';
 import UserCreateModal from '@/components/Users/UserCreateModal';
 import UserViewModal from '@/components/Users/UserViewModal';
@@ -19,6 +31,7 @@ import UserDeactivateModal from '@/components/Users/UserDeactivateModal';
 import { sortBy } from 'lodash';
 import UserDeleteModal from '@/components/Users/UserDeleteModal';
 import ToggleSwitch from '@/components/__Shared/ToggleSwitch';
+import { PAGE_SIZES } from '@/utils/contant';
 
 const ManageUsers = () => {
     const dispatch = useDispatch();
@@ -26,7 +39,7 @@ const ManageUsers = () => {
         dispatch(setPageTitle('Manage Users'));
     });
     //hooks
-    const { data, isFetching, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate, isAbleToUpdatePolicy, isAbleToChangeActiveStatus, totalRecords } = useSelector(
+    const { data, isFetching, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate, isAbleToUpdatePolicy, isAbleToChangeActiveStatus, totalRecords, pageSize, page } = useSelector(
         (state: IRootState) => state.user
     );
     const [searchInputText, setSearchInputText] = useState<string>('');
@@ -34,9 +47,6 @@ const ManageUsers = () => {
     const [search, setSearch] = useState<string>('');
 
     //datatable
-    const [page, setPage] = useState(1);
-    const PAGE_SIZES = [10, 20, 30];
-    const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
     const [recordsData, setRecordsData] = useState([] as UserDataType[]);
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
         columnAccessor: 'firstName',
@@ -48,7 +58,7 @@ const ManageUsers = () => {
     useEffect(() => {
         const data = sortBy(recordsData, sortStatus.columnAccessor);
         setRecordsData(sortStatus.direction === 'desc' ? data.reverse() : data);
-        setPage(1);
+        dispatch(setPage(1));
     }, [sortStatus]);
 
     //get all user after page render
@@ -128,7 +138,7 @@ const ManageUsers = () => {
                             accessor: 'index',
                             title: '#',
                             width: 40,
-                            render: (record) => recordsData.indexOf(record) + 1,
+                            render: ({ srNo }) => srNo,
                         },
                         {
                             accessor: 'firstName',
@@ -230,9 +240,9 @@ const ManageUsers = () => {
                     totalRecords={totalRecords}
                     recordsPerPage={pageSize}
                     page={page}
-                    onPageChange={(p) => setPage(p)}
+                    onPageChange={(page) => dispatch(setPage(page))}
                     recordsPerPageOptions={data?.length < 10 ? [10] : PAGE_SIZES}
-                    onRecordsPerPageChange={setPageSize}
+                    onRecordsPerPageChange={(recordsPerPage) => dispatch(setPageSize(recordsPerPage))}
                     sortStatus={sortStatus}
                     onSortStatusChange={setSortStatus}
                     minHeight={200}

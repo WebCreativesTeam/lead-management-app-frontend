@@ -1,5 +1,5 @@
 import { SourceDataType, SourceInitialStateProps, UserDataType } from '@/utils/Types';
-import { fetchUserInfo } from '@/utils/contant';
+import { PAGE_SIZES, fetchUserInfo } from '@/utils/contant';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 const initialState: SourceInitialStateProps = {
@@ -17,6 +17,8 @@ const initialState: SourceInitialStateProps = {
     isAbleToDelete: false,
     userPolicyArr: [] as string[],
     totalRecords: 0,
+    pageSize: PAGE_SIZES[0],
+    page: 1,
 };
 
 const sourceSlice = createSlice({
@@ -66,8 +68,24 @@ const sourceSlice = createSlice({
                 state.singleData = {} as SourceDataType;
             }
         },
-        getAllSources(state, action) {
-            state.data = action.payload;
+        getAllSources(state, action: PayloadAction<SourceDataType[]>) {
+            let srNoArray: number[] = [];
+            for (let i = state.pageSize * state.page - state.pageSize; i <= state.pageSize * state.page; i++) {
+                srNoArray.push(i);
+            }
+            srNoArray.shift();
+            if (action.payload.length > 0) {
+                const serializedData = action.payload?.map((item, index) => {
+                    return { ...item, srNo: srNoArray[index] };
+                });
+                state.data = serializedData;
+            }
+        },
+        setPage(state, { payload }: PayloadAction<number>) {
+            state.page = payload;
+        },
+        setPageSize(state, { payload }: PayloadAction<number>) {
+            state.pageSize = payload;
         },
         setDisableBtn(state, action) {
             state.isBtnDisabled = action.payload;
@@ -110,5 +128,7 @@ export const {
     setSourceReadPolicy,
     setSourceUpdatePolicy,
     setSourceDataLength,
+    setPageSize,
+    setPage,
 } = sourceSlice.actions;
 export default sourceSlice.reducer;

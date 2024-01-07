@@ -11,7 +11,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setPageTitle } from '@/store/themeConfigSlice';
 import { IRootState } from '@/store';
 import { ApiClient } from '@/utils/http';
-import { getAllLeadPriorities, setCreateModal, setDefaultPriorityModal, setEditModal, setLeadPriorityDataLength, setViewModal } from '@/store/Slices/leadSlice/leadPrioritySlice';
+import { getAllLeadPriorities, setCreateModal, setDefaultPriorityModal, setEditModal, setLeadPriorityDataLength, setPage, setPageSize, setViewModal } from '@/store/Slices/leadSlice/leadPrioritySlice';
 import { setDeleteModal } from '@/store/Slices/leadSlice/leadPrioritySlice';
 import DeleteLeadPriorityModal from '@/components/Leads/LeadPriority/DeleteLeadPriorityModal';
 import CreateLeadPriorityModal from '@/components/Leads/LeadPriority/CreateLeadPriorityModal';
@@ -19,6 +19,7 @@ import EditLeadPriorityModal from '@/components/Leads/LeadPriority/EditLeadPrior
 import ChangeDefaultPriorityModal from '@/components/Leads/LeadPriority/ChangeDefaultPriorityModal';
 import ViewLeadPriorityModal from '@/components/Leads/LeadPriority/ViewLeadPriorityModal';
 import ToggleSwitch from '@/components/__Shared/ToggleSwitch';
+import { PAGE_SIZES } from '@/utils/contant';
 
 const LeadPriorityPage = () => {
     const dispatch = useDispatch();
@@ -27,15 +28,15 @@ const LeadPriorityPage = () => {
     });
 
     //hooks
-    const { data, isFetching, isAbleToChangeDefaultPriority, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate, totalRecords } = useSelector((state: IRootState) => state.leadPriority);
+    const { data, isFetching, isAbleToChangeDefaultPriority, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate, totalRecords, pageSize, page } = useSelector(
+        (state: IRootState) => state.leadPriority
+    );
     const [searchInputText, setSearchInputText] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(false);
     const [search, setSearch] = useState<string>('');
 
     //datatable
-    const [page, setPage] = useState(1);
-    const PAGE_SIZES = [10, 20, 30];
-    const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
+
     const [recordsData, setRecordsData] = useState<LeadPriorityType[]>([] as LeadPriorityType[]);
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
         columnAccessor: 'name',
@@ -48,7 +49,7 @@ const LeadPriorityPage = () => {
     useEffect(() => {
         const data = sortBy(recordsData, sortStatus.columnAccessor);
         setRecordsData(sortStatus.direction === 'desc' ? data.reverse() : data);
-        setPage(1);
+        dispatch(setPage(1));
     }, [sortStatus]);
 
     //get all leadPriority after page render
@@ -108,6 +109,12 @@ const LeadPriorityPage = () => {
                     className="table-hover whitespace-nowrap"
                     records={recordsData}
                     columns={[
+                        {
+                            accessor: 'index',
+                            title: '#',
+                            width: 40,
+                            render: ({ srNo }) => srNo,
+                        },
                         {
                             accessor: 'name',
                             title: 'Lead Priority Name',
@@ -187,9 +194,9 @@ const LeadPriorityPage = () => {
                     totalRecords={totalRecords}
                     recordsPerPage={pageSize}
                     page={page}
-                    onPageChange={(p) => setPage(p)}
+                    onPageChange={(page) => dispatch(setPage(page))}
                     recordsPerPageOptions={data?.length < 10 ? [10] : PAGE_SIZES}
-                    onRecordsPerPageChange={setPageSize}
+                    onRecordsPerPageChange={(recordsPerPage) => dispatch(setPageSize(recordsPerPage))}
                     sortStatus={sortStatus}
                     onSortStatusChange={setSortStatus}
                     minHeight={200}

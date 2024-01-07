@@ -10,13 +10,14 @@ import ConfirmationModal from '@/components/__Shared/ConfirmationModal';
 import { setPageTitle } from '@/store/themeConfigSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { BranchDataType, GetMethodResponseType } from '@/utils/Types';
-import { getAllBranches, setBranchDataLength, setCreateModal, setDeleteModal, setDisableBtn, setEditModal, setFetching, setViewModal } from '@/store/Slices/branchSlice';
+import { getAllBranches, setBranchDataLength, setCreateModal, setDeleteModal, setDisableBtn, setEditModal, setFetching, setPage, setPageSize, setViewModal } from '@/store/Slices/branchSlice';
 import BranchViewModal from '@/components/Branches/BranchViewModal';
 import { IRootState } from '@/store';
 import { ApiClient } from '@/utils/http';
 import BranchCreateModal from '@/components/Branches/BranchCreateModal';
 import BranchEditModal from '@/components/Branches/BranchEditModal';
 import Loader from '@/components/__Shared/Loader';
+import { PAGE_SIZES } from '@/utils/contant';
 
 const BranchPage = () => {
     const dispatch = useDispatch();
@@ -25,15 +26,15 @@ const BranchPage = () => {
     }, []);
 
     //hooks
-    const { data, isFetching, isBtnDisabled, deleteModal, singleData, isAbleToCreate, isAbleToDelete, isAbleToUpdate, isAbleToRead, totalRecords } = useSelector((state: IRootState) => state.branch);
+    const { data, isFetching, isBtnDisabled, deleteModal, singleData, isAbleToCreate, isAbleToDelete, isAbleToUpdate, isAbleToRead, totalRecords, page, pageSize } = useSelector(
+        (state: IRootState) => state.branch
+    );
     const [searchInputText, setSearchInputText] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(false);
     const [search, setSearch] = useState<string>('');
 
     //datatable
-    const [page, setPage] = useState(1);
-    const PAGE_SIZES = [10, 20, 30];
-    const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
+
     const [recordsData, setRecordsData] = useState<BranchDataType[]>([] as BranchDataType[]);
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
         columnAccessor: 'name',
@@ -43,7 +44,7 @@ const BranchPage = () => {
     useEffect(() => {
         const data = sortBy(recordsData, sortStatus.columnAccessor);
         setRecordsData(sortStatus.direction === 'desc' ? data.reverse() : data);
-        setPage(1);
+        dispatch(setPage(1));
     }, [sortStatus]);
     //useDefferedValue hook for search query
     const searchQuery = useDeferredValue(search);
@@ -122,6 +123,12 @@ const BranchPage = () => {
                     fetching={loading}
                     columns={[
                         {
+                            accessor: 'index',
+                            title: '#',
+                            width: 40,
+                            render: ({ srNo }) => srNo,
+                        },
+                        {
                             accessor: 'name',
                             title: 'Branch Name',
                             sortable: true,
@@ -189,9 +196,9 @@ const BranchPage = () => {
                     totalRecords={totalRecords}
                     recordsPerPage={pageSize}
                     page={page}
-                    onPageChange={(p) => setPage(p)}
+                    onPageChange={(page) => dispatch(setPage(page))}
                     recordsPerPageOptions={data?.length < 10 ? [10] : PAGE_SIZES}
-                    onRecordsPerPageChange={setPageSize}
+                    onRecordsPerPageChange={(recordsPerPage) => dispatch(setPageSize(recordsPerPage))}
                     sortStatus={sortStatus}
                     onSortStatusChange={setSortStatus}
                     minHeight={200}

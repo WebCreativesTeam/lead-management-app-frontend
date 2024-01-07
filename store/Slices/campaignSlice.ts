@@ -9,7 +9,7 @@ import {
     ILeadStatus,
     ProductSecondaryEndpointType,
 } from '@/utils/Types';
-import { fetchUserInfo } from '@/utils/contant';
+import { PAGE_SIZES, fetchUserInfo } from '@/utils/contant';
 import { ApiClient } from '@/utils/http';
 import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
 
@@ -37,6 +37,8 @@ const initialState: CampaignInitialStateProps = {
     userPolicyArr: [] as string[],
     totalRecords: 0,
     customDateFields: [] as ICustomField[],
+    pageSize: PAGE_SIZES[0],
+    page: 1,
 };
 
 export const getCustomDateFieldsList = createAsyncThunk('getCustomDates', async () => {
@@ -114,7 +116,23 @@ const campaignSlice = createSlice({
             }
         },
         getAllCampaigns(state, action: PayloadAction<ICampaign[]>) {
-            state.data = action.payload;
+            let srNoArray: number[] = [];
+            for (let i = state.pageSize * state.page - state.pageSize; i <= state.pageSize * state.page; i++) {
+                srNoArray.push(i);
+            }
+            srNoArray.shift();
+            if (action.payload.length > 0) {
+                const serializedData = action.payload?.map((item, index) => {
+                    return { ...item, srNo: srNoArray[index] };
+                });
+                state.data = serializedData;
+            }
+        },
+        setPage(state, { payload }: PayloadAction<number>) {
+            state.page = payload;
+        },
+        setPageSize(state, { payload }: PayloadAction<number>) {
+            state.pageSize = payload;
         },
         getAllLeadStatusForCampaign(state, action: PayloadAction<ILeadStatus[]>) {
             state.leadStatusList = action.payload;
@@ -187,5 +205,7 @@ export const {
     getAllEmailTemplatesForCampaign,
     getAllWhatsappTemplatesForCampaign,
     getAllSmsTemplatesForCampaign,
+    setPageSize,
+    setPage,
 } = campaignSlice.actions;
 export default campaignSlice.reducer;

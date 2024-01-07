@@ -1,5 +1,5 @@
 import { IProduct, ProductColorSecondaryEndpointType, ProductInitialStateProps, UserDataType } from '@/utils/Types';
-import { fetchUserInfo } from '@/utils/contant';
+import { PAGE_SIZES, fetchUserInfo } from '@/utils/contant';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 const initialState: ProductInitialStateProps = {
@@ -18,6 +18,8 @@ const initialState: ProductInitialStateProps = {
     userPolicyArr: [] as string[],
     totalRecords: 0,
     colors: [] as ProductColorSecondaryEndpointType[],
+    pageSize: PAGE_SIZES[0],
+    page: 1,
 };
 
 const productSlice = createSlice({
@@ -67,8 +69,24 @@ const productSlice = createSlice({
                 state.singleData = {} as IProduct;
             }
         },
-        getAllProducts(state, action) {
-            state.data = action.payload;
+        getAllProducts(state, action: PayloadAction<IProduct[]>) {
+            let srNoArray: number[] = [];
+            for (let i = state.pageSize * state.page - state.pageSize; i <= state.pageSize * state.page; i++) {
+                srNoArray.push(i);
+            }
+            srNoArray.shift();
+            if (action.payload.length > 0) {
+                const serializedData = action.payload?.map((item, index) => {
+                    return { ...item, srNo: srNoArray[index] };
+                });
+                state.data = serializedData;
+            }
+        },
+        setPage(state, { payload }: PayloadAction<number>) {
+            state.page = payload;
+        },
+        setPageSize(state, { payload }: PayloadAction<number>) {
+            state.pageSize = payload;
         },
         getAllProductColorForProduct(state, action: PayloadAction<ProductColorSecondaryEndpointType[]>) {
             state.colors = action.payload;
@@ -115,5 +133,7 @@ export const {
     setProductUpdatePolicy,
     setProductDataLength,
     getAllProductColorForProduct,
+    setPageSize,
+    setPage,
 } = productSlice.actions;
 export default productSlice.reducer;

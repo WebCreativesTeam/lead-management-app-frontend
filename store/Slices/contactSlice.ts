@@ -1,5 +1,5 @@
 import { ContactDataType, ContactInitialStateProps, SourceDataType, UserDataType, UserListSecondaryEndpointType } from '@/utils/Types';
-import { fetchUserInfo, showToastAlert } from '@/utils/contant';
+import { PAGE_SIZES, fetchUserInfo, showToastAlert } from '@/utils/contant';
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 
 const initialState: ContactInitialStateProps = {
@@ -18,7 +18,9 @@ const initialState: ContactInitialStateProps = {
     userPolicyArr: [] as string[],
     usersList: [] as UserListSecondaryEndpointType[],
     sourceList: [] as SourceDataType[],
-    totalRecords:0
+    totalRecords: 0,
+    pageSize: PAGE_SIZES[0],
+    page: 1,
 };
 
 const contactSlice = createSlice({
@@ -68,8 +70,24 @@ const contactSlice = createSlice({
                 state.singleData = {} as ContactDataType;
             }
         },
-        getAllContacts(state, action) {
-            state.data = action.payload;
+        getAllContacts(state, action: PayloadAction<ContactDataType[]>) {
+            let srNoArray: number[] = [];
+            for (let i = state.pageSize * state.page - state.pageSize; i <= state.pageSize * state.page; i++) {
+                srNoArray.push(i);
+            }
+            srNoArray.shift();
+            if (action.payload.length > 0) {
+                const serializedData = action.payload?.map((item, index) => {
+                    return { ...item, srNo: srNoArray[index] };
+                });
+                state.data = serializedData;
+            }
+        },
+        setPage(state, { payload }: PayloadAction<number>) {
+            state.page = payload;
+        },
+        setPageSize(state, { payload }: PayloadAction<number>) {
+            state.pageSize = payload;
         },
         getAllUsersForContact(state, action) {
             state.usersList = action.payload;
@@ -119,7 +137,8 @@ export const {
     setContactUpdatePolicy,
     getAllUsersForContact,
     getAllSourceForContact,
-    setContactDataLength
-
+    setContactDataLength,
+    setPageSize,
+    setPage,
 } = contactSlice.actions;
 export default contactSlice.reducer;

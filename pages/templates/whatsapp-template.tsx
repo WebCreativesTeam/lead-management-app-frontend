@@ -11,11 +11,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setPageTitle } from '@/store/themeConfigSlice';
 import { IRootState } from '@/store';
 import { ApiClient } from '@/utils/http';
-import { getAllWhatsappTemplates, setCreateModal, setEditModal, setViewModal, setDeleteModal, setWhatsappTemplateDataLength } from '@/store/Slices/templateSlice/whatsappTemplateSlice';
+import { getAllWhatsappTemplates, setCreateModal, setEditModal, setViewModal, setDeleteModal, setWhatsappTemplateDataLength, setPage, setPageSize } from '@/store/Slices/templateSlice/whatsappTemplateSlice';
 import DeleteWhatsappTemplateModal from '@/components/Templates/WhatsAppTemplate/DeleteWhatsappTemplateModal';
 import CreateWhatsappTemplateModal from '@/components/Templates/WhatsAppTemplate/CreateWhatsappTemplateModal';
 import EditWhatsappTemplateModal from '@/components/Templates/WhatsAppTemplate/EditWhatsappTemplateModal';
 import ViewWhatsappTemplateModal from '@/components/Templates/WhatsAppTemplate/ViewWhatsappTemplateModal';
+import { PAGE_SIZES } from '@/utils/contant';
 
 const WhatsappTemplatePage = () => {
     const dispatch = useDispatch();
@@ -24,15 +25,13 @@ const WhatsappTemplatePage = () => {
     });
 
     //hooks
-    const { data, isFetching, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate, totalRecords } = useSelector((state: IRootState) => state.whatsappTemplate);
+    const { data, isFetching, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate, totalRecords, pageSize, page } = useSelector((state: IRootState) => state.whatsappTemplate);
     const [searchInputText, setSearchInputText] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(false);
     const [search, setSearch] = useState<string>('');
 
     //datatable
-    const [page, setPage] = useState(1);
-    const PAGE_SIZES = [10, 20, 30];
-    const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
+
     const [recordsData, setRecordsData] = useState<IWhatsappTemplate[]>([] as IWhatsappTemplate[]);
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
         columnAccessor: 'name',
@@ -45,7 +44,7 @@ const WhatsappTemplatePage = () => {
     useEffect(() => {
         const data = sortBy(recordsData, sortStatus.columnAccessor);
         setRecordsData(sortStatus.direction === 'desc' ? data.reverse() : data);
-        setPage(1);
+        dispatch(setPage(1));
     }, [sortStatus]);
 
     //get all whatsappTemplate after page render
@@ -108,6 +107,12 @@ const WhatsappTemplatePage = () => {
                     records={recordsData}
                     columns={[
                         {
+                            accessor: 'index',
+                            title: '#',
+                            width: 40,
+                            render: ({ srNo }) => srNo,
+                        },
+                        {
                             accessor: 'name',
                             title: 'Whatsapp Template Name',
                             sortable: true,
@@ -157,9 +162,9 @@ const WhatsappTemplatePage = () => {
                     totalRecords={totalRecords}
                     recordsPerPage={pageSize}
                     page={page}
-                    onPageChange={(p) => setPage(p)}
+                    onPageChange={(page) => dispatch(setPage(page))}
                     recordsPerPageOptions={data?.length < 10 ? [10] : PAGE_SIZES}
-                    onRecordsPerPageChange={setPageSize}
+                    onRecordsPerPageChange={(recordsPerPage) => dispatch(setPageSize(recordsPerPage))}
                     sortStatus={sortStatus}
                     onSortStatusChange={setSortStatus}
                     minHeight={200}

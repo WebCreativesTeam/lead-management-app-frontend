@@ -11,19 +11,20 @@ import { setPageTitle } from '@/store/themeConfigSlice';
 import { GetMethodResponseType, IProduct, IProductColor, ProductColorSecondaryEndpointType } from '@/utils/Types';
 import { ApiClient } from '@/utils/http';
 import { IRootState } from '@/store';
-import { getAllProductColorForProduct, getAllProducts, setCreateModal, setDeleteModal, setEditModal, setProductDataLength, setViewModal } from '@/store/Slices/productSlice';
+import { getAllProductColorForProduct, getAllProducts, setCreateModal, setDeleteModal, setEditModal, setPage, setPageSize, setProductDataLength, setViewModal } from '@/store/Slices/productSlice';
 import ProductViewModal from '@/components/Product/ProductViewModal';
 import ProductCreateModal from '@/components/Product/ProductCreateModal';
 import ProductEditModal from '@/components/Product/ProductEditModal';
 import ProductDeleteModal from '@/components/Product/ProductDeleteModal';
 import Link from 'next/link';
+import { PAGE_SIZES } from '@/utils/contant';
 
 const Product = () => {
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('Track Leads | Products'));
     });
-    const { data, isFetching, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate, totalRecords } = useSelector((state: IRootState) => state.product);
+    const { data, isFetching, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate, totalRecords, pageSize, page } = useSelector((state: IRootState) => state.product);
 
     //hooks
     const [searchInputText, setSearchInputText] = useState<string>('');
@@ -31,9 +32,7 @@ const Product = () => {
     const [search, setSearch] = useState<string>('');
 
     //datatable
-    const [page, setPage] = useState(1);
-    const PAGE_SIZES = [10, 20, 30];
-    const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
+
     const [recordsData, setRecordsData] = useState<IProduct[]>([] as IProduct[]);
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
         columnAccessor: 'name',
@@ -45,7 +44,7 @@ const Product = () => {
     useEffect(() => {
         const data = sortBy(recordsData, sortStatus.columnAccessor);
         setRecordsData(sortStatus.direction === 'desc' ? data.reverse() : data);
-        setPage(1);
+        dispatch(setPage(1));
     }, [sortStatus]);
 
     //get all product after page render
@@ -125,6 +124,12 @@ const Product = () => {
                         records={recordsData}
                         columns={[
                             {
+                                accessor: 'index',
+                                title: '#',
+                                width: 40,
+                                render: ({ srNo }) => srNo,
+                            },
+                            {
                                 accessor: 'name',
                                 title: 'Product Name',
                                 sortable: true,
@@ -180,9 +185,9 @@ const Product = () => {
                         totalRecords={totalRecords}
                         recordsPerPage={pageSize}
                         page={page}
-                        onPageChange={(p) => setPage(p)}
+                        onPageChange={(page) => dispatch(setPage(page))}
                         recordsPerPageOptions={data?.length < 10 ? [10] : PAGE_SIZES}
-                        onRecordsPerPageChange={setPageSize}
+                        onRecordsPerPageChange={(recordsPerPage) => dispatch(setPageSize(recordsPerPage))}
                         sortStatus={sortStatus}
                         onSortStatusChange={setSortStatus}
                         minHeight={200}

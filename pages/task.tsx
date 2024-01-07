@@ -24,6 +24,8 @@ import {
     setCreateModal,
     setDeleteModal,
     setEditModal,
+    setPage,
+    setPageSize,
     setTaskDataLength,
     setTransferTaskModal,
     setViewModal,
@@ -36,6 +38,7 @@ import ViewTaskModal from '@/components/Tasks/ManageTasks/ViewTaskModal';
 import ChangeTaskPriorityModal from '@/components/Tasks/ManageTasks/ChangeTaskPriorityModal';
 import ChangeTaskStatusModal from '@/components/Tasks/ManageTasks/ChangeTaskStatusModal';
 import TransferTaskModal from '@/components/Tasks/ManageTasks/TransferTaskModal';
+import { PAGE_SIZES } from '@/utils/contant';
 
 const TaskPage = () => {
     const dispatch = useDispatch();
@@ -44,7 +47,7 @@ const TaskPage = () => {
     }, []);
 
     //hooks
-    const { data, isFetching, taskPriorityList, taskStatusList, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate, isAbleToTransferTask, totalRecords } = useSelector(
+    const { data, isFetching, taskPriorityList, taskStatusList, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate, isAbleToTransferTask, totalRecords, pageSize, page } = useSelector(
         (state: IRootState) => state.task
     );
     const [searchInputText, setSearchInputText] = useState<string>('');
@@ -56,9 +59,7 @@ const TaskPage = () => {
     const searchQuery = useDeferredValue(search);
 
     //datatable
-    const [page, setPage] = useState(1);
-    const PAGE_SIZES = [10, 20, 30];
-    const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
+
     const [recordsData, setRecordsData] = useState<TaskDataType[]>([] as TaskDataType[]);
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
         columnAccessor: 'title',
@@ -68,7 +69,7 @@ const TaskPage = () => {
     useEffect(() => {
         const data = sortBy(recordsData, sortStatus.columnAccessor);
         setRecordsData(sortStatus.direction === 'desc' ? data.reverse() : data);
-        setPage(1);
+        dispatch(setPage(1));
     }, [sortStatus]);
 
     //get all task after page render
@@ -207,6 +208,12 @@ const TaskPage = () => {
                     className="table-hover whitespace-nowrap"
                     records={recordsData}
                     columns={[
+                        {
+                            accessor: 'index',
+                            title: '#',
+                            width: 40,
+                            render: ({ srNo }) => srNo,
+                        },
                         {
                             accessor: 'title',
                             title: 'Task Name',
@@ -364,9 +371,9 @@ const TaskPage = () => {
                     totalRecords={totalRecords}
                     recordsPerPage={pageSize}
                     page={page}
-                    onPageChange={(p) => setPage(p)}
+                    onPageChange={(page) => dispatch(setPage(page))}
                     recordsPerPageOptions={data?.length < 10 ? [10] : PAGE_SIZES}
-                    onRecordsPerPageChange={setPageSize}
+                    onRecordsPerPageChange={(recordsPerPage) => dispatch(setPageSize(recordsPerPage))}
                     sortStatus={sortStatus}
                     onSortStatusChange={setSortStatus}
                     minHeight={200}

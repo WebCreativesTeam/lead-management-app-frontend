@@ -12,7 +12,7 @@ import {
     ProductSecondaryEndpointType,
     OverviewFormType,
 } from '@/utils/Types';
-import { fetchUserInfo } from '@/utils/contant';
+import { PAGE_SIZES, fetchUserInfo } from '@/utils/contant';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 const initialState: ManageLeadInitialStateProps = {
@@ -46,6 +46,8 @@ const initialState: ManageLeadInitialStateProps = {
     overViewFormData: {} as OverviewFormType,
     isOverviewTabDisabled: false,
     leadNoteList: [] as ILeadNotes[],
+    pageSize: PAGE_SIZES[0],
+    page: 1,
 };
 
 const manageLeadSlice = createSlice({
@@ -123,8 +125,24 @@ const manageLeadSlice = createSlice({
                 state.singleData = {} as LeadDataType;
             }
         },
-        getAllLeads(state, action) {
-            state.data = action.payload;
+        getAllLeads(state, action: PayloadAction<LeadDataType[]>) {
+            let srNoArray: number[] = [];
+            for (let i = state.pageSize * state.page - state.pageSize; i <= state.pageSize * state.page; i++) {
+                srNoArray.push(i);
+            }
+            srNoArray.shift();
+            if (action.payload.length > 0) {
+                const serializedData = action.payload?.map((item, index) => {
+                    return { ...item, srNo: srNoArray[index] };
+                });
+                state.data = serializedData;
+            }
+        },
+        setPage(state, { payload }: PayloadAction<number>) {
+            state.page = payload;
+        },
+        setPageSize(state, { payload }: PayloadAction<number>) {
+            state.pageSize = payload;
         },
         getAllContactsForLead(state, action) {
             state.leadContactsList = action.payload;
@@ -217,5 +235,7 @@ export const {
     setIsOverviewTabDisabled,
     getAllNotesForLead,
     getAllSubProductsForLead,
+    setPageSize,
+    setPage,
 } = manageLeadSlice.actions;
 export default manageLeadSlice.reducer;

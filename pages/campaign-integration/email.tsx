@@ -11,11 +11,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setPageTitle } from '@/store/themeConfigSlice';
 import { IRootState } from '@/store';
 import { ApiClient } from '@/utils/http';
-import { getAllEmailSmtp, setCreateModal, setEditModal, setViewModal, setDeleteModal, setEmailSmtpDataLength } from '@/store/Slices/emailSlice/emailSmtpSlice';
+import { getAllEmailSmtp, setCreateModal, setEditModal, setViewModal, setDeleteModal, setEmailSmtpDataLength, setPageSize, setPage } from '@/store/Slices/emailSlice/emailSmtpSlice';
 import DeleteEmailSmtpModal from '@/components/emails/SMTP/DeleteEmailSmtpModal';
 import CreateEmailSmtpModal from '@/components/emails/SMTP/CreateEmailSmtpModal';
 import EditEmailSmtpModal from '@/components/emails/SMTP/EditEmailSmtpModal';
 import ViewEmailSmtpModal from '@/components/emails/SMTP/ViewEmailSmtpModal';
+import { PAGE_SIZES } from '@/utils/contant';
 
 const EmailSmtpPage = () => {
     const dispatch = useDispatch();
@@ -24,15 +25,13 @@ const EmailSmtpPage = () => {
     });
 
     //hooks
-    const { data, isFetching, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate, totalRecords } = useSelector((state: IRootState) => state.emailSmtp);
+    const { data, isFetching, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate, totalRecords, pageSize, page } = useSelector((state: IRootState) => state.emailSmtp);
     const [searchInputText, setSearchInputText] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(false);
     const [search, setSearch] = useState<string>('');
 
     //datatable
-    const [page, setPage] = useState(1);
-    const PAGE_SIZES = [10, 20, 30];
-    const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
+
     const [recordsData, setRecordsData] = useState<IEmailSmtp[]>([] as IEmailSmtp[]);
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
         columnAccessor: 'name',
@@ -45,7 +44,7 @@ const EmailSmtpPage = () => {
     useEffect(() => {
         const data = sortBy(recordsData, sortStatus.columnAccessor);
         setRecordsData(sortStatus.direction === 'desc' ? data.reverse() : data);
-        setPage(1);
+        dispatch(setPage(1));
     }, [sortStatus]);
 
     //get all emailSmtp after page render
@@ -99,6 +98,12 @@ const EmailSmtpPage = () => {
                     className="table-hover whitespace-nowrap"
                     records={recordsData}
                     columns={[
+                        {
+                            accessor: 'index',
+                            title: '#',
+                            width: 40,
+                            render: ({ srNo }) => srNo,
+                        },
                         {
                             accessor: 'SMTP',
                             title: 'SMTP',
@@ -161,9 +166,9 @@ const EmailSmtpPage = () => {
                     totalRecords={totalRecords}
                     recordsPerPage={pageSize}
                     page={page}
-                    onPageChange={(p) => setPage(p)}
+                    onPageChange={(page) => dispatch(setPage(page))}
                     recordsPerPageOptions={data?.length < 10 ? [10] : PAGE_SIZES}
-                    onRecordsPerPageChange={setPageSize}
+                    onRecordsPerPageChange={(recordsPerPage) => dispatch(setPageSize(recordsPerPage))}
                     sortStatus={sortStatus}
                     onSortStatusChange={setSortStatus}
                     minHeight={200}

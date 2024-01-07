@@ -1,5 +1,5 @@
 import { TaskStatusInitialStateProps, TaskStatusType, UserDataType } from '@/utils/Types';
-import { fetchUserInfo, showToastAlert } from '@/utils/contant';
+import { PAGE_SIZES, fetchUserInfo, showToastAlert } from '@/utils/contant';
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 
 const initialState: TaskStatusInitialStateProps = {
@@ -19,6 +19,8 @@ const initialState: TaskStatusInitialStateProps = {
     isAbleToChangeDefaultStatus: false,
     userPolicyArr: [] as string[],
     totalRecords: 0,
+    pageSize: PAGE_SIZES[0],
+    page: 1,
 };
 
 const taskStatusSlice = createSlice({
@@ -86,8 +88,24 @@ const taskStatusSlice = createSlice({
                 state.singleData = {} as TaskStatusType;
             }
         },
-        getAllTaskStatus(state, action) {
-            state.data = action.payload;
+        getAllTaskStatus(state, action: PayloadAction<TaskStatusType[]>) {
+            let srNoArray: number[] = [];
+            for (let i = state.pageSize * state.page - state.pageSize; i <= state.pageSize * state.page; i++) {
+                srNoArray.push(i);
+            }
+            srNoArray.shift();
+            if (action.payload.length > 0) {
+                const serializedData = action.payload?.map((item, index) => {
+                    return { ...item, srNo: srNoArray[index] };
+                });
+                state.data = serializedData;
+            }
+        },
+        setPage(state, { payload }: PayloadAction<number>) {
+            state.page = payload;
+        },
+        setPageSize(state, { payload }: PayloadAction<number>) {
+            state.pageSize = payload;
         },
         setDisableBtn(state, action) {
             state.isBtnDisabled = action.payload;
@@ -136,5 +154,7 @@ export const {
     setTaskStatusUpdatePolicy,
     setChangeDefaultTaskStatusPermission,
     setTaskStatusDataLength,
+    setPageSize,
+    setPage,
 } = taskStatusSlice.actions;
 export default taskStatusSlice.reducer;

@@ -32,6 +32,7 @@ export type PolicyDataType = {
     description: string;
     permissions: string[];
     isDefault: boolean;
+    srNo: number;
 };
 
 //users Page
@@ -50,6 +51,7 @@ export type UserDataType = {
         description: string;
     }[];
     token: string;
+    srNo: number;
 };
 
 export type UserListSecondaryEndpointType = {
@@ -63,6 +65,7 @@ export type UserListSecondaryEndpointType = {
 export type SourceDataType = {
     name: string;
     id: string;
+    srNo: number;
 };
 
 //source page
@@ -73,6 +76,7 @@ export type IProduct = {
     createdAt: string;
     updatedAt: string;
     subProducts: { id: string; name: string; colors: { id: string; name: string; value: string }[] }[];
+    srNo: number;
 };
 
 //taskPage
@@ -127,6 +131,7 @@ export type TaskDataType = {
         id: string;
         name: string;
     };
+    srNo: number;
 };
 
 export type TaskSelectOptions = {
@@ -183,6 +188,7 @@ export type TaskPriorityType = {
     updatedAt: string;
     isDefault: boolean;
     color: string;
+    srNo: number;
 };
 
 export type TaskPrioritySecondaryEndpoint = {
@@ -197,6 +203,7 @@ export type LeadPriorityType = {
     updatedAt: string;
     isDefault: boolean;
     color: string;
+    srNo: number;
 };
 
 export type TaskStatusType = {
@@ -206,6 +213,7 @@ export type TaskStatusType = {
     updatedAt: string;
     isDefault: boolean;
     color: string;
+    srNo: number;
 };
 export type LeadStatusType = {
     name: string;
@@ -214,6 +222,7 @@ export type LeadStatusType = {
     updatedAt: string;
     isDefault: boolean;
     color: string;
+    srNo: number;
 };
 
 export interface ContactDataType {
@@ -255,6 +264,7 @@ export interface ContactDataType {
     altPhoneNumber: string;
     DOB: string;
     anniversary: string;
+    srNo: number;
 }
 
 //branch page types //
@@ -268,6 +278,7 @@ export type BranchDataType = {
     country: string;
     createdAt: string;
     updatedAt: string;
+    srNo: number;
 };
 
 // email template types
@@ -278,6 +289,7 @@ export interface IEmailTemplate {
     createdAt: string;
     updatedAt: string;
     id: string;
+    srNo: number;
 }
 
 // send email types
@@ -300,6 +312,7 @@ export interface ISmsTemplate {
     message: string;
     createdAt: string;
     updatedAt: string;
+    srNo: number;
 }
 
 //whatsapp template types
@@ -336,6 +349,7 @@ export type LeadDataType = {
     contact: ContactDataType;
     source: SourceDataType;
     branch: BranchDataType;
+    srNo: number;
 };
 
 export type LeadListSecondaryEndpointType = {
@@ -353,6 +367,7 @@ export interface ILeadStatus {
     isDefault: boolean;
     createdAt: string;
     updatedAt: string;
+    srNo: number;
 }
 
 export interface ILeadPriority {
@@ -362,6 +377,7 @@ export interface ILeadPriority {
     isDefault: boolean;
     createdAt: string;
     updatedAt: string;
+    srNo: number;
 }
 
 //Emails SMTP types
@@ -376,6 +392,7 @@ export interface IEmailSmtp {
     password: string;
     createdAt: string;
     updatedAt: string;
+    srNo: number;
 }
 
 //campaign page
@@ -406,6 +423,7 @@ export interface ICampaign {
     isAllSource?: boolean;
     isAllProduct?: boolean;
     isAllStatus?: boolean;
+    srNo: number;
 }
 
 // dashboard page types
@@ -438,6 +456,7 @@ export interface ICustomField {
     operator: string;
     options: { name: string; value: string }[];
     parentValue: string;
+    srNo: number;
 }
 
 export interface IFiedlListType {
@@ -451,6 +470,7 @@ export interface IProductColor {
     value: string;
     createdAt: string;
     updatedAt: string;
+    srNo: number;
 }
 
 export interface ProductColorSecondaryEndpointType {
@@ -472,6 +492,7 @@ export interface ILeadNotes {
     content: string;
     userId: string;
     leadId: string;
+    srNo: number;
 }
 
 export interface ILeadAssignment extends ICommonResponse {
@@ -491,6 +512,7 @@ export interface ILeadAssignment extends ICommonResponse {
     }[];
     isAllSource: boolean;
     isAllProduct: boolean;
+    srNo: number;
 }
 
 // ----------------- authentication types : start -------------------//
@@ -517,6 +539,8 @@ export interface InitialStateProps {
     isAbleToDelete: boolean;
     userPolicyArr: string[];
     totalRecords: number;
+    page: number;
+    pageSize: number;
 }
 
 //contact slice initial props
@@ -730,6 +754,8 @@ export interface EmailTemplateInitialStateProps {
     isAbleToDelete: boolean;
     userPolicyArr: string[];
     totalRecords: number;
+    pageSize: number;
+    page: number;
 }
 
 // email slice initial props

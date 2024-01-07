@@ -10,7 +10,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setPageTitle } from '@/store/themeConfigSlice';
 import { GetMethodResponseType, Permission, PolicyDataType } from '@/utils/Types';
 import { ApiClient } from '@/utils/http';
-import { getAllPermissions, getAllPolicies, setCreateModal, setDefaultPolicyModal, setDeleteModal, setEditModal, setPolicyDataLength, setViewModal } from '@/store/Slices/policySlice';
+import { getAllPermissions, getAllPolicies, setCreateModal, setDefaultPolicyModal, setDeleteModal, setEditModal, setPage, setPageSize, setPolicyDataLength, setViewModal } from '@/store/Slices/policySlice';
 import { IRootState } from '@/store';
 import PolicyCreateModal from '@/components/Policy/PolicyCreateModal';
 import PolicyEditModal from '@/components/Policy/PolicyEditModal';
@@ -18,6 +18,7 @@ import ChangeDefaultPolicyModal from '@/components/Policy/ChangeDefaultPolicyMod
 import PolicyDeleteModal from '@/components/Policy/PolicyDeleteModal';
 import PolicyViewModal from '@/components/Policy/PolicyViewModal';
 import ToggleSwitch from '@/components/__Shared/ToggleSwitch';
+import { PAGE_SIZES } from '@/utils/contant';
 
 const PolicyPage = () => {
     const dispatch = useDispatch();
@@ -26,15 +27,15 @@ const PolicyPage = () => {
     });
 
     //hooks
-    const { data, isFetching, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate, isAbleToChangeDefaultPolicy, totalRecords } = useSelector((state: IRootState) => state.policy);
+    const { data, isFetching, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate, isAbleToChangeDefaultPolicy, totalRecords, pageSize, page } = useSelector(
+        (state: IRootState) => state.policy
+    );
     const [searchInputText, setSearchInputText] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(false);
     const [search, setSearch] = useState<string>('');
 
     //datatable
-    const [page, setPage] = useState(1);
-    const PAGE_SIZES = [10, 20, 30];
-    const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
+
     const [recordsData, setRecordsData] = useState<PolicyDataType[]>([] as PolicyDataType[]);
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
         columnAccessor: 'name',
@@ -46,7 +47,7 @@ const PolicyPage = () => {
     useEffect(() => {
         const data = sortBy(recordsData, sortStatus.columnAccessor);
         setRecordsData(sortStatus.direction === 'desc' ? data.reverse() : data);
-        setPage(1);
+        dispatch(setPage(1));
     }, [sortStatus]);
 
     //get all policy after page render
@@ -126,6 +127,12 @@ const PolicyPage = () => {
                     fetching={loading}
                     columns={[
                         {
+                            accessor: 'index',
+                            title: '#',
+                            width: 40,
+                            render: ({ srNo }) => srNo,
+                        },
+                        {
                             accessor: 'name',
                             title: 'Policy Name',
                             sortable: true,
@@ -194,9 +201,9 @@ const PolicyPage = () => {
                     totalRecords={totalRecords}
                     recordsPerPage={pageSize}
                     page={page}
-                    onPageChange={(p) => setPage(p)}
+                    onPageChange={(page) => dispatch(setPage(page))}
                     recordsPerPageOptions={data?.length < 10 ? [10] : PAGE_SIZES}
-                    onRecordsPerPageChange={setPageSize}
+                    onRecordsPerPageChange={(recordsPerPage) => dispatch(setPageSize(recordsPerPage))}
                     sortStatus={sortStatus}
                     onSortStatusChange={setSortStatus}
                     minHeight={200}

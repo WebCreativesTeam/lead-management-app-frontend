@@ -11,11 +11,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setPageTitle } from '@/store/themeConfigSlice';
 import { IRootState } from '@/store';
 import { ApiClient } from '@/utils/http';
-import { getAllSmsTemplates, setCreateModal, setEditModal, setViewModal, setDeleteModal, setSmsTemplateDataLength } from '@/store/Slices/templateSlice/smsTemplateSlice';
+import { getAllSmsTemplates, setCreateModal, setEditModal, setViewModal, setDeleteModal, setSmsTemplateDataLength, setPageSize, setPage } from '@/store/Slices/templateSlice/smsTemplateSlice';
 import DeleteSmsTemplateModal from '@/components/Templates/SmsTemplate/DeleteSmsTemplateModal';
 import CreateSmsTemplateModal from '@/components/Templates/SmsTemplate/CreateSmsTemplateModal';
 import EditSmsTemplateModal from '@/components/Templates/SmsTemplate/EditSmsTemplateModal';
 import ViewSmsTemplateModal from '@/components/Templates/SmsTemplate/ViewSmsTemplateModal';
+import { PAGE_SIZES } from '@/utils/contant';
 
 const SmsTemplatePage = () => {
     const dispatch = useDispatch();
@@ -24,15 +25,13 @@ const SmsTemplatePage = () => {
     });
 
     //hooks
-    const { data, isFetching, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate, totalRecords } = useSelector((state: IRootState) => state.smsTemplate);
+    const { data, isFetching, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate, totalRecords, pageSize, page } = useSelector((state: IRootState) => state.smsTemplate);
     const [searchInputText, setSearchInputText] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(false);
     const [search, setSearch] = useState<string>('');
 
     //datatable
-    const [page, setPage] = useState(1);
-    const PAGE_SIZES = [10, 20, 30];
-    const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
+
     const [recordsData, setRecordsData] = useState<ISmsTemplate[]>([] as ISmsTemplate[]);
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
         columnAccessor: 'name',
@@ -45,7 +44,7 @@ const SmsTemplatePage = () => {
     useEffect(() => {
         const data = sortBy(recordsData, sortStatus.columnAccessor);
         setRecordsData(sortStatus.direction === 'desc' ? data.reverse() : data);
-        setPage(1);
+        dispatch(setPage(1));
     }, [sortStatus]);
 
     //get all smsTemplate after page render
@@ -106,6 +105,12 @@ const SmsTemplatePage = () => {
                     records={recordsData}
                     columns={[
                         {
+                            accessor: 'index',
+                            title: '#',
+                            width: 40,
+                            render: ({ srNo }) => srNo,
+                        },
+                        {
                             accessor: 'name',
                             title: 'Sms Template Name',
                             sortable: true,
@@ -155,9 +160,9 @@ const SmsTemplatePage = () => {
                     totalRecords={totalRecords}
                     recordsPerPage={pageSize}
                     page={page}
-                    onPageChange={(p) => setPage(p)}
+                    onPageChange={(page) => dispatch(setPage(page))}
                     recordsPerPageOptions={data?.length < 10 ? [10] : PAGE_SIZES}
-                    onRecordsPerPageChange={setPageSize}
+                    onRecordsPerPageChange={(recordsPerPage) => dispatch(setPageSize(recordsPerPage))}
                     sortStatus={sortStatus}
                     onSortStatusChange={setSortStatus}
                     minHeight={200}

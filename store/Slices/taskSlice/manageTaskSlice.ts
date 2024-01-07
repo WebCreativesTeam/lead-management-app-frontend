@@ -1,6 +1,16 @@
-import { TaskDataType, ManageTaskInitialStateProps, TaskSelectOptions, UserDataType, LeadDataType, UserListSecondaryEndpointType, LeadListSecondaryEndpointType, TaskPrioritySecondaryEndpoint, TaskStatusSecondaryEndpoint } from '@/utils/Types';
-import { fetchUserInfo } from '@/utils/contant';
-import { createSlice,PayloadAction } from '@reduxjs/toolkit';
+import {
+    TaskDataType,
+    ManageTaskInitialStateProps,
+    TaskSelectOptions,
+    UserDataType,
+    LeadDataType,
+    UserListSecondaryEndpointType,
+    LeadListSecondaryEndpointType,
+    TaskPrioritySecondaryEndpoint,
+    TaskStatusSecondaryEndpoint,
+} from '@/utils/Types';
+import { PAGE_SIZES, fetchUserInfo } from '@/utils/contant';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 const initialState: ManageTaskInitialStateProps = {
     data: [] as TaskDataType[],
@@ -26,7 +36,9 @@ const initialState: ManageTaskInitialStateProps = {
     isAbleToTransferTask: false,
     transferTaskModal: false,
     userPolicyArr: [] as string[],
-    totalRecords: 0
+    totalRecords: 0,
+    pageSize: PAGE_SIZES[0],
+    page: 1,
 };
 
 const manageTaskSlice = createSlice({
@@ -115,8 +127,24 @@ const manageTaskSlice = createSlice({
                 state.singleData = {} as TaskDataType;
             }
         },
-        getAllTasks(state, action) {
-            state.data = action.payload;
+        getAllTasks(state, action: PayloadAction<TaskDataType[]>) {
+            let srNoArray: number[] = [];
+            for (let i = state.pageSize * state.page - state.pageSize; i <= state.pageSize * state.page; i++) {
+                srNoArray.push(i);
+            }
+            srNoArray.shift();
+            if (action.payload.length > 0) {
+                const serializedData = action.payload?.map((item, index) => {
+                    return { ...item, srNo: srNoArray[index] };
+                });
+                state.data = serializedData;
+            }
+        },
+        setPage(state, { payload }: PayloadAction<number>) {
+            state.page = payload;
+        },
+        setPageSize(state, { payload }: PayloadAction<number>) {
+            state.pageSize = payload;
         },
         getAllUsersForTask(state, action) {
             state.usersList = action.payload;
@@ -182,6 +210,8 @@ export const {
     getAllLeadsForTask,
     setTaskTransferPermission,
     setTransferTaskModal,
-    setTaskDataLength
+    setTaskDataLength,
+    setPageSize,
+    setPage,
 } = manageTaskSlice.actions;
 export default manageTaskSlice.reducer;

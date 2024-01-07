@@ -11,10 +11,11 @@ import { setPageTitle } from '@/store/themeConfigSlice';
 import { GetMethodResponseType, IEmailTemplate } from '@/utils/Types';
 import { ApiClient } from '@/utils/http';
 import { IRootState } from '@/store';
-import { getAllEmailTemplates, setDeleteModal, setEmailTemplateDataLength, setViewModal } from '@/store/Slices/emailSlice/emailTemplateSlice';
+import { getAllEmailTemplates, setDeleteModal, setEmailTemplateDataLength, setPage, setPageSize, setViewModal } from '@/store/Slices/emailSlice/emailTemplateSlice';
 import EmailDeleteModal from '@/components/emails/EmailTemplates/EmailTemplateDeleteModal';
 import { useRouter } from 'next/router';
 import EmailViewModal from '@/components/emails/EmailTemplates/EmailTemplateViewModal';
+import { PAGE_SIZES } from '@/utils/contant';
 
 const EmailTemplates = () => {
     const dispatch = useDispatch();
@@ -22,16 +23,14 @@ const EmailTemplates = () => {
         dispatch(setPageTitle('Email Templates | Emails'));
     });
     //hooks
-    const { data, isFetching, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate, totalRecords } = useSelector((state: IRootState) => state.emailTemplate);
+    const { data, isFetching, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate, totalRecords, pageSize, page } = useSelector((state: IRootState) => state.emailTemplate);
     const [searchInputText, setSearchInputText] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(false);
     const [search, setSearch] = useState<string>('');
 
     const router = useRouter();
     //datatable
-    const [page, setPage] = useState(1);
-    const PAGE_SIZES = [10, 20, 30];
-    const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
+
     const [recordsData, setRecordsData] = useState<IEmailTemplate[]>([] as IEmailTemplate[]);
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
         columnAccessor: 'name',
@@ -44,7 +43,7 @@ const EmailTemplates = () => {
     useEffect(() => {
         const data = sortBy(recordsData, sortStatus.columnAccessor);
         setRecordsData(sortStatus.direction === 'desc' ? data.reverse() : data);
-        setPage(1);
+        dispatch(setPage(1));
     }, [sortStatus]);
 
     //get all emails after page render
@@ -108,6 +107,12 @@ const EmailTemplates = () => {
                     records={recordsData}
                     columns={[
                         {
+                            accessor: 'index',
+                            title: '#',
+                            width: 40,
+                            render: ({ srNo }) => srNo,
+                        },
+                        {
                             accessor: 'name',
                             title: 'Template Name',
                             sortable: true,
@@ -169,9 +174,9 @@ const EmailTemplates = () => {
                     totalRecords={totalRecords}
                     recordsPerPage={pageSize}
                     page={page}
-                    onPageChange={(p) => setPage(p)}
+                    onPageChange={(page) => dispatch(setPage(page))}
                     recordsPerPageOptions={data?.length < 10 ? [10] : PAGE_SIZES}
-                    onRecordsPerPageChange={setPageSize}
+                    onRecordsPerPageChange={(recordsPerPage) => dispatch(setPageSize(recordsPerPage))}
                     sortStatus={sortStatus}
                     onSortStatusChange={setSortStatus}
                     minHeight={200}

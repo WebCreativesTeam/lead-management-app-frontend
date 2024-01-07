@@ -1,6 +1,6 @@
 import { TaskPriorityType, TaskPriorityInitialStateProps, UserDataType } from '@/utils/Types';
-import { showToastAlert, fetchUserInfo } from '@/utils/contant';
-import { createSlice,PayloadAction } from '@reduxjs/toolkit';
+import { showToastAlert, fetchUserInfo, PAGE_SIZES } from '@/utils/contant';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 const initialState: TaskPriorityInitialStateProps = {
     data: [] as TaskPriorityType[],
@@ -18,7 +18,9 @@ const initialState: TaskPriorityInitialStateProps = {
     isAbleToDelete: false,
     isAbleToChangeDefaultPriority: false,
     userPolicyArr: [] as string[],
-    totalRecords:0
+    totalRecords: 0,
+    pageSize: PAGE_SIZES[0],
+    page: 1,
 };
 
 const taskPrioritySlice = createSlice({
@@ -86,8 +88,24 @@ const taskPrioritySlice = createSlice({
                 state.singleData = {} as TaskPriorityType;
             }
         },
-        getAllTaskPriorities(state, action) {
-            state.data = action.payload;
+        getAllTaskPriorities(state, action: PayloadAction<TaskPriorityType[]>) {
+            let srNoArray: number[] = [];
+            for (let i = state.pageSize * state.page - state.pageSize; i <= state.pageSize * state.page; i++) {
+                srNoArray.push(i);
+            }
+            srNoArray.shift();
+            if (action.payload.length > 0) {
+                const serializedData = action.payload?.map((item, index) => {
+                    return { ...item, srNo: srNoArray[index] };
+                });
+                state.data = serializedData;
+            }
+        },
+        setPage(state, { payload }: PayloadAction<number>) {
+            state.page = payload;
+        },
+        setPageSize(state, { payload }: PayloadAction<number>) {
+            state.pageSize = payload;
         },
         setDisableBtn(state, action) {
             state.isBtnDisabled = action.payload;
@@ -135,6 +153,8 @@ export const {
     setTaskPriorityReadPolicy,
     setTaskPriorityUpdatePolicy,
     setChangeDefaultTaskPriorityPermission,
-    setTaskPriorityDataLength
+    setTaskPriorityDataLength,
+    setPageSize,
+    setPage,
 } = taskPrioritySlice.actions;
 export default taskPrioritySlice.reducer;

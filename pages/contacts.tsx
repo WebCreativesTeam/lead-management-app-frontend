@@ -10,13 +10,14 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setPageTitle } from '@/store/themeConfigSlice';
 import { ContactDataType, GetMethodResponseType, SourceDataType, UserListSecondaryEndpointType } from '@/utils/Types';
 import { ApiClient } from '@/utils/http';
-import { getAllContacts, setEditModal, setDeleteModal, setCreateModal, setViewModal, getAllUsersForContact, getAllSourceForContact, setContactDataLength } from '@/store/Slices/contactSlice';
+import { getAllContacts, setEditModal, setDeleteModal, setCreateModal, setViewModal, getAllUsersForContact, getAllSourceForContact, setContactDataLength, setPage, setPageSize } from '@/store/Slices/contactSlice';
 import ContactViewModal from '@/components/Contact/ContactViewModal';
 import { IRootState } from '@/store';
 import ContactCreateModal from '@/components/Contact/ContactCreateModal';
 import ContactEditModal from '@/components/Contact/ContactEditModal';
 import ContactDeleteModal from '@/components/Contact/ContactDeleteModal';
 import Dropdown from '@/components/Dropdown';
+import { PAGE_SIZES } from '@/utils/contant';
 
 const Contacts = () => {
     const dispatch = useDispatch();
@@ -24,15 +25,15 @@ const Contacts = () => {
         dispatch(setPageTitle('Contacts'));
     });
     //hooks
-    const { data, isFetching, isAbleToCreate, isAbleToDelete, isAbleToUpdate, isAbleToRead, totalRecords, viewModal, deleteModal, createModal } = useSelector((state: IRootState) => state.contacts);
+    const { data, isFetching, isAbleToCreate, isAbleToDelete, isAbleToUpdate, isAbleToRead, totalRecords, viewModal, deleteModal, createModal, pageSize, page } = useSelector(
+        (state: IRootState) => state.contacts
+    );
     const isRtl = useSelector((state: IRootState) => state.themeConfig.rtlClass) === 'rtl' ? true : false;
     const [searchInputText, setSearchInputText] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(false);
 
     //datatable
-    const [page, setPage] = useState(1);
-    const PAGE_SIZES = [10, 20, 30];
-    const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
+
     const [search, setSearch] = useState<string>('');
     const [hideCols, setHideCols] = useState<string[]>(['contactTitle']);
 
@@ -64,7 +65,7 @@ const Contacts = () => {
     useEffect(() => {
         const data = sortBy(recordsData, sortStatus.columnAccessor);
         setRecordsData(sortStatus.direction === 'desc' ? data.reverse() : data);
-        setPage(1);
+        dispatch(setPage(1));
     }, [sortStatus]);
 
     //get all contact after page render
@@ -92,17 +93,17 @@ const Contacts = () => {
         setLoading(false);
     };
 
-//get all user's list
-const getAllUsersList = async () => {
-    setLoading(true);
-    const usersList: GetMethodResponseType = await new ApiClient().get('user/list');
-    const users: UserListSecondaryEndpointType[] = usersList?.data;
-    if (typeof users === 'undefined') {
-        dispatch(getAllUsersForContact([] as UserListSecondaryEndpointType[]));
-        return;
-    }
-    dispatch(getAllUsersForContact(users));
-};
+    //get all user's list
+    const getAllUsersList = async () => {
+        setLoading(true);
+        const usersList: GetMethodResponseType = await new ApiClient().get('user/list');
+        const users: UserListSecondaryEndpointType[] = usersList?.data;
+        if (typeof users === 'undefined') {
+            dispatch(getAllUsersForContact([] as UserListSecondaryEndpointType[]));
+            return;
+        }
+        dispatch(getAllUsersForContact(users));
+    };
 
     //get all Source list
     const getAllSourceList = async () => {
@@ -204,6 +205,12 @@ const getAllUsersList = async () => {
                     className="table-hover whitespace-nowrap"
                     records={recordsData}
                     columns={[
+                        {
+                            accessor: 'index',
+                            title: '#',
+                            width: 40,
+                            render: ({ srNo }) => srNo,
+                        },
                         {
                             accessor: 'name',
                             title: 'Name',
@@ -327,9 +334,9 @@ const getAllUsersList = async () => {
                     totalRecords={totalRecords}
                     recordsPerPage={pageSize}
                     page={page}
-                    onPageChange={(p) => setPage(p)}
+                    onPageChange={(page) => dispatch(setPage(page))}
                     recordsPerPageOptions={data?.length < 10 ? [10] : PAGE_SIZES}
-                    onRecordsPerPageChange={setPageSize}
+                    onRecordsPerPageChange={(recordsPerPage) => dispatch(setPageSize(recordsPerPage))}
                     sortStatus={sortStatus}
                     onSortStatusChange={setSortStatus}
                     minHeight={200}

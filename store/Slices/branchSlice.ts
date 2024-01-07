@@ -1,5 +1,5 @@
 import { BranchDataType, BranchInitialStateProps, Permission, UserDataType } from '@/utils/Types';
-import { fetchUserInfo } from '@/utils/contant';
+import { PAGE_SIZES, fetchUserInfo } from '@/utils/contant';
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 
 const initialState: BranchInitialStateProps = {
@@ -16,7 +16,9 @@ const initialState: BranchInitialStateProps = {
     isAbleToUpdate: false,
     isAbleToDelete: false,
     userPolicyArr: [] as string[],
-    totalRecords:0
+    totalRecords: 0,
+    pageSize: PAGE_SIZES[0],
+    page: 1,
 };
 
 const branchSlice = createSlice({
@@ -66,8 +68,24 @@ const branchSlice = createSlice({
                 state.singleData = {} as BranchDataType;
             }
         },
-        getAllBranches(state, action) {
-            state.data = action.payload;
+        getAllBranches(state, action: PayloadAction<BranchDataType[]>) {
+            let srNoArray: number[] = [];
+            for (let i = state.pageSize * state.page - state.pageSize; i <= state.pageSize * state.page; i++) {
+                srNoArray.push(i);
+            }
+            srNoArray.shift();
+            if (action.payload.length > 0) {
+                const serializedData = action.payload?.map((item, index) => {
+                    return { ...item, srNo: srNoArray[index] };
+                });
+                state.data = serializedData;
+            }
+        },
+        setPage(state, { payload }: PayloadAction<number>) {
+            state.page = payload;
+        },
+        setPageSize(state, { payload }: PayloadAction<number>) {
+            state.pageSize = payload;
         },
         setDisableBtn(state, action) {
             state.isBtnDisabled = action.payload;
@@ -109,6 +127,8 @@ export const {
     setBranchDeletePolicy,
     setBranchReadPolicy,
     setBranchUpdatePolicy,
-    setBranchDataLength
+    setBranchDataLength,
+    setPageSize,
+    setPage,
 } = branchSlice.actions;
 export default branchSlice.reducer;
