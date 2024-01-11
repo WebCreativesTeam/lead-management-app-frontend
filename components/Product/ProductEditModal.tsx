@@ -33,10 +33,11 @@ const ProductEditModal = () => {
         initialValues: {
             name: '',
             description: '',
-            instances: [
+            updateInstances: [
                 {
                     name: '',
                     colorIds: [] as string[],
+                    id: '',
                 },
             ],
         },
@@ -48,7 +49,7 @@ const ProductEditModal = () => {
             try {
                 dispatch(setDisableBtn(true));
                 // if (singleData?.name === value.name && singleData?.description === value.description) {
-                //     await new ApiClient().patch('sub-product/' + singleData?.id, value.instances);
+                //     await new ApiClient().patch('sub-product/' + singleData?.id, value.updateInstances);
                 // } else {
                 await new ApiClient().patch('product/' + singleData?.id, { name: value.name, description: value.description });
                 // }
@@ -83,7 +84,7 @@ const ProductEditModal = () => {
             return { name: item?.name, colorIds: item?.colors?.map((item) => item?.id) };
         });
 
-        formik.setFieldValue('instances', defaultInstances);
+        formik.setFieldValue('updateInstances', defaultInstances);
     }, [singleData]);
 
     useEffect(() => {
@@ -92,6 +93,7 @@ const ProductEditModal = () => {
         });
         setColorDropdown(createColorDropdown);
     }, [colors]);
+
     return (
         <Modal
             open={editModal}
@@ -108,8 +110,8 @@ const ProductEditModal = () => {
             isBtnDisabled={
                 formik.values.name &&
                 formik.values.description &&
-                formik.values.instances[formik.values.instances.length - 1]?.name &&
-                formik.values.instances[formik.values.instances.length - 1]?.colorIds?.length > 0 &&
+                formik.values.updateInstances[formik.values.updateInstances.length - 1]?.name &&
+                formik.values.updateInstances[formik.values.updateInstances.length - 1]?.colorIds?.length > 0 &&
                 !isBtnDisabled
                     ? false
                     : true
@@ -158,23 +160,23 @@ const ProductEditModal = () => {
                                                     className="btn btn-primary rounded"
                                                     onClick={() => arrayHelpers.push({ name: '', colorIds: [] })}
                                                     disabled={
-                                                        !formik.values.instances[formik.values.instances.length - 1].name ||
-                                                        formik.values.instances[formik.values.instances?.length - 1].colorIds?.length < 1
+                                                        !formik.values.updateInstances[formik.values.updateInstances.length - 1].name ||
+                                                        formik.values.updateInstances[formik.values.updateInstances?.length - 1].colorIds?.length < 1
                                                     }
                                                 >
                                                     Add Sub Product
                                                 </button>
                                             </div>
-                                            {formik.values.instances.map((instances, index) => (
+                                            {formik.values.updateInstances.map((updateInstances, index) => (
                                                 <div key={index} className="panel my-6 flex flex-1 flex-col gap-4 sm:flex-row">
                                                     <div className="flex-1">
                                                         <label htmlFor={`textForOption${index + 1}`}>Name</label>
                                                         <input
                                                             onChange={formik.handleChange}
                                                             onBlur={formik.handleBlur}
-                                                            value={formik.values.instances[index].name}
+                                                            value={formik.values.updateInstances[index].name}
                                                             id={`textForOption${index + 1}`}
-                                                            name={`instances[${index}].name`}
+                                                            name={`updateInstances[${index}].name`}
                                                             type="text"
                                                             placeholder={'Name'}
                                                             className="form-input"
@@ -187,7 +189,7 @@ const ProductEditModal = () => {
                                                             options={colorDropdown}
                                                             onChange={(data: any) => {
                                                                 formik.setFieldValue(
-                                                                    `instances[${index}].colorIds`,
+                                                                    `updateInstances[${index}].colorIds`,
                                                                     data?.map((item: SelectOptionsType) => item?.value)
                                                                 );
                                                             }}
@@ -200,7 +202,7 @@ const ProductEditModal = () => {
                                                             type="button"
                                                             className="btn btn-outline-danger"
                                                             onClick={() => arrayHelpers.remove(index)}
-                                                            disabled={formik.values.instances.length <= 1}
+                                                            disabled={formik.values.updateInstances.length <= 1}
                                                         >
                                                             X
                                                         </button>

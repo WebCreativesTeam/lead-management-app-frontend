@@ -3,13 +3,11 @@ import ViewModal from '@/components/__Shared/ViewModal';
 import { useDispatch, useSelector } from 'react-redux';
 import { setViewModal } from '@/store/Slices/leadSlice/manageLeadSlice';
 import { IRootState } from '@/store';
-import { GetMethodResponseType, IFiedlListType, SelectOptionsType } from '@/utils/Types';
+import { SelectOptionsType } from '@/utils/Types';
 import { genderList } from '@/utils/Raw Data';
 import { Tab } from '@headlessui/react';
-import { Delete, Home, Note, Setting } from '@/utils/icons';
-import Loader from '@/components/__Shared/Loader';
+import { Home, Note, Setting } from '@/utils/icons';
 import CreateNotesTab from './CreateNotesTab';
-import { ApiClient } from '@/utils/http';
 
 const LeadViewModal = () => {
     const { viewModal, singleData, leadProductList, customFieldsList } = useSelector((state: IRootState) => state.lead);

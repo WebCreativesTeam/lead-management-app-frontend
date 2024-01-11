@@ -20,7 +20,7 @@ const CreateProductModal = () => {
         initialValues: {
             name: '',
             description: '',
-            instances: [
+            createInstances: [
                 {
                     name: '',
                     colorIds: [],
@@ -74,8 +74,8 @@ const CreateProductModal = () => {
             isBtnDisabled={
                 formik.values.name &&
                 formik.values.description &&
-                formik.values.instances[formik.values.instances.length - 1].name &&
-                formik.values.instances[formik.values.instances.length - 1].colorIds.length > 0 &&
+                formik.values.createInstances[formik.values.createInstances.length - 1].name &&
+                formik.values.createInstances[formik.values.createInstances.length - 1].colorIds.length > 0 &&
                 !isBtnDisabled
                     ? false
                     : true
@@ -115,7 +115,7 @@ const CreateProductModal = () => {
                             </div>
                             <div>
                                 <FieldArray
-                                    name="instances"
+                                    name="createInstances"
                                     render={(arrayHelpers) => (
                                         <div className="my-6">
                                             <div className="flex justify-end">
@@ -124,23 +124,23 @@ const CreateProductModal = () => {
                                                     className="btn btn-primary rounded"
                                                     onClick={() => arrayHelpers.push({ name: '', colorIds: [] })}
                                                     disabled={
-                                                        !formik.values.instances[formik.values.instances.length - 1].name ||
-                                                        formik.values.instances[formik.values.instances.length - 1].colorIds.length < 1
+                                                        !formik.values.createInstances[formik.values.createInstances.length - 1].name ||
+                                                        formik.values.createInstances[formik.values.createInstances.length - 1].colorIds.length < 1
                                                     }
                                                 >
                                                     Add Sub Product
                                                 </button>
                                             </div>
-                                            {formik.values.instances.map((instances, index) => (
+                                            {formik.values.createInstances.map((createInstances, index) => (
                                                 <div key={index} className="panel my-6 flex flex-1 flex-col gap-4 sm:flex-row">
                                                     <div className="flex-1">
                                                         <label htmlFor={`textForOption${index + 1}`}>Name</label>
                                                         <input
                                                             onChange={formik.handleChange}
                                                             onBlur={formik.handleBlur}
-                                                            value={formik.values.instances[index].name}
+                                                            value={formik.values.createInstances[index].name}
                                                             id={`textForOption${index + 1}`}
-                                                            name={`instances[${index}].name`}
+                                                            name={`createInstances[${index}].name`}
                                                             type="text"
                                                             placeholder={'Name'}
                                                             className="form-input"
@@ -153,7 +153,7 @@ const CreateProductModal = () => {
                                                             options={colorDropdown}
                                                             onChange={(data: any) => {
                                                                 formik.setFieldValue(
-                                                                    `instances[${index}].colorIds`,
+                                                                    `createInstances[${index}].colorIds`,
                                                                     data?.map((item: SelectOptionsType) => item?.value)
                                                                 );
                                                             }}
@@ -165,7 +165,7 @@ const CreateProductModal = () => {
                                                             type="button"
                                                             className="btn btn-outline-danger"
                                                             onClick={() => arrayHelpers.remove(index)}
-                                                            disabled={formik.values.instances.length <= 1}
+                                                            disabled={formik.values.createInstances.length <= 1}
                                                         >
                                                             X
                                                         </button>
