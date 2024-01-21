@@ -51,8 +51,9 @@ const ProductEditModal = () => {
                 // if (singleData?.name === value.name && singleData?.description === value.description) {
                 //     await new ApiClient().patch('sub-product/' + singleData?.id, value.updateInstances);
                 // } else {
-                await new ApiClient().patch('product/' + singleData?.id, { name: value.name, description: value.description });
+                await new ApiClient().patch('product/' + singleData?.id, value);
                 // }
+                console.log(value);
 
                 dispatch(setEditModal({ open: false }));
                 action.resetForm();
@@ -81,7 +82,7 @@ const ProductEditModal = () => {
         setDefaultColorValue(findDefaultSelectedColors);
 
         const defaultInstances = singleData?.subProducts?.map((item) => {
-            return { name: item?.name, colorIds: item?.colors?.map((item) => item?.id) };
+            return { name: item?.name, colorIds: item?.colors?.map((item) => item?.id), id: item?.id };
         });
 
         formik.setFieldValue('updateInstances', defaultInstances);
@@ -151,14 +152,14 @@ const ProductEditModal = () => {
                             </div>
                             <div>
                                 <FieldArray
-                                    name="instances"
+                                    name="updateInstances"
                                     render={(arrayHelpers) => (
                                         <div className="my-6">
                                             <div className="flex justify-end">
                                                 <button
                                                     type="button"
                                                     className="btn btn-primary rounded"
-                                                    onClick={() => arrayHelpers.push({ name: '', colorIds: [] })}
+                                                    onClick={() => arrayHelpers.push({ name: '', colorIds: [], id: '' })}
                                                     disabled={
                                                         !formik.values.updateInstances[formik.values.updateInstances.length - 1].name ||
                                                         formik.values.updateInstances[formik.values.updateInstances?.length - 1].colorIds?.length < 1
