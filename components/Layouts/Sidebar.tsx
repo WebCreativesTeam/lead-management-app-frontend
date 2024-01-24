@@ -71,6 +71,7 @@ import {
     setWhatsappTemplateReadPermission,
     setWhatsappTemplateUpdatePermission,
 } from '@/store/Slices/templateSlice/whatsappTemplateSlice';
+import { Dashboard } from '@/utils/icons/Dashboard';
 
 const Sidebar = () => {
     const router = useRouter();
@@ -380,11 +381,12 @@ const Sidebar = () => {
                     </div>
                     <PerfectScrollbar className="relative h-[calc(100vh-80px)]">
                         <ul className="relative space-y-0.5 p-4 py-0 font-semibold">
-                            {/* dashboard */}
+                            <SideabarLabel label="Menu" />
+                            {/* Dashboard */}
                             <li className="menu nav-item">
                                 <Link href="/" className="group">
                                     <div className="flex items-center">
-                                        <User />
+                                        <Dashboard />
                                         <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Dashboard')}</span>
                                     </div>
                                 </Link>
