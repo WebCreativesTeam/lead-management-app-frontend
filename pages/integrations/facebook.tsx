@@ -1,7 +1,12 @@
+import FacebookBtn from '@/components/Integrations/FacebookBtn';
 import React from 'react';
 
 const FacebookIntegration = () => {
-    return <div>Facebook</div>;
+    return (
+        <div>
+            <FacebookBtn />
+        </div>
+    );
 };
 
 export default FacebookIntegration;
