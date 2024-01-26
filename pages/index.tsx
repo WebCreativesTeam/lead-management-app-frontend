@@ -18,6 +18,10 @@ import ScheduleMessageDeleteModal from '@/components/Campaign/CampaignDeleteModa
 import { followUpDropdownList, followupData } from '@/utils/Raw Data';
 import { getAllLeadStatusForDashboard, getAllPendingFollowups, getAllTodayFollowups, getAllTomorrowFollowups } from '@/store/Slices/dashbordSlice';
 import FollowUpCard from '@/components/Dashboard/FollowUpCard';
+import { setEmailTemplateModal, setSmsTemplateModal, setWhatsappTemplateModal } from '@/store/Slices/leadSlice/manageLeadSlice';
+import WhatsappTemplateModal from '@/components/Leads/ManageLeads/WhatsappTemplateModal';
+import SmsTemplateModal from '@/components/Leads/ManageLeads/SmsTemplateModal';
+import EmailTemplateModal from '@/components/Leads/ManageLeads/EmailTemplateModal';
 
 const Dashboard = () => {
     const dispatch = useDispatch();
@@ -25,6 +29,8 @@ const Dashboard = () => {
         dispatch(setPageTitle('Track Leads | ScheduleMessages'));
     });
     const { todayFollowUps, isFetching, totalRecords, leadStatusList } = useSelector((state: IRootState) => state.dashboard);
+
+    const { whatsAppTemplateModal, emailTemplateModal, smsTemplateModal } = useSelector((state: IRootState) => state.lead);
 
     //hooks
     const [loading, setLoading] = useState<boolean>(false);
@@ -131,7 +137,7 @@ const Dashboard = () => {
             return {
                 value: item.id,
                 label: (
-                    <div className={`rounded px-2.5 py-0.5 text-sm font-medium dark:bg-blue-900 dark:text-blue-300 text-center`} style={{ color: item?.color, backgroundColor: item?.color + '20' }}>
+                    <div className={`rounded px-2.5 py-0.5 text-center text-sm font-medium dark:bg-blue-900 dark:text-blue-300`} style={{ color: item?.color, backgroundColor: item?.color + '20' }}>
                         {item?.name}
                     </div>
                 ),
@@ -232,29 +238,20 @@ const Dashboard = () => {
                             render: ({ id }) => (
                                 <div className="flex justify-center gap-2  p-3 text-center ">
                                     <Tippy content="WhatsApp">
-                                        <button
-                                            type="button"
-                                            // onClick={() => dispatch(setViewModal({ id, open: true }))}
-                                        >
+                                        <button type="button" onClick={() => dispatch(setWhatsappTemplateModal({ id, open: true }))}>
                                             <Sms />
                                         </button>
                                     </Tippy>
                                     {/* {isAbleToUpdate && ( */}
                                     <Tippy content="SMS">
-                                        <button
-                                            type="button"
-                                            // onClick={() => dispatch(setEditModal({ id, open: true }))}
-                                        >
+                                        <button type="button" onClick={() => dispatch(setSmsTemplateModal({ id, open: true }))}>
                                             <ChatIcon />
                                         </button>
                                     </Tippy>
                                     {/* )} */}
                                     {/* {isAbleToDelete && ( */}
                                     <Tippy content="Email">
-                                        <button
-                                            type="button"
-                                            // onClick={() => dispatch(setDeleteModal({ id, open: true }))}
-                                        >
+                                        <button type="button" onClick={() => dispatch(setEmailTemplateModal({ id, open: true }))}>
                                             <Email />
                                         </button>
                                     </Tippy>
@@ -322,6 +319,15 @@ const Dashboard = () => {
 
             {/* delete modal */}
             {/* <ScheduleMessageDeleteModal /> */}
+
+            {/* send whatsapp template priority modal */}
+            {whatsAppTemplateModal && <WhatsappTemplateModal />}
+
+            {/* send sms template priority modal */}
+            {smsTemplateModal && <SmsTemplateModal />}
+
+            {/* send email template priority modal */}
+            {emailTemplateModal && <EmailTemplateModal />}
         </div>
     );
 };

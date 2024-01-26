@@ -618,6 +618,9 @@ export interface ManageLeadInitialStateProps extends InitialStateProps {
     overViewFormData: OverviewFormType;
     isOverviewTabDisabled: boolean;
     leadNoteList: ILeadNotes[];
+    whatsAppTemplateModal: boolean;
+    smsTemplateModal: boolean;
+    emailTemplateModal: boolean;
 }
 
 //source slice initial props

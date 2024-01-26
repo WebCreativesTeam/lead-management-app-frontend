@@ -39,10 +39,13 @@ import {
     setCreateModal,
     setDeleteModal,
     setEditModal,
+    setEmailTemplateModal,
     setLeadDataLength,
     setPage,
     setPageSize,
+    setSmsTemplateModal,
     setViewModal,
+    setWhatsappTemplateModal,
 } from '@/store/Slices/leadSlice/manageLeadSlice';
 import { ApiClient } from '@/utils/http';
 import DeleteLeadModal from '@/components/Leads/ManageLeads/DeleteLeadModal';
@@ -53,6 +56,9 @@ import ChangeLeadPriorityModal from '@/components/Leads/ManageLeads/ChangeLeadPr
 import ChangeLeadStatusModal from '@/components/Leads/ManageLeads/ChangeLeadStatusModal';
 import Link from 'next/link';
 import { PAGE_SIZES } from '@/utils/contant';
+import WhatsappTemplateModal from '@/components/Leads/ManageLeads/WhatsappTemplateModal';
+import SmsTemplateModal from '@/components/Leads/ManageLeads/SmsTemplateModal';
+import EmailTemplateModal from '@/components/Leads/ManageLeads/EmailTemplateModal';
 
 const ManageLeads = () => {
     const dispatch = useDispatch();
@@ -89,6 +95,9 @@ const ManageLeads = () => {
         viewModal,
         pageSize,
         page,
+        whatsAppTemplateModal,
+        emailTemplateModal,
+        smsTemplateModal
     } = useSelector((state: IRootState) => state.lead);
     const isRtl = useSelector((state: IRootState) => state.themeConfig.rtlClass) === 'rtl' ? true : false;
     const [searchInputText, setSearchInputText] = useState<string>('');
@@ -497,22 +506,22 @@ const ManageLeads = () => {
                             render: ({ id }) => (
                                 <div className="flex justify-center gap-2  p-3 text-center ">
                                     <Tippy content="WhatsApp">
-                                        <Link href={'/message/whatsapp'}>
+                                        <button type="button" onClick={() => dispatch(setWhatsappTemplateModal({ id, open: true }))}>
                                             <Sms />
-                                        </Link>
+                                        </button>
                                     </Tippy>
                                     {/* {isAbleToUpdate && ( */}
                                     <Tippy content="SMS">
-                                        <Link href={'/message/sms'}>
+                                        <button type="button" onClick={() => dispatch(setSmsTemplateModal({ id, open: true }))}>
                                             <ChatIcon />
-                                        </Link>
+                                        </button>
                                     </Tippy>
                                     {/* )} */}
                                     {/* {isAbleToDelete && ( */}
                                     <Tippy content="Email">
-                                        <Link href={'/message/email'}>
+                                        <button type="button" onClick={() => dispatch(setEmailTemplateModal({ id, open: true }))}>
                                             <Email />
-                                        </Link>
+                                        </button>
                                     </Tippy>
                                     {/* )} */}
                                 </div>
@@ -575,6 +584,15 @@ const ManageLeads = () => {
 
             {/* change lead priority modal */}
             <ChangeLeadPriorityModal />
+
+            {/* send whatsapp template priority modal */}
+            {whatsAppTemplateModal && <WhatsappTemplateModal />}
+
+            {/* send sms template priority modal */}
+            {smsTemplateModal && <SmsTemplateModal />}
+
+            {/* send email template priority modal */}
+            {emailTemplateModal && <EmailTemplateModal />}
 
             {/* create modal */}
             {isAbleToCreate && createModal && <CreateLeadModal />}

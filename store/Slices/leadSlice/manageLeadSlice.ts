@@ -48,6 +48,9 @@ const initialState: ManageLeadInitialStateProps = {
     leadNoteList: [] as ILeadNotes[],
     pageSize: PAGE_SIZES[0],
     page: 1,
+    emailTemplateModal: false,
+    smsTemplateModal: false,
+    whatsAppTemplateModal: false,
 };
 
 const manageLeadSlice = createSlice({
@@ -205,6 +208,39 @@ const manageLeadSlice = createSlice({
         setIsOverviewTabDisabled(state, action: PayloadAction<boolean>) {
             state.isOverviewTabDisabled = action.payload;
         },
+        setWhatsappTemplateModal(state, action: PayloadAction<{ open: boolean; id?: string }>) {
+            const { open, id } = action.payload;
+            state.whatsAppTemplateModal = open;
+            const findRequestedData: LeadDataType | undefined = state.data.find((item: LeadDataType) => item.id === id);
+
+            if (findRequestedData && state.whatsAppTemplateModal) {
+                state.singleData = findRequestedData;
+            } else {
+                state.singleData = {} as LeadDataType;
+            }
+        },
+        setEmailTemplateModal(state, action: PayloadAction<{ open: boolean; id?: string }>) {
+            const { open, id } = action.payload;
+            state.emailTemplateModal = open;
+            const findRequestedData: LeadDataType | undefined = state.data.find((item: LeadDataType) => item.id === id);
+
+            if (findRequestedData && state.emailTemplateModal) {
+                state.singleData = findRequestedData;
+            } else {
+                state.singleData = {} as LeadDataType;
+            }
+        },
+        setSmsTemplateModal(state, action: PayloadAction<{ open: boolean; id?: string }>) {
+            const { open, id } = action.payload;
+            state.smsTemplateModal = open;
+            const findRequestedData: LeadDataType | undefined = state.data.find((item: LeadDataType) => item.id === id);
+
+            if (findRequestedData && state.smsTemplateModal) {
+                state.singleData = findRequestedData;
+            } else {
+                state.singleData = {} as LeadDataType;
+            }
+        },
     },
 });
 
@@ -237,5 +273,8 @@ export const {
     getAllSubProductsForLead,
     setPageSize,
     setPage,
+    setEmailTemplateModal,
+    setSmsTemplateModal,
+    setWhatsappTemplateModal,
 } = manageLeadSlice.actions;
 export default manageLeadSlice.reducer;
