@@ -436,6 +436,7 @@ export interface ICampaign {
 
 // dashboard page types
 export interface IFollowup {
+    srNo?: number;
     name: string;
     phoneNumber: string;
     source: SourceDataType;

@@ -95,7 +95,7 @@ const ManageLeads = () => {
     const [loading, setLoading] = useState<boolean>(false);
     const [filter, setFilter] = useState<string>('assigned-by-me');
     const [search, setSearch] = useState<string>('');
-    const [hideCols, setHideCols] = useState<string[]>(['contactTitle']);
+    const [hideCols, setHideCols] = useState<string[]>([]);
 
     //useDefferedValue hook for search query
     const searchQuery = useDeferredValue(search);

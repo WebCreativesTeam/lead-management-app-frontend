@@ -166,6 +166,12 @@ const Dashboard = () => {
                     records={recordsData}
                     columns={[
                         {
+                            accessor: 'srNo',
+                            title: '#',
+                            sortable: true,
+                            render: ({ srNo }) => <div>{srNo}</div>,
+                        },
+                        {
                             accessor: 'name',
                             title: 'Name',
                             sortable: true,

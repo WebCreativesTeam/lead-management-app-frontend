@@ -48,13 +48,8 @@ const ProductEditModal = () => {
             dispatch(setFetching(true));
             try {
                 dispatch(setDisableBtn(true));
-                // if (singleData?.name === value.name && singleData?.description === value.description) {
-                //     await new ApiClient().patch('sub-product/' + singleData?.id, value.updateInstances);
-                // } else {
                 await new ApiClient().patch('product/' + singleData?.id, value);
-                // }
                 console.log(value);
-
                 dispatch(setEditModal({ open: false }));
                 action.resetForm();
             } catch (error: any) {

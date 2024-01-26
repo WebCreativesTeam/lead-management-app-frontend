@@ -53,7 +53,7 @@ import { setEmailSmtpCreatePermission, setEmailSmtpDeletePermission, setEmailSmt
 import { setSmsTemplateCreatePermission, setSmsTemplateDeletePermission, setSmsTemplateReadPermission, setSmsTemplateUpdatePermission } from '@/store/Slices/templateSlice/smsTemplateSlice';
 
 //other imports
-import { ArrowRight, Branch, Phone, Shield, Tasks, User, File, Talegram, Setting, ChatIcon, ShopingBag } from '../../utils/icons';
+import { ArrowRight, Branch, Phone, Shield, Tasks, User, File, Talegram, Setting, ChatIcon, ShopingBag, Dashboard, Chart, Recorder, Logs, Calender, SettingRounded, CampaignIntegration, Integration, Assigning } from '../../utils/icons';
 import { fetchUserInfo } from '@/utils/contant';
 import SideabarLabel from '../__Shared/SidebarLabel';
 import { setProductCreatePolicy, setProductDeletePolicy, setProductReadPolicy, setProductUpdatePolicy } from '@/store/Slices/productSlice';
@@ -71,6 +71,7 @@ import {
     setWhatsappTemplateReadPermission,
     setWhatsappTemplateUpdatePermission,
 } from '@/store/Slices/templateSlice/whatsappTemplateSlice';
+import { RulerPen } from '@/utils/icons/RulerPen';
 
 const Sidebar = () => {
     const router = useRouter();
@@ -384,7 +385,7 @@ const Sidebar = () => {
                             <li className="menu nav-item">
                                 <Link href="/" className="group">
                                     <div className="flex items-center">
-                                        <User />
+                                        <Dashboard />
                                         <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Dashboard')}</span>
                                     </div>
                                 </Link>
@@ -416,7 +417,7 @@ const Sidebar = () => {
                             <li className="menu nav-item">
                                 <Link href="/ivr" className="group">
                                     <div className="flex items-center">
-                                        <User />
+                                        <Recorder />
                                         <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('IVR')}</span>
                                     </div>
                                 </Link>
@@ -436,7 +437,7 @@ const Sidebar = () => {
                             <li className="menu nav-item">
                                 <Link href="/report" className="group">
                                     <div className="flex items-center">
-                                        <Phone />
+                                        <Chart />
                                         <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Report')}</span>
                                     </div>
                                 </Link>
@@ -447,7 +448,7 @@ const Sidebar = () => {
                                 <li className="menu nav-item">
                                     <Link href="/lead-assigning" className="group">
                                         <div className="flex items-center">
-                                            <Phone />
+                                            <Assigning />
                                             <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Lead Assigning')}</span>
                                         </div>
                                     </Link>
@@ -459,7 +460,7 @@ const Sidebar = () => {
                                 <li className="menu nav-item">
                                     <Link href="/campaign" className="group">
                                         <div className="flex items-center">
-                                            <Phone />
+                                            <Calender />
                                             <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Campaign')}</span>
                                         </div>
                                     </Link>
@@ -533,7 +534,7 @@ const Sidebar = () => {
                             <li className="menu nav-item">
                                 <Link href="/integrations" className="group">
                                     <div className="flex items-center">
-                                        <Phone />
+                                        <Integration />
                                         <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Integrations')}</span>
                                     </div>
                                 </Link>
@@ -571,7 +572,7 @@ const Sidebar = () => {
                             <li className="menu nav-item">
                                 <Link href="/custom-fields" className="group">
                                     <div className="flex items-center">
-                                        <User />
+                                        <RulerPen />
                                         <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Custom Fields')}</span>
                                     </div>
                                 </Link>
@@ -580,7 +581,7 @@ const Sidebar = () => {
                             <li className="menu nav-item">
                                 <Link href="/logs" className="group">
                                     <div className="flex items-center">
-                                        <User />
+                                        <Logs />
                                         <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Logs')}</span>
                                     </div>
                                 </Link>
@@ -591,7 +592,7 @@ const Sidebar = () => {
                             <li className="menu nav-item">
                                 <button type="button" className={`${currentMenu === 'Campaign Integration' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('Campaign Integration')}>
                                     <div className="flex items-center">
-                                        <ChatIcon />
+                                        <CampaignIntegration />
                                         <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Campaign Integration')}</span>
                                     </div>
 
@@ -628,7 +629,7 @@ const Sidebar = () => {
                             <li className="menu nav-item">
                                 <button type="button" className={`${currentMenu === 'Lead Settings' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('Lead Settings')}>
                                     <div className="flex items-center">
-                                        <Talegram />
+                                        <SettingRounded />
                                         <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Lead Settings')}</span>
                                     </div>
 
@@ -655,7 +656,7 @@ const Sidebar = () => {
                             <li className="menu nav-item">
                                 <button type="button" className={`${currentMenu === 'Task Settings' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('Task Settings')}>
                                     <div className="flex items-center">
-                                        <Tasks />
+                                        <Setting />
                                         <span className="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{t('Task Settings')}</span>
                                     </div>
 

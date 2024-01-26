@@ -2,6 +2,7 @@ import { IFollowup, SelectOptionsType } from '../Types';
 
 export const followupData: IFollowup[] = [
     {
+        srNo:1,
         name: 'John Doe',
         phoneNumber: '1234567890',
         source: {
