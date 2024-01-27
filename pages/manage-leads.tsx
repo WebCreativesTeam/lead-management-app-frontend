@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState, useDeferredValue } from 'react';
+import React, { useEffect, useState, useDeferredValue, useRef } from 'react';
 import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
@@ -55,10 +55,12 @@ import ViewLeadModal from '@/components/Leads/ManageLeads/ViewLeadModal';
 import ChangeLeadPriorityModal from '@/components/Leads/ManageLeads/ChangeLeadPriorityModal';
 import ChangeLeadStatusModal from '@/components/Leads/ManageLeads/ChangeLeadStatusModal';
 import Link from 'next/link';
-import { PAGE_SIZES } from '@/utils/contant';
+import { PAGE_SIZES, showToastAlert } from '@/utils/contant';
 import WhatsappTemplateModal from '@/components/Leads/ManageLeads/WhatsappTemplateModal';
 import SmsTemplateModal from '@/components/Leads/ManageLeads/SmsTemplateModal';
 import EmailTemplateModal from '@/components/Leads/ManageLeads/EmailTemplateModal';
+import axios from 'axios';
+import Swal from 'sweetalert2';
 
 const ManageLeads = () => {
     const dispatch = useDispatch();
@@ -97,7 +99,7 @@ const ManageLeads = () => {
         page,
         whatsAppTemplateModal,
         emailTemplateModal,
-        smsTemplateModal
+        smsTemplateModal,
     } = useSelector((state: IRootState) => state.lead);
     const isRtl = useSelector((state: IRootState) => state.themeConfig.rtlClass) === 'rtl' ? true : false;
     const [searchInputText, setSearchInputText] = useState<string>('');
@@ -105,6 +107,8 @@ const ManageLeads = () => {
     const [filter, setFilter] = useState<string>('assigned-by-me');
     const [search, setSearch] = useState<string>('');
     const [hideCols, setHideCols] = useState<string[]>([]);
+    const [file, setFile] = useState<File>({} as File);
+    const bulkImportBtnRef: any = useRef(null);
 
     //useDefferedValue hook for search query
     const searchQuery = useDeferredValue(search);
@@ -251,6 +255,55 @@ const ManageLeads = () => {
         }
         dispatch(getAllProductsForLead(products));
     };
+
+    const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files?.length > 0) {
+            setFile(e?.target?.files[0]);
+        }
+    };
+
+    const handleUploadFile = async (e: any) => {
+        e.preventDefault();
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+            setLoading(true);
+            const uploadFile = await axios.post(`${process.env.NEXT_PUBLIC_API_LINK}lead/import`, formData, {
+                withCredentials: true,
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                    'x-tenant-id': localStorage.getItem('uid'),
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                },
+            });
+            console.log(uploadFile);
+            bulkImportBtnRef?.current?.close();
+            setLoading(false);
+            setFile({} as File);
+            const toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+            });
+            toast.fire({
+                icon: 'success',
+                title: 'File Uploaded Successfully',
+                padding: '10px 20px',
+            });
+        } catch (error: any) {
+            if (typeof error?.response?.data?.message === 'object') {
+                showToastAlert(error?.response?.data?.message.join(' , '));
+            } else {
+                showToastAlert(error?.response?.data?.message);
+            }
+            showToastAlert(error?.response?.data?.message);
+            setLoading(false);
+            setFile({} as File);
+        }
+    };
+
     return !isAbleToRead ? null : (
         <div>
             <PageHeadingSection description="View, create, update, and close leads. Organize by status, priority, and due date. Stay on top of work." heading="Lead Management" />
@@ -345,8 +398,38 @@ const ManageLeads = () => {
                         </ul>
                     </Dropdown>
                 </div>
-                <div>
-                    <button className="btn btn-outline-primary dropdown-toggle h-full">Bulk Import</button>
+                <div className="dropdown">
+                    <Dropdown
+                        placement={`${isRtl ? 'bottom-end' : 'bottom-start'}`}
+                        btnClassName="!flex items-center border font-semibold border-white-light dark:border-[#253b5c] rounded-md px-4 py-2 text-sm dark:bg-[#1b2e4b] dark:text-white-dark"
+                        button={
+                            <>
+                                <span className="ltr:mr-1 rtl:ml-1">Bulk Import</span>
+                                <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M19 9L12 15L5 9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                                </svg>
+                            </>
+                        }
+                        ref={bulkImportBtnRef}
+                    >
+                        <ul className="!min-w-[170px]">
+                            <li
+                                className="flex flex-col"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                }}
+                            >
+                                <form className="flex items-center px-4 py-1" onSubmit={handleUploadFile}>
+                                    <input type="file" accept=".csv" multiple={false} name="file" onChange={(e) => handleOnChange(e)} />
+                                    {file.type === 'text/csv' && (
+                                        <button type="submit" className="btn btn-secondary btn-sm" disabled={loading}>
+                                            Upload
+                                        </button>
+                                    )}
+                                </form>
+                            </li>
+                        </ul>
+                    </Dropdown>
                 </div>
                 <div>
                     <button className="btn btn-outline-primary dropdown-toggle h-full">Bulk Delete</button>
