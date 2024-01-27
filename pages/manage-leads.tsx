@@ -299,6 +299,7 @@ const ManageLeads = () => {
                 showToastAlert(error?.response?.data?.message);
             }
             showToastAlert(error?.response?.data?.message);
+            console.log(error);
             setLoading(false);
             setFile({} as File);
         }
