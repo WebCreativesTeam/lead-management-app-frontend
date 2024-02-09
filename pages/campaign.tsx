@@ -101,14 +101,14 @@ const Campaign = () => {
     //get all Campaign list
     const getCampaignList = async () => {
         setLoading(true);
-        const res: GetMethodResponseType = await new ApiClient().get(`campaign`);
+        const res: GetMethodResponseType = await new ApiClient().get(`campaign?limit=${pageSize}&page=${page}&search=${searchQuery}`);
         const campaign: ICampaign[] = res?.data;
         if (typeof campaign === 'undefined') {
             dispatch(getAllCampaigns([] as ICampaign[]));
             return;
         }
         dispatch(getAllCampaigns(campaign));
-        dispatch(setCampaignDataLength(campaign.length));
+        dispatch(setCampaignDataLength(res?.meta?.totalCount));
         setLoading(false);
     };
 

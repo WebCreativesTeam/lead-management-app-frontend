@@ -156,6 +156,8 @@ const EditOverviewForm = () => {
         }
     }, [productDropdown, singleData]);
 
+    console.log(defaultProduct);
+
     //find default selected subproduct
     useEffect(() => {
         const findSubProduct: SelectOptionsType | undefined = subProductDropdown.find((item: SelectOptionsType) => item?.value === singleData?.subProduct?.id);
@@ -196,25 +198,26 @@ const EditOverviewForm = () => {
     ) : (
         <form className="space-y-5" onSubmit={handleSubmit}>
             <div className="flex flex-col gap-4 sm:flex-row">
-                {Object.keys(defaultProduct).length > 0 && (
-                    <div className="flex-1">
-                        <label htmlFor="leadProduct">Product</label>
-                        <Select placeholder="Product" options={productDropdown} id="leadProduct" onChange={(e) => setFieldValue('product', e)} defaultValue={defaultProduct} />
-                    </div>
-                )}
-                {Object.keys(defaultSubProduct).length > 0 && (
-                    <div className="flex-1">
-                        <label htmlFor="subProduct">Sub Product</label>
-                        <Select
-                            placeholder="Sub Product"
-                            options={subProductDropdown}
-                            id="subProduct"
-                            onChange={(e) => setFieldValue('subProduct', e)}
-                            defaultValue={defaultSubProduct}
-                            isDisabled={(!values?.subProduct?.value && !singleData?.product?.id) || isLoading || Object.keys(defaultProduct).length === 0}
-                        />
-                    </div>
-                )}
+                {/* {Object.keys(defaultProduct).length > 0 && ( */}
+                <div className="flex-1">
+                    <label htmlFor="leadProduct">Product</label>
+                    <Select placeholder="Product" options={productDropdown} id="leadProduct" onChange={(e) => setFieldValue('product', e)} defaultValue={defaultProduct} />
+                </div>
+                {/* )} */}
+                {/* {Object.keys(defaultSubProduct).length > 0 && ( */}
+                <div className="flex-1">
+                    <label htmlFor="subProduct">Sub Product</label>
+                    <Select
+                        placeholder="Sub Product"
+                        options={subProductDropdown}
+                        id="subProduct"
+                        onChange={(e) => setFieldValue('subProduct', e)}
+                        defaultValue={defaultSubProduct}
+                        isDisabled={values?.product?.value || singleData?.product?.id || !isLoading ? false : true}
+                        // isLoading || Object.keys(defaultProduct).length === 0}
+                    />
+                </div>
+                {/* )} */}
             </div>
             <div className="flex flex-col gap-4 sm:flex-row">
                 <div className="flex-1">
@@ -222,7 +225,7 @@ const EditOverviewForm = () => {
                     <Flatpickr
                         data-enable-time
                         options={{
-                            enableTime: false,
+                            enableTime: true,
                             dateFormat: 'Y-m-d H:i',
                             position: 'auto',
                         }}
@@ -235,7 +238,7 @@ const EditOverviewForm = () => {
                     />
                 </div>
                 <div className="flex-1">
-                    <label>Estimated Date</label>
+                    <label>Estimated Purchase Date</label>
                     <Flatpickr
                         data-enable-time
                         options={{
@@ -244,7 +247,7 @@ const EditOverviewForm = () => {
                             position: 'auto',
                         }}
                         id="estimatedDate"
-                        placeholder="Estimated  Date"
+                        placeholder="Estimated Purchase Date"
                         name="estimatedDate"
                         className="form-input"
                         onChange={(e) => setFieldValue('estimatedDate', e)}

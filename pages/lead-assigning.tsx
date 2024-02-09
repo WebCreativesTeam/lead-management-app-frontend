@@ -94,7 +94,7 @@ const LeadAssigning = () => {
     //get all LeadAssignment list
     const getLeadAssignmentList = async () => {
         setLoading(true);
-        const res: GetMethodResponseType = await new ApiClient().get(`lead-assignment`);
+        const res: GetMethodResponseType = await new ApiClient().get(`lead-assignment?limit=${pageSize}&page=${page}&search=${searchQuery}`);
         const leadAssignment: ILeadAssignment[] = res?.data;
         if (typeof leadAssignment === 'undefined') {
             dispatch(getAllLeadAssignments([] as ILeadAssignment[]));
