@@ -12,7 +12,7 @@ import CreateNotesTab from './CreateNotesTab';
 const LeadViewModal = () => {
     const { viewModal, singleData, leadProductList, customFieldsList } = useSelector((state: IRootState) => state.lead);
     const dispatch = useDispatch();
-    const { createdAt, status, updatedAt, branch, contact, estimatedDate, priority, source, followUpDate, zip } = singleData;
+    const { createdAt, status, updatedAt, branch, contact, estimatedDate, priority, source, followUpDate, zip , assignTo } = singleData;
     const [defaultGender, setDefaultGender] = useState<SelectOptionsType>({} as SelectOptionsType);
     const [defaultProduct, setDefaultProduct] = useState<SelectOptionsType>({} as SelectOptionsType);
     const [defaultSubProduct, setDefaultSubProduct] = useState<SelectOptionsType>({} as SelectOptionsType);
@@ -65,12 +65,15 @@ const LeadViewModal = () => {
 
     const reqData: any = {
         branch: branch?.name,
-        contact: `${contact?.title} ${contact?.name} (${contact?.email})`,
+        ['Contact Name']: `${contact?.title} ${contact?.name}`,
+        ['Contact Number']: contact?.phoneNumber,
+        Email: contact?.email,
         source: source?.name,
         gender: defaultGender?.label,
         product: defaultProduct?.label,
+        ['Assigned To']: assignTo,
         ['Sub Product']: defaultSubProduct?.label,
-        zip,
+        ['Pin Code']: zip,
         priority: (
             <span className={`rounded px-2.5 py-0.5 text-sm font-medium dark:bg-blue-900 dark:text-blue-300`} style={{ color: priority?.color, backgroundColor: priority?.color + '20' }}>
                 {priority?.name}
@@ -82,7 +85,7 @@ const LeadViewModal = () => {
             </span>
         ),
         ['FollowUp Date']: new Date(followUpDate).toLocaleString(),
-        ['Estimate Date']: new Date(estimatedDate).toLocaleString(),
+        ['Estimate Purchase Date']: new Date(estimatedDate).toLocaleString(),
         ['Created']: new Date(createdAt).toLocaleString(),
         ['Updated']: new Date(updatedAt).toLocaleString(),
     };

@@ -277,8 +277,8 @@ const EditOverviewForm = () => {
                 )}
 
                 <div className="flex-1">
-                    <label htmlFor="zip">Zip Code</label>
-                    <input onChange={handleChange} onBlur={handleBlur} value={values.zip} id="zip" name="zip" type="number" placeholder="Zip Code" className="form-input" />
+                    <label htmlFor="zip">Pin Code</label>
+                    <input onChange={handleChange} onBlur={handleBlur} value={values.zip} id="zip" name="zip" type="number" placeholder="Pin Code" className="form-input" />
                 </div>
             </div>
             <div className="mt-8 flex items-center justify-end">

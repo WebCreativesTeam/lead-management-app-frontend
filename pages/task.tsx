@@ -221,6 +221,12 @@ const TaskPage = () => {
                             render: ({ title }) => <div>{title}</div>,
                         },
                         {
+                            accessor: 'assignTo',
+                            title: 'Assigned To',
+                            sortable: true,
+                            render: ({ assignedTo }) => <div>{assignedTo?.firstName + ' ' + assignedTo?.lastName}</div>,
+                        },
+                        {
                             accessor: 'createdAt',
                             title: 'Created Date',
                             sortable: true,
@@ -331,6 +337,12 @@ const TaskPage = () => {
                             title: 'End Date',
                             sortable: true,
                             render: ({ updatedAt }) => <div>{new Date(updatedAt).toLocaleString()}</div>,
+                        },
+                        {
+                            accessor: 'isActive',
+                            title: 'Is Active',
+                            sortable: true,
+                            render: ({ isActive }) => <div className="text-center font-semibold">{isActive ? 'Active' : 'In Active'}</div>,
                         },
                         {
                             accessor: 'action',

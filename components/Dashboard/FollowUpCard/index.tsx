@@ -10,11 +10,12 @@ const FollowUpCard = ({ title, followUpPercentage, followups, lastWeekFollowUps,
             </div>
             <div className="mt-5 flex items-center">
                 <div className="text-3xl font-bold ltr:mr-3 rtl:ml-3"> {followups} </div>
-                <div className="badge bg-white/30"> {followUpPercentage} </div>
+                {/* <div className="badge bg-white/30"> {followUpPercentage} </div> */}
             </div>
             <div className="mt-5 flex items-center font-semibold">
                 <EyeIcon />
-                Last Week {lastWeekFollowUps}
+                {/* Last Week */}
+                {lastWeekFollowUps}
             </div>
         </div>
     );

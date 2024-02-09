@@ -85,7 +85,7 @@ export const taskSchema = Yup.object().shape({
 
 //task Schema
 export const leadSchema = Yup.object().shape({
-    zip: Yup.string().required('Enter Zip Code'),
+    zip: Yup.string().required('Enter Pin Code'),
 });
 
 //task priority schema

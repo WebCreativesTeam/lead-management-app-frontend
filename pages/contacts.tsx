@@ -10,7 +10,18 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setPageTitle } from '@/store/themeConfigSlice';
 import { ContactDataType, GetMethodResponseType, SourceDataType, UserListSecondaryEndpointType } from '@/utils/Types';
 import { ApiClient } from '@/utils/http';
-import { getAllContacts, setEditModal, setDeleteModal, setCreateModal, setViewModal, getAllUsersForContact, getAllSourceForContact, setContactDataLength, setPage, setPageSize } from '@/store/Slices/contactSlice';
+import {
+    getAllContacts,
+    setEditModal,
+    setDeleteModal,
+    setCreateModal,
+    setViewModal,
+    getAllUsersForContact,
+    getAllSourceForContact,
+    setContactDataLength,
+    setPage,
+    setPageSize,
+} from '@/store/Slices/contactSlice';
 import ContactViewModal from '@/components/Contact/ContactViewModal';
 import { IRootState } from '@/store';
 import ContactCreateModal from '@/components/Contact/ContactCreateModal';
@@ -250,14 +261,14 @@ const Contacts = () => {
                             accessor: 'anniversary',
                             title: 'Wedding Anniversary',
                             sortable: true,
-                            render: ({ anniversary }) => <div>{new Date(anniversary).toLocaleString()}</div>,
+                            render: ({ anniversary }) => <div className="text-center">{new Date(anniversary).toLocaleDateString()}</div>,
                             hidden: hideCols.includes('anniversary'),
                         },
                         {
                             accessor: 'DOB',
                             title: 'Date Of Birth',
                             sortable: true,
-                            render: ({ DOB }) => <div>{new Date(DOB).toLocaleString()}</div>,
+                            render: ({ DOB }) => <div className="text-center">{new Date(DOB).toLocaleDateString()}</div>,
                             hidden: hideCols.includes('DOB'),
                         },
                         {

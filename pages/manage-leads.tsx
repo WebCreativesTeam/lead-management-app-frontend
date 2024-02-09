@@ -70,13 +70,16 @@ const ManageLeads = () => {
 
     const cols: { accessor: string; title: string }[] = [
         { accessor: 'contactTitle', title: 'Name' },
+        { accessor: 'phoneNumber', title: 'Mobile' },
         { accessor: 'contactEmail', title: 'Email' },
         { accessor: 'source', title: 'Source' },
-        { accessor: 'createdAt', title: 'Created Date' },
+        { accessor: 'product', title: 'Product' },
+        { accessor: 'assignTo', title: 'Assigned To' },
+        { accessor: 'createdAt', title: 'Create Date' },
         { accessor: 'updatedAt', title: 'Last Updated' },
         { accessor: 'startDate', title: 'Start Date' },
         { accessor: 'status', title: 'Lead Status' },
-        { accessor: 'priority', title: 'Priority' },
+        { accessor: 'priority', title: 'Lead Priority' },
         { accessor: 'endDate', title: 'End Date' },
     ];
 
@@ -459,6 +462,13 @@ const ManageLeads = () => {
                             hidden: hideCols.includes('contactTitle'),
                         },
                         {
+                            accessor: 'phoneNumber',
+                            title: 'Mobile',
+                            sortable: true,
+                            render: ({ contact }) => <div>{contact?.phoneNumber}</div>,
+                            hidden: hideCols.includes('phoneNumber'),
+                        },
+                        {
                             accessor: 'contactEmail',
                             title: 'Email',
                             sortable: true,
@@ -473,6 +483,20 @@ const ManageLeads = () => {
                             hidden: hideCols.includes('source'),
                         },
                         {
+                            accessor: 'product',
+                            title: 'Product',
+                            sortable: true,
+                            render: ({ product }) => <div>{product?.name}</div>,
+                            hidden: hideCols.includes('product'),
+                        },
+                        {
+                            accessor: 'assignTo',
+                            title: 'Assigned To',
+                            sortable: true,
+                            render: ({ assignTo }) => <div>{assignTo}</div>,
+                            hidden: hideCols.includes('assignTo'),
+                        },
+                        {
                             accessor: 'createdAt',
                             title: 'Created Date',
                             sortable: true,
@@ -485,13 +509,6 @@ const ManageLeads = () => {
                             sortable: true,
                             render: ({ updatedAt }) => <div>{new Date(updatedAt).toLocaleString()}</div>,
                             hidden: hideCols.includes('updatedAt'),
-                        },
-                        {
-                            accessor: 'startDate',
-                            title: 'Start Date',
-                            sortable: true,
-                            render: ({ createdAt }) => <div>{new Date(createdAt).toLocaleString()}</div>,
-                            hidden: hideCols.includes('startDate'),
                         },
                         {
                             accessor: 'status',

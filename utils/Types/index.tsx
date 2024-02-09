@@ -358,6 +358,7 @@ export type LeadDataType = {
     source: SourceDataType;
     branch: BranchDataType;
     srNo: number;
+    assignTo: string;
 };
 
 export type LeadListSecondaryEndpointType = {
