@@ -50,6 +50,7 @@ const TaskPage = () => {
     const { data, isFetching, taskPriorityList, taskStatusList, isAbleToCreate, isAbleToDelete, isAbleToRead, isAbleToUpdate, isAbleToTransferTask, totalRecords, pageSize, page } = useSelector(
         (state: IRootState) => state.task
     );
+    const { data: UserData } = useSelector((state: IRootState) => state.userInfo);
     const [searchInputText, setSearchInputText] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(false);
     const [filter, setFilter] = useState<string>('');
@@ -75,7 +76,7 @@ const TaskPage = () => {
     //get all task after page render
     useEffect(() => {
         getTasksList();
-    }, [isFetching, pageSize, page, searchQuery]);
+    }, [isFetching, pageSize, page, searchQuery, filter]);
 
     useEffect(() => {
         getTasksPriority();
@@ -85,21 +86,27 @@ const TaskPage = () => {
     }, []);
 
     useEffect(() => {
+        if (UserData?.email) {
+            setFilter(`assignedById=${UserData?.id}`);
+        }
+    }, [UserData?.email]);
+    useEffect(() => {
         setRecordsData(data);
     }, [data]);
-
     //get all tasks list
     const getTasksList = async () => {
-        setLoading(true);
-        const res: GetMethodResponseType = await new ApiClient().get(`task?limit=${pageSize}&page=${page}&search=${searchQuery}`);
-        const tasks: TaskDataType[] | undefined = res?.data;
-        if (typeof tasks === 'undefined') {
-            dispatch(getAllTasks([] as TaskDataType[]));
-            return;
+        if (filter) {
+            setLoading(true);
+            const res: GetMethodResponseType = await new ApiClient().get(`task?limit=${pageSize}&page=${page}&search=${searchQuery}&${filter}`);
+            const tasks: TaskDataType[] | undefined = res?.data;
+            if (typeof tasks === 'undefined') {
+                dispatch(getAllTasks([] as TaskDataType[]));
+                return;
+            }
+            dispatch(getAllTasks(tasks));
+            dispatch(setTaskDataLength(res?.meta?.totalCount));
+            setLoading(false);
         }
-        dispatch(getAllTasks(tasks));
-        dispatch(setTaskDataLength(res?.meta?.totalCount));
-        setLoading(false);
     };
 
     //get all users list
@@ -175,12 +182,12 @@ const TaskPage = () => {
                         >
                             <ul className="!min-w-[170px]">
                                 <li>
-                                    <button type="button" onClick={() => setFilter(`assignedById=${null}`)}>
+                                    <button type="button" onClick={() => UserData?.id && setFilter(`assignedById=${UserData?.id}`)}>
                                         Assigned by Me
                                     </button>
                                 </li>
                                 <li>
-                                    <button type="button" onClick={() => setFilter(`assignedToId=${null}`)}>
+                                    <button type="button" onClick={() => UserData?.id && setFilter(`assignedToId=${UserData?.id}`)}>
                                         Assigned to Me
                                     </button>
                                 </li>

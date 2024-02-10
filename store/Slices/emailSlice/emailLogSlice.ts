@@ -54,5 +54,5 @@ const emailLogSlice = createSlice({
     },
 });
 
-export const { setViewModal, getAllEmailLogs, setDisableBtn, setFetching, setEmailLogReadPolicy,setEmailLogDataLength } = emailLogSlice.actions;
+export const { setViewModal, getAllEmailLogs, setDisableBtn, setFetching, setEmailLogReadPolicy, setEmailLogDataLength } = emailLogSlice.actions;
 export default emailLogSlice.reducer;
