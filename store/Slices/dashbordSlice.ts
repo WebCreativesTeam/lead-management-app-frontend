@@ -4,9 +4,7 @@ import { PAGE_SIZES, fetchUserInfo } from '@/utils/contant';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 const initialState: DashboardInitialStateProps = {
-    todayFollowUps: [] as IFollowup[],
-    tomorrowFollowUps: [] as IFollowup[],
-    pendingFollowUps: [] as IFollowup[],
+    data: [] as IFollowup[],
     sourceList: [] as SourceDataType[],
     leadStatusList: [] as LeadStatusSecondaryEndpoint[],
     singleData: {} as IFollowup,
@@ -40,7 +38,7 @@ const dashboardSlice = createSlice({
         setViewModal(state, action) {
             const { open, id } = action.payload;
             state.viewModal = open;
-            const findRequestedData: IFollowup | undefined = state.todayFollowUps.find((item: IFollowup) => item.id === id);
+            const findRequestedData: IFollowup | undefined = state.data.find((item: IFollowup) => item.id === id);
 
             if (findRequestedData && state.viewModal) {
                 state.singleData = findRequestedData;
@@ -51,7 +49,7 @@ const dashboardSlice = createSlice({
         setEditModal(state, action) {
             const { open, id } = action.payload;
             state.editModal = open;
-            const findRequestedData: IFollowup | undefined = state.todayFollowUps.find((item: IFollowup) => item.id === id);
+            const findRequestedData: IFollowup | undefined = state.data.find((item: IFollowup) => item.id === id);
 
             if (findRequestedData && state.editModal) {
                 state.singleData = findRequestedData;
@@ -62,7 +60,7 @@ const dashboardSlice = createSlice({
         setDeleteModal(state, action) {
             const { open, id } = action.payload;
             state.deleteModal = open;
-            const findRequestedData: IFollowup | undefined = state.todayFollowUps.find((item: IFollowup) => item.id === id);
+            const findRequestedData: IFollowup | undefined = state.data.find((item: IFollowup) => item.id === id);
 
             if (findRequestedData && state.deleteModal) {
                 state.singleData = findRequestedData;
@@ -70,14 +68,18 @@ const dashboardSlice = createSlice({
                 state.singleData = {} as IFollowup;
             }
         },
-        getAllTodayFollowups(state, action: PayloadAction<IFollowup[]>) {
-            state.todayFollowUps = action.payload;
-        },
-        getAllTomorrowFollowups(state, action: PayloadAction<IFollowup[]>) {
-            state.tomorrowFollowUps = action.payload;
-        },
-        getAllPendingFollowups(state, action: PayloadAction<IFollowup[]>) {
-            state.todayFollowUps = action.payload;
+        getFollowUps(state, action: PayloadAction<IFollowup[]>) {
+            let srNoArray: number[] = [];
+            for (let i = state.pageSize * state.page - state.pageSize; i <= state.pageSize * state.page; i++) {
+                srNoArray.push(i);
+            }
+            srNoArray.shift();
+            if (action.payload.length > 0) {
+                const serializedData = action.payload?.map((item, index) => {
+                    return { ...item, srNo: srNoArray[index] };
+                });
+                state.data = serializedData;
+            }
         },
         getAllLeadStatusForDashboard(state, action: PayloadAction<LeadStatusSecondaryEndpoint[]>) {
             state.leadStatusList = action.payload;
@@ -118,9 +120,7 @@ export const {
     setDeleteModal,
     setEditModal,
     setViewModal,
-    getAllTodayFollowups,
-    getAllTomorrowFollowups,
-    getAllPendingFollowups,
+    getFollowUps,
     setDisableBtn,
     setFetching,
     setDashboardCreatePermission,

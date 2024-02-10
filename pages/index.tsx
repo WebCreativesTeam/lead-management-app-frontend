@@ -3,7 +3,7 @@ import React, { useEffect, useState, useDeferredValue } from 'react';
 import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
-import { sortBy } from 'lodash';
+import { sortBy, values } from 'lodash';
 import { ChatIcon, Delete, Edit, Email, View, Sms } from '@/utils/icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { setPageTitle } from '@/store/themeConfigSlice';
@@ -15,8 +15,8 @@ import { getAllLeadStatusForCampaign, getAllSourceForCampaign, setDeleteModal, s
 import ScheduleMessageViewModal from '@/components/Campaign/CampaignViewModal';
 import ScheduleMessageEditModal from '@/components/Campaign/CampaignEditModal';
 import ScheduleMessageDeleteModal from '@/components/Campaign/CampaignDeleteModal';
-import { followUpDropdownList, followupData } from '@/utils/Raw Data';
-import { getAllLeadStatusForDashboard, getAllPendingFollowups, getAllTodayFollowups, getAllTomorrowFollowups } from '@/store/Slices/dashbordSlice';
+import { followUpDropdownList } from '@/utils/Raw Data';
+import { getAllLeadStatusForDashboard, getFollowUps, setDashboardDataLength } from '@/store/Slices/dashbordSlice';
 import FollowUpCard from '@/components/Dashboard/FollowUpCard';
 import { setEmailTemplateModal, setSmsTemplateModal, setWhatsappTemplateModal } from '@/store/Slices/leadSlice/manageLeadSlice';
 import WhatsappTemplateModal from '@/components/Leads/ManageLeads/WhatsappTemplateModal';
@@ -28,13 +28,13 @@ const Dashboard = () => {
     useEffect(() => {
         dispatch(setPageTitle('Track Leads | ScheduleMessages'));
     });
-    const { todayFollowUps, isFetching, totalRecords, leadStatusList } = useSelector((state: IRootState) => state.dashboard);
+    const { data, isFetching, totalRecords, leadStatusList } = useSelector((state: IRootState) => state.dashboard);
 
     const { whatsAppTemplateModal, emailTemplateModal, smsTemplateModal } = useSelector((state: IRootState) => state.lead);
 
     //hooks
     const [loading, setLoading] = useState<boolean>(false);
-    const [followupBy, setFollowupBy] = useState<string>('');
+    const [followupBy, setFollowupBy] = useState<string>(followUpDropdownList[0]?.value);
     const [leadSatusDropdown, setLeadSatusDropdown] = useState<SelectOptionsType[]>([] as SelectOptionsType[]);
 
     //datatable
@@ -46,6 +46,8 @@ const Dashboard = () => {
         columnAccessor: 'name',
         direction: 'asc',
     });
+    const [selectedStatus, setSelectedStatus] = useState<string>('');
+    const [filter, setFilter] = useState('');
     useEffect(() => {
         const data = sortBy(recordsData, sortStatus.columnAccessor);
         setRecordsData(sortStatus.direction === 'desc' ? data.reverse() : data);
@@ -54,60 +56,40 @@ const Dashboard = () => {
 
     //get all scheduleMessage after page render
     useEffect(() => {
-        getTodayFollowupList();
-        getTomorrowFollowupList();
-        getPendingFollowupList();
-    }, [isFetching, pageSize, page]);
+        getFollowUpList();
+    }, [isFetching, pageSize, page, filter]);
 
     useEffect(() => {
-        setRecordsData(todayFollowUps);
-    }, [todayFollowUps]);
+        setRecordsData(data);
+    }, [data]);
 
     useEffect(() => {
         getAllSourceList();
         getLeadStatus();
     }, []);
 
-    //get all ScheduleMessage list
-    const getTodayFollowupList = async () => {
-        setLoading(true);
-        // const res: GetMethodResponseType = await new ApiClient().get(`schedule-message?limit=${pageSize}&page=${page}&search=${searchQuery}`);
-        // const scheduleMessage: IFollowup[] = res?.data;
-        // if (typeof scheduleMessage === 'undefined') {
-        //     dispatch(getAllScheduleMessages([] as IFollowup[]));
-        //     return;
-        // }
-        dispatch(getAllTodayFollowups(followupData));
-        // dispatch(setCampaignDataLength(followupData.length));
-        setLoading(false);
-    };
+    useEffect(() => {
+        if (leadSatusDropdown?.length > 0) {
+            setFilter(`/today?statusId=${leadSatusDropdown[0]?.value}`);
+            setSelectedStatus(leadSatusDropdown[0]?.value);
+        }
+    }, [leadStatusList]);
 
     //get all ScheduleMessage list
-    const getTomorrowFollowupList = async () => {
-        setLoading(true);
-        // const res: GetMethodResponseType = await new ApiClient().get(`schedule-message?limit=${pageSize}&page=${page}&search=${searchQuery}`);
-        // const scheduleMessage: IFollowup[] = res?.data;
-        // if (typeof scheduleMessage === 'undefined') {
-        //     dispatch(getAllScheduleMessages([] as IFollowup[]));
-        //     return;
-        // }
-        dispatch(getAllTomorrowFollowups(followupData));
-        // dispatch(setCampaignDataLength(followupData.length));
-        setLoading(false);
-    };
-
-    //get all ScheduleMessage list
-    const getPendingFollowupList = async () => {
-        setLoading(true);
-        // const res: GetMethodResponseType = await new ApiClient().get(`schedule-message?limit=${pageSize}&page=${page}&search=${searchQuery}`);
-        // const scheduleMessage: IFollowup[] = res?.data;
-        // if (typeof scheduleMessage === 'undefined') {
-        //     dispatch(getAllScheduleMessages([] as IFollowup[]));
-        //     return;
-        // }
-        dispatch(getAllPendingFollowups(followupData));
-        // dispatch(setCampaignDataLength(followupData.length));
-        setLoading(false);
+    const getFollowUpList = async () => {
+        if (filter) {
+            setLoading(true);
+            // /lead/today?statusId=6505e3b852641e76b6c2b4ca
+            const res: GetMethodResponseType = await new ApiClient().get(`lead${filter}?limit=${pageSize}&page=${page}`);
+            const resData: IFollowup[] = res?.data;
+            if (typeof resData === 'undefined') {
+                dispatch(getFollowUps([] as IFollowup[]));
+                return;
+            }
+            dispatch(getFollowUps(resData));
+            dispatch(setDashboardDataLength(res?.meta?.totalCount));
+            setLoading(false);
+        }
     };
 
     // get all Source list
@@ -145,7 +127,6 @@ const Dashboard = () => {
         });
         setLeadSatusDropdown(createLeadStatusDropdown);
     }, [leadStatusList]);
-
     return (
         <div>
             <div className="mb-6 grid grid-cols-1 gap-6 text-white sm:grid-cols-2 xl:grid-cols-3">
@@ -161,8 +142,29 @@ const Dashboard = () => {
                         <p className="text-lg font-bold">Followups</p>
                     </div>
                     <div className="flex flex-1 gap-6">
-                        <Select placeholder="Select Status" className="z-10 flex-1" options={leadSatusDropdown} onChange={(data: any) => setFollowupBy(data.value)} />
-                        <Select placeholder="Choose Followup" className="z-10 flex-1" options={followUpDropdownList} onChange={(data: any) => setFollowupBy(data.value)} />
+                        {leadSatusDropdown?.length > 0 && (
+                            <Select
+                                placeholder="Select Status"
+                                className="z-10 flex-1"
+                                options={leadSatusDropdown}
+                                onChange={(data: any) => {
+                                    setFilter(`/${followupBy}?statusId=${data.value}`);
+                                    setSelectedStatus(data.value);
+                                }}
+                                defaultValue={leadSatusDropdown[0]}
+                            />
+                        )}
+
+                        <Select
+                            placeholder="Choose Followup"
+                            className="z-10 flex-1"
+                            options={followUpDropdownList}
+                            defaultValue={followUpDropdownList[0]}
+                            onChange={(data: any) => {
+                                setFilter(`/${data.value}?statusId=${selectedStatus}`);
+                                setFollowupBy(data.value);
+                            }}
+                        />
                     </div>
                 </div>
 
@@ -178,16 +180,16 @@ const Dashboard = () => {
                             render: ({ srNo }) => <div>{srNo}</div>,
                         },
                         {
-                            accessor: 'name',
+                            accessor: 'contact',
                             title: 'Name',
                             sortable: true,
-                            render: ({ name }) => <div>{name}</div>,
+                            render: ({ contact }) => <div>{contact?.name}</div>,
                         },
                         {
                             accessor: 'phoneNumber',
                             title: 'Phone Number',
                             sortable: true,
-                            render: ({ phoneNumber }) => <div>{phoneNumber}</div>,
+                            render: ({ contact }) => <div>{contact?.phoneNumber}</div>,
                         },
                         {
                             accessor: 'source',
@@ -199,7 +201,7 @@ const Dashboard = () => {
                             accessor: 'product',
                             title: 'Product',
                             sortable: true,
-                            render: ({ product }) => <div>{product}</div>,
+                            render: ({ product }) => <div>{product?.name}</div>,
                         },
                         {
                             accessor: 'status',
@@ -225,12 +227,12 @@ const Dashboard = () => {
                             sortable: true,
                             render: ({ updatedAt }) => <div>{updatedAt}</div>,
                         },
-                        {
-                            accessor: 'nextFollowup',
-                            title: 'Next Follow Up',
-                            sortable: true,
-                            render: ({ nextFollowup }) => <div>{nextFollowup}</div>,
-                        },
+                        // {
+                        //     accessor: 'nextFollowup',
+                        //     title: 'Next Follow Up',
+                        //     sortable: true,
+                        //     render: ({ nextFollowup }) => <div>{nextFollowup}</div>,
+                        // },
                         {
                             accessor: 'quickMessage',
                             title: 'Quick Message',
@@ -301,7 +303,7 @@ const Dashboard = () => {
                     recordsPerPage={pageSize}
                     page={page}
                     onPageChange={(p) => setPage(p)}
-                    recordsPerPageOptions={todayFollowUps?.length < 10 ? [10] : PAGE_SIZES}
+                    recordsPerPageOptions={data?.length < 10 ? [10] : PAGE_SIZES}
                     onRecordsPerPageChange={setPageSize}
                     sortStatus={sortStatus}
                     onSortStatusChange={setSortStatus}

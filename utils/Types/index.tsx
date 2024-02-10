@@ -438,16 +438,24 @@ export interface ICampaign {
 // dashboard page types
 export interface IFollowup {
     srNo?: number;
-    name: string;
-    phoneNumber: string;
-    source: SourceDataType;
-    product: string;
+    id: string;
+    updatedAt: string;
+    createdAt: string;
+    estimatedDate: string;
+    followUpDate: string;
+    gender: string;
+    zip: string;
+    customFields: {
+        [key: string]: string | number | string[];
+    };
     status: LeadStatusSecondaryEndpoint;
     priority: LeadPrioritySecondaryEndpoint;
-    createdAt: string;
-    updatedAt: string;
-    nextFollowup: string;
-    id: string;
+    contact: ContactDataType;
+    source: SourceDataType;
+    assignedTo: string;
+    branch: BranchDataType;
+    product: IProduct;
+    subProduct: ISubProduct;
 }
 
 // Custom field data types
@@ -667,9 +675,7 @@ export interface CampaignInitialStateProps extends InitialStateProps {
 
 //dashboard slice intial props
 export interface DashboardInitialStateProps extends InitialStateProps {
-    todayFollowUps: IFollowup[];
-    tomorrowFollowUps: IFollowup[];
-    pendingFollowUps: IFollowup[];
+    data: IFollowup[];
     singleData: IFollowup;
     sourceList: SourceDataType[];
     leadStatusList: LeadStatusSecondaryEndpoint[];
