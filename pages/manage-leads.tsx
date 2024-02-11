@@ -34,6 +34,7 @@ import {
     getAllNotesForLead,
     getAllProductsForLead,
     getAllSourceForLead,
+    getAllUsersForLead,
     setChangePriorityModal,
     setChangeStatusModal,
     setCreateModal,
@@ -143,6 +144,7 @@ const ManageLeads = () => {
         getSourceList();
         getCustomFieldList();
         getAllProducts();
+        getUsersList();
     }, []);
 
     useEffect(() => {
@@ -306,6 +308,19 @@ const ManageLeads = () => {
             setLoading(false);
             setFile({} as File);
         }
+    };
+
+    //get all users list
+    const getUsersList = async () => {
+        setLoading(true);
+        const res: GetMethodResponseType = await new ApiClient().get('user/list');
+        const users: UserListSecondaryEndpointType[] = res?.data;
+        if (typeof users === 'undefined') {
+            dispatch(getAllUsersForLead([] as UserListSecondaryEndpointType[]));
+            return;
+        }
+        dispatch(getAllUsersForLead(users));
+        setLoading(false);
     };
 
     return !isAbleToRead ? null : (
@@ -493,7 +508,7 @@ const ManageLeads = () => {
                             accessor: 'assignTo',
                             title: 'Assigned To',
                             sortable: true,
-                            render: ({ assignTo }) => <div>{assignTo}</div>,
+                            render: ({ assignedTo }) => <div>{assignedTo?.firstName + assignedTo?.lastName}</div>,
                             hidden: hideCols.includes('assignTo'),
                         },
                         {

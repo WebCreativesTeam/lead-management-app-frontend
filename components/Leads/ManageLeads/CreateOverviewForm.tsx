@@ -20,17 +20,18 @@ import {
     OverviewFormType,
     GetMethodResponseType,
     ProductSecondaryEndpointType,
+    UserListSecondaryEndpointType,
 } from '@/utils/Types';
 import { genderList } from '@/utils/Raw Data';
 
 const CreateOverviewForm = () => {
     const dispatch = useDispatch();
-    const { isFetching, createModal, isBtnDisabled, leadPriorityList, leadBranchList, leadContactsList, leadSourceList, leadProductList, leadSubProductList, overViewFormData } = useSelector(
-        (state: IRootState) => state.lead
-    );
+    const { isFetching, createModal, isBtnDisabled, leadPriorityList, leadBranchList, leadContactsList, leadSourceList, leadProductList, leadSubProductList, overViewFormData, usersList } =
+        useSelector((state: IRootState) => state.lead);
     const [productDropdown, setProductDropdown] = useState<SelectOptionsType[]>([] as SelectOptionsType[]);
     const [subProductDropdown, setsubProductDropdown] = useState<SelectOptionsType[]>([] as SelectOptionsType[]);
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [userDropdown, setUserDropdown] = useState<SelectOptionsType[]>([] as SelectOptionsType[]);
 
     const initialValues = {
         priority: {
@@ -68,6 +69,7 @@ const CreateOverviewForm = () => {
             label: '',
         },
         zip: '',
+        assignedToId: '',
     };
     const { values, handleChange, submitForm, handleSubmit, setFieldValue, handleBlur, resetForm, errors } = useFormik({
         initialValues,
@@ -79,8 +81,8 @@ const CreateOverviewForm = () => {
             try {
                 // dispatch(setDisableBtn(true));
                 const createLeadObj = {
-                    estimatedDate: new Date(value.estimatedDate).toISOString(),
-                    followUpDate: new Date(value.followUpDate).toISOString(),
+                    estimatedDate: value.estimatedDate ? new Date(value.estimatedDate).toISOString() : null,
+                    followUpDate: value.followUpDate ? new Date(value.followUpDate).toISOString() : null,
                     sourceId: values.source.value,
                     priorityId: values.priority.value,
                     // statusId: values.status.value,
@@ -90,6 +92,7 @@ const CreateOverviewForm = () => {
                     zip: values.zip.toString(),
                     subProductId: values.subProduct.value,
                     gender: values.gender.value,
+                    assignedToId: values.assignedToId,
                 };
                 console.log(createLeadObj);
 
@@ -122,17 +125,6 @@ const CreateOverviewForm = () => {
             ),
         };
     });
-
-    // const leadStatusDropdown: SelectOptionsType[] = leadStatusList?.map((item: LeadStatusSecondaryEndpoint) => {
-    //     return {
-    //         value: item.id,
-    //         label: (
-    //             <div className={`rounded px-2.5 py-0.5 text-center text-sm font-medium dark:bg-blue-900 dark:text-blue-300`} style={{ color: item?.color, backgroundColor: item?.color + '20' }}>
-    //                 {item?.name}
-    //             </div>
-    //         ),
-    //     };
-    // });
 
     const leadBranchDropdown: SelectOptionsType[] = leadBranchList?.map((item: BranchListSecondaryEndpoint) => {
         return { value: item.id, label: item.name };
@@ -179,6 +171,18 @@ const CreateOverviewForm = () => {
         setProductDropdown(createProductDropdown);
         getAllSubProducts(values?.product?.value);
     }, [values.product?.value]);
+
+    useEffect(() => {
+        const userDropdownList: SelectOptionsType[] = usersList?.map((item: UserListSecondaryEndpointType) => {
+            return { value: item?.id, label: `${item.firstName} ${item.lastName} (${item?.email})` };
+        });
+        const uid: string | null = localStorage?.getItem('uid');
+        if (uid) {
+            userDropdownList.unshift({ label: 'Self', value: uid });
+        }
+        setUserDropdown(userDropdownList);
+    }, [usersList]);
+
     return (
         <form className="space-y-5" onSubmit={handleSubmit}>
             <div className="flex flex-col gap-4 sm:flex-row">
@@ -220,7 +224,7 @@ const CreateOverviewForm = () => {
                     />
                 </div>
                 <div className="flex-1">
-                    <label>Estimated Date</label>
+                    <label>Estimated Purchase Date</label>
                     <Flatpickr
                         data-enable-time
                         options={{
@@ -258,6 +262,12 @@ const CreateOverviewForm = () => {
                     <input onChange={handleChange} onBlur={handleBlur} value={values.zip} id="zip" name="zip" type="number" placeholder="Pin Code" className="form-input" />
                 </div>
             </div>
+            <div className="flex flex-col gap-4 sm:flex-row">
+                <div className="flex-1">
+                    <label htmlFor="leadAssignTo">Assign To</label>
+                    <Select placeholder="Select Lead Assign To" options={userDropdown} id="leadAssignTo" onChange={(e) => setFieldValue('assignedToId', e?.value)} />
+                </div>
+            </div>
             <div className="mt-8 flex items-center justify-end">
                 <button
                     type="button"
@@ -277,14 +287,13 @@ const CreateOverviewForm = () => {
                     className="btn  btn-primary cursor-pointer ltr:ml-4 rtl:mr-4"
                     disabled={
                         values.contact.value &&
-                        values.estimatedDate &&
-                        values.followUpDate &&
+                        // values.estimatedDate &&
+                        // values.followUpDate &&
                         values.source.value &&
                         values.branch.value &&
                         values.priority.value &&
                         values.product?.value &&
                         values.subProduct.value &&
-                        // values.status.value &&
                         values.gender.value &&
                         values.zip &&
                         !isBtnDisabled

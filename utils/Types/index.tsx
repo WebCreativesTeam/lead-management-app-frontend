@@ -340,8 +340,8 @@ export type LeadDataType = {
     updatedAt: string;
     product: IProduct;
     subProduct: ISubProduct;
-    estimatedDate: string;
-    followUpDate: string;
+    estimatedDate: string | null;
+    followUpDate: string | null;
     gender: Gender;
     zip: string;
     customFields: any;
@@ -359,7 +359,11 @@ export type LeadDataType = {
     source: SourceDataType;
     branch: BranchDataType;
     srNo: number;
-    assignTo: string;
+    assignedTo: {
+        id: string;
+        firstName: string;
+        lastName: string;
+    };
 };
 
 export type LeadListSecondaryEndpointType = {
@@ -597,8 +601,8 @@ export interface ManageTaskInitialStateProps extends InitialStateProps {
 }
 
 export type OverviewFormType = {
-    estimatedDate: string;
-    followUpDate: string;
+    estimatedDate: string | null;
+    followUpDate: string | null;
     sourceId: string;
     priorityId: string;
     branchId: string;
@@ -612,6 +616,7 @@ export type OverviewFormType = {
 export interface ManageLeadInitialStateProps extends InitialStateProps {
     data: LeadDataType[];
     singleData: LeadDataType;
+    usersList: UserListSecondaryEndpointType[];
     leadPriorityList: LeadPrioritySecondaryEndpoint[];
     leadStatusList: LeadStatusSecondaryEndpoint[];
     changePriorityModal: boolean;

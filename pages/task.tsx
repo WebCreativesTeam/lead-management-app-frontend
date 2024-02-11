@@ -87,7 +87,7 @@ const TaskPage = () => {
 
     useEffect(() => {
         if (UserData?.email) {
-            setFilter(`assignedById=${UserData?.id}`);
+            setFilter(`assignedToId=${UserData?.id}`);
         }
     }, [UserData?.email]);
     useEffect(() => {
@@ -181,11 +181,11 @@ const TaskPage = () => {
                             }
                         >
                             <ul className="!min-w-[170px]">
-                                <li>
+                                {/* <li>
                                     <button type="button" onClick={() => UserData?.id && setFilter(`assignedById=${UserData?.id}`)}>
                                         Assigned by Me
                                     </button>
-                                </li>
+                                </li> */}
                                 <li>
                                     <button type="button" onClick={() => UserData?.id && setFilter(`assignedToId=${UserData?.id}`)}>
                                         Assigned to Me

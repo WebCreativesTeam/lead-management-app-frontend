@@ -127,7 +127,6 @@ const Dashboard = () => {
         setLeadSatusDropdown(createLeadStatusDropdown);
     }, [leadStatusList]);
 
-    console.log(filter);
     return (
         <div>
             <div className="mb-6 grid grid-cols-1 gap-6 text-white sm:grid-cols-2 xl:grid-cols-3">

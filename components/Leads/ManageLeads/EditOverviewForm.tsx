@@ -10,28 +10,34 @@ import { showToastAlert } from '@/utils/contant';
 import Select from 'react-select';
 import Flatpickr from 'react-flatpickr';
 import 'flatpickr/dist/flatpickr.css';
-import { SelectOptionsType, BranchListSecondaryEndpoint, SourceDataType, LeadStatusSecondaryEndpoint, GetMethodResponseType, ProductSecondaryEndpointType } from '@/utils/Types';
+import {
+    SelectOptionsType,
+    BranchListSecondaryEndpoint,
+    SourceDataType,
+    LeadStatusSecondaryEndpoint,
+    GetMethodResponseType,
+    ProductSecondaryEndpointType,
+    UserListSecondaryEndpointType,
+} from '@/utils/Types';
 import { genderList } from '@/utils/Raw Data';
 import Loader from '@/components/__Shared/Loader';
 
 const EditOverviewForm = () => {
     const dispatch = useDispatch();
-    const { isBtnDisabled, leadBranchList, leadSourceList, leadProductList, singleData, isFetching } = useSelector((state: IRootState) => state.lead);
+    const { isBtnDisabled, leadBranchList, leadSourceList, leadProductList, singleData, isFetching, usersList } = useSelector((state: IRootState) => state.lead);
     const [productDropdown, setProductDropdown] = useState<SelectOptionsType[]>([] as SelectOptionsType[]);
     const [branchDropdown, setBranchDropdown] = useState<SelectOptionsType[]>([] as SelectOptionsType[]);
     const [sourceDropdown, setSourceDropdown] = useState<SelectOptionsType[]>([] as SelectOptionsType[]);
     const [defaultSourceValue, setDefaultSourceValue] = useState<SelectOptionsType>({} as SelectOptionsType);
+    const [defaultAssignedToValue, setDefaultAssigedToValue] = useState<SelectOptionsType>({} as SelectOptionsType);
     const [defaultBranch, setDefaultBranch] = useState<SelectOptionsType>({} as SelectOptionsType);
     const [defaultProduct, setDefaultProduct] = useState<SelectOptionsType>({} as SelectOptionsType);
     const [defaultSubProduct, setDefaultSubProduct] = useState<SelectOptionsType>({} as SelectOptionsType);
     const [defaultGender, setDefaultGender] = useState<SelectOptionsType>({} as SelectOptionsType);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [subProductDropdown, setsubProductDropdown] = useState<SelectOptionsType[]>([] as SelectOptionsType[]);
+    const [userDropdown, setUserDropdown] = useState<SelectOptionsType[]>([] as SelectOptionsType[]);
     const initialValues = {
-        // status: {
-        //     value: '',
-        //     label: '',
-        // },
         estimatedDate: '',
         branch: {
             value: '',
@@ -55,6 +61,7 @@ const EditOverviewForm = () => {
             label: '',
         },
         zip: '',
+        assignedToId: '',
     };
     const { values, handleChange, submitForm, handleSubmit, setFieldValue, handleBlur } = useFormik({
         initialValues,
@@ -74,6 +81,7 @@ const EditOverviewForm = () => {
                     followUpDate: new Date(value.followUpDate).toISOString(),
                     zip: values.zip.toString(),
                     subProductId: values.subProduct.value,
+                    assignedToId: values?.assignedToId,
                 };
                 console.log(editLeadObj);
                 await new ApiClient().patch('lead/' + singleData?.id, editLeadObj);
@@ -101,6 +109,7 @@ const EditOverviewForm = () => {
         setFieldValue('gender', singleData?.gender);
         setFieldValue('branch', singleData?.branch?.id);
         setFieldValue('zip', singleData?.zip);
+        setFieldValue('assignedToId', singleData?.assignedTo?.id);
 
         const findGender: SelectOptionsType | undefined = genderList.find((item: SelectOptionsType) => item?.value === singleData?.gender);
         if (findGender) {
@@ -140,6 +149,14 @@ const EditOverviewForm = () => {
         }
     }, [sourceDropdown, singleData]);
 
+    //find default selected assignto
+    useEffect(() => {
+        const findAssignedToLead: SelectOptionsType | undefined = userDropdown.find((item: SelectOptionsType) => item?.value === singleData?.assignedTo?.id);
+        if (findAssignedToLead) {
+            setDefaultAssigedToValue(findAssignedToLead);
+        }
+    }, [userDropdown, singleData]);
+
     //create product dropdown
     useEffect(() => {
         const createProductDropdown: SelectOptionsType[] = leadProductList?.map((item) => {
@@ -155,8 +172,6 @@ const EditOverviewForm = () => {
             setDefaultProduct(findProduct);
         }
     }, [productDropdown, singleData]);
-
-    console.log(defaultProduct);
 
     //find default selected subproduct
     useEffect(() => {
@@ -192,6 +207,17 @@ const EditOverviewForm = () => {
         setProductDropdown(createProductDropdown);
         getAllSubProducts(values?.product?.value || singleData?.product?.id);
     }, [values.product?.value, singleData]);
+
+    useEffect(() => {
+        const userDropdownList: SelectOptionsType[] = usersList?.map((item: UserListSecondaryEndpointType) => {
+            return { value: item?.id, label: `${item.firstName} ${item.lastName} (${item?.email})` };
+        });
+        const uid: string | null = localStorage?.getItem('uid');
+        if (uid) {
+            userDropdownList.unshift({ label: 'Self', value: uid });
+        }
+        setUserDropdown(userDropdownList);
+    }, [usersList]);
 
     return isFetching ? (
         <Loader />
@@ -284,6 +310,21 @@ const EditOverviewForm = () => {
                     <input onChange={handleChange} onBlur={handleBlur} value={values.zip} id="zip" name="zip" type="number" placeholder="Pin Code" className="form-input" />
                 </div>
             </div>
+            <div className="flex flex-col gap-4 sm:flex-row">
+                {defaultAssignedToValue?.value && (
+                    <div className="flex-1">
+                        <label htmlFor="leadAssignTo">Assign To</label>
+                        <Select
+                            placeholder="Select Lead Assign To"
+                            options={userDropdown}
+                            id="leadAssignTo"
+                            onChange={(e) => setFieldValue('assignedToId', e?.value)}
+                            // defaultValue={defaultAssignedToValue}
+                            // defaultInputValue={values?.ass}
+                        />
+                    </div>
+                )}
+            </div>
             <div className="mt-8 flex items-center justify-end">
                 <button
                     type="button"
@@ -299,8 +340,8 @@ const EditOverviewForm = () => {
                     type="submit"
                     className="btn  btn-primary cursor-pointer ltr:ml-4 rtl:mr-4"
                     disabled={
-                        values.estimatedDate &&
-                        values.followUpDate &&
+                        // values.estimatedDate &&
+                        // values.followUpDate &&
                         (values.source.value || singleData?.source?.id) &&
                         (values.branch.value || singleData?.branch?.id) &&
                         (values.product?.value || singleData?.product?.id) &&

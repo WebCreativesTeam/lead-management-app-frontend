@@ -27,6 +27,7 @@ const ContactViewModal = () => {
         anniversary,
         DOB,
         altPhoneNumber,
+        company,
     } = singleData;
 
     const reqData: any = {
@@ -51,6 +52,7 @@ const ContactViewModal = () => {
         comment,
         createdAt: new Date(createdAt).toLocaleString(),
         updatedAt: new Date(updatedAt).toLocaleString(),
+        company,
     };
 
     return (

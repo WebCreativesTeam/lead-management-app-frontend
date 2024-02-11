@@ -1,4 +1,4 @@
-import { ILeadNotes } from './../../../utils/Types/index';
+import { ILeadNotes, UserListSecondaryEndpointType } from './../../../utils/Types/index';
 import {
     LeadDataType,
     ManageLeadInitialStateProps,
@@ -51,6 +51,7 @@ const initialState: ManageLeadInitialStateProps = {
     emailTemplateModal: false,
     smsTemplateModal: false,
     whatsAppTemplateModal: false,
+    usersList: [] as UserListSecondaryEndpointType[],
 };
 
 const manageLeadSlice = createSlice({
@@ -149,6 +150,9 @@ const manageLeadSlice = createSlice({
         },
         getAllContactsForLead(state, action) {
             state.leadContactsList = action.payload;
+        },
+        getAllUsersForLead(state, action: PayloadAction<UserListSecondaryEndpointType[]>) {
+            state.usersList = action.payload;
         },
         getAllProductsForLead(state, action: PayloadAction<ProductSecondaryEndpointType[]>) {
             state.leadProductList = action.payload;
@@ -276,5 +280,6 @@ export const {
     setEmailTemplateModal,
     setSmsTemplateModal,
     setWhatsappTemplateModal,
+    getAllUsersForLead,
 } = manageLeadSlice.actions;
 export default manageLeadSlice.reducer;
