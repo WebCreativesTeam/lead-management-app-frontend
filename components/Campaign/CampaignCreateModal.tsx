@@ -69,21 +69,40 @@ const CampaignCreateModal = () => {
                 sendTo: value.sendTo,
                 instance: value.instance,
             };
-            if (value.isAllSource && value.isAllProduct) {
-                campaignCreateObj.isAllSource = true;
-                campaignCreateObj.isAllProduct = true;
-            } else if (!value.isAllSource && value.isAllProduct) {
-                campaignCreateObj.isAllProduct = true;
-                campaignCreateObj.sourceId = value.sourceId;
-            } else if (value.isAllSource && !value.isAllProduct) {
-                campaignCreateObj.isAllSource = true;
-                campaignCreateObj.productId = value.productId;
-            } else if (!value.isAllSource && !value.isAllProduct) {
-                campaignCreateObj.isAllSource = false;
-                campaignCreateObj.isAllProduct = false;
-                campaignCreateObj.productId = value.productId;
-                campaignCreateObj.sourceId = value.sourceId;
+            // if (value.isAllSource && value.isAllProduct) {
+            //     campaignCreateObj.isAllSource = true;
+            //     campaignCreateObj.isAllProduct = true;
+            // } else if (!value.isAllSource && value.isAllProduct) {
+            //     campaignCreateObj.isAllProduct = true;
+            //     campaignCreateObj.sourceId = value.sourceId;
+            // } else if (value.isAllSource && !value.isAllProduct) {
+            //     campaignCreateObj.isAllSource = true;
+            //     campaignCreateObj.productId = value.productId;
+            // } else if (!value.isAllSource && !value.isAllProduct) {
+            //     campaignCreateObj.isAllSource = false;
+            //     campaignCreateObj.isAllProduct = false;
+            //     campaignCreateObj.productId = value.productId;
+            //     campaignCreateObj.sourceId = value.sourceId;
+            // }
+
+            if (value.sendTo === 'LEAD') {
+                if (value.isAllStatus && value.isAllProduct) {
+                    campaignCreateObj.isAllStatus = true;
+                    campaignCreateObj.isAllProduct = true;
+                } else if (value.isAllStatus && !value.isAllProduct) {
+                    campaignCreateObj.productId = value.productId;
+                    campaignCreateObj.isAllStatus = true;
+                } else if (!value.isAllStatus && value.isAllProduct) {
+                    campaignCreateObj.statusId = value.statusId;
+                    campaignCreateObj.isAllProduct = true;
+                } else if (!value.isAllStatus && !value.isAllProduct) {
+                    campaignCreateObj.isAllStatus = false;
+                    campaignCreateObj.isAllProduct = false;
+                    campaignCreateObj.statusId = value.statusId;
+                    campaignCreateObj.productId = value.productId;
+                }
             }
+
             if (value.type === 'SCHEDULED') {
                 campaignCreateObj.date = value.date;
             } else if (value.type === 'DRIP') {
@@ -92,15 +111,15 @@ const CampaignCreateModal = () => {
                 campaignCreateObj.customDateId = value.customDate;
                 campaignCreateObj.sendBefore = value.sendBefore.toString();
             }
-            if (value.sendTo === 'LEAD') {
-                if (value.isAllStatus) {
-                    campaignCreateObj.isAllStatus = true;
-                } else {
-                    campaignCreateObj.statusId = value.statusId;
-                    campaignCreateObj.isAllStatus = false;
-                }
+
+            if (value.isAllSource) {
+                campaignCreateObj.isAllSource = true;
+            } else {
+                campaignCreateObj.isAllSource = false;
+                campaignCreateObj.sourceId = value.sourceId;
             }
-            console.log("campaignCreateObj",campaignCreateObj);
+
+            console.log('campaignCreateObj', campaignCreateObj);
             try {
                 dispatch(setDisableBtn(true));
                 await new ApiClient().post('campaign', campaignCreateObj);
@@ -199,8 +218,6 @@ const CampaignCreateModal = () => {
     function padTo2Digits(num: number) {
         return String(num).padStart(2, '0');
     }
-
-    console.log(formik.values)
 
     return (
         <Modal
@@ -353,26 +370,6 @@ const CampaignCreateModal = () => {
                                         }}
                                     />
                                 </div>
-                                {formik.values.sendTo === 'LEAD' && (
-                                    <div className="flex-1">
-                                        <label htmlFor="statusId">Lead Status</label>
-                                        <Select
-                                            placeholder="Select Lead Status"
-                                            options={leadStatusDropdown}
-                                            onChange={(data: any) => {
-                                                if (data.value === 'All') {
-                                                    formik.setFieldValue('isAllStatus', true);
-                                                } else {
-                                                    formik.setFieldValue('statusId', data.value);
-                                                    formik.setFieldValue('isAllStatus', false);
-                                                }
-                                            }}
-                                            defaultValue={{ label: 'All', value: 'All' }}
-                                        />
-                                    </div>
-                                )}
-                            </div>
-                            <div className="flex flex-col gap-4 sm:flex-row">
                                 <div className="flex-1">
                                     <label htmlFor="source">Source</label>
                                     <Select
@@ -389,23 +386,43 @@ const CampaignCreateModal = () => {
                                         defaultValue={{ label: 'All', value: 'All' }}
                                     />
                                 </div>
-                                <div className="flex-1">
-                                    <label htmlFor="productId">Product</label>
-                                    <Select
-                                        placeholder="Select Product"
-                                        options={productDropdown}
-                                        onChange={(data: any) => {
-                                            if (data.value === 'All') {
-                                                formik.setFieldValue('isAllProduct', true);
-                                            } else {
-                                                formik.setFieldValue('productId', data.value);
-                                                formik.setFieldValue('isAllProduct', false);
-                                            }
-                                        }}
-                                        defaultValue={{ label: 'All', value: 'All' }}
-                                    />
-                                </div>
                             </div>
+                            {formik.values.sendTo === 'LEAD' && (
+                                <div className="flex flex-col gap-4 sm:flex-row">
+                                    <div className="flex-1">
+                                        <label htmlFor="statusId">Lead Status</label>
+                                        <Select
+                                            placeholder="Select Lead Status"
+                                            options={leadStatusDropdown}
+                                            onChange={(data: any) => {
+                                                if (data.value === 'All') {
+                                                    formik.setFieldValue('isAllStatus', true);
+                                                } else {
+                                                    formik.setFieldValue('statusId', data.value);
+                                                    formik.setFieldValue('isAllStatus', false);
+                                                }
+                                            }}
+                                            defaultValue={{ label: 'All', value: 'All' }}
+                                        />
+                                    </div>
+                                    <div className="flex-1">
+                                        <label htmlFor="productId">Product</label>
+                                        <Select
+                                            placeholder="Select Product"
+                                            options={productDropdown}
+                                            onChange={(data: any) => {
+                                                if (data.value === 'All') {
+                                                    formik.setFieldValue('isAllProduct', true);
+                                                } else {
+                                                    formik.setFieldValue('productId', data.value);
+                                                    formik.setFieldValue('isAllProduct', false);
+                                                }
+                                            }}
+                                            defaultValue={{ label: 'All', value: 'All' }}
+                                        />
+                                    </div>
+                                </div>
+                            )}
                             <FieldArray
                                 name="instance"
                                 render={(arrayHelpers) => (

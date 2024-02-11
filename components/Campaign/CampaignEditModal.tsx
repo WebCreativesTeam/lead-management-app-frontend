@@ -139,22 +139,23 @@ const CampaignEditModal = () => {
                 sendTo: value.sendTo,
                 instance: value.instance,
             };
-            if (value.isAllSource && value.isAllProduct) {
-                campaignEditObj.isAllSource = true;
-                campaignEditObj.isAllProduct = true;
-            } else if (!value.isAllSource && value.isAllProduct) {
-                campaignEditObj.isAllProduct = true;
-                campaignEditObj.isAllSource = false;
-                campaignEditObj.sourceId = value.sourceId;
-            } else if (value.isAllSource && !value.isAllProduct) {
-                campaignEditObj.isAllSource = true;
-                campaignEditObj.isAllProduct = false;
-                campaignEditObj.productId = value.productId;
-            } else if (!value.isAllSource && !value.isAllProduct) {
-                campaignEditObj.isAllSource = false;
-                campaignEditObj.isAllProduct = false;
-                campaignEditObj.productId = value.productId;
-                campaignEditObj.sourceId = value.sourceId;
+
+            if (value.sendTo === 'LEAD') {
+                if (value.isAllStatus && value.isAllProduct) {
+                    campaignEditObj.isAllStatus = true;
+                    campaignEditObj.isAllProduct = true;
+                } else if (value.isAllStatus && !value.isAllProduct) {
+                    campaignEditObj.productId = value.productId;
+                    campaignEditObj.isAllStatus = true;
+                } else if (!value.isAllStatus && value.isAllProduct) {
+                    campaignEditObj.statusId = value.statusId;
+                    campaignEditObj.isAllProduct = true;
+                } else if (!value.isAllStatus && !value.isAllProduct) {
+                    campaignEditObj.isAllStatus = false;
+                    campaignEditObj.isAllProduct = false;
+                    campaignEditObj.statusId = value.statusId;
+                    campaignEditObj.productId = value.productId;
+                }
             }
             if (singleData.type === 'SCHEDULED') {
                 campaignEditObj.date = value.date;
@@ -164,13 +165,12 @@ const CampaignEditModal = () => {
                 campaignEditObj.customDateId = value.customDateId;
                 campaignEditObj.sendBefore = value.sendBefore.toString();
             }
-            if (value.sendTo === 'LEAD') {
-                if (value.isAllStatus) {
-                    campaignEditObj.isAllStatus = true;
-                } else {
-                    campaignEditObj.statusId = value.statusId;
-                    campaignEditObj.isAllStatus = false;
-                }
+
+            if (value.isAllSource) {
+                campaignEditObj.isAllSource = true;
+            } else {
+                campaignEditObj.isAllSource = false;
+                campaignEditObj.sourceId = value.sourceId;
             }
             console.log(campaignEditObj);
             try {
@@ -418,26 +418,6 @@ const CampaignEditModal = () => {
                                         defaultValue={defaultSendToValue}
                                     />
                                 </div>
-                                {formik.values.sendTo === 'LEAD' && (
-                                    <div className="flex-1">
-                                        <label htmlFor="statusId">Lead Status</label>
-                                        <Select
-                                            placeholder="Select Lead Status"
-                                            options={leadStatusDropdown}
-                                            onChange={(data: any) => {
-                                                if (data.value === 'All') {
-                                                    formik.setFieldValue('isAllStatus', true);
-                                                } else {
-                                                    formik.setFieldValue('statusId', data.value);
-                                                    formik.setFieldValue('isAllStatus', false);
-                                                }
-                                            }}
-                                            defaultValue={defaultLeadStatusValue}
-                                        />
-                                    </div>
-                                )}
-                            </div>
-                            <div className="flex flex-col gap-4 sm:flex-row">
                                 <div className="flex-1">
                                     <label htmlFor="source">Source</label>
                                     <Select
@@ -454,23 +434,44 @@ const CampaignEditModal = () => {
                                         defaultValue={defaultSourceValue}
                                     />
                                 </div>
-                                <div className="flex-1">
-                                    <label htmlFor="productId">Product</label>
-                                    <Select
-                                        placeholder="Select Product"
-                                        options={productDropdown}
-                                        onChange={(data: any) => {
-                                            if (data.value === 'All') {
-                                                formik.setFieldValue('isAllProduct', true);
-                                            } else {
-                                                formik.setFieldValue('productId', data.value);
-                                                formik.setFieldValue('isAllProduct', false);
-                                            }
-                                        }}
-                                        defaultValue={defaultProductValue}
-                                    />
-                                </div>
                             </div>
+
+                            {formik.values.sendTo === 'LEAD' && (
+                                <div className="flex flex-col gap-4 sm:flex-row">
+                                    <div className="flex-1">
+                                        <label htmlFor="statusId">Lead Status</label>
+                                        <Select
+                                            placeholder="Select Lead Status"
+                                            options={leadStatusDropdown}
+                                            onChange={(data: any) => {
+                                                if (data.value === 'All') {
+                                                    formik.setFieldValue('isAllStatus', true);
+                                                } else {
+                                                    formik.setFieldValue('statusId', data.value);
+                                                    formik.setFieldValue('isAllStatus', false);
+                                                }
+                                            }}
+                                            defaultValue={defaultLeadStatusValue}
+                                        />
+                                    </div>
+                                    <div className="flex-1">
+                                        <label htmlFor="productId">Product</label>
+                                        <Select
+                                            placeholder="Select Product"
+                                            options={productDropdown}
+                                            onChange={(data: any) => {
+                                                if (data.value === 'All') {
+                                                    formik.setFieldValue('isAllProduct', true);
+                                                } else {
+                                                    formik.setFieldValue('productId', data.value);
+                                                    formik.setFieldValue('isAllProduct', false);
+                                                }
+                                            }}
+                                            defaultValue={defaultProductValue}
+                                        />
+                                    </div>
+                                </div>
+                            )}
                             <FieldArray
                                 name="instance"
                                 render={(arrayHelpers) => (
