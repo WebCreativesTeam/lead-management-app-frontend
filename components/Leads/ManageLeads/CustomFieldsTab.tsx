@@ -209,23 +209,23 @@ const CustomFieldsTab = () => {
                                             <Flatpickr
                                                 data-enable-time
                                                 options={{
-                                                    enableTime: true,
-                                                    dateFormat: 'Y-m-d H:i',
+                                                    enableTime: false,
+                                                    dateFormat: 'Y-m-d',
                                                     position: 'auto',
                                                 }}
                                                 placeholder={`Select ${item?.label}`}
                                                 name={item?.id}
                                                 className="form-input"
-                                                onChange={(e) => {
-                                                    setFieldValue(item?.id, e[0].toISOString());
-                                                    if (e[0].toISOString() && item?.required) {
-                                                        setErrorObj((preVal: any) => {
-                                                            return { ...preVal, [item?.id]: undefined };
-                                                        });
-                                                    }
-                                                }}
+                                                // onChange={(e) => {
+                                                //     setFieldValue(item?.id, e[0].toISOString());
+                                                //     if (e[0].toISOString() && item?.required) {
+                                                //         setErrorObj((preVal: any) => {
+                                                //             return { ...preVal, [item?.id]: undefined };
+                                                //         });
+                                                //     }
+                                                // }}
                                                 onBlur={(e) => {
-                                                    setFieldTouched(item?.id, true);
+                                                    setFieldValue(item?.id, e?.target?.value);
                                                     if (!e.target.value && item?.required) {
                                                         setErrorObj((preVal: any) => {
                                                             return { ...preVal, [item?.id]: `${item?.label} is required` };

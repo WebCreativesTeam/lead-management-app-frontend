@@ -79,7 +79,6 @@ const Dashboard = () => {
     const getFollowUpList = async () => {
         if (filter) {
             setLoading(true);
-            // /lead/today?statusId=6505e3b852641e76b6c2b4ca
             const res: GetMethodResponseType = await new ApiClient().get(`lead${filter}?limit=${pageSize}&page=${page}`);
             const resData: IFollowup[] = res?.data;
             if (typeof resData === 'undefined') {
@@ -127,6 +126,8 @@ const Dashboard = () => {
         });
         setLeadSatusDropdown(createLeadStatusDropdown);
     }, [leadStatusList]);
+
+    console.log(filter);
     return (
         <div>
             <div className="mb-6 grid grid-cols-1 gap-6 text-white sm:grid-cols-2 xl:grid-cols-3">
