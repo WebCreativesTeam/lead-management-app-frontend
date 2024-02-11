@@ -23,8 +23,6 @@ const LeadAssignmentViewModal = () => {
         setResUsers(resultArray);
     }, []);
 
-    console.log(singleData);
-
     return (
         <ViewModal
             title="View Lead Assignment Detail"

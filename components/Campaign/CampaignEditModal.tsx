@@ -330,7 +330,7 @@ const CampaignEditModal = () => {
                                             data-enable-time={false}
                                             options={{
                                                 enableTime: false,
-                                                dateFormat: 'Y-m-d H:i',
+                                                dateFormat: 'Y-m-d',
                                                 position: 'auto',
                                             }}
                                             id="date"
