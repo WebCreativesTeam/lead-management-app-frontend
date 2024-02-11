@@ -203,11 +203,24 @@ const Dashboard = () => {
                             sortable: true,
                             render: ({ product }) => <div>{product?.name}</div>,
                         },
+                        // {
+                        //     accessor: 'status',
+                        //     title: 'Status',
+                        //     sortable: true,
+                        //     render: ({ status }) => <div>{status.name}</div>,
+                        // },
                         {
-                            accessor: 'status',
-                            title: 'Status',
+                            accessor: 'name',
+                            title: 'Lead Status Name',
                             sortable: true,
-                            render: ({ status }) => <div>{status.name}</div>,
+                            render: ({ status }) => (
+                                <span
+                                    className={`mr-2 rounded px-2.5 py-0.5 text-sm font-medium dark:bg-blue-900 dark:text-blue-300`}
+                                    style={{ color: status?.color, backgroundColor: status?.color + '20' }}
+                                >
+                                    {status?.name}
+                                </span>
+                            ),
                         },
                         {
                             accessor: 'priority',
@@ -227,12 +240,12 @@ const Dashboard = () => {
                             sortable: true,
                             render: ({ updatedAt }) => <div>{updatedAt}</div>,
                         },
-                        // {
-                        //     accessor: 'nextFollowup',
-                        //     title: 'Next Follow Up',
-                        //     sortable: true,
-                        //     render: ({ nextFollowup }) => <div>{nextFollowup}</div>,
-                        // },
+                        {
+                            accessor: 'nextFollowup',
+                            title: 'Next Follow Up',
+                            sortable: true,
+                            render: ({ followUpDate }) => <div>{followUpDate}</div>,
+                        },
                         {
                             accessor: 'quickMessage',
                             title: 'Quick Message',

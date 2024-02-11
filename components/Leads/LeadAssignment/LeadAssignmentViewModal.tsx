@@ -23,6 +23,8 @@ const LeadAssignmentViewModal = () => {
         setResUsers(resultArray);
     }, []);
 
+    console.log(singleData);
+
     return (
         <ViewModal
             title="View Lead Assignment Detail"
@@ -38,11 +40,11 @@ const LeadAssignmentViewModal = () => {
                         </li>
                         <li className="flex flex-wrap">
                             <span className="flex-1 text-lg font-bold">Source</span>
-                            <p className="flex-[2]">{singleData?.source?.name}</p>
+                            <p className="flex-[2]">{singleData?.source?.name || (singleData?.isAllSource && 'All')}</p>
                         </li>
                         <li className="flex flex-wrap">
                             <span className="flex-1 text-lg font-bold">Product</span>
-                            <p className="flex-[2]">{singleData?.product?.name}</p>
+                            <p className="flex-[2]">{singleData?.product?.name || (singleData?.isAllProduct && 'All')}</p>
                         </li>
                         <li className="flex flex-wrap">
                             <span className="flex-1 text-lg font-bold">Is Active</span>
