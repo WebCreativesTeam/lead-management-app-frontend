@@ -83,7 +83,7 @@ const CustomFieldsTab = () => {
         setErrorObj(createErrorObj);
     }, [customFieldsList]);
 
-    console.log(values);
+    // console.log(!Object.values(errorObj).every((value) => value === undefined) || Object.keys(overViewFormData).length === 0 ? true : false);
 
     return (
         <div>
@@ -216,16 +216,16 @@ const CustomFieldsTab = () => {
                                                 placeholder={`Select ${item?.label}`}
                                                 name={item?.id}
                                                 className="form-input"
-                                                // onChange={(e) => {
-                                                //     setFieldValue(item?.id, e[0].toISOString());
-                                                //     if (e[0].toISOString() && item?.required) {
-                                                //         setErrorObj((preVal: any) => {
-                                                //             return { ...preVal, [item?.id]: undefined };
-                                                //         });
-                                                //     }
-                                                // }}
+                                                onChange={(e) => {
+                                                    setFieldValue(item?.id, e[0].toISOString());
+                                                    if (e[0].toISOString() && item?.required) {
+                                                        setErrorObj((preVal: any) => {
+                                                            return { ...preVal, [item?.id]: undefined };
+                                                        });
+                                                    }
+                                                }}
                                                 onBlur={(e) => {
-                                                    setFieldValue(item?.id, e?.target?.value);
+                                                    // setFieldValue(item?.id, e?.target?.value);
                                                     if (!e.target.value && item?.required) {
                                                         setErrorObj((preVal: any) => {
                                                             return { ...preVal, [item?.id]: `${item?.label} is required` };
