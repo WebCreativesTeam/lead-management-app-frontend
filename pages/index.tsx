@@ -73,7 +73,7 @@ const Dashboard = () => {
             setFilter(`/today?statusId=${leadSatusDropdown[0]?.value}`);
             setSelectedStatus(leadSatusDropdown[0]?.value);
         }
-    }, [leadStatusList]);
+    }, [leadSatusDropdown]);
 
     //get all ScheduleMessage list
     const getFollowUpList = async () => {
