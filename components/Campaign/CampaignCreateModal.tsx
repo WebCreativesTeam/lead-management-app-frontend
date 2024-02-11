@@ -104,7 +104,7 @@ const CampaignCreateModal = () => {
             }
 
             if (value.type === 'SCHEDULED') {
-                campaignCreateObj.date = new Date(value.date).toLocaleDateString();
+                campaignCreateObj.date = value.date;
             } else if (value.type === 'DRIP') {
                 campaignCreateObj.sendAfter = value.sendAfter.toString();
             } else {
@@ -297,7 +297,8 @@ const CampaignCreateModal = () => {
                                             name="date"
                                             className="form-input"
                                             onChange={(e) => {
-                                                formik.setFieldValue('date', e[0].toISOString());
+                                                console.log(e[0]);
+                                                formik.setFieldValue('date', e[0]);
                                             }}
                                             value={formik.values.date}
                                         />
