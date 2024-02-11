@@ -12,7 +12,7 @@ import CreateNotesTab from './CreateNotesTab';
 const LeadViewModal = () => {
     const { viewModal, singleData, leadProductList, customFieldsList } = useSelector((state: IRootState) => state.lead);
     const dispatch = useDispatch();
-    const { createdAt, status, updatedAt, branch, contact, estimatedDate, priority, source, followUpDate, zip, assignTo } = singleData;
+    const { createdAt, status, updatedAt, branch, contact, estimatedDate, priority, source, followUpDate, zip, assignedTo } = singleData;
     const [defaultGender, setDefaultGender] = useState<SelectOptionsType>({} as SelectOptionsType);
     const [defaultProduct, setDefaultProduct] = useState<SelectOptionsType>({} as SelectOptionsType);
     const [defaultSubProduct, setDefaultSubProduct] = useState<SelectOptionsType>({} as SelectOptionsType);
@@ -71,7 +71,7 @@ const LeadViewModal = () => {
         source: source?.name,
         gender: defaultGender?.label,
         product: defaultProduct?.label,
-        ['Assigned To']: assignTo,
+        ['Assigned To']: assignedTo?.firstName + ' ' + assignedTo?.lastName,
         ['Sub Product']: defaultSubProduct?.label,
         ['Pin Code']: zip,
         priority: (
