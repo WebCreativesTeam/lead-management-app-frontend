@@ -43,6 +43,7 @@ const ContactCreateModal = () => {
         altPhoneNumber: '',
         DOB: '',
         anniversary: '',
+        company: '',
     };
     const { values, handleChange, submitForm, handleSubmit, setFieldValue, handleBlur, resetForm } = useFormik({
         initialValues,
@@ -73,6 +74,7 @@ const ContactCreateModal = () => {
                     altPhoneNumber,
                     DOB,
                     anniversary,
+                    company,
                 } = value;
                 const createContactObj = {
                     title,
@@ -97,6 +99,7 @@ const ContactCreateModal = () => {
                     DOB,
                     anniversary,
                     altPhoneNumber,
+                    company,
                 };
                 await new ApiClient().post('contact', createContactObj);
                 dispatch(setCreateModal(false));
@@ -174,6 +177,7 @@ const ContactCreateModal = () => {
                 values.altPhoneNumber &&
                 values.DOB &&
                 values.anniversary &&
+                values.company &&
                 !isBtnDisabled
                     ? false
                     : true
@@ -361,6 +365,10 @@ const ContactCreateModal = () => {
                                 <label htmlFor="createEmail">Email</label>
                                 <input onChange={handleChange} onBlur={handleBlur} value={values.email} id="createEmail" name="email" type="email" placeholder="Your Email" className="form-input" />
                             </div>
+                        </div>
+                        <div className="flex-1">
+                            <label htmlFor="createCompany">Company</label>
+                            <input onChange={handleChange} onBlur={handleBlur} value={values.company} id="createCompany" name="company" type="text" placeholder="Company" className="form-input" />
                         </div>
                         <div>
                             <label htmlFor="contactComment"> Comment</label>

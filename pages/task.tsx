@@ -228,6 +228,12 @@ const TaskPage = () => {
                             render: ({ title }) => <div>{title}</div>,
                         },
                         {
+                            accessor: 'contact',
+                            title: 'Lead Name',
+                            sortable: true,
+                            render: ({ lead }) => <div>{lead?.contact?.name}</div>,
+                        },
+                        {
                             accessor: 'assignTo',
                             title: 'Assigned To',
                             sortable: true,

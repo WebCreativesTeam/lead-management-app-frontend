@@ -38,7 +38,8 @@ const ContactEditModal = () => {
     });
 
     useEffect(() => {
-        const { email, comment, name, phoneNumber, position, assignedTo, facebookProfile, twitterProfile, industry, location, source, title, website, DOB, altPhoneNumber, anniversary } = singleData;
+        const { email, comment, name, phoneNumber, position, assignedTo, facebookProfile, twitterProfile, industry, location, source, title, website, DOB, altPhoneNumber, anniversary, company } =
+            singleData;
         setFieldValue('email', email);
         setFieldValue('comment', comment);
         setFieldValue('name', name);
@@ -58,6 +59,7 @@ const ContactEditModal = () => {
         setFieldValue('DOB', DOB);
         setFieldValue('anniversary', anniversary);
         setFieldValue('altPhoneNumber', altPhoneNumber);
+        setFieldValue('company', company);
 
         const creatCountryJsonList: SelectOptionsType[] = countryJson.countries.map((data: ICountryData) => {
             return { value: data.country, label: data.country };
@@ -116,6 +118,7 @@ const ContactEditModal = () => {
         DOB: '',
         anniversary: '',
         altPhoneNumber: '',
+        company: '',
     };
     const { values, handleChange, submitForm, handleSubmit, setFieldValue, errors, handleBlur, resetForm } = useFormik({
         initialValues,
@@ -145,6 +148,7 @@ const ContactEditModal = () => {
                     DOB,
                     anniversary,
                     altPhoneNumber,
+                    company,
                 } = value;
                 const editContactObj = {
                     title,
@@ -168,6 +172,7 @@ const ContactEditModal = () => {
                     DOB,
                     anniversary,
                     altPhoneNumber,
+                    company,
                 };
                 dispatch(setDisableBtn(true));
                 await new ApiClient().patch('contact/' + singleData.id, editContactObj);
@@ -432,6 +437,10 @@ const ContactEditModal = () => {
                                 <label htmlFor="createEmail">Email</label>
                                 <input onChange={handleChange} onBlur={handleBlur} value={values.email} id="createEmail" name="email" type="email" placeholder="Your Email" className="form-input" />
                             </div>
+                        </div>
+                        <div className="flex-1">
+                            <label htmlFor="createCompany">Company</label>
+                            <input onChange={handleChange} onBlur={handleBlur} value={values.company} id="createCompany" name="company" type="text" placeholder="Company" className="form-input" />
                         </div>
                         <div>
                             <label htmlFor="contactComment"> Comment</label>

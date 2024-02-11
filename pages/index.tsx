@@ -79,7 +79,7 @@ const Dashboard = () => {
     const getFollowUpList = async () => {
         if (filter) {
             setLoading(true);
-            const res: GetMethodResponseType = await new ApiClient().get(`lead${filter}?limit=${pageSize}&page=${page}`);
+            const res: GetMethodResponseType = await new ApiClient().get(`lead${filter}&limit=${pageSize}&page=${page}`);
             const resData: IFollowup[] = res?.data;
             if (typeof resData === 'undefined') {
                 dispatch(getFollowUps([] as IFollowup[]));

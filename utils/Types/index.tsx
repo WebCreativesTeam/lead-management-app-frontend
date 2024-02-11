@@ -264,6 +264,7 @@ export interface ContactDataType {
     altPhoneNumber: string;
     DOB: string;
     anniversary: string;
+    company: string;
     srNo: number;
 }
 
