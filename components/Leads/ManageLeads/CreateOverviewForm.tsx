@@ -207,7 +207,7 @@ const CreateOverviewForm = () => {
                     <Flatpickr
                         data-enable-time
                         options={{
-                            enableTime: false,
+                            enableTime: true,
                             dateFormat: 'Y-m-d H:i',
                             position: 'auto',
                         }}
@@ -225,7 +225,7 @@ const CreateOverviewForm = () => {
                         data-enable-time
                         options={{
                             enableTime: false,
-                            dateFormat: 'Y-m-d H:i',
+                            dateFormat: 'Y-m-d',
                             position: 'auto',
                         }}
                         id="estimatedDate"

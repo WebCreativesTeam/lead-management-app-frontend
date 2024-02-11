@@ -84,7 +84,7 @@ const LeadViewModal = () => {
                 {status?.name}
             </span>
         ),
-        ['FollowUp Date']: new Date(followUpDate).toLocaleString(),
+        ['Follow Up Date']: new Date(followUpDate).toLocaleString(),
         ['Estimate Purchase Date']: new Date(estimatedDate).toLocaleString(),
         ['Created']: new Date(createdAt).toLocaleString(),
         ['Updated']: new Date(updatedAt).toLocaleString(),

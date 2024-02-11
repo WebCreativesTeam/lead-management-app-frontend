@@ -149,8 +149,8 @@ const CreateCustomFieldModal = () => {
                 label &&
                 formik.values.fieldType &&
                 order &&
-                // formik.values.options[formik.values.options.length - 1].name &&
-                // formik.values.options[formik.values.options.length - 1].value &&
+                formik.values.options[formik.values.options.length - 1].name &&
+                formik.values.options[formik.values.options.length - 1].value &&
                 !isBtnDisabled
                     ? false
                     : true
