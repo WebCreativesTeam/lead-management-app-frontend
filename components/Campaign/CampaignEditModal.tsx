@@ -158,7 +158,7 @@ const CampaignEditModal = () => {
                 }
             }
             if (singleData.type === 'SCHEDULED') {
-                campaignEditObj.date = value.date;
+                campaignEditObj.date = new Date(value.date).toLocaleDateString();
             } else if (singleData.type === 'DRIP') {
                 campaignEditObj.sendAfter = value.sendAfter.toString();
             } else {
