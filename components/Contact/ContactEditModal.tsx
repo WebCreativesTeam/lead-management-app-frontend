@@ -44,20 +44,34 @@ const ContactEditModal = () => {
         setFieldValue('comment', comment);
         setFieldValue('name', name);
         setFieldValue('phoneNumber', phoneNumber);
-        setFieldValue('position', position);
-        setFieldValue('facebookProfile', facebookProfile);
-        setFieldValue('twitterProfile', twitterProfile);
-        setFieldValue('industry', industry);
+        if (position) {
+            setFieldValue('position', position);
+        }
+        if (facebookProfile) {
+            setFieldValue('facebookProfile', facebookProfile);
+        }
+        if (twitterProfile) {
+            setFieldValue('twitterProfile', twitterProfile);
+        }
+        if (industry) {
+            setFieldValue('industry', industry);
+        }
         setFieldValue('address', location?.address);
-        setFieldValue('website', website);
+        if (website) {
+            setFieldValue('website', website);
+        }
         setFieldValue('title', title);
         setFieldValue('state', location?.state);
         setFieldValue('country', location?.country);
         setFieldValue('city', location?.city);
         setFieldValue('assignedTo', assignedTo?.id);
         setFieldValue('source', source?.id);
-        setFieldValue('DOB', DOB);
-        setFieldValue('anniversary', anniversary);
+        if (DOB) {
+            setFieldValue('DOB', DOB);
+        }
+        if (anniversary) {
+            setFieldValue('anniversary', anniversary);
+        }
         setFieldValue('altPhoneNumber', altPhoneNumber);
         setFieldValue('company', company);
 
@@ -157,11 +171,11 @@ const ContactEditModal = () => {
                     email,
                     assignedToId: assignedTo,
                     sourceId: source,
-                    website,
-                    position,
-                    industry,
-                    facebookProfile,
-                    twitterProfile,
+                    website: website ? website : null,
+                    position: position ? position : null,
+                    industry: industry ? industry : null,
+                    facebookProfile: facebookProfile ? facebookProfile : null,
+                    twitterProfile: twitterProfile ? twitterProfile : null,
                     comment,
                     location: {
                         address,
@@ -169,8 +183,8 @@ const ContactEditModal = () => {
                         country,
                         state,
                     },
-                    DOB,
-                    anniversary,
+                    DOB: DOB ? DOB : null,
+                    anniversary: anniversary ? anniversary : null,
                     altPhoneNumber,
                     company,
                 };
@@ -243,13 +257,13 @@ const ContactEditModal = () => {
                 values.country &&
                 values.source &&
                 values.assignedTo &&
-                values.industry &&
-                values.position &&
-                values.facebookProfile &&
-                values.twitterProfile &&
+                // values.industry &&
+                // values.position &&
+                // values.facebookProfile &&
+                // values.twitterProfile &&
                 values.comment &&
-                values.anniversary &&
-                values.DOB &&
+                // values.anniversary &&
+                // values.DOB &&
                 values.altPhoneNumber &&
                 !isBtnDisabled
                     ? false
@@ -281,7 +295,7 @@ const ContactEditModal = () => {
                         </div>
                         <div className="flex flex-col gap-4 sm:flex-row">
                             <div className="flex-1">
-                                <label htmlFor="createPhoneNo"> Phone Number</label>
+                                <label htmlFor="createPhoneNo">Phone Number</label>
                                 <input
                                     onChange={handleChange}
                                     onBlur={handleBlur}
@@ -294,7 +308,7 @@ const ContactEditModal = () => {
                                 />
                             </div>
                             <div className="flex-1">
-                                <label htmlFor="altPhoneNumber"> Alternative Number</label>
+                                <label htmlFor="altPhoneNumber">Alternative Number</label>
                                 <input
                                     onChange={handleChange}
                                     onBlur={handleBlur}
@@ -309,7 +323,7 @@ const ContactEditModal = () => {
                         </div>
                         <div className="flex flex-col gap-4 sm:flex-row">
                             <div className="flex-1">
-                                <label>Date Of Birth</label>
+                                <label>Date Of Birth (optional)</label>
                                 <Flatpickr
                                     data-enable-time={false}
                                     options={{
@@ -326,7 +340,7 @@ const ContactEditModal = () => {
                                 />
                             </div>
                             <div className="flex-1">
-                                <label>Wedding Anniversary</label>
+                                <label>Wedding Anniversary (optional)</label>
                                 <Flatpickr
                                     data-enable-time={false}
                                     options={{
@@ -355,11 +369,11 @@ const ContactEditModal = () => {
                         </div>
                         <div className="flex flex-col gap-4 sm:flex-row">
                             <div className="flex-1">
-                                <label htmlFor="designation">Position</label>
+                                <label htmlFor="designation">Position (optional)</label>
                                 <input onChange={handleChange} onBlur={handleBlur} value={values.position} id="designation" name="position" type="text" placeholder="Position" className="form-input" />
                             </div>
                             <div className="flex-1">
-                                <label htmlFor="createIndustry">Industry</label>
+                                <label htmlFor="createIndustry">Industry (optional)</label>
                                 <input
                                     onChange={handleChange}
                                     onBlur={handleBlur}
@@ -374,7 +388,7 @@ const ContactEditModal = () => {
                         </div>
                         <div className="flex flex-col gap-4 sm:flex-row">
                             <div className="flex-1">
-                                <label htmlFor="createFacebookProfile">FacebookProfile</label>
+                                <label htmlFor="createFacebookProfile">FacebookProfile (optional)</label>
                                 <input
                                     onChange={handleChange}
                                     onBlur={handleBlur}
@@ -387,7 +401,7 @@ const ContactEditModal = () => {
                                 />
                             </div>
                             <div className="flex-1">
-                                <label htmlFor="createTwitterProfile">TwitterProfile</label>
+                                <label htmlFor="createTwitterProfile">TwitterProfile (optional)</label>
                                 <input
                                     onChange={handleChange}
                                     onBlur={handleBlur}
@@ -402,7 +416,7 @@ const ContactEditModal = () => {
                         </div>
                         <div className="flex flex-col gap-4 sm:flex-row">
                             <div className="flex-1">
-                                <label htmlFor="createWebsite">Website</label>
+                                <label htmlFor="createWebsite">Website (optional)</label>
                                 <input onChange={handleChange} onBlur={handleBlur} value={values.website} id="createWebsite" name="website" type="text" placeholder="Website" className="form-input" />
                             </div>
                             <div className="flex-1">

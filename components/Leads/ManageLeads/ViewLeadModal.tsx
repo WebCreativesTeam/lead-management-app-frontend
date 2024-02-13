@@ -63,6 +63,8 @@ const LeadViewModal = () => {
         }
     }, [productDropdown, singleData]);
 
+    console.log(singleData);
+
     const reqData: any = {
         branch: branch?.name,
         ['Contact Name']: `${contact?.title} ${contact?.name}`,
@@ -71,7 +73,7 @@ const LeadViewModal = () => {
         source: source?.name,
         gender: defaultGender?.label,
         product: defaultProduct?.label,
-        ['Assigned To']: assignedTo?.firstName + ' ' + assignedTo?.lastName,
+        ['Assigned To']: `${assignedTo?.firstName} ${assignedTo?.lastName} (${assignedTo?.email})`,
         ['Sub Product']: defaultSubProduct?.label,
         ['Pin Code']: zip,
         priority: (
@@ -85,7 +87,7 @@ const LeadViewModal = () => {
             </span>
         ),
         ['Follow Up Date']: followUpDate ? new Date(followUpDate).toLocaleString() : 'Pending',
-        ['Estimate Purchase Date']: estimatedDate ? new Date(estimatedDate).toLocaleString() : 'Pending',
+        ['Estimate Purchase Date']: estimatedDate ? new Date(estimatedDate).toLocaleDateString() : 'Pending',
         ['Created']: new Date(createdAt).toLocaleString(),
         ['Updated']: new Date(updatedAt).toLocaleString(),
     };

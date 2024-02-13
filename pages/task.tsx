@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState, Fragment, useDeferredValue, useLayoutEffect } from 'react';
+import React, { useEffect, useState, useDeferredValue } from 'react';
 import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
@@ -171,21 +171,13 @@ const TaskPage = () => {
                         </button>
                     )}
                     <div className="dropdown">
-                        <Dropdown
-                            placement="auto-start"
-                            btnClassName="btn btn-outline-primary h-full dropdown-toggle"
-                            button={
-                                <>
-                                    <span>Filter</span>
-                                </>
-                            }
-                        >
+                        <Dropdown placement="auto-start" btnClassName="btn btn-outline-primary h-full dropdown-toggle" button={<span>Filter</span>}>
                             <ul className="!min-w-[170px]">
-                                {/* <li>
+                                <li>
                                     <button type="button" onClick={() => UserData?.id && setFilter(`assignedById=${UserData?.id}`)}>
                                         Assigned by Me
                                     </button>
-                                </li> */}
+                                </li>
                                 <li>
                                     <button type="button" onClick={() => UserData?.id && setFilter(`assignedToId=${UserData?.id}`)}>
                                         Assigned to Me

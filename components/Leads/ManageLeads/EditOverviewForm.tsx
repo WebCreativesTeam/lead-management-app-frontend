@@ -75,13 +75,13 @@ const EditOverviewForm = () => {
                 const editLeadObj = {
                     branchId: value.branch.value,
                     sourceId: values.source.value,
-                    estimatedDate: new Date(value.estimatedDate).toISOString(),
+                    estimatedDate: value.estimatedDate ? new Date(value.estimatedDate).toISOString() : null,
                     productId: values.product.value,
                     gender: values.gender.value,
-                    followUpDate: new Date(value.followUpDate).toISOString(),
+                    followUpDate: value.followUpDate ? new Date(value.followUpDate).toISOString() : null,
                     zip: values.zip.toString(),
                     subProductId: values.subProduct.value,
-                    assignedToId: values?.assignedToId,
+                    assignedToId: values?.assignedToId ? values?.assignedToId : null,
                 };
                 console.log(editLeadObj);
                 await new ApiClient().patch('lead/' + singleData?.id, editLeadObj);
@@ -103,13 +103,19 @@ const EditOverviewForm = () => {
     useEffect(() => {
         setFieldValue('product', singleData?.product?.id);
         setFieldValue('subProduct', singleData?.subProduct?.id);
-        setFieldValue('followUpDate', singleData?.followUpDate);
-        setFieldValue('estimatedDate', singleData?.estimatedDate);
+        if (singleData?.followUpDate) {
+            setFieldValue('followUpDate', singleData?.followUpDate);
+        }
+        if (singleData?.estimatedDate) {
+            setFieldValue('estimatedDate', singleData?.estimatedDate);
+        }
         setFieldValue('source', singleData?.source?.id);
         setFieldValue('gender', singleData?.gender);
         setFieldValue('branch', singleData?.branch?.id);
         setFieldValue('zip', singleData?.zip);
-        setFieldValue('assignedToId', singleData?.assignedTo?.id);
+        if (singleData?.assignedTo?.id) {
+            setFieldValue('assignedToId', singleData?.assignedTo?.id);
+        }
 
         const findGender: SelectOptionsType | undefined = genderList.find((item: SelectOptionsType) => item?.value === singleData?.gender);
         if (findGender) {
@@ -247,7 +253,7 @@ const EditOverviewForm = () => {
             </div>
             <div className="flex flex-col gap-4 sm:flex-row">
                 <div className="flex-1">
-                    <label htmlFor="followUpDate"> Follow Up Date</label>
+                    <label> Follow Up Date (optional)</label>
                     <Flatpickr
                         data-enable-time
                         options={{
@@ -255,7 +261,6 @@ const EditOverviewForm = () => {
                             dateFormat: 'Y-m-d H:i',
                             position: 'auto',
                         }}
-                        id="followUpDate"
                         placeholder="Follow Up Date"
                         name="followUpDate"
                         className="form-input"
@@ -264,15 +269,14 @@ const EditOverviewForm = () => {
                     />
                 </div>
                 <div className="flex-1">
-                    <label>Estimated Purchase Date</label>
+                    <label>Estimated Purchase Date (optional)</label>
                     <Flatpickr
                         data-enable-time
                         options={{
                             enableTime: false,
-                            dateFormat: 'Y-m-d H:i',
+                            dateFormat: 'Y-m-d',
                             position: 'auto',
                         }}
-                        id="estimatedDate"
                         placeholder="Estimated Purchase Date"
                         name="estimatedDate"
                         className="form-input"
@@ -313,7 +317,7 @@ const EditOverviewForm = () => {
             <div className="flex flex-col gap-4 sm:flex-row">
                 {defaultAssignedToValue?.value && (
                     <div className="flex-1">
-                        <label htmlFor="leadAssignTo">Assign To</label>
+                        <label htmlFor="leadAssignTo">Assign To (optional)</label>
                         <Select
                             placeholder="Select Lead Assign To"
                             options={userDropdown}
@@ -340,8 +344,6 @@ const EditOverviewForm = () => {
                     type="submit"
                     className="btn  btn-primary cursor-pointer ltr:ml-4 rtl:mr-4"
                     disabled={
-                        // values.estimatedDate &&
-                        // values.followUpDate &&
                         (values.source.value || singleData?.source?.id) &&
                         (values.branch.value || singleData?.branch?.id) &&
                         (values.product?.value || singleData?.product?.id) &&

@@ -363,6 +363,7 @@ export type LeadDataType = {
         id: string;
         firstName: string;
         lastName: string;
+        email?: string
     };
 };
 

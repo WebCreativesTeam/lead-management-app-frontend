@@ -45,7 +45,7 @@ const ContactCreateModal = () => {
         anniversary: '',
         company: '',
     };
-    const { values, handleChange, submitForm, handleSubmit, setFieldValue, handleBlur, resetForm } = useFormik({
+    const { values, handleChange, submitForm, handleSubmit, setFieldValue, handleBlur, resetForm,errors } = useFormik({
         initialValues,
         validationSchema: contactSchema,
         validateOnChange: false,
@@ -83,11 +83,11 @@ const ContactCreateModal = () => {
                     email,
                     assignedToId: assignedTo,
                     sourceId: source,
-                    website,
-                    position,
-                    industry,
-                    facebookProfile,
-                    twitterProfile,
+                    website: website ? website : null,
+                    position: position ? position : null,
+                    industry: industry ? industry : null,
+                    facebookProfile: facebookProfile ? facebookProfile : null,
+                    twitterProfile: twitterProfile ? twitterProfile : null,
                     comment,
 
                     location: {
@@ -96,8 +96,8 @@ const ContactCreateModal = () => {
                         country,
                         state,
                     },
-                    DOB,
-                    anniversary,
+                    DOB: DOB ? DOB : null,
+                    anniversary: anniversary ? anniversary : null,
                     altPhoneNumber,
                     company,
                 };
@@ -120,7 +120,7 @@ const ContactCreateModal = () => {
         dispatch(setCreateModal(false));
         resetForm();
     };
-
+console.log(errors)
     useEffect(() => {
         const creatCountryJsonList: SelectOptionsType[] = countryJson.countries.map((data: ICountryData) => {
             return { value: data.country, label: data.country };
@@ -169,14 +169,14 @@ const ContactCreateModal = () => {
                 values.country &&
                 values.source &&
                 values.assignedTo &&
-                values.industry &&
-                values.position &&
-                values.facebookProfile &&
-                values.twitterProfile &&
+                // values.industry &&
+                // values.position &&
+                // values.facebookProfile &&
+                // values.twitterProfile &&
                 values.comment &&
                 values.altPhoneNumber &&
-                values.DOB &&
-                values.anniversary &&
+                // values.DOB &&
+                // values.anniversary &&
                 values.company &&
                 !isBtnDisabled
                     ? false
@@ -237,7 +237,7 @@ const ContactCreateModal = () => {
                         </div>
                         <div className="flex flex-col gap-4 sm:flex-row">
                             <div className="flex-1">
-                                <label>Date Of Birth</label>
+                                <label>Date Of Birth (optional)</label>
                                 <Flatpickr
                                     data-enable-time={false}
                                     options={{
@@ -254,7 +254,7 @@ const ContactCreateModal = () => {
                                 />
                             </div>
                             <div className="flex-1">
-                                <label>Wedding Anniversary</label>
+                                <label>Wedding Anniversary (optional)</label>
                                 <Flatpickr
                                     data-enable-time={false}
                                     options={{
@@ -283,11 +283,11 @@ const ContactCreateModal = () => {
                         </div>
                         <div className="flex flex-col gap-4 sm:flex-row">
                             <div className="flex-1">
-                                <label htmlFor="designation">Position</label>
+                                <label htmlFor="designation">Position (optional)</label>
                                 <input onChange={handleChange} onBlur={handleBlur} value={values.position} id="designation" name="position" type="text" placeholder="Position" className="form-input" />
                             </div>
                             <div className="flex-1">
-                                <label htmlFor="createIndustry">Industry</label>
+                                <label htmlFor="createIndustry">Industry (optional)</label>
                                 <input
                                     onChange={handleChange}
                                     onBlur={handleBlur}
@@ -302,7 +302,7 @@ const ContactCreateModal = () => {
                         </div>
                         <div className="flex flex-col gap-4 sm:flex-row">
                             <div className="flex-1">
-                                <label htmlFor="createFacebookProfile">FacebookProfile</label>
+                                <label htmlFor="createFacebookProfile">FacebookProfile (optional)</label>
                                 <input
                                     onChange={handleChange}
                                     onBlur={handleBlur}
@@ -315,7 +315,7 @@ const ContactCreateModal = () => {
                                 />
                             </div>
                             <div className="flex-1">
-                                <label htmlFor="createTwitterProfile">TwitterProfile</label>
+                                <label htmlFor="createTwitterProfile">TwitterProfile (optional)</label>
                                 <input
                                     onChange={handleChange}
                                     onBlur={handleBlur}
@@ -330,7 +330,7 @@ const ContactCreateModal = () => {
                         </div>
                         <div className="flex flex-col gap-4 sm:flex-row">
                             <div className="flex-1">
-                                <label htmlFor="createWebsite">Website</label>
+                                <label htmlFor="createWebsite">Website (optional)</label>
                                 <input onChange={handleChange} onBlur={handleBlur} value={values.website} id="createWebsite" name="website" type="text" placeholder="Website" className="form-input" />
                             </div>
                             <div className="flex-1">

@@ -77,31 +77,25 @@ const CreateOverviewForm = () => {
         validateOnChange: false,
         enableReinitialize: true,
         onSubmit: async (value, action) => {
-            // dispatch(setFetching(true));
             try {
-                // dispatch(setDisableBtn(true));
                 const createLeadObj = {
                     estimatedDate: value.estimatedDate ? new Date(value.estimatedDate).toISOString() : null,
                     followUpDate: value.followUpDate ? new Date(value.followUpDate).toISOString() : null,
                     sourceId: values.source.value,
                     priorityId: values.priority.value,
-                    // statusId: values.status.value,
                     branchId: value.branch.value,
                     contactId: values.contact.value,
                     productId: values.product.value,
                     zip: values.zip.toString(),
                     subProductId: values.subProduct.value,
                     gender: values.gender.value,
-                    assignedToId: values.assignedToId,
+                    assignedToId: values.assignedToId ? values?.assignedToId : null,
                 };
                 console.log(createLeadObj);
 
                 dispatch(setOverViewFormData(createLeadObj));
                 dispatch(setIsOverviewTabDisabled(true));
                 dispatch(setActiveTab(1));
-                // await new ApiClient().post('lead', createLeadObj);
-                // dispatch(setCreateModal(false));
-                // action.resetForm();
             } catch (error: any) {
                 if (typeof error?.response?.data?.message === 'object') {
                     showToastAlert(error?.response?.data?.message.join(' , '));
@@ -207,7 +201,7 @@ const CreateOverviewForm = () => {
             </div>
             <div className="flex flex-col gap-4 sm:flex-row">
                 <div className="flex-1">
-                    <label htmlFor="followUpDate"> Follow Up Date</label>
+                    <label htmlFor="followUpDate"> Follow Up Date (optional)</label>
                     <Flatpickr
                         data-enable-time
                         options={{
@@ -224,7 +218,7 @@ const CreateOverviewForm = () => {
                     />
                 </div>
                 <div className="flex-1">
-                    <label>Estimated Purchase Date</label>
+                    <label>Estimated Purchase Date (optional)</label>
                     <Flatpickr
                         data-enable-time
                         options={{
@@ -264,7 +258,7 @@ const CreateOverviewForm = () => {
             </div>
             <div className="flex flex-col gap-4 sm:flex-row">
                 <div className="flex-1">
-                    <label htmlFor="leadAssignTo">Assign To</label>
+                    <label htmlFor="leadAssignTo">Assign To (optional)</label>
                     <Select placeholder="Select Lead Assign To" options={userDropdown} id="leadAssignTo" onChange={(e) => setFieldValue('assignedToId', e?.value)} />
                 </div>
             </div>

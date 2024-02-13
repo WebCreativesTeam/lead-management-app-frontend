@@ -34,6 +34,7 @@ const ContactViewModal = () => {
         name: title + ' ' + name,
         email,
         phoneNumber,
+        company,
         industry,
         position,
         ['Wedding Anniversary']: new Date(anniversary).toLocaleDateString(),
@@ -52,7 +53,6 @@ const ContactViewModal = () => {
         comment,
         createdAt: new Date(createdAt).toLocaleString(),
         updatedAt: new Date(updatedAt).toLocaleString(),
-        company,
     };
 
     return (

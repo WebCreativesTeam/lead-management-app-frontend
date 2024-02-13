@@ -105,10 +105,11 @@ const ManageLeads = () => {
         emailTemplateModal,
         smsTemplateModal,
     } = useSelector((state: IRootState) => state.lead);
+    // const { data } = useSelector((state: IRootState) => state?.userInfo);
     const isRtl = useSelector((state: IRootState) => state.themeConfig.rtlClass) === 'rtl' ? true : false;
     const [searchInputText, setSearchInputText] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(false);
-    const [filter, setFilter] = useState<string>('assigned-by-me');
+    const [filter, setFilter] = useState<string>('');
     const [search, setSearch] = useState<string>('');
     const [hideCols, setHideCols] = useState<string[]>([]);
     const [file, setFile] = useState<File>({} as File);
@@ -335,21 +336,8 @@ const ManageLeads = () => {
                         </button>
                     )}
                     <div className="dropdown">
-                        <Dropdown
-                            placement="bottom-start"
-                            btnClassName="btn btn-outline-primary h-full dropdown-toggle"
-                            button={
-                                <>
-                                    <span>Filter</span>
-                                </>
-                            }
-                        >
+                        <Dropdown placement="bottom-start" btnClassName="btn btn-outline-primary h-full dropdown-toggle" button={<span>Filter</span>}>
                             <ul className="!min-w-[170px]">
-                                <li>
-                                    <button type="button" onClick={() => setFilter('assigned-by-me')}>
-                                        Assigned by Me
-                                    </button>
-                                </li>
                                 <li>
                                     <button type="button" onClick={() => setFilter('assigned-to-me')}>
                                         Assigned to Me
