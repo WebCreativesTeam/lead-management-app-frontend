@@ -206,9 +206,10 @@ const EditOverviewForm = () => {
         });
         const uid: string | null = localStorage?.getItem('uid');
         if (uid) {
-            userDropdownList.unshift({ label: 'Self', value: uid });
+            const filteredArray = userDropdownList?.filter((state) => state.value !== uid);
+            filteredArray.unshift({ label: 'Self', value: uid });
+            setUserDropdown(filteredArray);
         }
-        setUserDropdown(userDropdownList);
     }, [usersList]);
 
     return isFetching ? (
@@ -301,19 +302,16 @@ const EditOverviewForm = () => {
                 </div>
             </div>
             <div className="flex flex-col gap-4 sm:flex-row">
-                {defaultAssignedToValue?.value && (
-                    <div className="flex-1">
-                        <label htmlFor="leadAssignTo">Assign To (optional)</label>
-                        <Select
-                            placeholder="Select Lead Assign To"
-                            options={userDropdown}
-                            id="leadAssignTo"
-                            onChange={(e) => setFieldValue('assignedToId', e?.value)}
-                            // defaultValue={defaultAssignedToValue}
-                            // defaultInputValue={values?.ass}
-                        />
-                    </div>
-                )}
+                <div className="flex-1">
+                    <label htmlFor="leadAssignTo">Assign To (optional)</label>
+                    <Select
+                        placeholder="Select Lead Assign To"
+                        options={userDropdown}
+                        id="leadAssignTo"
+                        onChange={(e) => setFieldValue('assignedToId', e?.value)}
+                        defaultValue={defaultAssignedToValue}
+                    />
+                </div>
             </div>
             <div className="mt-8 flex items-center justify-end">
                 <button
