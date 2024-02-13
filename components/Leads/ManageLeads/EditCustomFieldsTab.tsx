@@ -234,7 +234,7 @@ const EditCustomFieldsTab: React.FC = () => {
                                                 data-enable-time={false}
                                                 options={{
                                                     enableTime: false,
-                                                    dateFormat: 'Y-m-d H:i',
+                                                    dateFormat: 'Y-m-d',
                                                     position: 'auto',
                                                 }}
                                                 placeholder={`Select ${item?.label}`}

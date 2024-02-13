@@ -39,27 +39,12 @@ const EditOverviewForm = () => {
     const [userDropdown, setUserDropdown] = useState<SelectOptionsType[]>([] as SelectOptionsType[]);
     const initialValues = {
         estimatedDate: '',
-        branch: {
-            value: '',
-            label: '',
-        },
-        source: {
-            value: '',
-            label: '',
-        },
-        product: {
-            value: '',
-            label: '',
-        },
-        subProduct: {
-            value: '',
-            label: '',
-        },
+        branch: '',
+        source: '',
+        product: '',
+        subProduct: '',
         followUpDate: '',
-        gender: {
-            value: '',
-            label: '',
-        },
+        gender: '',
         zip: '',
         assignedToId: '',
     };
@@ -69,19 +54,20 @@ const EditOverviewForm = () => {
         validateOnChange: false,
         enableReinitialize: true,
         onSubmit: async (value, action) => {
+            console.log(value);
             dispatch(setFetching(true));
             try {
                 dispatch(setDisableBtn(true));
                 const editLeadObj = {
-                    branchId: value.branch.value,
-                    sourceId: values.source.value,
+                    branchId: value.branch,
+                    sourceId: values.source,
                     estimatedDate: value.estimatedDate ? new Date(value.estimatedDate).toISOString() : null,
-                    productId: values.product.value,
-                    gender: values.gender.value,
+                    productId: values.product,
+                    gender: values.gender,
                     followUpDate: value.followUpDate ? new Date(value.followUpDate).toISOString() : null,
                     zip: values.zip.toString(),
-                    subProductId: values.subProduct.value,
-                    assignedToId: values?.assignedToId ? values?.assignedToId : null,
+                    subProductId: value.subProduct,
+                    assignedToId: value?.assignedToId ? value?.assignedToId : null,
                 };
                 console.log(editLeadObj);
                 await new ApiClient().patch('lead/' + singleData?.id, editLeadObj);
@@ -211,8 +197,8 @@ const EditOverviewForm = () => {
             return { label: item?.name, value: item?.id };
         });
         setProductDropdown(createProductDropdown);
-        getAllSubProducts(values?.product?.value || singleData?.product?.id);
-    }, [values.product?.value, singleData]);
+        getAllSubProducts(values?.product || singleData?.product?.id);
+    }, [values.product, singleData]);
 
     useEffect(() => {
         const userDropdownList: SelectOptionsType[] = usersList?.map((item: UserListSecondaryEndpointType) => {
@@ -233,7 +219,7 @@ const EditOverviewForm = () => {
                 {/* {Object.keys(defaultProduct).length > 0 && ( */}
                 <div className="flex-1">
                     <label htmlFor="leadProduct">Product</label>
-                    <Select placeholder="Product" options={productDropdown} id="leadProduct" onChange={(e) => setFieldValue('product', e)} defaultValue={defaultProduct} />
+                    <Select placeholder="Product" options={productDropdown} id="leadProduct" onChange={(data) => setFieldValue('product', data?.value)} defaultValue={defaultProduct} />
                 </div>
                 {/* )} */}
                 {/* {Object.keys(defaultSubProduct).length > 0 && ( */}
@@ -243,9 +229,9 @@ const EditOverviewForm = () => {
                         placeholder="Sub Product"
                         options={subProductDropdown}
                         id="subProduct"
-                        onChange={(e) => setFieldValue('subProduct', e)}
+                        onChange={(data) => setFieldValue('subProduct', data?.value)}
                         defaultValue={defaultSubProduct}
-                        isDisabled={values?.product?.value || singleData?.product?.id || !isLoading ? false : true}
+                        isDisabled={values?.product || singleData?.product?.id || !isLoading ? false : true}
                         // isLoading || Object.keys(defaultProduct).length === 0}
                     />
                 </div>
@@ -289,14 +275,14 @@ const EditOverviewForm = () => {
                 {Object.keys(defaultSourceValue).length > 0 && (
                     <div className="flex-1">
                         <label htmlFor="leadSource"> Source</label>
-                        <Select placeholder="Select Source" options={sourceDropdown} id="leadSource" onChange={(e) => setFieldValue('source', e)} defaultValue={defaultSourceValue} />
+                        <Select placeholder="Select Source" options={sourceDropdown} id="leadSource" onChange={(data) => setFieldValue('source', data?.value)} defaultValue={defaultSourceValue} />
                     </div>
                 )}
 
                 {Object.keys(defaultGender).length > 0 && (
                     <div className="flex-1">
                         <label htmlFor="gender">Gender</label>
-                        <Select placeholder="Select Gender" options={genderList} id="gender" onChange={(e) => setFieldValue('gender', e)} defaultValue={defaultGender} />
+                        <Select placeholder="Select Gender" options={genderList} id="gender" onChange={(data) => setFieldValue('gender', data?.value)} defaultValue={defaultGender} />
                     </div>
                 )}
             </div>
@@ -344,11 +330,11 @@ const EditOverviewForm = () => {
                     type="submit"
                     className="btn  btn-primary cursor-pointer ltr:ml-4 rtl:mr-4"
                     disabled={
-                        (values.source.value || singleData?.source?.id) &&
-                        (values.branch.value || singleData?.branch?.id) &&
-                        (values.product?.value || singleData?.product?.id) &&
-                        (values.subProduct?.value || singleData.subProduct?.id) &&
-                        (values.gender?.value || values.gender) &&
+                        (values.source || singleData?.source?.id) &&
+                        (values.branch || singleData?.branch?.id) &&
+                        (values.product || singleData?.product?.id) &&
+                        (values.subProduct || singleData.subProduct?.id) &&
+                        (values.gender || singleData.gender) &&
                         values.zip &&
                         !isBtnDisabled
                             ? false
