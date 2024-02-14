@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState, useDeferredValue } from 'react';
+import React, { useEffect, useState, useDeferredValue, useRef } from 'react';
 import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
@@ -34,7 +34,7 @@ const Dashboard = () => {
 
     //hooks
     const [loading, setLoading] = useState<boolean>(false);
-    const [followupBy, setFollowupBy] = useState<string>(followUpDropdownList[0]?.value);
+    const [followupBy, setFollowupBy] = useState<SelectOptionsType | null>(null);
     const [leadSatusDropdown, setLeadSatusDropdown] = useState<SelectOptionsType[]>([] as SelectOptionsType[]);
 
     //datatable
@@ -46,7 +46,7 @@ const Dashboard = () => {
         columnAccessor: 'name',
         direction: 'asc',
     });
-    const [selectedStatus, setSelectedStatus] = useState<string>('');
+    const [selectedStatus, setSelectedStatus] = useState<SelectOptionsType | null>(null);
     const [filter, setFilter] = useState('');
     useEffect(() => {
         const data = sortBy(recordsData, sortStatus.columnAccessor);
@@ -68,27 +68,18 @@ const Dashboard = () => {
         getLeadStatus();
     }, []);
 
-    useEffect(() => {
-        if (leadSatusDropdown?.length > 0) {
-            setFilter(`/today?statusId=${leadSatusDropdown[0]?.value}`);
-            setSelectedStatus(leadSatusDropdown[0]?.value);
-        }
-    }, [leadSatusDropdown]);
-
     //get all ScheduleMessage list
     const getFollowUpList = async () => {
-        if (filter) {
-            setLoading(true);
-            const res: GetMethodResponseType = await new ApiClient().get(`lead${filter}&limit=${pageSize}&page=${page}`);
-            const resData: IFollowup[] = res?.data;
-            if (typeof resData === 'undefined') {
-                dispatch(getFollowUps([] as IFollowup[]));
-                return;
-            }
-            dispatch(getFollowUps(resData));
-            dispatch(setDashboardDataLength(res?.meta?.totalCount));
-            setLoading(false);
+        setLoading(true);
+        const res: GetMethodResponseType = await new ApiClient().get(`lead${filter}${!filter ? '?' : ''}limit=${pageSize}&page=${page}`);
+        const resData: IFollowup[] = res?.data;
+        if (typeof resData === 'undefined') {
+            dispatch(getFollowUps([] as IFollowup[]));
+            return;
         }
+        dispatch(getFollowUps(resData));
+        dispatch(setDashboardDataLength(res?.meta?.totalCount));
+        setLoading(false);
     };
 
     // get all Source list
@@ -141,30 +132,46 @@ const Dashboard = () => {
                     <div className="flex-1">
                         <p className="text-lg font-bold">Followups</p>
                     </div>
-                    <div className="flex flex-1 gap-6">
-                        {leadSatusDropdown?.length > 0 && (
-                            <Select
-                                placeholder="Select Status"
-                                className="z-10 flex-1"
-                                options={leadSatusDropdown}
-                                onChange={(data: any) => {
-                                    setFilter(`/${followupBy}?statusId=${data.value}`);
-                                    setSelectedStatus(data.value);
-                                }}
-                                defaultValue={leadSatusDropdown[0]}
-                            />
-                        )}
-
+                    <div className="flex items-stretch gap-6">
+                        <Select
+                            placeholder="Select Status"
+                            className="z-10 flex-1 self-center"
+                            options={leadSatusDropdown}
+                            onChange={(data: any) => {
+                                if (followupBy?.value) {
+                                    setFilter(`/${followupBy?.value}?statusId=${data.value}&`);
+                                } else {
+                                    setFilter(`?statusId=${data.value}&`);
+                                }
+                                setSelectedStatus(data);
+                            }}
+                            value={selectedStatus}
+                        />
                         <Select
                             placeholder="Choose Followup"
                             className="z-10 flex-1"
                             options={followUpDropdownList}
-                            defaultValue={followUpDropdownList[0]}
                             onChange={(data: any) => {
-                                setFilter(`/${data.value}?statusId=${selectedStatus}`);
-                                setFollowupBy(data.value);
+                                if (selectedStatus?.value) {
+                                    setFilter(`/${data.value}?statusId=${selectedStatus?.value}&`);
+                                } else {
+                                    setFilter(`/${data.value}?`);
+                                }
+                                setFollowupBy(data);
                             }}
+                            value={followupBy}
                         />
+                        <button
+                            type="button"
+                            className="btn btn-outline-danger"
+                            onClick={() => {
+                                setFilter('');
+                                setFollowupBy(null);
+                                setSelectedStatus(null);
+                            }}
+                        >
+                            Clear
+                        </button>
                     </div>
                 </div>
 

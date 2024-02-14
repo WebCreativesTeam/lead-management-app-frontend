@@ -173,7 +173,7 @@ const CreateOverviewForm = () => {
         const uid: string | null = localStorage?.getItem('uid');
         if (uid) {
             const filteredArray = userDropdownList?.filter((state) => state.value !== uid);
-            filteredArray.unshift({ label: 'Self', value: uid });
+        filteredArray.unshift({ label: 'Self', value: uid });
             setUserDropdown(filteredArray);
         }
     }, [usersList]);

@@ -275,7 +275,7 @@ const EditOverviewForm = () => {
             <div className="flex flex-col gap-4 sm:flex-row">
                 {Object.keys(defaultSourceValue).length > 0 && (
                     <div className="flex-1">
-                        <label htmlFor="leadSource"> Source</label>
+                        <label htmlFor="leadSource">Source</label>
                         <Select placeholder="Select Source" options={sourceDropdown} id="leadSource" onChange={(data) => setFieldValue('source', data?.value)} defaultValue={defaultSourceValue} />
                     </div>
                 )}

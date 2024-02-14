@@ -105,7 +105,7 @@ const ManageLeads = () => {
         emailTemplateModal,
         smsTemplateModal,
     } = useSelector((state: IRootState) => state.lead);
-    // const { data } = useSelector((state: IRootState) => state?.userInfo);
+    const { data: userDetails } = useSelector((state: IRootState) => state?.userInfo);
     const isRtl = useSelector((state: IRootState) => state.themeConfig.rtlClass) === 'rtl' ? true : false;
     const [searchInputText, setSearchInputText] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(false);
@@ -135,7 +135,7 @@ const ManageLeads = () => {
     //get all lead after page render
     useEffect(() => {
         getLeadsList();
-    }, [isFetching, pageSize, page, searchQuery]);
+    }, [isFetching, pageSize, page, searchQuery, filter]);
 
     useEffect(() => {
         getLeadsPriority();
@@ -155,7 +155,7 @@ const ManageLeads = () => {
     //get all leads list
     const getLeadsList = async () => {
         setLoading(true);
-        const res: GetMethodResponseType = await new ApiClient().get(`lead?limit=${pageSize}&page=${page}&search=${searchQuery}`);
+        const res: GetMethodResponseType = await new ApiClient().get(`lead?${filter}&limit=${pageSize}&page=${page}&search=${searchQuery}`);
         const leads: LeadDataType[] | undefined = res?.data;
         if (typeof leads === 'undefined') {
             dispatch(getAllLeads([] as LeadDataType[]));
@@ -339,7 +339,7 @@ const ManageLeads = () => {
                         <Dropdown placement="bottom-start" btnClassName="btn btn-outline-primary h-full dropdown-toggle" button={<span>Filter</span>}>
                             <ul className="!min-w-[170px]">
                                 <li>
-                                    <button type="button" onClick={() => setFilter('assigned-to-me')}>
+                                    <button type="button" onClick={() => setFilter(`assignedToId=${userDetails?.id}`)}>
                                         Assigned to Me
                                     </button>
                                 </li>
