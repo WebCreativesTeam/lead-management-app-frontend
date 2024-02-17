@@ -217,7 +217,7 @@ const CustomFieldsTab = () => {
                                                 name={item?.id}
                                                 className="form-input"
                                                 onChange={(e) => {
-                                                    setFieldValue(item?.id, e[0].toISOString());
+                                                    setFieldValue(item?.id, e[0].toLocaleDateString());
                                                     if (e[0].toISOString() && item?.required) {
                                                         setErrorObj((preVal: any) => {
                                                             return { ...preVal, [item?.id]: undefined };

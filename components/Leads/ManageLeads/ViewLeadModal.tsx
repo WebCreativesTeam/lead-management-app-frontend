@@ -63,8 +63,6 @@ const LeadViewModal = () => {
         }
     }, [productDropdown, singleData]);
 
-    console.log(singleData);
-
     const reqData: any = {
         branch: branch?.name,
         ['Contact Name']: `${contact?.title} ${contact?.name}`,
@@ -74,7 +72,7 @@ const LeadViewModal = () => {
         gender: defaultGender?.label,
         product: defaultProduct?.label,
         ['Assigned To']: `${assignedTo?.firstName} ${assignedTo?.lastName} (${assignedTo?.email})`,
-        ['Sub Product']: defaultSubProduct?.label,
+        ['Sub Product']: singleData?.subProduct?.name,
         ['Pin Code']: zip,
         priority: (
             <span className={`rounded px-2.5 py-0.5 text-sm font-medium dark:bg-blue-900 dark:text-blue-300`} style={{ color: priority?.color, backgroundColor: priority?.color + '20' }}>
@@ -87,12 +85,10 @@ const LeadViewModal = () => {
             </span>
         ),
         ['Follow Up Date']: followUpDate ? new Date(followUpDate).toLocaleString() : 'Pending',
-        ['Estimate Purchase Date']: estimatedDate ? new Date(estimatedDate).toLocaleDateString() : 'Pending',
+        ['Estimated Purchase Date']: estimatedDate ? new Date(estimatedDate).toLocaleDateString() : 'Pending',
         ['Created']: new Date(createdAt).toLocaleString(),
         ['Updated']: new Date(updatedAt).toLocaleString(),
     };
-
-    // janxk60
 
     useEffect(() => {
         const result = Object.keys(singleData?.customFields).map((key) => {
