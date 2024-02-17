@@ -1,11 +1,11 @@
-import { LeadStatusSecondaryEndpoint } from '@/utils/Types';
+import { IDashboardStatisticsResponse, LeadStatusSecondaryEndpoint } from '@/utils/Types';
 import { DashboardInitialStateProps, SourceDataType, UserDataType, ILeadStatus, IFollowup } from '@/utils/Types';
 import { PAGE_SIZES, fetchUserInfo } from '@/utils/contant';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 const initialState: DashboardInitialStateProps = {
     data: [] as IFollowup[],
-    sourceList: [] as SourceDataType[],
+    statisticsData: {} as IDashboardStatisticsResponse,
     leadStatusList: [] as LeadStatusSecondaryEndpoint[],
     singleData: {} as IFollowup,
     createModal: false,
@@ -84,10 +84,9 @@ const dashboardSlice = createSlice({
         getAllLeadStatusForDashboard(state, action: PayloadAction<LeadStatusSecondaryEndpoint[]>) {
             state.leadStatusList = action.payload;
         },
-        getAllSourceForDashboard(state, action: PayloadAction<SourceDataType[]>) {
-            state.sourceList = action.payload;
+        setDashboardStatisticsData(state, action: PayloadAction<IDashboardStatisticsResponse>) {
+            state.statisticsData = action.payload;
         },
-
         setDisableBtn(state, action) {
             state.isBtnDisabled = action.payload;
         },
@@ -129,6 +128,6 @@ export const {
     setDashboardUpdatePermission,
     setDashboardDataLength,
     getAllLeadStatusForDashboard,
-    getAllSourceForDashboard,
+    setDashboardStatisticsData,
 } = dashboardSlice.actions;
 export default dashboardSlice.reducer;

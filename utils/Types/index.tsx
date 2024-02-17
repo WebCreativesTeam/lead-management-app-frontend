@@ -10,6 +10,17 @@ export type GetMethodResponseType = {
     };
 };
 
+export interface IDashboardStatisticsResponse {
+    status: string;
+    data: {
+        followup_today: number;
+        followup_tomorrow: number;
+        followup_pending: number;
+        leads_total: number;
+        leads_new: number;
+    };
+}
+
 export interface ICommonResponse {
     id: string;
     createdAt: string;
@@ -363,7 +374,7 @@ export type LeadDataType = {
         id: string;
         firstName: string;
         lastName: string;
-        email?: string
+        email?: string;
     };
 };
 
@@ -684,7 +695,7 @@ export interface CampaignInitialStateProps extends InitialStateProps {
 export interface DashboardInitialStateProps extends InitialStateProps {
     data: IFollowup[];
     singleData: IFollowup;
-    sourceList: SourceDataType[];
+    statisticsData: IDashboardStatisticsResponse;
     leadStatusList: LeadStatusSecondaryEndpoint[];
 }
 

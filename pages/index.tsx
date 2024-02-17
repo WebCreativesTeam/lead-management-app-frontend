@@ -7,7 +7,7 @@ import { sortBy, values } from 'lodash';
 import { ChatIcon, Delete, Edit, Email, View, Sms } from '@/utils/icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { setPageTitle } from '@/store/themeConfigSlice';
-import { GetMethodResponseType, IFollowup, ILeadStatus, LeadStatusSecondaryEndpoint, SelectOptionsType, SourceDataType } from '@/utils/Types';
+import { GetMethodResponseType, IDashboardStatisticsResponse, IFollowup, ILeadStatus, LeadStatusSecondaryEndpoint, SelectOptionsType, SourceDataType } from '@/utils/Types';
 import { ApiClient } from '@/utils/http';
 import { IRootState } from '@/store';
 import Select from 'react-select';
@@ -16,7 +16,7 @@ import ScheduleMessageViewModal from '@/components/Campaign/CampaignViewModal';
 import ScheduleMessageEditModal from '@/components/Campaign/CampaignEditModal';
 import ScheduleMessageDeleteModal from '@/components/Campaign/CampaignDeleteModal';
 import { followUpDropdownList } from '@/utils/Raw Data';
-import { getAllLeadStatusForDashboard, getFollowUps, setDashboardDataLength } from '@/store/Slices/dashbordSlice';
+import { getAllLeadStatusForDashboard, getFollowUps, setDashboardDataLength, setDashboardStatisticsData } from '@/store/Slices/dashbordSlice';
 import FollowUpCard from '@/components/Dashboard/FollowUpCard';
 import { setEmailTemplateModal, setSmsTemplateModal, setWhatsappTemplateModal } from '@/store/Slices/leadSlice/manageLeadSlice';
 import WhatsappTemplateModal from '@/components/Leads/ManageLeads/WhatsappTemplateModal';
@@ -28,7 +28,7 @@ const Dashboard = () => {
     useEffect(() => {
         dispatch(setPageTitle('Track Leads | ScheduleMessages'));
     });
-    const { data, isFetching, totalRecords, leadStatusList } = useSelector((state: IRootState) => state.dashboard);
+    const { data, isFetching, totalRecords, leadStatusList, statisticsData } = useSelector((state: IRootState) => state.dashboard);
 
     const { whatsAppTemplateModal, emailTemplateModal, smsTemplateModal } = useSelector((state: IRootState) => state.lead);
 
@@ -64,7 +64,7 @@ const Dashboard = () => {
     }, [data]);
 
     useEffect(() => {
-        getAllSourceList();
+        getDashboardStatistics();
         getLeadStatus();
     }, []);
 
@@ -82,15 +82,11 @@ const Dashboard = () => {
         setLoading(false);
     };
 
-    // get all Source list
-    const getAllSourceList = async () => {
-        const sourceList: GetMethodResponseType = await new ApiClient().get('source/list');
-        const source: SourceDataType[] = sourceList?.data;
-        if (typeof source === 'undefined') {
-            dispatch(getAllSourceForCampaign([] as SourceDataType[]));
-            return;
-        }
-        dispatch(getAllSourceForCampaign(source));
+    // get dashboard statistics data
+    const getDashboardStatistics = async () => {
+        const dashboardStatisticResponse: IDashboardStatisticsResponse = await new ApiClient().get('lead/statistics');
+
+        dispatch(setDashboardStatisticsData(dashboardStatisticResponse));
     };
 
     // get all lead status list
@@ -121,11 +117,11 @@ const Dashboard = () => {
     return (
         <div>
             <div className="mb-6 grid grid-cols-1 gap-6 text-white sm:grid-cols-2 xl:grid-cols-3">
-                <FollowUpCard title="Today Followups" followUpPercentage="-2.35%" followups={74137} lastWeekFollowUps={84709} color="#06b6d4" />
-                <FollowUpCard title="Tomorrow Followups" followUpPercentage="-2.35%" followups={74137} lastWeekFollowUps={84709} color="#8b5cf6" />
-                <FollowUpCard title="Pending Followups" followUpPercentage="+ 1.35%" followups={38085} lastWeekFollowUps={37894} color="#3b82f6" />
-                <FollowUpCard title="Total Leads" followUpPercentage="+ 1.35%" followups={38085} lastWeekFollowUps={37894} color="#d946ef" />
-                <FollowUpCard title="Total Fresh Leads" followUpPercentage="+ 1.35%" followups={38085} lastWeekFollowUps={37894} color="#3b82f6" />
+                <FollowUpCard title="Today Followups" followups={statisticsData?.data?.followup_today} color="#06b6d4" />
+                <FollowUpCard title="Tomorrow Followups" followups={statisticsData?.data?.followup_tomorrow} color="#8b5cf6" />
+                <FollowUpCard title="Pending Followups" followups={statisticsData?.data?.followup_pending} color="#3b82f6" />
+                <FollowUpCard title="Total Leads" followups={statisticsData?.data?.leads_total} color="#d946ef" />
+                <FollowUpCard title="Total Fresh Leads" followups={statisticsData?.data?.leads_new} color="#3b82f6" />
             </div>
             <div className="datatables panel mt-6">
                 <div className="z-10 my-6 flex flex-col items-center gap-5 sm:flex-row">
