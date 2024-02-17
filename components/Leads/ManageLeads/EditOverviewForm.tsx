@@ -32,7 +32,7 @@ const EditOverviewForm = () => {
     const [defaultAssignedToValue, setDefaultAssigedToValue] = useState<SelectOptionsType>({} as SelectOptionsType);
     const [defaultBranch, setDefaultBranch] = useState<SelectOptionsType>({} as SelectOptionsType);
     const [defaultProduct, setDefaultProduct] = useState<SelectOptionsType>({} as SelectOptionsType);
-    const [defaultSubProduct, setDefaultSubProduct] = useState<SelectOptionsType>({} as SelectOptionsType);
+    const [defaultSubProduct, setDefaultSubProduct] = useState<SelectOptionsType | null>(null);
     const [defaultGender, setDefaultGender] = useState<SelectOptionsType>({} as SelectOptionsType);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [subProductDropdown, setsubProductDropdown] = useState<SelectOptionsType[]>([] as SelectOptionsType[]);
@@ -220,7 +220,17 @@ const EditOverviewForm = () => {
                 {/* {Object.keys(defaultProduct).length > 0 && ( */}
                 <div className="flex-1">
                     <label htmlFor="leadProduct">Product</label>
-                    <Select placeholder="Product" options={productDropdown} id="leadProduct" onChange={(data) => setFieldValue('product', data?.value)} defaultValue={defaultProduct} />
+                    <Select
+                        placeholder="Product"
+                        options={productDropdown}
+                        id="leadProduct"
+                        onChange={(data: any) => {
+                            setDefaultProduct({ label: data?.label, value: data?.value });
+                            setFieldValue('product', data?.value);
+                            setDefaultSubProduct(null);
+                        }}
+                        value={defaultProduct}
+                    />
                 </div>
                 {/* )} */}
                 {/* {Object.keys(defaultSubProduct).length > 0 && ( */}
@@ -230,9 +240,12 @@ const EditOverviewForm = () => {
                         placeholder="Sub Product"
                         options={subProductDropdown}
                         id="subProduct"
-                        onChange={(data) => setFieldValue('subProduct', data?.value)}
-                        defaultValue={defaultSubProduct}
-                        isDisabled={values?.product || singleData?.product?.id || !isLoading ? false : true}
+                        onChange={(data: any) => {
+                            setDefaultSubProduct({ label: data?.label, value: data?.value });
+                            setFieldValue('subProduct', data?.value);
+                        }}
+                        value={defaultSubProduct}
+                        isDisabled={defaultProduct?.value && !isLoading ? false : true}
                         // isLoading || Object.keys(defaultProduct).length === 0}
                     />
                 </div>
@@ -308,8 +321,12 @@ const EditOverviewForm = () => {
                         placeholder="Select Lead Assign To"
                         options={userDropdown}
                         id="leadAssignTo"
-                        onChange={(e) => setFieldValue('assignedToId', e?.value)}
-                        defaultValue={defaultAssignedToValue}
+                        onChange={(e: any) => {
+                            setDefaultAssigedToValue({ label: e?.label, value: e?.value });
+                            setFieldValue('assignedToId', e?.value);
+                        }}
+                        // defaultValue={defaultAssignedToValue}
+                        value={defaultAssignedToValue}
                     />
                 </div>
             </div>
