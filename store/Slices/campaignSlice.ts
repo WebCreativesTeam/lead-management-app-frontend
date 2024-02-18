@@ -58,13 +58,6 @@ const campaignSlice = createSlice({
         });
         builder.addCase(getCustomDateFieldsList.fulfilled, (state, action: PayloadAction<ICustomField[]>) => {
             state.customDateFields = action.payload;
-            state.isFetching = false;
-        });
-        builder.addCase(getCustomDateFieldsList.pending, (state) => {
-            state.isFetching = true;
-        });
-        builder.addCase(getCustomDateFieldsList.rejected, (state) => {
-            state.isFetching = false;
         });
     },
     reducers: {

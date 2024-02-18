@@ -12,7 +12,7 @@ import { ICustomField, ILeadStatus, ProductSecondaryEndpointType, SourceDataType
 import Flatpickr from 'react-flatpickr';
 import Select from 'react-select';
 import 'flatpickr/dist/flatpickr.css';
-import { campaignTypeList, platformListRawData, sendToDropdown } from '@/utils/Raw Data';
+import { campaignTypeList, contactDateDropdown, leadDateDropdown, platformListRawData, sendToDropdown } from '@/utils/Raw Data';
 
 type SelectOptionsType = {
     value: string;
@@ -41,7 +41,10 @@ const CampaignCreateModal = () => {
             sendAfter: '',
             sendBefore: '',
             type: '',
-            customDate: '',
+            customDate: {
+                label: '',
+                value: '',
+            },
             sendTo: '',
             statusId: '',
             isActive: false,
@@ -108,7 +111,7 @@ const CampaignCreateModal = () => {
             } else if (value.type === 'DRIP') {
                 campaignCreateObj.sendAfter = value.sendAfter.toString();
             } else {
-                campaignCreateObj.customDateId = value.customDate;
+                campaignCreateObj.customDateId = value.customDate?.value;
                 campaignCreateObj.sendBefore = value.sendBefore.toString();
             }
 
@@ -146,11 +149,16 @@ const CampaignCreateModal = () => {
     }, [formik.values.instance]);
 
     useEffect(() => {
-        const createCustomFieldDropdown: SelectOptionsType[] = customDateFields?.map((item: ICustomField) => {
-            return { label: item?.label, value: item?.id };
-        });
-        setCustomFieldList(createCustomFieldDropdown);
-    }, [customDateFields]);
+        if (formik.values?.sendTo === 'LEAD') {
+            const createCustomFieldDropdown: SelectOptionsType[] = customDateFields?.map((item: ICustomField) => {
+                return { label: item?.label, value: item?.id };
+            });
+            const combinedLeadDateListDropdown = leadDateDropdown.concat(createCustomFieldDropdown);
+            setCustomFieldList(combinedLeadDateListDropdown);
+        } else if (formik.values?.sendTo === 'CONTACT') {
+            setCustomFieldList(contactDateDropdown);
+        }
+    }, [customDateFields, formik.values?.sendTo]);
 
     useEffect(() => {
         const createLeadStatusDropdown: SelectOptionsType[] = leadStatusList.map((item: ILeadStatus) => {
@@ -218,6 +226,8 @@ const CampaignCreateModal = () => {
     function padTo2Digits(num: number) {
         return String(num).padStart(2, '0');
     }
+
+    console.log(formik.values);
 
     return (
         <Modal
@@ -338,7 +348,12 @@ const CampaignCreateModal = () => {
                                 {formik.values.type === 'OCCASIONAL' && (
                                     <div className="flex-1">
                                         <label htmlFor="customDate">Date</label>
-                                        <Select placeholder="Select Date" options={customFieldList} onChange={(data: any) => formik.setFieldValue('customDate', data.value)} />
+                                        <Select
+                                            placeholder="Select Date"
+                                            options={customFieldList}
+                                            onChange={(data: any) => formik.setFieldValue('customDate', data)}
+                                            value={formik.values.customDate?.value ? formik.values.customDate : null}
+                                        />
                                     </div>
                                 )}
                                 <div className="flex-1">
@@ -370,6 +385,7 @@ const CampaignCreateModal = () => {
                                         onChange={(data: any) => {
                                             formik.setFieldValue('sendTo', data.value);
                                             formik.setFieldValue('isAllStatus', true);
+                                            formik.setFieldValue('customDate', null);
                                         }}
                                     />
                                 </div>

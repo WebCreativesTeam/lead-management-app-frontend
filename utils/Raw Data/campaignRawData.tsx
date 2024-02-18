@@ -1,4 +1,9 @@
-import { ICampaign, SelectOptionsType, CampaignType } from '../Types';
+import { ICampaign, CampaignType } from '../Types';
+
+type SelectOptionsType = {
+    value: string;
+    label: string;
+};
 
 // export const campaignRawData: ICampaign[] = [
 //     {
@@ -64,6 +69,13 @@ export const sendToDropdown: { value: string; label: string }[] = [
         value: 'CONTACT',
     },
 ];
+
+export const contactDateDropdown: SelectOptionsType[] = [
+    { label: 'Date Of Birth', value: 'DOB' },
+    { label: 'Wedding Anniversary', value: 'anniversary' },
+];
+
+export const leadDateDropdown: SelectOptionsType[] = [...contactDateDropdown, { label: 'FollowUp Date', value: 'followUpDate' }, { label: 'Estimated Purchase Date', value: 'estimatedDate' }];
 
 // export const platformListDropdown: SelectOptionsType[] = [
 //     {
