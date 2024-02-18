@@ -75,13 +75,6 @@ const CampaignEditModal = () => {
         if (findSendToDefaultValue) {
             setDefaultSendToValue(findSendToDefaultValue);
         }
-
-        const findLeadStatusDefaultValue: SelectOptionsType | undefined = leadStatusDropdown.find((item: SelectOptionsType) => item.value === singleData?.status?.id);
-        if (findLeadStatusDefaultValue) {
-            setDefaultLeadStatusValue(findLeadStatusDefaultValue);
-        } else {
-            setDefaultLeadStatusValue({ label: 'All', value: 'All' });
-        }
     }, [singleData]);
 
     useEffect(() => {
@@ -94,6 +87,17 @@ const CampaignEditModal = () => {
             }
         }
     }, [sourceDropdown, singleData]);
+
+    useEffect(() => {
+        if (singleData?.isAllStatus) {
+            setDefaultLeadStatusValue({ label: 'All', value: 'All' });
+        } else {
+            const findLeadStatusDefaultValue: SelectOptionsType | undefined = leadStatusDropdown.find((item: SelectOptionsType) => item.value === singleData?.status?.id);
+            if (findLeadStatusDefaultValue?.value) {
+                setDefaultLeadStatusValue(findLeadStatusDefaultValue);
+            }
+        }
+    }, [leadStatusDropdown, singleData]);
 
     useEffect(() => {
         if (singleData?.sendTo === 'LEAD') {
@@ -300,7 +304,6 @@ const CampaignEditModal = () => {
         }
     }, [singleData, formik.values.sendTo]);
 
-    // console.log(singleData);
 
     return (
         <Modal
@@ -449,8 +452,9 @@ const CampaignEditModal = () => {
                                             formik.setFieldValue('sendTo', data.value);
                                             formik.setFieldValue('isAllStatus', true);
                                             formik.setFieldValue('customDateId', null);
+                                            setDefaultSendToValue({ label: data?.label, value: data?.value });
                                         }}
-                                        defaultValue={defaultSendToValue}
+                                        value={defaultSendToValue}
                                     />
                                 </div>
                                 <div className="flex-1">
@@ -461,12 +465,14 @@ const CampaignEditModal = () => {
                                         onChange={(data: any) => {
                                             if (data.value === 'All') {
                                                 formik.setFieldValue('isAllSource', true);
+                                                setDefaultSourceValue({ label: 'All', value: 'All' });
                                             } else {
+                                                setDefaultSourceValue({ label: data?.label, value: data?.value });
                                                 formik.setFieldValue('sourceId', data.value);
                                                 formik.setFieldValue('isAllSource', false);
                                             }
                                         }}
-                                        defaultValue={defaultSourceValue}
+                                        value={defaultSourceValue}
                                     />
                                 </div>
                             </div>
@@ -481,12 +487,14 @@ const CampaignEditModal = () => {
                                             onChange={(data: any) => {
                                                 if (data.value === 'All') {
                                                     formik.setFieldValue('isAllStatus', true);
+                                                    setDefaultLeadStatusValue({ label: 'All', value: 'All' });
                                                 } else {
                                                     formik.setFieldValue('statusId', data.value);
                                                     formik.setFieldValue('isAllStatus', false);
+                                                    setDefaultLeadStatusValue({ label: data?.label, value: data?.value });
                                                 }
                                             }}
-                                            defaultValue={defaultLeadStatusValue}
+                                            value={defaultLeadStatusValue}
                                         />
                                     </div>
                                     <div className="flex-1">
@@ -497,12 +505,14 @@ const CampaignEditModal = () => {
                                             onChange={(data: any) => {
                                                 if (data.value === 'All') {
                                                     formik.setFieldValue('isAllProduct', true);
+                                                    setDefaultProductValue({ label: 'All', value: 'All' });
                                                 } else {
                                                     formik.setFieldValue('productId', data.value);
                                                     formik.setFieldValue('isAllProduct', false);
+                                                    setDefaultProductValue({ label: data?.label, value: data?.value });
                                                 }
                                             }}
-                                            defaultValue={defaultProductValue}
+                                            value={defaultProductValue}
                                         />
                                     </div>
                                 </div>
