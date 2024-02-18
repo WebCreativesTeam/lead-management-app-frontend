@@ -20,7 +20,7 @@ import { GetMethodResponseType, ICustomField, ILeadStatus, LeadStatusSecondaryEn
 import Flatpickr from 'react-flatpickr';
 import Select from 'react-select';
 import 'flatpickr/dist/flatpickr.css';
-import { platformListRawData, sendToDropdown } from '@/utils/Raw Data';
+import { contactDateDropdown, leadDateDropdown, platformListRawData, sendToDropdown } from '@/utils/Raw Data';
 
 type SelectOptionsType = {
     value: string;
@@ -61,12 +61,12 @@ const CampaignEditModal = () => {
         if (singleData.isAllProduct) {
             formik.setFieldValue('isAllProduct', singleData?.isAllProduct);
         } else {
-            formik.setFieldValue('productId', singleData?.productId);
+            formik.setFieldValue('productId', singleData?.product?.id);
         }
         if (singleData.isAllSource) {
             formik.setFieldValue('isAllSource', singleData?.isAllSource);
         } else {
-            formik.setFieldValue('sourceId', singleData?.sourceId);
+            formik.setFieldValue('sourceId', singleData?.source?.id);
         }
         formik.setFieldValue('isActive', singleData?.isActive);
         formik.setFieldValue('instance', singleData?.instance);
@@ -76,32 +76,46 @@ const CampaignEditModal = () => {
             setDefaultSendToValue(findSendToDefaultValue);
         }
 
-        const findProductDefaultValue: SelectOptionsType | undefined = productDropdown.find((item: SelectOptionsType) => item.value === singleData?.productId);
-        if (findProductDefaultValue) {
-            setDefaultProductValue(findProductDefaultValue);
-        } else {
-            setDefaultProductValue({ label: 'All', value: 'All' });
-        }
-
-        const findSourceDefaultValue: SelectOptionsType | undefined = sourceDropdown.find((item: SelectOptionsType) => item.value === singleData?.sourceId);
-        if (findSourceDefaultValue) {
-            setDefaultSourceValue(findSourceDefaultValue);
-        } else {
-            setDefaultSourceValue({ label: 'All', value: 'All' });
-        }
-
         const findLeadStatusDefaultValue: SelectOptionsType | undefined = leadStatusDropdown.find((item: SelectOptionsType) => item.value === singleData?.status?.id);
         if (findLeadStatusDefaultValue) {
             setDefaultLeadStatusValue(findLeadStatusDefaultValue);
         } else {
             setDefaultLeadStatusValue({ label: 'All', value: 'All' });
         }
+    }, [singleData]);
 
+    useEffect(() => {
+        if (singleData?.isAllSource) {
+            setDefaultSourceValue({ label: 'All', value: 'All' });
+        } else {
+            const findSourceDefaultValue: SelectOptionsType | undefined = sourceDropdown.find((item: SelectOptionsType) => item.value === singleData?.source?.id);
+            if (findSourceDefaultValue?.value) {
+                setDefaultSourceValue(findSourceDefaultValue);
+            }
+        }
+    }, [sourceDropdown, singleData]);
+
+    useEffect(() => {
+        if (singleData?.sendTo === 'LEAD') {
+            if (singleData?.isAllProduct) {
+                setDefaultProductValue({ label: 'All', value: 'All' });
+            } else {
+                const findProductDefaultValue: SelectOptionsType | undefined = productDropdown.find((item: SelectOptionsType) => item.value === singleData?.product?.id);
+
+                if (findProductDefaultValue) {
+                    setDefaultProductValue(findProductDefaultValue);
+                }
+            }
+            console.log(singleData);
+        }
+    }, [productDropdown, singleData]);
+
+    useEffect(() => {
         const findCustomDateDefaultValue: SelectOptionsType | undefined = customFieldList.find((item: SelectOptionsType) => item.value === singleData?.customDateId);
         if (findCustomDateDefaultValue) {
             setDefaultCustomDateValue(findCustomDateDefaultValue);
         }
-    }, [singleData]);
+    }, [customFieldList, singleData]);
 
     const dispatch = useDispatch<AppDispatch>();
     const formik = useFormik({
@@ -112,7 +126,10 @@ const CampaignEditModal = () => {
             sendAfter: '',
             sendBefore: '',
             type: '',
-            customDateId: '',
+            customDateId: {
+                label: '',
+                value: '',
+            },
             sendTo: '',
             statusId: '',
             isActive: false,
@@ -146,6 +163,7 @@ const CampaignEditModal = () => {
                     campaignEditObj.isAllProduct = true;
                 } else if (value.isAllStatus && !value.isAllProduct) {
                     campaignEditObj.productId = value.productId;
+                    campaignEditObj.isAllProduct = false;
                     campaignEditObj.isAllStatus = true;
                 } else if (!value.isAllStatus && value.isAllProduct) {
                     campaignEditObj.statusId = value.statusId;
@@ -162,7 +180,7 @@ const CampaignEditModal = () => {
             } else if (singleData.type === 'DRIP') {
                 campaignEditObj.sendAfter = value.sendAfter.toString();
             } else {
-                campaignEditObj.customDateId = value.customDateId;
+                campaignEditObj.customDateId = value.customDateId?.value;
                 campaignEditObj.sendBefore = value.sendBefore.toString();
             }
 
@@ -192,11 +210,16 @@ const CampaignEditModal = () => {
     });
 
     useEffect(() => {
-        const editCustomFieldDropdown: SelectOptionsType[] = customDateFields?.map((item: ICustomField) => {
-            return { label: item?.label, value: item?.id };
-        });
-        setCustomFieldList(editCustomFieldDropdown);
-    }, [customDateFields]);
+        if (formik.values?.sendTo === 'LEAD') {
+            const createCustomFieldDropdown: SelectOptionsType[] = customDateFields?.map((item: ICustomField) => {
+                return { label: item?.label, value: item?.id };
+            });
+            const combinedLeadDateListDropdown = leadDateDropdown.concat(createCustomFieldDropdown);
+            setCustomFieldList(combinedLeadDateListDropdown);
+        } else if (formik.values?.sendTo === 'CONTACT') {
+            setCustomFieldList(contactDateDropdown);
+        }
+    }, [customDateFields, formik.values?.sendTo]);
 
     useEffect(() => {
         const editLeadStatusDropdown: SelectOptionsType[] = leadStatusList.map((item: ILeadStatus) => {
@@ -271,6 +294,14 @@ const CampaignEditModal = () => {
         setPlatformDropdown(filteredDropdown);
     }, [formik.values.instance]);
 
+    useEffect(() => {
+        if (singleData?.type === 'OCCASIONAL' && formik.values.sendTo === 'LEAD') {
+            dispatch(getCustomDateFieldsList());
+        }
+    }, [singleData, formik.values.sendTo]);
+
+    // console.log(singleData);
+
     return (
         <Modal
             open={editModal}
@@ -288,7 +319,7 @@ const CampaignEditModal = () => {
                 formik.values.name &&
                 formik.values.sendTo &&
                 (formik.values.sourceId || formik.values.isAllSource) &&
-                (formik.values.productId || formik.values.isAllProduct) &&
+                (formik.values.sendTo === 'LEAD' ? formik.values.productId || formik.values.isAllProduct : true) &&
                 formik.values.instance[formik.values.instance.length - 1].platform &&
                 formik.values.instance[formik.values.instance.length - 1].templateId &&
                 formik.values.instance.length <= 3 &&
@@ -380,8 +411,11 @@ const CampaignEditModal = () => {
                                         <Select
                                             placeholder="Select Date"
                                             options={customFieldList}
-                                            onChange={(data: any) => formik.setFieldValue('customDateId', data.value)}
-                                            defaultValue={defaultCustomDateValue}
+                                            onChange={(data: any) => {
+                                                formik.setFieldValue('customDateId', data);
+                                                setDefaultCustomDateValue(data);
+                                            }}
+                                            value={defaultCustomDateValue?.value ? defaultCustomDateValue : null}
                                         />
                                     </div>
                                 )}
@@ -414,6 +448,7 @@ const CampaignEditModal = () => {
                                         onChange={(data: any) => {
                                             formik.setFieldValue('sendTo', data.value);
                                             formik.setFieldValue('isAllStatus', true);
+                                            formik.setFieldValue('customDateId', null);
                                         }}
                                         defaultValue={defaultSendToValue}
                                     />

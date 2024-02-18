@@ -433,8 +433,8 @@ export interface ICampaign {
     id: string;
     type: 'SCHEDULED' | 'DRIP' | 'OCCASIONAL';
     name: string;
-    sourceId: string;
-    productId: string;
+    source: SourceDataType;
+    product: ProductSecondaryEndpointType;
     customDateId: string;
     status: ILeadStatus;
     sendBefore: string;

@@ -227,8 +227,6 @@ const CampaignCreateModal = () => {
         return String(num).padStart(2, '0');
     }
 
-    console.log(formik.values);
-
     return (
         <Modal
             open={createModal}
